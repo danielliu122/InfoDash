@@ -14,7 +14,6 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY, // Ensure your API key is set in the environment
 });
 
-
 const app = express();
 const port = process.env.PORT || 3000;
 
