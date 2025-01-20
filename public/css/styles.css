@@ -346,19 +346,19 @@ footer {
 
 /* Reddit thumbnail styles */
 .reddit-thumbnail {
-    width: 100%;
-    max-width: 150px;
-    height: auto;
+    width: 100%; /* Ensure the image takes full width of its container */
+    max-width: 300px; /* Increase the max-width to make images larger */
+    height: auto; /* Maintain aspect ratio */
     border-radius: 4px;
     margin-bottom: 10px;
-    object-fit: cover;
+    object-fit: cover; /* Ensure the image covers the area without distortion */
 }
 
 /* Reddit video styles */
 .reddit-video {
-    width: 100%;
-    max-width: 300px;
-    height: auto;
+    width: 100%; /* Ensure the video takes full width of its container */
+    max-width: 300px; /* Set a max-width for the video */
+    height: auto; /* Maintain aspect ratio */
     border-radius: 4px;
     margin-bottom: 10px;
 }

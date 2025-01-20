@@ -102,7 +102,7 @@ export const renderMedia = (post) => {
     if (post.media && post.media.reddit_video && post.media.reddit_video.fallback_url) {
         const videoSrc = post.media.reddit_video.fallback_url;
         mediaHtml += `
-            <video controls class="reddit-video">
+            <video controls class="reddit-video" muted="false">
                 <source src="${videoSrc}" type="video/mp4">
                 Your browser does not support the video tag.
             </video><br>`;
