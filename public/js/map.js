@@ -127,30 +127,8 @@ function initMap() {
     isMapInitialized = true;
     console.log('Map initialized');
 
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-
-                map.setCenter(pos);
-                map.setZoom(12);
-
-                updateTrafficInfo(pos);
-
-                //console.log('Map centered on current location');
-            },
-            () => {
-                console.warn('Geolocation permission denied or failed. Using default center.');
-                updateTrafficInfo(defaultCenter);
-            }
-        );
-    } else {
-        console.warn('Geolocation not supported. Using default center.');
-        updateTrafficInfo(defaultCenter);
-    }
+    // Add event listener for map interaction to request location
+    map.addListener('click', requestLocation);
 
     // Add a button to re-center the map to the user's current location
     const locationButton = document.createElement("button");
@@ -158,32 +136,7 @@ function initMap() {
     locationButton.className = "location-button";
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(locationButton);
 
-    locationButton.addEventListener("click", () => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const pos = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-
-                    map.setCenter(pos);
-                    map.setZoom(12);
-
-                    updateTrafficInfo(pos);
-
-                    //console.log('Map re-centered on current location');
-                },
-                () => {
-                    console.warn('Geolocation permission denied or failed. Using default center.');
-                    updateTrafficInfo(defaultCenter);
-                }
-            );
-        } else {
-            console.warn('Geolocation not supported. Using default center.');
-            updateTrafficInfo(defaultCenter);
-        }
-    });
+    locationButton.addEventListener("click", requestLocation);
 
     const debouncedUpdate = debounce(async () => {
         const center = map.getCenter();
@@ -208,6 +161,30 @@ const updateTrafficInfo = async (location) => {
         return;
     }
     //console.log('Updating traffic info for location:', location);
+}
+
+// New function to request location
+function requestLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                map.setCenter(pos);
+                map.setZoom(12);
+                updateTrafficInfo(pos);
+            },
+            () => {
+                console.warn('Geolocation permission denied or failed. Using default center.');
+                updateTrafficInfo(defaultCenter);
+            }
+        );
+    } else {
+        console.warn('Geolocation not supported. Using default center.');
+        updateTrafficInfo(defaultCenter);
+    }
 }
 
 export { loadGoogleMapsScript, initMap, startPeriodicTrafficUpdates, updateTrafficInfo };
