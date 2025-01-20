@@ -29,78 +29,183 @@ export const fetchTrendsData = async (type = 'daily', category = 'all', language
     }
 };
 
-// Function to update the trends section with fetched data
+// Function to refresh trends data
+async function refreshTrends() {
+    const trendsCountrySelect = document.getElementById('trendsCountrySelect');
+    const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
+    const country = trendsCountrySelect.value;
+    const language = trendsLanguageSelect.value;
+
+    const trendsData = await fetchTrendsData('daily', 'all', country);
+    updateTrends(trendsData, 'daily');
+}
+
 export const updateTrends = (data, category) => {
     const trendsSection = document.querySelector('#trends .data-container');
     trendsSection.innerHTML = ''; // Clear previous data
 
-    if (data.error) {
-        trendsSection.innerHTML = `<p>${data.error}</p>`;
-        return;
-    }
-
-    console.log('Trends Data:', data);
-
     let topics = [];
-    if (data.default && data.default.trendingSearchesDays && Array.isArray(data.default.trendingSearchesDays)) {
-        console.log('Processing daily trends data');
-        console.log('Daily Trends Data:', data.default.trendingSearchesDays);
-        const trendingSearchesDays = data.default.trendingSearchesDays;
+
+    if (category === 'daily') {
+        const trendingSearchesDays = data.default.trendingSearchesDays || [];
         trendingSearchesDays.forEach(day => {
-            const trendingSearches = day.trendingSearches;
-            topics = topics.concat(trendingSearches);
+            topics = topics.concat(day.trendingSearches);
         });
-    } else if (data.storySummaries && data.storySummaries.trendingStories && Array.isArray(data.storySummaries.trendingStories)) {
-        console.log('Processing real-time trends data');
-        console.log('Real-Time Trends Data:', data.storySummaries.trendingStories);
-        topics = data.storySummaries.trendingStories;
-    } else {
-        trendsSection.innerHTML = '<p>Unexpected data format received.</p>';
-        console.error('Unexpected data format:', data);
-        return;
+    } else if (category === 'realtime') {
+        topics = data.storySummaries.trendingStories || [];
     }
 
-    // Limit total topics to 25
-    topics = topics.slice(0, 25);
+    // Create buttons for each topic title
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.classList.add('buttons-container');
 
-    // Pagination
+    topics.forEach((topic, index) => {
+        const topicButton = document.createElement('button');
+        topicButton.classList.add('topic-button');
+        topicButton.textContent = decodeHtmlEntities(topic.title.query || topic.title);
+        topicButton.onclick = () => renderTopicArticles(index);
+        buttonsContainer.appendChild(topicButton);
+    });
+
+    trendsSection.appendChild(buttonsContainer); // Ensure buttons are added first
+
     let currentPage = 1;
-    const totalPages = topics.length;
+    const itemsPerPage = 1;
+    const totalPages = Math.ceil(topics.length / itemsPerPage);
 
     const renderPage = (page) => {
         trendsSection.innerHTML = ''; // Clear previous data
-        const topic = topics[page - 1];
+        trendsSection.appendChild(buttonsContainer); // Re-add the buttons container first
 
-        console.log('Current Topic:', topic); // Debugging: log the current topic
+        const start = (page - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const pageData = topics.slice(start, end);
 
+        pageData.forEach(topic => {
+            const topicElement = document.createElement('div');
+            topicElement.classList.add('trend-item');
+
+            const title = document.createElement('h4');
+            title.textContent = decodeHtmlEntities(topic.title.query || topic.title);
+            topicElement.appendChild(title);
+
+            const traffic = document.createElement('p');
+            traffic.textContent = `Traffic: ${topic.formattedTraffic || 'N/A'}`;
+            topicElement.appendChild(traffic);
+
+            // New: Display author, date, and source
+            const author = document.createElement('p');
+            author.textContent = `Author: ${topic.author || 'Unknown'}`;
+            topicElement.appendChild(author);
+
+            const date = document.createElement('p');
+            date.textContent = `Date: ${new Date(topic.date).toLocaleDateString() || 'N/A'}`;
+            topicElement.appendChild(date);
+
+            const source = document.createElement('p');
+            source.textContent = `Source: ${topic.source || 'N/A'}`;
+            topicElement.appendChild(source);
+
+            if (topic.image && topic.image.imgUrl) {
+                const image = document.createElement('img');
+                image.src = topic.image.imgUrl;
+                image.alt = decodeHtmlEntities(topic.title.query || topic.title);
+                topicElement.appendChild(image);
+            }
+
+            if (topic.articles && Array.isArray(topic.articles)) {
+                const articles = document.createElement('ul');
+                topic.articles.slice(0, 5).forEach(article => { // Limit to 5 articles per topic
+                    const articleItem = document.createElement('li');
+                    const articleLink = document.createElement('a');
+                    articleLink.href = article.url;
+                    articleLink.textContent = decodeHtmlEntities(article.title || article.articleTitle);
+                    articleLink.target = '_blank';
+                    articleItem.appendChild(articleLink);
+
+                    // Handle image for daily trends
+                    if (article.image && article.image.imageUrl) {
+                        const image = document.createElement('img');
+                        image.src = article.image.imageUrl;
+                        image.alt = decodeHtmlEntities(article.title || article.articleTitle);
+                        articleItem.appendChild(image);
+                    }
+
+                    if (article.videoUrl) {
+                        const video = document.createElement('video');
+                        video.src = article.videoUrl;
+                        video.controls = true;
+                        articleItem.appendChild(video);
+                    }
+
+                    const snippet = document.createElement('p');
+                    snippet.textContent = decodeHtmlEntities(article.snippet.split('\n')[0]); // First paragraph
+                    articleItem.appendChild(snippet);
+
+                    articles.appendChild(articleItem);
+                });
+                topicElement.appendChild(articles);
+            }
+
+            trendsSection.appendChild(topicElement);
+        });
+
+        // Pagination controls
+        const paginationControls = document.createElement('div');
+        paginationControls.classList.add('pagination-controls');
+
+        if (currentPage > 1) {
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'Previous';
+            prevButton.onclick = () => {
+                currentPage--;
+                renderPage(currentPage);
+            };
+            paginationControls.appendChild(prevButton);
+        }
+
+        if (currentPage < totalPages) {
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Next';
+            nextButton.onclick = () => {
+                currentPage++;
+                renderPage(currentPage);
+            };
+            paginationControls.appendChild(nextButton);
+        }
+
+        trendsSection.appendChild(paginationControls);
+    };
+
+    const renderTopicArticles = (index) => {
+        trendsSection.innerHTML = ''; // Clear previous data
+        trendsSection.appendChild(buttonsContainer); // Re-add the buttons container first
+
+        const topic = topics[index];
         const topicElement = document.createElement('div');
         topicElement.classList.add('trend-item');
 
-        // Determine the title based on the data format
-        let topicTitle;
-        if (typeof topic.title === 'object' && topic.title.query) {
-            topicTitle = topic.title.query;
-        } else if (typeof topic.title === 'string') {
-            topicTitle = topic.title;
-        } else if (typeof topic.query === 'string') {
-            topicTitle = topic.query;
-        } else {
-            topicTitle = 'No Title';
-        }
-
         const title = document.createElement('h4');
-        title.textContent = decodeHtmlEntities(topicTitle);
+        title.textContent = decodeHtmlEntities(topic.title.query || topic.title);
         topicElement.appendChild(title);
 
-        const traffic = document.createElement('p');
-        traffic.textContent = `Traffic: ${topic.formattedTraffic || 'N/A'}`;
-        topicElement.appendChild(traffic);
+        // New: Display author, date, and source
+        const author = document.createElement('p');
+        author.textContent = `Author: ${topic.author || 'Unknown'}`;
+        topicElement.appendChild(author);
 
-        // Handle image for real-time trends
+        const date = document.createElement('p');
+        date.textContent = `Date: ${new Date(topic.date).toLocaleDateString() || 'N/A'}`;
+        topicElement.appendChild(date);
+
+        const source = document.createElement('p');
+        source.textContent = `Source: ${topic.source || 'N/A'}`;
+        topicElement.appendChild(source);
+
         if (topic.image && topic.image.imgUrl) {
             const image = document.createElement('img');
             image.src = topic.image.imgUrl;
-            image.alt = decodeHtmlEntities(topicTitle);
+            image.alt = decodeHtmlEntities(topic.title.query || topic.title);
             topicElement.appendChild(image);
         }
 
@@ -139,36 +244,10 @@ export const updateTrends = (data, category) => {
         }
 
         trendsSection.appendChild(topicElement);
-
-        // Pagination controls
-        const paginationControls = document.createElement('div');
-        paginationControls.classList.add('pagination-controls');
-
-        if (currentPage > 1) {
-            const prevButton = document.createElement('button');
-            prevButton.textContent = 'Previous';
-            prevButton.onclick = () => {
-                currentPage--;
-                renderPage(currentPage);
-            };
-            paginationControls.appendChild(prevButton);
-        }
-
-        if (currentPage < totalPages) {
-            const nextButton = document.createElement('button');
-            nextButton.textContent = 'Next';
-            nextButton.onclick = () => {
-                currentPage++;
-                renderPage(currentPage);
-            };
-            paginationControls.appendChild(nextButton);
-        }
-
-        trendsSection.appendChild(paginationControls);
     };
 
     renderPage(currentPage);
-};
+}
 
 async function fetchTrends(type = 'daily', geo = 'US', category = 'all', language = 'en') {
     try {
@@ -309,4 +388,8 @@ document.getElementById('realtimeTrendsButton').addEventListener('click', () => 
     const geo = document.getElementById('trendsCountrySelect').value;
     const language = document.getElementById('trendsLanguageSelect').value;
     fetchTrends(type, geo, 'all', language);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    refreshTrends();
 });

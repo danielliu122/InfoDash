@@ -15,7 +15,6 @@ export const fetchRedditData = async (timePeriod = 'day') => {
         if (data && data.data && data.data.children) {
             return data.data.children
                 .filter(child => child.kind === 't3') // Filter out non-posts
-                .slice(0, 5) // Take only the top 5 posts
                 .map(child => ({
                     title: child.data.title,
                     permalink: child.data.permalink,
@@ -35,24 +34,65 @@ export const fetchRedditData = async (timePeriod = 'day') => {
 // Function to update UI with Reddit data
 export const updateReddit = (data) => {
     const container = document.querySelector('#reddit .data-container');
+    container.innerHTML = ''; // Clear previous data
 
     if (!data || data.length === 0) {
         container.innerHTML = '<p>No Reddit posts found.</p>';
         return;
     }
 
-    container.innerHTML = `
-        <ul>
-            ${data.map(post => `
-                <li style="margin-bottom: 20px;">
-                    <a href="https://www.reddit.com${post.permalink}" target="_blank">${post.title}</a>
-                    <p>Score: ${post.score}</p>
-                    ${renderMedia(post)}
-                </li>
-            `).join('')}
-        </ul>
-    `;
-}
+    // Pagination
+    let currentPage = 1;
+    const itemsPerPage = 5;
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+
+    const renderPage = (page) => {
+        container.innerHTML = ''; // Clear previous data
+        const start = (page - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const pageData = data.slice(start, end);
+
+        container.innerHTML = `
+            <ul>
+                ${pageData.map(post => `
+                    <li style="margin-bottom: 20px;">
+                        <a href="https://www.reddit.com${post.permalink}" target="_blank">${post.title}</a>
+                        <p>Score: ${post.score}</p>
+                        ${renderMedia(post)}
+                    </li>
+                `).join('')}
+            </ul>
+        `;
+
+        // Pagination controls
+        const paginationControls = document.createElement('div');
+        paginationControls.classList.add('pagination-controls');
+
+        if (currentPage > 1) {
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'Previous';
+            prevButton.onclick = () => {
+                currentPage--;
+                renderPage(currentPage);
+            };
+            paginationControls.appendChild(prevButton);
+        }
+
+        if (currentPage < totalPages) {
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Next';
+            nextButton.onclick = () => {
+                currentPage++;
+                renderPage(currentPage);
+            };
+            paginationControls.appendChild(nextButton);
+        }
+
+        container.appendChild(paginationControls);
+    };
+
+    renderPage(currentPage);
+};
 
 // Function to render media content for a Reddit post
 export const renderMedia = (post) => {

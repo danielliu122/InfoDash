@@ -12,7 +12,7 @@
     --primary-text: #212121;
     --secondary-text: #757575;
     --accent-color: #3F51B5;
-    --button-bg: #E0E0E0;
+    --button-bg: #e1dbdbec;
     --button-hover-bg: #D5D5D5;
     --border-color: #BDBDBD;
     --input-bg: #FFFFFF;
@@ -62,11 +62,14 @@ section {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
-    width: calc(50% - 20px); /* Two columns with gap */
     position: relative; /* Positioning for button */
     color: var(--primary-text);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s; /* Add transition */
+}
+
+.one-section .col.s12 > section {
+    width: 100%; /* Full width for single section */
 }
 
 section:hover {
@@ -119,15 +122,15 @@ footer {
 
 /* Theme toggle button styles */
 #themeToggleButton {
-    background-color: var(--accent-color);
+    background-color: #04c4b1;
     color: var(--primary-text);
     border: none;
-    padding: 10px 20px;
+    padding: 3px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    margin: 4px 2px;
+    margin: 12px;
     cursor: pointer;
     border-radius: 4px;
     transition: background-color 0.3s, box-shadow 0.3s;
@@ -217,7 +220,9 @@ footer {
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
     body {
-        padding: 10px;
+        padding: 5px;
+        width: 95%; /* Set width to 85% on mobile */
+        margin: 0 auto;
     }
 
     main {
@@ -227,18 +232,35 @@ footer {
 
     section {
         width: 100%;
-        padding: 10px;
+        padding: 5px;
+    }
+
+    .chart-container {
+        height: 70vh;
+        width: 100% !important;
+        margin: 0 auto;
+    }
+
+    #finance-content {
+        width: 85vw;
+        margin: 0 auto;
+        padding: 10px 0;
     }
 
     header, footer {
         text-align: center;
+    }
+
+    .btn {
+        padding: 0 10px;
+        font-size: 12px;
     }
 }
 
 /* News item styles */
 .news-item {
     display: flex;
-    flex-direction: column; /* Stack items vertically */
+    flex-direction: column;
     align-items: center;
     margin-bottom: 20px;
     padding: 10px;
@@ -260,28 +282,29 @@ footer {
     height: auto;
     border-radius: 4px;
     margin-bottom: 10px;
-    object-fit: cover; /* Maintain aspect ratio and cover the area */
+    object-fit: cover;
 }
 
 .news-item h3 {
     margin: 10px 0;
     color: var(--primary-text);
     text-align: center;
-    width: 100%; /* Ensure the heading takes full width */
+    width: 100%;
+    font-size: 1.5em; /* Adjust the font size to be smaller */
 }
 
 .news-item p {
     color: var(--secondary-text);
     text-align: center;
-    width: 100%; /* Ensure the paragraph takes full width */
+    width: 100%;
 }
 
 .news-item a {
     color: var(--accent-color);
     text-decoration: none;
     margin-top: 10px;
-    width: 100%; /* Ensure the link takes full width */
-    text-align: center; /* Center the link text */
+    width: 100%;
+    text-align: center;
 }
 
 .news-item a:hover {
@@ -328,7 +351,7 @@ footer {
     height: auto;
     border-radius: 4px;
     margin-bottom: 10px;
-    object-fit: cover; /* Maintain aspect ratio and cover the area */
+    object-fit: cover;
 }
 
 /* Reddit video styles */
@@ -355,4 +378,217 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.topic-button {
+    padding: 10px 20px;
+    background-color: #4CAF50; /* Change to desired button color */
+    border: none;
+    margin:2px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.topic-button:hover {
+    background-color: #45a049; /* Change to desired hover effect */
+}
+
+/* Chart container base styles */
+.chart-container {
+    height: 400px;
+    position: relative;
+    z-index: 0;
+    width: 100%;
+    transition: height 0.3s ease;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 200px; /* Half of desktop height */
+        width: 100% !important;
+        margin: 0 auto;
+    }
+
+    /* Show both zoom controls and slider on mobile */
+    .zoom-controls {
+        display: flex !important;
+        top: 5px; /* Reduced from 10px */
+        right: 5px; /* Reduced from 10px */
+    }
+
+    .zoom-button {
+        width: 24px; /* Smaller buttons on mobile */
+        height: 24px; /* Smaller buttons on mobile */
+        font-size: 16px; /* Smaller font on mobile */
+    }
+
+    .chart-slider {
+        display: block !important;
+        width: 100%;
+        margin-top: 5px; /* Reduced from 10px */
+    }
+}
+
+/* Autocomplete styles */
+.autocomplete-items {
+    position: absolute;
+    border: 1px solid #d4d4d4;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white; /* Ensure background is white */
+}
+
+.autocomplete-item {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff;
+}
+
+.autocomplete-item:hover {
+    background-color: #e9e9e9; /* Highlight on hover */
+}
+
+#stockSymbolInput {
+    width: 100%; /* Ensures the input fits within its parent container */
+    box-sizing: border-box; /* Includes padding and border in the element's total width */
+}
+
+/* Chat styles */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#chat-log {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+    background-color: var(--secondary-bg);
+}
+
+#chat-input {
+    width: 95%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+#MapsInput {
+    width: 40%;;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 0%;
+}
+
+#MapsInput::placeholder {
+    color: grey; /* Change to your desired color */
+    font-weight: bold;
+}
+
+.fullscreen-pac-container[style]{
+    z-index: 2547483647 !important;
+    top:50px !important;
+}
+
+/* Add these styles for the chart scrollbar */
+.chart-container::-webkit-scrollbar {
+    height: 12px;
+}
+
+.chart-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.chart-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.chart-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* For Firefox */
+.chart-container {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+}
+
+/* Hide slider by default */
+.chart-slider {
+    display: none;
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Add this to ensure slider doesn't interfere with other elements */
+.chart-container {
+    position: relative;
+    z-index: 0;
+}
+
+/* Add new rule for container class */
+.container {
+    width: 95% !important; /* Changed from 95% to 85% to leave room for ads */
+    max-width: none !important; /* Remove max-width restriction */
+}
+
+/* Zoom control styles */
+.zoom-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 3;
+}
+
+.zoom-button {
+    background-color: var(--button-bg);
+    color: var(--primary-text);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.zoom-button:hover {
+    background-color: var(--button-hover-bg);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Hide zoom buttons on mobile */
+@media screen and (max-width: 768px) {
+    .zoom-controls {
+        display: none;
+    }
+}
+
+.pause-button {
+    display: none; /* Hidden by default */
+    margin-top: 10px;
 }
