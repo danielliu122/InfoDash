@@ -84,7 +84,25 @@ function togglePauseFinance() {
     console.log(`Finance data fetching is ${isPaused['finance'] ? 'paused' : 'resumed'}.`);
     
     if (!isPaused['finance']) {
-        refreshData('finance');
+        const stockSymbolInput = document.getElementById('stockSymbolInput');
+        const symbol = stockSymbolInput.value || '^IXIC';
+        
+        // Check if the button exists before trying to get its attribute
+        const minutelyButton = document.getElementById('realtimeButton'); // Change to the correct button ID
+        if (minutelyButton) {
+            const match = minutelyButton.getAttribute('onclick').match(/updateFinanceData\('([^']*)', '([^']*)'\)/i);
+            if (match) {
+                const timeRange = match[1];
+                const interval = match[2];
+                
+                // Restart auto-refresh when resumed
+                startAutoRefresh(symbol, timeRange, interval);
+            } else {
+                console.error('Could not parse timeRange and interval from onclick attribute.');
+            }
+        } else {
+            console.error('Minutely button not found. Cannot resume auto-refresh.');
+        }
     } else {
         stopAutoRefresh(); // Stop refreshing when paused
     }
@@ -310,6 +328,10 @@ document.addEventListener('click', function(e) {
 });
 
 const stockSymbols = {
+    'ETH-USD': 'Ethereum',
+    'BTC-USD': 'BTC',
+    'SOL-USD': 'Solana',
+    'XRP-USD': 'XRP',
     'AAPL': 'Apple',
     'GOOGL': 'Google',
     'MSFT': 'Microsoft',
@@ -455,45 +477,67 @@ document.onfullscreenchange = function ( event ) {
   };
 
 document.getElementById('nvdaButton').addEventListener('click', () => {
-    updateFinanceDataWithPercentage('NVDA', '1d', '1m');
+    document.getElementById('stockSymbolInput').value = 'NVDA'; // Set input value
+    updateFinanceData('1d', '1m'); // Refresh chart with daily data
 });
 
 document.getElementById('aaplButton').addEventListener('click', () => {
-    updateFinanceDataWithPercentage('AAPL', '1d', '1m');
-});
-
-document.getElementById('googlButton').addEventListener('click', () => {
-    updateFinanceDataWithPercentage('GOOGL', '1d', '1m');
+    document.getElementById('stockSymbolInput').value = 'AAPL'; // Set input value
+    updateFinanceData('1d', '1m'); // Refresh chart with daily data
 });
 
 document.getElementById('msftButton').addEventListener('click', () => {
-    updateFinanceDataWithPercentage('MSFT', '1d', '1m');
+    document.getElementById('stockSymbolInput').value = 'MSFT'; // Set input value
+    updateFinanceData('1d', '1m'); // Refresh chart with daily data
+});
+
+document.getElementById('googlButton').addEventListener('click', () => {
+    document.getElementById('stockSymbolInput').value = 'GOOGL'; // Set input value
+    updateFinanceData('1d', '1m'); // Refresh chart with daily data
 });
 
 document.getElementById('amznButton').addEventListener('click', () => {
-    updateFinanceDataWithPercentage('AMZN', '1d', '1m');
+    document.getElementById('stockSymbolInput').value = 'AMZN'; // Set input value
+    updateFinanceData('1d', '1m'); // Refresh chart with daily data
 });
 
 document.getElementById('tslaButton').addEventListener('click', () => {
-    updateFinanceDataWithPercentage('TSLA', '1d', '1m');
+    document.getElementById('stockSymbolInput').value = 'TSLA'; // Set input value
+    updateFinanceData('1d', '1m'); // Refresh chart with daily data
 });
 
 document.getElementById('fbButton').addEventListener('click', () => {
-    updateFinanceDataWithPercentage('FB', '1d', '1m');
+    document.getElementById('stockSymbolInput').value = 'META'; // Set input value to META
+    updateFinanceData('1d', '1m'); // Refresh chart with daily data
 });
 
 document.getElementById('nflxButton').addEventListener('click', () => {
-    updateFinanceDataWithPercentage('NFLX', '1d', '1m');
+    document.getElementById('stockSymbolInput').value = 'NFLX'; // Set input value
+    updateFinanceData('1d', '1m'); // Refresh chart with daily data
 });
 
 document.getElementById('disButton').addEventListener('click', () => {
-    updateFinanceDataWithPercentage('DIS', '1d', '1m');
+    document.getElementById('stockSymbolInput').value = 'DIS'; // Set input value
+    updateFinanceData('1d', '1m'); // Refresh chart with daily data
 });
 
-document.getElementById('vButton').addEventListener('click', () => {
-    updateFinanceDataWithPercentage('V', '1d', '1m');
+document.getElementById('ethButton').addEventListener('click', () => {
+    document.getElementById('stockSymbolInput').value = 'ETH-USD'; // Set input value
+    updateFinanceData('1d', '1m'); // Refresh chart with daily data
 });
 
-document.getElementById('jnjButton').addEventListener('click', () => {
-    updateFinanceDataWithPercentage('JNJ', '1d', '1m');
+document.getElementById('btcButton').addEventListener('click', () => {
+    document.getElementById('stockSymbolInput').value = 'BTC-USD'; // Set input value
+    updateFinanceData('1d', '1m'); // Refresh chart with daily data
 });
+
+document.getElementById('solButton').addEventListener('click', () => {
+    document.getElementById('stockSymbolInput').value = 'SOL-USD'; // Set input value
+    updateFinanceData('1d', '1m'); // Refresh chart with daily data
+});
+
+document.getElementById('xrpButton').addEventListener('click', () => {
+    document.getElementById('stockSymbolInput').value = 'XRP-USD'; // Set input value
+    updateFinanceData('1d', '1m'); // Refresh chart with daily data
+});
+
