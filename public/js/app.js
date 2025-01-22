@@ -51,9 +51,11 @@ function updateFinanceData(timeRange, interval) {
             }
         });
     
-    // Start new auto-refresh only for realtime timeframe during market hours
+    // Start new auto-refresh only for the minute interval during market hours
     if (timeRange === '5m' && interval === '1m' && isMarketOpen()) {
         startAutoRefresh(symbol, timeRange, interval);
+    } else {
+        stopAutoRefresh(); // Stop auto-refresh for other intervals
     }
 }
 
@@ -83,6 +85,8 @@ function togglePauseFinance() {
     
     if (!isPaused['finance']) {
         refreshData('finance');
+    } else {
+        stopAutoRefresh(); // Stop refreshing when paused
     }
 }
 
