@@ -449,3 +449,47 @@ document.onfullscreenchange = function ( event ) {
       }
     }
   };
+
+document.getElementById('nvdaButton').addEventListener('click', () => {
+    updateFinanceDataWithPercentage('NVDA', '1d', '1m');
+});
+
+document.getElementById('aaplButton').addEventListener('click', () => {
+    updateFinanceDataWithPercentage('AAPL', '1d', '1m');
+});
+
+document.getElementById('googlButton').addEventListener('click', () => {
+    updateFinanceDataWithPercentage('GOOGL', '1d', '1m');
+});
+
+document.getElementById('msftButton').addEventListener('click', () => {
+    updateFinanceDataWithPercentage('MSFT', '1d', '1m');
+});
+
+document.getElementById('amznButton').addEventListener('click', () => {
+    updateFinanceDataWithPercentage('AMZN', '1d', '1m');
+});
+
+document.getElementById('tslaButton').addEventListener('click', () => {
+    updateFinanceDataWithPercentage('TSLA', '1d', '1m');
+});
+
+document.getElementById('fbButton').addEventListener('click', () => {
+    updateFinanceDataWithPercentage('FB', '1d', '1m');
+});
+
+document.getElementById('nflxButton').addEventListener('click', () => {
+    updateFinanceDataWithPercentage('NFLX', '1d', '1m');
+});
+
+document.getElementById('disButton').addEventListener('click', () => {
+    updateFinanceDataWithPercentage('DIS', '1d', '1m');
+});
+
+document.getElementById('vButton').addEventListener('click', () => {
+    updateFinanceDataWithPercentage('V', '1d', '1m');
+});
+
+document.getElementById('jnjButton').addEventListener('click', () => {
+    updateFinanceDataWithPercentage('JNJ', '1d', '1m');
+});

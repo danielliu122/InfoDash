@@ -592,3 +592,14 @@ footer {
     display: none; /* Hidden by default */
     margin-top: 10px;
 }
+
+/* Button styles for finance section */
+#finance .btn {
+    margin: 5px;
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+#finance .btn:hover {
+    background-color: #45a049; /* Darker green */
+}
