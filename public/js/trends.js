@@ -22,6 +22,10 @@ export const fetchTrendsData = async (type = 'daily', category = 'all', language
         }
 
         const data = JSON.parse(responseText);
+        
+        // Log the data response to the console
+        console.log('Fetched trends data:', data);
+        
         return data;
     } catch (error) {
         console.error('Error fetching trends data:', error);
@@ -92,6 +96,13 @@ export const updateTrends = (data, category) => {
         topics = data.storySummaries.trendingStories || [];
     }
 
+    // Sort topics by formattedTraffic in descending order
+    topics.sort((a, b) => {
+        const trafficA = a.formattedTraffic ? parseInt(a.formattedTraffic.replace(/,/g, ''), 10) : 0;
+        const trafficB = b.formattedTraffic ? parseInt(b.formattedTraffic.replace(/,/g, ''), 10) : 0;
+        return trafficB - trafficA; // Sort in descending order
+    });
+
     // Create buttons for each topic title
     const buttonsContainer = document.createElement('div');
     buttonsContainer.classList.add('buttons-container');
@@ -130,26 +141,6 @@ export const updateTrends = (data, category) => {
             traffic.textContent = `Traffic: ${topic.formattedTraffic || 'N/A'}`;
             topicElement.appendChild(traffic);
 
-            // New: Display author, date, and source
-            const author = document.createElement('p');
-            author.textContent = `Author: ${topic.author || 'Unknown'}`;
-            topicElement.appendChild(author);
-
-            const date = document.createElement('p');
-            date.textContent = `Date: ${new Date(topic.date).toLocaleDateString() || 'N/A'}`;
-            topicElement.appendChild(date);
-
-            const source = document.createElement('p');
-            source.textContent = `Source: ${topic.source || 'N/A'}`;
-            topicElement.appendChild(source);
-
-            if (topic.image && topic.image.imgUrl) {
-                const image = document.createElement('img');
-                image.src = topic.image.imgUrl;
-                image.alt = decodeHtmlEntities(topic.title.query || topic.title);
-                topicElement.appendChild(image);
-            }
-
             if (topic.articles && Array.isArray(topic.articles)) {
                 const articles = document.createElement('ul');
                 topic.articles.slice(0, 5).forEach(article => { // Limit to 5 articles per topic
@@ -159,6 +150,11 @@ export const updateTrends = (data, category) => {
                     articleLink.textContent = decodeHtmlEntities(article.title || article.articleTitle);
                     articleLink.target = '_blank';
                     articleItem.appendChild(articleLink);
+
+                    // New: Display source for each article
+                    const source = document.createElement('p');
+                    source.textContent = `Source: ${article.source || 'N/A'}`; // Accessing the source from the article
+                    articleItem.appendChild(source);
 
                     // Handle image for daily trends
                     if (article.image && article.image.imageUrl) {
@@ -226,25 +222,9 @@ export const updateTrends = (data, category) => {
         title.textContent = decodeHtmlEntities(topic.title.query || topic.title);
         topicElement.appendChild(title);
 
-        // New: Display author, date, and source
-        const author = document.createElement('p');
-        author.textContent = `Author: ${topic.author || 'Unknown'}`;
-        topicElement.appendChild(author);
-
-        const date = document.createElement('p');
-        date.textContent = `Date: ${new Date(topic.date).toLocaleDateString() || 'N/A'}`;
-        topicElement.appendChild(date);
-
-        const source = document.createElement('p');
-        source.textContent = `Source: ${topic.source || 'N/A'}`;
-        topicElement.appendChild(source);
-
-        if (topic.image && topic.image.imgUrl) {
-            const image = document.createElement('img');
-            image.src = topic.image.imgUrl;
-            image.alt = decodeHtmlEntities(topic.title.query || topic.title);
-            topicElement.appendChild(image);
-        }
+        const traffic = document.createElement('p');
+        traffic.textContent = `Traffic: ${topic.formattedTraffic || 'N/A'}`;
+        topicElement.appendChild(traffic);
 
         if (topic.articles && Array.isArray(topic.articles)) {
             const articles = document.createElement('ul');
@@ -255,6 +235,11 @@ export const updateTrends = (data, category) => {
                 articleLink.textContent = decodeHtmlEntities(article.title || article.articleTitle);
                 articleLink.target = '_blank';
                 articleItem.appendChild(articleLink);
+
+                // New: Display source for each article
+                const source = document.createElement('p');
+                source.textContent = `Source: ${article.source || 'N/A'}`; // Accessing the source from the article
+                articleItem.appendChild(source);
 
                 // Handle image for daily trends
                 if (article.image && article.image.imageUrl) {

@@ -278,7 +278,7 @@ footer {
 
 .news-thumbnail {
     width: 100%;
-    max-width: 150px;
+    max-width: 400px;
     height: auto;
     border-radius: 4px;
     margin-bottom: 10px;
@@ -290,13 +290,14 @@ footer {
     color: var(--primary-text);
     text-align: center;
     width: 100%;
-    font-size: 1.5em; /* Adjust the font size to be smaller */
+    font-size: 1.8em; /* Increased font size for the title */
 }
 
 .news-item p {
     color: var(--secondary-text);
     text-align: center;
     width: 100%;
+    font-size: 1.1em; /* Increased font size for the paragraph */
 }
 
 .news-item a {
