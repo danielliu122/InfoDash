@@ -281,6 +281,36 @@ export const updateTrends = (data, category) => {
         }
 
         trendsSection.appendChild(topicElement);
+
+        // Re-render pagination controls
+        renderPaginationControls();
+    };
+
+    const renderPaginationControls = () => {
+        const paginationControls = document.createElement('div');
+        paginationControls.classList.add('pagination-controls');
+
+        if (currentPage > 1) {
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'Previous';
+            prevButton.onclick = () => {
+                currentPage--;
+                renderPage(currentPage);
+            };
+            paginationControls.appendChild(prevButton);
+        }
+
+        if (currentPage < totalPages) {
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Next';
+            nextButton.onclick = () => {
+                currentPage++;
+                renderPage(currentPage);
+            };
+            paginationControls.appendChild(nextButton);
+        }
+
+        trendsSection.appendChild(paginationControls);
     };
 
     renderPage(currentPage);

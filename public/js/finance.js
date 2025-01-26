@@ -78,7 +78,7 @@ export function updateRealTimeFinance(data) {
     const changeColor = lastKnownChange >= 0 ? 'green' : 'red';
 
     realTimeContainer.innerHTML = `
-        <h3>Real-Time Stock Data (${data.symbol})</h3>
+        <h3>Stock Data (${data.symbol})</h3>
         <p>Price: $${price}</p>
         <p>Change: <span style="color: ${changeColor}">$${change} (${changePercent}%)</span></p>
         <p>Last Updated: ${timestamp}</p>
