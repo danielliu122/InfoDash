@@ -83,30 +83,27 @@ app.get('/api/news', async (req, res) => {
 app.get('/api/trends', async (req, res) => {
     const type = req.query.type || 'daily';
     const geo = req.query.geo || 'US';
-    const category = req.query.category || 'h'; // Default to 'h' for Top Stories
-    const language = req.query.language || 'en';
+    const category = req.query.category || 'all'; // Default to 'all' for all categories
+    const language = req.query.language || 'en'; // Default to English
+
+    //console.log(`Fetching trends with parameters: type=${type}, geo=${geo}, category=${category}, language=${language}`);
 
     try {
         let trends;
-        if (type === 'realtime') {
-            trends = await googleTrends.realTimeTrends({
-                geo: geo,
-                category: category,
-                hl: language
-            });
-        } else if (type === 'daily') {
+        if (type === 'daily') {
             trends = await googleTrends.dailyTrends({
                 geo: geo,
                 hl: language // Add language parameter for daily trends
             });
+
+            // Parse and send the results
+            res.json(JSON.parse(trends));
         } else {
             return res.status(400).json({ error: 'Invalid trend type' });
         }
-
-        res.json(JSON.parse(trends));
     } catch (error) {
-        console.error('Error fetching Google Trends data:', error);
-        res.status(500).json({ error: 'Error fetching Google Trends data' });
+        console.error('Error fetching trends data:', error);
+        res.status(500).json({ error: 'Error fetching trends data' });
     }
 });
 

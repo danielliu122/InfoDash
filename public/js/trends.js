@@ -8,9 +8,9 @@ const decodeHtmlEntities = (text) => {
 };
 
 // Function to fetch Google Trends data
-export const fetchTrendsData = async (type = 'daily', category = 'all', language = 'en') => {
+export const fetchTrendsData = async (type = 'daily', category = 'all', language = 'en', country = 'US') => {
     try {
-        const response = await fetch(`/api/trends?type=${type}&category=${category}&language=${language}`);
+        const response = await fetch(`/api/trends?type=${type}&category=${category}&language=${language}&geo=${country}`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -25,19 +25,56 @@ export const fetchTrendsData = async (type = 'daily', category = 'all', language
         return data;
     } catch (error) {
         console.error('Error fetching trends data:', error);
-        return { error: 'Unable to fetch trends data' };
+        return null; // Return null or an empty object to indicate failure
     }
 };
+
+// Add event listeners for the dropdowns
+document.getElementById('trendsCountrySelect').addEventListener('change', refreshTrends);
+document.getElementById('trendsLanguageSelect').addEventListener('change', refreshTrends);
 
 // Function to refresh trends data
 async function refreshTrends() {
     const trendsCountrySelect = document.getElementById('trendsCountrySelect');
     const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
     const country = trendsCountrySelect.value;
+
+    // Update language options based on selected country
+    updateLanguageOptions(country);
+
     const language = trendsLanguageSelect.value;
 
-    const trendsData = await fetchTrendsData('daily', 'all', country);
-    updateTrends(trendsData, 'daily');
+    // Validate language for the selected country
+    if (!validLanguageCountryMap[country] || !validLanguageCountryMap[country].includes(language)) {
+        console.error(`Invalid language "${language}" for country "${country}".`);
+        return; // Exit the function to prevent further execution
+    }
+
+    try {
+        const trendsData = await fetchTrendsData('daily', 'all', language, country);
+        updateTrends(trendsData, 'daily');
+    } catch (error) {
+        console.error('Error fetching trends data:', error);
+    }
+}
+
+// Function to update language options based on selected country
+function updateLanguageOptions(country) {
+    const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
+    trendsLanguageSelect.innerHTML = ''; // Clear existing options
+
+    const languages = validLanguageCountryMap[country] || [];
+    languages.forEach(lang => {
+        const option = document.createElement('option');
+        option.value = lang;
+        option.textContent = lang === 'en' ? 'English' : lang === 'fr' ? 'Français' : lang; // Display 'Français' for 'fr'
+        trendsLanguageSelect.appendChild(option);
+    });
+
+    // Optionally, set the first language as selected
+    if (languages.length > 0) {
+        trendsLanguageSelect.value = languages[0];
+    }
 }
 
 export const updateTrends = (data, category) => {
@@ -255,26 +292,28 @@ async function fetchTrends(type = 'daily', geo = 'US', category = 'all', languag
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        
-        const responseText = await response.text();
-        console.log('Response Text:', responseText); // Log the raw response text
 
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            throw new Error('Received non-JSON response');
-        }
+        const data = await response.json();
 
-        const data = JSON.parse(responseText);
-        console.log('Trends Data:', data);
-        
-        if (type === 'realtime') {
-            processRealtimeTrends(data);
-        } else if (type === 'daily') {
-            processDailyTrends(data);
+        if (data.default && data.default.trendingSearchesDays.length > 0) {
+            const trendingSearches = data.default.trendingSearchesDays[0].trendingSearches;
+            if (trendingSearches.length === 0) {
+                displayNoTrendsMessage();
+            } else {
+                processTrendingSearches(trendingSearches);
+            }
+        } else {
+            displayNoTrendsMessage();
         }
     } catch (error) {
         console.error('Error fetching trends data:', error);
     }
+}
+
+function displayNoTrendsMessage() {
+    const messageElement = document.getElementById('noTrendsMessage');
+    messageElement.innerText = 'No trending searches available at this time.';
+    messageElement.style.display = 'block'; // Show the message
 }
 
 function processRealtimeTrends(data) {
@@ -383,13 +422,29 @@ document.getElementById('dailyTrendsButton').addEventListener('click', () => {
     fetchTrends(type, geo, 'all', language);
 });
 
-document.getElementById('realtimeTrendsButton').addEventListener('click', () => {
-    const type = 'realtime';
-    const geo = document.getElementById('trendsCountrySelect').value;
-    const language = document.getElementById('trendsLanguageSelect').value;
-    fetchTrends(type, geo, 'all', language);
+document.addEventListener('DOMContentLoaded', async () => {
+    // Show loading state
+    const trendsSection = document.getElementById('trends'); // Updated to match the correct ID
+    trendsSection.style.display = 'none'; // Hide trends section initially
+
+    try {
+        await refreshTrends(); // Fetch and display trends data
+        trendsSection.style.display = 'block'; // Show trends section after data is loaded
+    } catch (error) {
+        console.error('Error loading trends data:', error);
+    }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    refreshTrends();
-});
+const validLanguageCountryMap = {
+    'US': ['en'],
+    'CA': ['en', 'fr'],
+    'GB': ['en'],
+    'AU': ['en'],
+    'DE': ['de', 'en'],
+    'FR': ['fr', 'en'],
+    'JP': ['ja', 'en'],
+    'TW': ['zh', 'en'],
+    'BR': ['pt', 'en'],
+    'ES': ['es', 'en'],
+    // Add more countries and their valid languages as needed
+};

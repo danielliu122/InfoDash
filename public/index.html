@@ -53,6 +53,15 @@
                                         <option value="ca">Canada</option>
                                         <option value="gb">United Kingdom</option>
                                         <option value="au">Australia</option>
+                                        <option value="fr">France</option>
+                                        <option value="it">Italy</option>
+                                        <option value="jp">Japan</option>
+                                        <option value="in">India</option>
+                                        <option value="br">Brazil</option>
+                                        <option value="mx">Mexico</option>
+                                        <option value="za">South Africa</option>
+                                        <option value="kr">South Korea</option>
+                                        <option value="ng">Nigeria</option>
                                         <!-- Add more countries as needed -->
                                     </select>
                                     <label for="countrySelect">Country</label>
@@ -81,42 +90,19 @@
                 <div class="col s12 m6">
                     <section id="trends" class="section">
                         <div class="section-header">
-                            <h3>Top Trends</h3>
+                            <h3>Trending</h3>
                             <button class="btn-small waves-effect waves-light right" onclick="toggleSection('trends-content')">Show/Hide</button>
                         </div>
                         <div id="trends-content" class="section-content">
                             <div class="row">
                                 <div class="col s12">
                                     <button id="dailyTrendsButton" class="btn waves-effect waves-light" onclick="handleButtonClick('trends', 'daily')">Daily News</button>
-                                    <button id="realtimeTrendsButton" disabled style="display: none;">Realtime Trends</button>
-
-                                    <!-- realtime doesn't work, onclick removed
-                                    original -->
-                                    <!-- <button id="realtimeTrendsButton" class="btn waves-effect waves-light" onclick="handleButtonClick('trends', 'realtime')">Trending News</button> -->
-
-                                    <!-- realtime is out of service -->
-                                    <!-- <button id="techTrendsButton" class="btn waves-effect waves-light" onclick="handleButtonClick('trends', 'realtime', 't')">Technology News</button>
-                                    <button id="businessTrendsButton" class="btn waves-effect waves-light" onclick="handleButtonClick('trends', 'realtime', 'b')">Business News</button>
-                                    <button id="healthTrendsButton" class="btn waves-effect waves-light" onclick="handleButtonClick('trends', 'realtime', 'm')">Health News</button>
-                                    <button id="sportsTrendsButton" class="btn waves-effect waves-light" onclick="handleButtonClick('trends', 'realtime', 's')">Sports News</button>
-                                    <button id="entertainmentTrendsButton" class="btn waves-effect waves-light" onclick="handleButtonClick('trends', 'realtime', 'e')">Entertainment News</button>
-                                    <button id="refreshTrendsButton" class="btn waves-effect waves-light" onclick="refreshTrends()">Refresh Trends</button> -->
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="input-field col s6">
-                                    <select id="trendsLanguageSelect">
-                                        <option value="en">English</option>
-                                        <option value="es">Spanish</option>
-                                        <option value="fr">French</option>
-                                        <option value="de">German</option>
-                                        <option value="ru">Russian</option>
-                                        <option value="zh">Chinese</option>
-                                        <option value="ja">Japanese</option>
-                                        <option value="ko">Korean</option>
-                                        <option value="pt">Portuguese</option>
-                                        <option value="ar">Arabic</option>
-                                        <!-- Add more languages as needed -->
+                                    <select id="trendsLanguageSelect" style="display: none;">
+                                        <!-- Options will be populated dynamically -->
                                     </select>
                                     <label for="trendsLanguageSelect">Language</label>
                                 </div>
@@ -129,8 +115,12 @@
                                         <option value="DE">Germany</option>
                                         <option value="FR">France</option>
                                         <option value="JP">Japan</option>
-                                        <option value="CN">China</option>
+                                        <option value="TW">Taiwan</option>
                                         <option value="BR">Brazil</option>
+                                        <option value="IN">India</option>
+                                        <option value="MX">Mexico</option>
+                                        <option value="ZA">South Africa</option>
+                                        <option value="NG">Nigeria</option>
                                         <!-- Add more countries as needed -->
                                     </select>
                                     <label for="trendsCountrySelect">Country</label>

@@ -126,7 +126,7 @@ async function refreshTrends() {
     const country = trendsCountrySelect.value;
     const language = trendsLanguageSelect.value;
 
-    const trendsData = await fetchTrendsData('daily', 'all', country, language);
+    const trendsData = await fetchTrendsData('daily', 'all', language, country);
     updateTrends(trendsData, 'daily');
 }
 
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const redditData = await fetchRedditData('day');
         updateReddit(redditData);
 
-        const trendsData = await fetchTrendsData('daily', 'all', trendsCountrySelect.value, trendsLanguageSelect.value);
+        const trendsData = await fetchTrendsData('daily', 'all', trendsLanguageSelect.value, trendsCountrySelect.value);
         updateTrends(trendsData, 'daily');
 
         // Start auto-refresh with default values (minutely) only if the market is open
