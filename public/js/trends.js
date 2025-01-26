@@ -96,13 +96,6 @@ export const updateTrends = (data, category) => {
         topics = data.storySummaries.trendingStories || [];
     }
 
-    // Sort topics by formattedTraffic in descending order
-    topics.sort((a, b) => {
-        const trafficA = a.formattedTraffic ? parseInt(a.formattedTraffic.replace(/,/g, ''), 10) : 0;
-        const trafficB = b.formattedTraffic ? parseInt(b.formattedTraffic.replace(/,/g, ''), 10) : 0;
-        return trafficB - trafficA; // Sort in descending order
-    });
-
     // Create buttons for each topic title
     const buttonsContainer = document.createElement('div');
     buttonsContainer.classList.add('buttons-container');
@@ -377,10 +370,12 @@ function createTopicElement(topic) {
     }
 
     const title = document.createElement('h4');
+    title.classList.add('article-title');
     title.textContent = decodeHtmlEntities(topicTitle);
     topicElement.appendChild(title);
 
     const traffic = document.createElement('p');
+    traffic.classList.add('article-descriptor');
     traffic.textContent = `Traffic: ${topic.formattedTraffic || 'N/A'}`;
     topicElement.appendChild(traffic);
 
@@ -396,6 +391,7 @@ function createTopicElement(topic) {
         const articles = document.createElement('ul');
         topic.articles.slice(0, 5).forEach(article => { // Limit to 5 articles per topic
             const articleItem = document.createElement('li');
+
             const articleLink = document.createElement('a');
             articleLink.href = article.url;
             articleLink.textContent = decodeHtmlEntities(article.title || article.articleTitle);
@@ -404,10 +400,10 @@ function createTopicElement(topic) {
 
             // Handle image for daily trends
             if (article.image && article.image.imageUrl) {
-                const image = document.createElement('img');
-                image.src = article.image.imageUrl;
-                image.alt = decodeHtmlEntities(article.title || article.articleTitle);
-                articleItem.appendChild(image);
+                const articleImage = document.createElement('img');
+                articleImage.src = article.image.imageUrl;
+                articleImage.alt = decodeHtmlEntities(article.title || article.articleTitle);
+                articleItem.appendChild(articleImage);
             }
 
             if (article.videoUrl) {
@@ -418,6 +414,7 @@ function createTopicElement(topic) {
             }
 
             const snippet = document.createElement('p');
+            snippet.classList.add('article-text');
             snippet.textContent = decodeHtmlEntities(article.snippet.split('\n')[0]); // First paragraph
             articleItem.appendChild(snippet);
 

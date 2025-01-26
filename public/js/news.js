@@ -67,22 +67,50 @@ export function updateNews(data) {
         const end = start + itemsPerPage;
         const pageData = articlesToDisplay.slice(start, end);
 
-        container.innerHTML = `
-            <ul>
-                ${pageData.map(article => `
-                    <li class="news-item">
-                        <img src="${article.urlToImage}" alt="Thumbnail" class="news-thumbnail">
-                        <h3>${article.title}</h3>
-                        <p">${article.description}</p>
-                        <br>
-                        <p style="text-indent: 20px;">Written by: ${article.author || 'Unknown'}
-                        on ${new Date(article.publishedAt).toLocaleDateString() || 'N/A'}</p>
-                        <p>From: ${article.source.name || 'N/A'}</p>
-                        <a href="${article.url}" target="_blank">Read more</a>
-                    </li>
-                `).join('')}
-            </ul>
-        `;
+        const ul = document.createElement('ul');
+        pageData.forEach(article => {
+            const li = document.createElement('li');
+            li.classList.add('news-item');
+
+            const img = document.createElement('img');
+            img.src = article.urlToImage;
+            img.alt = 'Thumbnail';
+            img.classList.add('news-thumbnail');
+
+            const title = document.createElement('h3');
+            title.classList.add('article-title');
+            title.textContent = article.title;
+
+            const description = document.createElement('p');
+            description.classList.add('article-text');
+            description.textContent = article.description;
+
+            const authorDate = document.createElement('p');
+            authorDate.classList.add('article-descriptor');
+            authorDate.textContent = `Written by: ${article.author || 'Unknown'} on ${new Date(article.publishedAt).toLocaleDateString() || 'N/A'}`;
+
+            const source = document.createElement('p');
+            source.classList.add('article-descriptor');
+            source.textContent = `From: ${article.source.name || 'N/A'}`;
+
+            const readMore = document.createElement('a');
+            readMore.href = article.url;
+            readMore.target = '_blank';
+            readMore.textContent = 'Read more';
+
+            // Append all elements to the list item
+            li.appendChild(img);
+            li.appendChild(title);
+            li.appendChild(description);
+            li.appendChild(authorDate);
+            li.appendChild(source);
+            li.appendChild(readMore);
+
+            // Append the list item to the unordered list
+            ul.appendChild(li);
+        });
+
+        container.appendChild(ul);
 
         // Pagination controls
         const paginationControls = document.createElement('div');

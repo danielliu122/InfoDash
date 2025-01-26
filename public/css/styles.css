@@ -297,7 +297,7 @@ footer {
     color: var(--secondary-text);
     text-align: center;
     width: 100%;
-    font-size: 1.1em; /* Increased font size for the paragraph */
+    font-size: 1.3em; /* Increased font size for the paragraph */
 }
 
 .news-item a {
@@ -603,4 +603,28 @@ footer {
 
 #finance .btn:hover {
     background-color: #45a049; /* Darker green */
+}
+
+/* Title styles */
+.article-title {
+    font-size: 1.8em; /* Adjust as needed */
+    color: var(--primary-text);
+    text-align: center;
+    margin: 10px 0;
+}
+
+/* Article text styles */
+.article-text {
+    font-size: 1.3em; /* Adjust as needed */
+    color: var(--secondary-text);
+    text-align: center;
+    margin: 10px 0;
+}
+
+/* Article descriptor styles */
+.article-descriptor {
+    font-size: 1em; /* Adjust as needed */
+    color: var(--secondary-text);
+    text-align: center;
+    margin: 5px 0;
 }
