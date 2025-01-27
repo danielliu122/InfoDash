@@ -1,9 +1,15 @@
-// app.js
-// The 'require' statement is not needed in browser-side JavaScript.
-// Configuration is now fetched from the server.
-
 import { loadGoogleMapsScript, initMap, startPeriodicTrafficUpdates, updateTrafficInfo } from './map.js';
-import { fetchFinancialData, fetchRealTimeYahooFinanceData, updateRealTimeFinance, refreshRealTimeFinanceData, updateFinance, updateFinanceDataWithPercentage, startAutoRefresh, stopAutoRefresh } from './finance.js';
+import { 
+    updateInterval,
+    fetchFinancialData, 
+    fetchRealTimeYahooFinanceData, 
+    updateRealTimeFinance, 
+    refreshRealTimeFinanceData, 
+    updateFinance, 
+    updateFinanceDataWithPercentage, 
+    startAutoRefresh, 
+    stopAutoRefresh 
+} from './finance.js';
 import { fetchNewsData, updateNews } from './news.js';
 import { fetchTrendsData, updateTrends } from './trends.js'; // Import from trends.js
 import { fetchRedditData, updateReddit } from './reddit.js'; // Import from reddit.js
@@ -12,6 +18,14 @@ import { fetchRedditData, updateReddit } from './reddit.js'; // Import from redd
 let lastUpdateTime = 0;
 
 function isMarketOpen() {
+    const symbol = document.getElementById('stockSymbolInput').value.toUpperCase();
+    
+    // Check if it's a crypto symbol
+    if (symbol.endsWith('-USD')) {
+        return true; // Crypto markets are always open
+    }
+
+    // Existing stock market hour checks
     const now = new Date();
     const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
     const day = etNow.getDay();
@@ -28,7 +42,6 @@ function isMarketOpen() {
     return false;
 }
 
-// Modify the updateFinanceData function
 function updateFinanceData(timeRange, interval) {
     const now = Date.now();
     if (now - lastUpdateTime < 250) {
@@ -40,9 +53,25 @@ function updateFinanceData(timeRange, interval) {
     
     const stockSymbolInput = document.getElementById('stockSymbolInput');
     const symbol = stockSymbolInput.value || '^IXIC';
+    const isCrypto = symbol.endsWith('-USD');
     
-    // Update once for all timeframes
-    updateFinanceDataWithPercentage(symbol, timeRange, interval)
+    // Adjust timeRange for crypto based on interval
+    let adjustedTimeRange = timeRange;
+    if (isCrypto) {
+        switch(interval) {
+            case '1m':
+                adjustedTimeRange = '15m';
+                break;
+            case '1h':
+                adjustedTimeRange = '1d';
+                break;
+            case '1d':
+                adjustedTimeRange = '7d';
+                break;
+        }
+    }
+    
+    updateFinanceDataWithPercentage(symbol, adjustedTimeRange, interval)
         .catch(error => {
             console.error('Error updating finance data:', error);
             const chartContainer = document.querySelector('#finance .chart-container');
@@ -51,11 +80,14 @@ function updateFinanceData(timeRange, interval) {
             }
         });
     
-    // Start new auto-refresh only for the minute interval during market hours
-    if (timeRange === '5m' && interval === '1m' && isMarketOpen()) {
-        startAutoRefresh(symbol, timeRange, interval);
+    // Start auto-refresh for minute intervals or crypto
+    if (interval === '1m' && (isMarketOpen() || isCrypto)) {
+        startAutoRefresh(symbol, adjustedTimeRange, interval);
     } else {
-        stopAutoRefresh(); // Stop auto-refresh for other intervals
+        stopAutoRefresh();
+        if (!isCrypto && !isMarketOpen()) {
+            console.log('Market is closed. Auto-refresh will not start.');
+        }
     }
 }
 
@@ -73,38 +105,29 @@ let isPaused = {
     'reddit': false
 };
 
-// Function to toggle pause state for finance module
-function togglePauseFinance() {
-    isPaused['finance'] = !isPaused['finance'];
-    
+// Update the togglePauseFinance function in app.js
+export function togglePauseFinance() {
+    const isPaused = !updateInterval; // Check if currently paused
     const button = document.querySelector('#finance .pause-button');
-    button.textContent = isPaused['finance'] ? 'Resume' : 'Pause';
-    button.classList.toggle('paused', isPaused['finance']); // Add or remove 'paused' class
+    const stockSymbolInput = document.getElementById('stockSymbolInput');
+    const symbol = stockSymbolInput.value || '^IXIC';
     
-    console.log(`Finance data fetching is ${isPaused['finance'] ? 'paused' : 'resumed'}.`);
+    // Get the currently active time range button
+    const activeButton = document.querySelector('.time-range-button.active') || document.getElementById('realtimeButton');
+    const [timeRange, interval] = activeButton.getAttribute('onclick')
+        .match(/updateFinanceData\('([^']*)', '([^']*)'\)/i)
+        .slice(1);
     
-    if (!isPaused['finance']) {
-        const stockSymbolInput = document.getElementById('stockSymbolInput');
-        const symbol = stockSymbolInput.value || '^IXIC';
-        
-        // Check if the button exists before trying to get its attribute
-        const minutelyButton = document.getElementById('realtimeButton'); // Change to the correct button ID
-        if (minutelyButton) {
-            const match = minutelyButton.getAttribute('onclick').match(/updateFinanceData\('([^']*)', '([^']*)'\)/i);
-            if (match) {
-                const timeRange = match[1];
-                const interval = match[2];
-                
-                // Restart auto-refresh when resumed
-                startAutoRefresh(symbol, timeRange, interval);
-            } else {
-                console.error('Could not parse timeRange and interval from onclick attribute.');
-            }
-        } else {
-            console.error('Minutely button not found. Cannot resume auto-refresh.');
-        }
+    if (isPaused) {
+        // Resume updates
+        startAutoRefresh(symbol, timeRange, interval);
+        button.textContent = 'Pause';
+        button.classList.remove('paused');
     } else {
-        stopAutoRefresh(); // Stop refreshing when paused
+        // Pause updates
+        stopAutoRefresh();
+        button.textContent = 'Resume';
+        button.classList.add('paused');
     }
 }
 
@@ -600,3 +623,22 @@ function scrollToSection(sectionId) {
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    // Add click handlers for time range buttons
+    document.querySelectorAll('.time-range-button').forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            document.querySelectorAll('.time-range-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Add active class to clicked button
+            this.classList.add('active');
+        });
+    });
+    
+    // Set initial active state
+    const realtimeButton = document.getElementById('realtimeButton');
+    if (realtimeButton) {
+        realtimeButton.classList.add('active');
+    }
+});

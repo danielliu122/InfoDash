@@ -1,3 +1,20 @@
+// At the top of the file
+export let updateInterval;
+
+// Add this helper function to ensure data points are properly connected
+function processChartData(dates, prices) {
+    // Filter out any null/undefined prices and their corresponding dates
+    const validData = dates.reduce((acc, date, index) => {
+        if (prices[index] !== null && prices[index] !== undefined) {
+            acc.dates.push(date);
+            acc.prices.push(prices[index]);
+        }
+        return acc;
+    }, { dates: [], prices: [] });
+
+    return validData;
+}
+
 // Function to fetch financial data
 export const fetchFinancialData = async (symbol = '^IXIC', timeRange = '5m', interval = '1m') => {
     try {
@@ -130,14 +147,16 @@ export function updateFinance(data) {
         return;
     }
 
+    // Process the data before creating the chart
+    const processedData = processChartData(data.dates, data.prices);
     // Create the new chart
     window.financeChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: data.dates,
+            labels: processedData.dates,
             datasets: [{
                 label: `${data.symbol} Closing Prices`,
-                data: data.prices,
+                data: processedData.prices,
                 borderColor: 'rgba(75, 192, 192, 1)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 fill: true,
@@ -207,6 +226,8 @@ export function updateFinance(data) {
         window.financeChart.zoom(0.9); // Zoom out by 10%
     });
 
+
+    
     // Add mobile mode toggle functionality - ADD YOUR CODE HERE
     const mobileToggle = document.getElementById('mobileToggle');
     if (mobileToggle) {
@@ -327,7 +348,6 @@ export async function updateFinanceDataWithPercentage(symbol, timeRange, interva
 }
 
 // Declare updateInterval at the top of the file, outside any function
-let updateInterval;
 let lastKnownChange = null;
 let lastKnownChangePercent = null;
 
@@ -336,14 +356,18 @@ export function startAutoRefresh(symbol, timeRange, interval) {
     // Stop any existing interval
     stopAutoRefresh();
 
-    // Initial update
-    updateFinanceDataWithPercentage(symbol, timeRange, interval);
+    const isCrypto = symbol.endsWith('-USD');
+    
+    // Only start auto-refresh if it's a crypto symbol or if using minute intervals
+    if (interval === '1m') {
+        // Initial update
+        updateFinanceDataWithPercentage(symbol, timeRange, interval);
 
-    // Set up interval for updates every 2-3 seconds only for minutely timeframe
-    if (timeRange === '5m' && interval === '1m') {
         updateInterval = setInterval(() => {
             updateFinanceDataWithPercentage(symbol, timeRange, interval);
-        }, Math.floor(Math.random() * (3000 - 2000 + 1) + 2000)); // Random interval between 2000-3000 ms
+        }, Math.floor(Math.random() * (3000 - 2000 + 1) + 2000));
+    } else if (!isCrypto) {
+        console.log('Market is closed. Auto-refresh will not start.');
     }
 }
 
@@ -355,10 +379,15 @@ export function stopAutoRefresh() {
     }
 }
 
-// Event listener for stock symbol input change
+// Update the event listener for stock symbol input
 document.getElementById('stockSymbolInput').addEventListener('change', (event) => {
     const symbol = event.target.value.toUpperCase();
-    const [timeRange, interval] = document.getElementById('minutelyButton').getAttribute('onclick').match(/updateFinanceData\('[^']*', '([^']*)', '([^']*)'\)/i).slice(1);
+    
+    // Get the currently active time range button
+    const activeButton = document.querySelector('.time-range-button.active') || document.getElementById('realtimeButton');
+    const [timeRange, interval] = activeButton.getAttribute('onclick')
+        .match(/updateFinanceData\('([^']*)', '([^']*)'\)/i)
+        .slice(1);
     
     // Check if auto-refresh is already running
     if (updateInterval) {
@@ -440,3 +469,27 @@ function initializeFinanceChart(data) {
 
 // Call this function with your data when you need to initialize the chart
 // Example: initializeFinanceChart(yourData);
+
+export function togglePauseFinance() {
+    const isPaused = !updateInterval;
+    const button = document.querySelector('#finance .pause-button');
+    const stockSymbolInput = document.getElementById('stockSymbolInput');
+    const symbol = stockSymbolInput.value || '^IXIC';
+    
+    // Get the currently active time range button
+    const activeButton = document.querySelector('.time-range-button.active') || document.getElementById('realtimeButton');
+    const timeRange = activeButton.getAttribute('onclick').match(/updateFinanceData\('([^']*)',/)[1];
+    const interval = activeButton.getAttribute('onclick').match(/, '([^']*)'\)/)[1];
+    
+    if (isPaused && interval === '1m') {
+        // Resume updates only for minute intervals
+        startAutoRefresh(symbol, timeRange, interval);
+        button.textContent = 'Pause';
+        button.classList.remove('paused');
+    } else {
+        // Pause updates
+        stopAutoRefresh();
+        button.textContent = 'Resume';
+        button.classList.add('paused');
+    }
+}
