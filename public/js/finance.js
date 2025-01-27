@@ -93,9 +93,6 @@ export function updateFinance(data) {
         return;
     }
 
-    // Debugging: Log the data to ensure it's correct
-    //console.log('Finance data:', data);
-
     // Clear the inner HTML and destroy existing chart if it exists
     chartContainer.innerHTML = `
         <div style="position: relative; width: 100%; height: 100%;">
@@ -113,75 +110,16 @@ export function updateFinance(data) {
     canvas.width = chartContainer.clientWidth;
     canvas.height = chartContainer.clientHeight - 30; // Subtract space for slider
 
-    const ctx = document.getElementById('financeChart').getContext('2d');
+    const ctx = canvas.getContext('2d');
 
-    let timeUnit;
-    switch (data.timeRange) {
-        case '1m':
-            timeUnit = 'minute';
-            break;
-        case '2m':
-            timeUnit = 'minute';
-            break;
-        case '5m':
-            timeUnit = 'minute';
-            break;
-        case '15m':
-            timeUnit = 'minute';
-            break;
-        case '30m':
-            timeUnit = 'minute';
-            break;
-        case '60m':
-            timeUnit = 'hour';
-            break;
-        case '90m':
-            timeUnit = 'hour';
-            break;
-        case '1h':
-            timeUnit = 'hour';
-            break;
-        case '1d':
-            timeUnit = 'minute';
-            break;
-        case '5d':
-            timeUnit = 'day';
-            break;
-        case '1wk':
-            timeUnit = 'week';
-            break;
-        case '1mo':
-            timeUnit = 'day';
-            break;
-        case '3mo':
-            timeUnit = 'week';
-            break;
-        case '6mo':
-            timeUnit = 'month';
-            break;
-        case '1y':
-            timeUnit = 'week';
-            break;
-        case '2y':
-            timeUnit = 'month';
-            break;
-        case '5y':
-            timeUnit = 'year';
-            break;
-        case '10y':
-            timeUnit = 'year';
-            break;
-        case 'ytd':
-            timeUnit = 'day';
-            break;
-        default:
-            timeUnit = 'minute';
+    // Destroy the existing chart if it exists
+    if (window.financeChart && window.financeChart instanceof Chart) {
+        window.financeChart.destroy();
     }
 
     // Ensure data.dates and data.prices are arrays and have the same length
     if (!Array.isArray(data.dates) || !Array.isArray(data.prices) || data.dates.length !== data.prices.length) {
         console.error('Invalid data format for chart:', data);
-        chartContainer.innerHTML = '<p>Invalid data format for chart.</p>';
         return;
     }
 
@@ -192,168 +130,69 @@ export function updateFinance(data) {
         return;
     }
 
-    // Fill missing points with null to ensure continuity
-    const filledPrices = data.prices.map((price, index) => {
-        return price !== null ? price : (index > 0 ? data.prices[index - 1] : null);
-    });
-
-    console.log('Creating new chart');
-
-    // Before creating the chart, decimate data if needed
-    let chartDates = data.dates;
-    let chartPrices = filledPrices;
-    
-    if (data.timeRange === '1wk' || data.timeRange === '1mo') {
-        const decimated = decimateData(data.dates, filledPrices);
-        chartDates = decimated.dates;
-        chartPrices = decimated.prices;
-    }
-
+    // Create the new chart
     window.financeChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: chartDates,
+            labels: data.dates,
             datasets: [{
                 label: `${data.symbol} Closing Prices`,
-                data: chartPrices,
+                data: data.prices,
                 borderColor: 'rgba(75, 192, 192, 1)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 fill: true,
-                pointRadius: 2,  // Set point size to 1px
-                pointHoverRadius: 10  // Keep hover size same as regular size
+                pointRadius: 2,
+                pointHoverRadius: 10
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            interaction: {
-                mode: 'index',
-                intersect: false,
-            },
-            plugins: {
-                zoom: {
-                    limits: {
-                        x: {min: 'original', max: 'original'},
-                        y: {min: 'original', max: 'original'},
-                        minScale: 0.1  // This means you can only zoom out to show 10x the initial view
-                    },
-                    pan: {
-                        enabled: true,
-                        mode: 'x',
-                        modifierKey: null
-                    },
-                    zoom: {
-                        wheel: {
-                            enabled: true,
-                            modifierKey: null
-                        },
-                        pinch: {
-                            enabled: true
-                        },
-                        mode: 'x'
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `Price: $${Number(context.parsed.y).toFixed(2)}`;
-                        }
-                    }
-                }
-            },
             scales: {
                 y: {
-                    display: !isMobile(),
                     ticks: {
                         callback: function(value) {
                             return '$' + Number(value).toFixed(2);
-                        }
+                        },
+                        color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000' // Black for light mode, white for dark mode
                     }
                 },
                 x: {
-                    display: !isMobile(),
                     type: 'time',
                     time: {
-                        unit: timeUnit
+                        unit: 'minute' // Adjust based on your data
+                    },
+                    ticks: {
+                        color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000' // Black for light mode, white for dark mode
                     }
                 }
             }
         }
     });
 
-    // After creating the chart, add this code
+    // Slider functionality
     const slider = document.getElementById('chartSlider');
     slider.addEventListener('input', function(e) {
         if (!window.financeChart) return;
-        
+
         const chart = window.financeChart;
-        const data = chart.data;
-        const totalPoints = data.labels.length;
+        const totalPoints = chart.data.labels.length;
         const visiblePoints = Math.floor(totalPoints * 0.1); // 10% of total points
-        
+
         // Calculate the start index based on slider position
         const percent = e.target.value / 100;
         const maxStartIndex = totalPoints - visiblePoints;
         const startIndex = Math.floor(percent * maxStartIndex);
-        
+
         // Set the viewport to show 10% of points starting from the calculated position
-        chart.options.scales.x.min = data.labels[startIndex];
-        chart.options.scales.x.max = data.labels[startIndex + visiblePoints];
-        chart.update('none');
+        chart.options.scales.x.min = chart.data.labels[startIndex];
+        chart.options.scales.x.max = chart.data.labels[startIndex + visiblePoints];
+        chart.update('none'); // Update without animation
     });
 
     // Initialize slider position
     if (slider) {
         slider.value = 0;
-    }
-
-    // Add zoom button functionality
-    const zoomIn = document.getElementById('zoomIn');
-    const zoomOut = document.getElementById('zoomOut');
-
-    if (zoomIn && zoomOut) {
-        zoomIn.addEventListener('click', function() {
-            if (!window.financeChart) return;
-            window.financeChart.zoom(1.2); // Zoom in by 20%
-        });
-
-        zoomOut.addEventListener('click', function() {
-            if (!window.financeChart) return;
-            window.financeChart.zoom(0.8); // Zoom out by 20%
-        });
-    }
-
-    // Add after the zoom button event listeners
-    const mobileToggle = document.getElementById('mobileToggle');
-    if (mobileToggle) {
-        mobileToggle.addEventListener('click', function() {
-            isMobileMode = !isMobileMode;
-            const chartContainer = document.querySelector('.chart-container');
-            const slider = document.getElementById('chartSlider');
-            
-            if (isMobileMode) {
-                chartContainer.style.height = '200px';
-                slider.style.display = 'block';
-                window.financeChart.options.scales.x.display = false;
-                window.financeChart.options.scales.y.display = false;
-            } else {
-                chartContainer.style.height = '400px';
-                slider.style.display = 'none';
-                window.financeChart.options.scales.x.display = true;
-                window.financeChart.options.scales.y.display = true;
-            }
-            window.financeChart.update();
-        });
-    }
-
-    // Add this near the end of the function, before the chart creation
-    const pauseButton = document.querySelector('#finance .pause-button');
-    if (pauseButton) {
-        if (data.timeRange === '5m') {
-            pauseButton.style.display = 'block';
-        } else {
-            pauseButton.style.display = 'none';
-        }
     }
 }
 
@@ -498,3 +337,52 @@ function isMobile() {
 
 // Add at the top of the file
 let isMobileMode = false;
+
+// Function to get the current theme
+function getCurrentTheme() {
+    return document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+}
+
+// Initialize the chart
+function initializeFinanceChart(data) {
+    const ctx = document.getElementById('financeChart').getContext('2d');
+
+    // Set colors based on the current theme
+    const axisLabelColor = getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000'; // Black for light mode, white for dark mode
+
+    const financeChart = new Chart(ctx, {
+        type: 'line', // or any other chart type
+        data: {
+            // your data here
+        },
+        options: {
+            scales: {
+                x: {
+                    ticks: {
+                        color: axisLabelColor // Set x-axis label color based on theme
+                    },
+                    grid: {
+                        color: getCurrentTheme() === 'dark' ? '#757575' : '#e0e0e0' // Optional: Set grid color based on theme
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: axisLabelColor // Set y-axis label color based on theme
+                    },
+                    grid: {
+                        color: getCurrentTheme() === 'dark' ? '#757575' : '#e0e0e0' // Optional: Set grid color based on theme
+                    }
+                }
+            },
+            // other options...
+        }
+    });
+
+    // Refresh the chart to apply the new colors
+    financeChart.update();
+
+    return financeChart;
+}
+
+// Call this function with your data when you need to initialize the chart
+// Example: initializeFinanceChart(yourData);

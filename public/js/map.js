@@ -1,9 +1,156 @@
 // map.js
 
+// Define light mode style with default colors
+const lightModeStyle = [
+    {
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "color": "#ffffff" // White background for light mode
+            }
+        ]
+    },
+    {
+        "elementType": "labels.icon",
+        "stylers": [
+            {
+                "visibility": "off"
+            }
+        ]
+    },
+    {
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "color": "#000000" // Black text for light mode
+            }
+        ]
+    },
+    {
+        "featureType": "road",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "color": "#e0e0e0" // Light gray roads
+            }
+        ]
+    },
+    {
+        "featureType": "water",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "color": "#b0d3f1" // Light blue for water
+            }
+        ]
+    },
+    {
+        "featureType": "landscape",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "color": "#f5f5f5" // Light color for landscape
+            }
+        ]
+    },
+    {
+        "featureType": "administrative",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "color": "#e0e0e0" // Light gray for administrative areas
+            }
+        ]
+    }
+];
+
+// Define night mode style
+const darkModeStyle = [
+    { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+    {
+        featureType: "administrative.locality",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#d59563" }],
+    },
+    {
+        featureType: "poi",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#d59563" }],
+    },
+    {
+        featureType: "poi.park",
+        elementType: "geometry",
+        stylers: [{ color: "#263c3f" }],
+    },
+    {
+        featureType: "poi.park",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#6b9a76" }],
+    },
+    {
+        featureType: "road",
+        elementType: "geometry",
+        stylers: [{ color: "#38414e" }],
+    },
+    {
+        featureType: "road",
+        elementType: "geometry.stroke",
+        stylers: [{ color: "#212a37" }],
+    },
+    {
+        featureType: "road",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#9ca5b3" }],
+    },
+    {
+        featureType: "road.highway",
+        elementType: "geometry",
+        stylers: [{ color: "#746855" }],
+    },
+    {
+        featureType: "road.highway",
+        elementType: "geometry.stroke",
+        stylers: [{ color: "#1f2835" }],
+    },
+    {
+        featureType: "road.highway",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#f3d19c" }],
+    },
+    {
+        featureType: "transit",
+        elementType: "geometry",
+        stylers: [{ color: "#2f3948" }],
+    },
+    {
+        featureType: "transit.station",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#d59563" }],
+    },
+    {
+        featureType: "water",
+        elementType: "geometry",
+        stylers: [{ color: "#17263c" }],
+    },
+    {
+        featureType: "water",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#515c6d" }],
+    },
+    {
+        featureType: "water",
+        elementType: "labels.text.stroke",
+        stylers: [{ color: "#17263c" }],
+    },
+];
+
 let map;
 let trafficLayer;
 let trafficUpdateInterval;
 let isMapInitialized = false;
+let currentMapStyle = lightModeStyle; // Default to light mode
 
 function debounce(func, wait) {
     let timeout;
@@ -61,23 +208,20 @@ async function loadGoogleMapsScript() {
 // Ensure initMap is available globally
 window.initMap = initMap;
 
-function initMap() {
-    const mapElement = document.getElementById('map');
-    if (!mapElement) {
-        console.error('Map container element not found');
-        return;
-    }
+async function initMap() {
+    // Import the ColorScheme from the Google Maps library
+    const { ColorScheme } = await google.maps.importLibrary("core");
 
-    const defaultCenter = { lat: 39.8283, lng: -98.5795 };
+    // Set the default color scheme to DARK
+    let currentColorScheme = ColorScheme.DARK;
 
-    console.log('Initializing map with center:', defaultCenter);
+    const mapOptions = {
+        center: { lat: 40.674, lng: -73.945 }, // Example coordinates
+        zoom: 12,
+        colorScheme: currentColorScheme, // Set the initial color scheme to DARK
+    };
 
-    map = new google.maps.Map(mapElement, {
-        zoom: 4,
-        center: defaultCenter,
-        // Remove mapId for now to isolate the issue
-        // mapId: 'YOUR_MAP_ID_HERE'
-    });
+    const map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
     const input = document.createElement("input");
     input.id = "MapsInput";
@@ -146,6 +290,13 @@ function initMap() {
     map.addListener('idle', debouncedUpdate);
 
     startPeriodicTrafficUpdates();
+
+    // Add event listener for the theme toggle button
+    document.getElementById('themeToggleButton').addEventListener('click', async () => {
+        // Toggle between DARK and LIGHT
+        currentColorScheme = currentColorScheme === ColorScheme.DARK ? ColorScheme.LIGHT : ColorScheme.DARK;
+        map.setOptions({ colorScheme: currentColorScheme });
+    });
 }
 
 function startPeriodicTrafficUpdates() {
@@ -185,6 +336,16 @@ function requestLocation() {
         console.warn('Geolocation not supported. Using default center.');
         updateTrafficInfo(defaultCenter);
     }
+}
+
+// Function to toggle between light and dark mode
+async function toggleMapStyle() {
+    const { ColorScheme } = await google.maps.importLibrary("core");
+    const currentColorScheme = map.get('colorScheme');
+
+    // Toggle between LIGHT and DARK
+    const newColorScheme = currentColorScheme === ColorScheme.LIGHT ? ColorScheme.DARK : ColorScheme.LIGHT;
+    map.setOptions({ colorScheme: newColorScheme });
 }
 
 export { loadGoogleMapsScript, initMap, startPeriodicTrafficUpdates, updateTrafficInfo };

@@ -269,8 +269,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Theme toggle functionality
         const themeToggleButton = document.getElementById('themeToggleButton');
         if (themeToggleButton) {
-            themeToggleButton.addEventListener('click', () => {
+            themeToggleButton.addEventListener('click', async () => {
+                // Toggle the theme class on the body
                 document.body.classList.toggle('dark-theme');
+
+                // Destroy the existing chart if it exists
+                if (window.financeChart && window.financeChart instanceof Chart) {
+                    window.financeChart.destroy();
+                }
+
+                // Get the current stock symbol and time range/interval
+                const stockSymbolInput = document.getElementById('stockSymbolInput');
+                const symbol = stockSymbolInput.value || '^IXIC';
+                const timeRange = '1d'; // Set your default time range
+                const interval = '1m'; // Set your default interval
+
+                // Fetch the financial data again to recreate the chart
+                try {
+                    const data = await fetchFinancialData(symbol, timeRange, interval);
+                    updateFinance(data); // This will recreate the chart with the new theme
+                } catch (error) {
+                    console.error('Error fetching financial data after theme toggle:', error);
+                }
             });
         } else {
             console.warn('Theme toggle button not found');

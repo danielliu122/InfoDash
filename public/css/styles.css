@@ -486,6 +486,14 @@ footer {
     padding: 10px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
+    color: #000; /* Default text color for light mode */
+    background-color: #fff; /* Default background color for light mode */
+}
+
+/* Dark mode styles */
+body.dark-theme #chat-input {
+    color: #fff; /* Text color for dark mode */
+    background-color: #333; /* Background color for dark mode */
 }
 
 #MapsInput {
@@ -627,4 +635,56 @@ footer {
     color: var(--secondary-text);
     text-align: center;
     margin: 5px 0;
+}
+
+/* Override Materialize CSS styles for select dropdown input in dark mode */
+body.dark-theme .select-dropdown {
+    background-color: #424242; /* Dark background for the input */
+    color: #FFFFFF; /* White text for the input */
+}
+
+/* Ensure the dropdown options have a dark background */
+body.dark-theme .dropdown-content {
+    background-color: #424242; /* Dark background for dropdown options */
+    color: #FFFFFF; /* White text for dropdown options */
+}
+
+/* Ensure the label is visible in dark mode */
+body.dark-theme .input-field label {
+    color: #BDBDBD; /* Light text for labels */
+}
+
+/* Additional styles to ensure dropdown text is white */
+body.dark-theme .input-field select option {
+    color: #FFFFFF; /* White text for options */
+    background-color: #424242; /* Dark background for options */
+}
+
+/* Styles for the stock symbol input in dark mode */
+body.dark-theme #stockSymbolInput {
+    background-color: #424242; /* Dark background for the input */
+    color: #FFFFFF; /* White text for the input */
+    border: 1px solid #757575; /* Border color */
+}
+
+/* Placeholder text color in dark mode */
+body.dark-theme #stockSymbolInput::placeholder {
+    color: #BDBDBD; /* Light color for placeholder text */
+}
+
+/* Styles for autocomplete items in dark mode */
+body.dark-theme .autocomplete-items {
+    background-color: #424242; /* Dark background for autocomplete dropdown */
+    color: #FFFFFF; /* White text for autocomplete items */
+}
+
+/* Styles for individual autocomplete items */
+body.dark-theme .autocomplete-item {
+    background-color: #424242; /* Dark background for each item */
+    color: #FFFFFF; /* White text for each item */
+}
+
+/* Highlight on hover for autocomplete items */
+body.dark-theme .autocomplete-item:hover {
+    background-color: #616161; /* Slightly lighter background on hover */
 }
