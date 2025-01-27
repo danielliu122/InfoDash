@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('dailyButton').addEventListener('click', () => updateFinanceData('1d', '5m'));
         document.getElementById('weeklyButton').addEventListener('click', () => updateFinanceData('1wk', '1h'));
         document.getElementById('monthlyButton').addEventListener('click', () => updateFinanceData('1mo', '1d'));
-        document.getElementById('yearlyButton').addEventListener('click', () => updateFinanceData('1y', '1wk'));
+        //document.getElementById('yearlyButton').addEventListener('click', () => updateFinanceData('3mo', '1d'));
     } catch (error) {
         console.error('Error initializing data:', error);
     }

@@ -154,16 +154,45 @@ export function updateFinance(data) {
                         callback: function(value) {
                             return '$' + Number(value).toFixed(2);
                         },
-                        color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000' // Black for light mode, white for dark mode
-                    }
+                        color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000'
+                    },
+                    offset: true,
+                    beginAtZero: false
                 },
                 x: {
                     type: 'time',
                     time: {
-                        unit: 'minute' // Adjust based on your data
+                        unit: 'minute'
                     },
                     ticks: {
-                        color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000' // Black for light mode, white for dark mode
+                        color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000'
+                    },
+                    offset: true,
+                    bounds: 'data'
+                }
+            },
+            plugins: {
+                zoom: {
+                    zoom: {
+                        wheel: {
+                            enabled: true,
+                            modifierKey: null,
+                            speed: 0.1
+                        },
+                        pinch: {
+                            enabled: true
+                        },
+                        mode: 'x',
+                        onZoom: function(ctx) {
+                            // If trying to zoom out, reset to previous state
+                            if (ctx.chart.getZoomLevel() < 1) {
+                                ctx.chart.resetZoom();
+                            }
+                        }
+                    },
+                    pan: {
+                        enabled: true,
+                        mode: 'x'
                     }
                 }
             }
