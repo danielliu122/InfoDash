@@ -222,6 +222,9 @@ window.toggleSection = function(sectionContentId) {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Scroll to the top of the page on reload
+    window.scrollTo(0, 0);
+
     // Initialize Materialize components
     M.AutoInit();
 
@@ -307,6 +310,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error initializing data:', error);
     }
     console.log("DOM fully loaded")
+
+    // Add event listeners for pagination controls
+    const paginationButtons = document.querySelectorAll('.pagination-controls button');
+    paginationButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent default button behavior
+
+            // Your logic for pagination (e.g., fetching new data)
+            // After fetching new data, the viewport will adjust automatically
+            // No need to scroll to the top here, as it should maintain its position
+        });
+    });
+
+    const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+
+    // Show the button when the user scrolls down 100px from the top of the document
+    window.onscroll = function() {
+        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+            scrollToTopBtn.style.display = "flex"; // Use flex to ensure it is centered
+        } else {
+            scrollToTopBtn.style.display = "none";
+        }
+    };
+
+    // Scroll to the top when the button is clicked
+    scrollToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // Smooth scroll effect
+        });
+    });
 });
 
 // Make sure to call loadGoogleMapsScript in your initialization code
@@ -560,4 +594,11 @@ document.getElementById('xrpButton').addEventListener('click', () => {
     document.getElementById('stockSymbolInput').value = 'XRP-USD'; // Set input value
     updateFinanceData('1d', '1m'); // Refresh chart with daily data
 });
+
+function scrollToSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+    }
+}
 

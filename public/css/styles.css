@@ -688,3 +688,47 @@ body.dark-theme .autocomplete-item {
 body.dark-theme .autocomplete-item:hover {
     background-color: #616161; /* Slightly lighter background on hover */
 }
+
+/* Add this to your styles.css */
+#news-content, #trends-content {
+    height: 600px; /* Set a fixed height based on the maximum expected content */
+    overflow-y: auto; /* Allow vertical scrolling if content exceeds max height */
+}
+
+/* Hide scrollbars for WebKit browsers (Chrome, Safari) */
+#news-content::-webkit-scrollbar, 
+#trends-content::-webkit-scrollbar {
+    display: none; /* Hide scrollbar */
+}
+
+/* Hide scrollbars for Firefox */
+#news-content {
+    scrollbar-width: none; /* Hide scrollbar */
+}
+
+#trends-content {
+    scrollbar-width: none; /* Hide scrollbar */
+}
+
+.scroll-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #333; /* Background color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px; /* Padding */
+    cursor: pointer; /* Pointer cursor on hover */
+    z-index: 1000; /* Ensure it is above other elements */
+    transition: opacity 0.3s, background-color 0.3s; /* Smooth transition for opacity and background color */
+    display: flex; /* Flexbox for centering text */
+    align-items: center; /* Center text vertically */
+    justify-content: center; /* Center text horizontally */
+    font-size: 16px; /* Font size */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Shadow for depth */
+}
+
+.scroll-to-top:hover {
+    background-color: #555; /* Darker background on hover */
+}

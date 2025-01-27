@@ -119,7 +119,9 @@ export function updateNews(data) {
         if (currentPage > 1) {
             const prevButton = document.createElement('button');
             prevButton.textContent = 'Previous';
-            prevButton.onclick = () => {
+            prevButton.type = 'button';
+            prevButton.onclick = (event) => {
+                event.preventDefault();
                 currentPage--;
                 renderPage(currentPage);
             };
@@ -129,7 +131,9 @@ export function updateNews(data) {
         if (currentPage < totalPages) {
             const nextButton = document.createElement('button');
             nextButton.textContent = 'Next';
-            nextButton.onclick = () => {
+            nextButton.type = 'button';
+            nextButton.onclick = (event) => {
+                event.preventDefault();
                 currentPage++;
                 renderPage(currentPage);
             };
