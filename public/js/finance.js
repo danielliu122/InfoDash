@@ -198,6 +198,37 @@ export function updateFinance(data) {
             }
         }
     });
+     // Add zoom button functionality
+     document.getElementById('zoomIn').addEventListener('click', () => {
+        window.financeChart.zoom(1.1); // Zoom in by 10%
+    });
+
+    document.getElementById('zoomOut').addEventListener('click', () => {
+        window.financeChart.zoom(0.9); // Zoom out by 10%
+    });
+
+    // Add mobile mode toggle functionality - ADD YOUR CODE HERE
+    const mobileToggle = document.getElementById('mobileToggle');
+    if (mobileToggle) {
+        mobileToggle.addEventListener('click', function() {
+            isMobileMode = !isMobileMode;
+            const chartContainer = document.querySelector('.chart-container');
+            const slider = document.getElementById('chartSlider');
+            
+            if (isMobileMode) {
+                chartContainer.style.height = '200px';
+                slider.style.display = 'block';
+                window.financeChart.options.scales.x.display = false;
+                window.financeChart.options.scales.y.display = false;
+            } else {
+                chartContainer.style.height = '400px';
+                slider.style.display = 'none';
+                window.financeChart.options.scales.x.display = true;
+                window.financeChart.options.scales.y.display = true;
+            }
+            window.financeChart.update();
+        });
+    }
 
     // Slider functionality
     const slider = document.getElementById('chartSlider');
