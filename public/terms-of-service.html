@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - Info Dash</title>
+    <style>
+        :root {
+            /* Light mode variables */
+            --primary-color: #2196F3;
+            --primary-color-rgb: 33, 150, 243;
+            --text-color: #333;
+            --background-color: #fff;
+            --border-color: #e0e0e0;
+            --container-bg: #fff;
+            --shadow-color: rgba(0,0,0,0.1);
+        }
+
+        /* Dark mode variables */
+        [data-theme="dark"] {
+            --primary-color: #64B5F6;
+            --primary-color-rgb: 100, 181, 246;
+            --text-color: #E0E0E0;
+            --background-color: #121212;
+            --border-color: #333;
+            --container-bg: #1E1E1E;
+            --shadow-color: rgba(0,0,0,0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--background-color);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px;
+            border-radius: 50%;
+            border: none;
+            background: var(--container-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            box-shadow: 0 2px 4px var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .tos-container {
+            background: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            padding: 30px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-top: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            background: rgba(var(--primary-color-rgb), 0.05);
+        }
+
+        ul {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .tos-container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .theme-toggle {
+                display: none;
+            }
+
+            body {
+                color: black;
+                background: white;
+            }
+
+            .tos-container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">🌓</button>
+    
+    <div class="tos-container">
+        <h1>Terms of Service</h1>
+        <p class="last-updated">Last updated: January 27, 2025</p>
+
+        <div class="section">
+            <h2>1. Terms</h2>
+            <p>By accessing Info Dash, accessible from infodash.app, you agree to be bound by these Terms of Service and comply with all applicable laws and regulations. If you disagree with any of these terms, you are prohibited from accessing this site. The materials contained in this Website are protected by copyright and trade mark law.</p>
+        </div>
+
+        <div class="section">
+            <h2>2. Use License</h2>
+            <p>Permission is granted to temporarily download one copy of the materials on Info Dash for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:</p>
+            <ul>
+                <li>Modify or copy the materials</li>
+                <li>Use the materials for any commercial purpose or public display</li>
+                <li>Attempt to reverse engineer any software contained on Info Dash</li>
+                <li>Remove any copyright or other proprietary notations from the materials</li>
+                <li>Transfer the materials to another person or "mirror" the materials on any other server</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>3. Disclaimer</h2>
+            <p>All materials on Info Dash are provided "as is". Info Dash makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties, including without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
+        </div>
+
+        <div class="section">
+            <h2>4. Limitations</h2>
+            <p>Info Dash or its suppliers will not be held accountable for any damages that will arise with the use or inability to use the materials on Info Dash's Website, even if Info Dash or an authorized representative has been notified, orally or written, of the possibility of such damage.</p>
+        </div>
+
+        <div class="section">
+            <h2>5. Revisions and Errata</h2>
+            <p>The materials appearing on Info Dash may include technical, typographical, or photographic errors. Info Dash does not warrant that any of the materials on its website are accurate, complete, or current. Info Dash may make changes to the materials contained on its website at any time without notice.</p>
+        </div>
+
+        <div class="section">
+            <h2>6. Links</h2>
+            <p>Info Dash has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The presence of any link does not imply endorsement by Info Dash of the site. Use of any such linked website is at the user's own risk.</p>
+        </div>
+
+        <div class="section">
+            <h2>7. Site Terms of Use Modifications</h2>
+            <p>Info Dash may revise these Terms of Use at any time without prior notice. By using this website, you are agreeing to be bound by the current version of these Terms and Conditions of Use.</p>
+        </div>
+
+        <div class="section">
+            <h2>8. Governing Law</h2>
+            <p>Any claim related to Info Dash's Website shall be governed by the laws of the United States without regards to its conflict of law provisions.</p>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        
+        // Check for saved theme preference or system preference
+        const getPreferredTheme = () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                return savedTheme;
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        // Apply theme
+        const setTheme = (theme) => {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        };
+
+        // Initialize theme
+        setTheme(getPreferredTheme());
+
+        // Theme toggle click handler
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+    </script>
+</body>
+</html>

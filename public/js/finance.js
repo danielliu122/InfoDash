@@ -214,18 +214,12 @@ export function updateFinance(data) {
             isMobileMode = !isMobileMode;
             const chartContainer = document.querySelector('.chart-container');
             const slider = document.getElementById('chartSlider');
+            const display = isMobileMode;
             
-            if (isMobileMode) {
-                chartContainer.style.height = '200px';
-                slider.style.display = 'block';
-                window.financeChart.options.scales.x.display = false;
-                window.financeChart.options.scales.y.display = false;
-            } else {
-                chartContainer.style.height = '400px';
-                slider.style.display = 'none';
-                window.financeChart.options.scales.x.display = true;
-                window.financeChart.options.scales.y.display = true;
-            }
+            chartContainer.style.height = isMobileMode ? '200px' : '400px';
+            slider.style.display = isMobileMode ? 'block' : 'none';
+            window.financeChart.options.scales.x.display = !isMobileMode;
+            window.financeChart.options.scales.y.display = !isMobileMode;
             window.financeChart.update();
         });
     }

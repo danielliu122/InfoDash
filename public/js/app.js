@@ -31,7 +31,7 @@ function isMarketOpen() {
 // Modify the updateFinanceData function
 function updateFinanceData(timeRange, interval) {
     const now = Date.now();
-    if (now - lastUpdateTime < 500) {
+    if (now - lastUpdateTime < 250) {
         console.log('Please wait before requesting new data');
         return;
     }
@@ -505,8 +505,6 @@ const stockSymbols = {
     'RCL': 'Royal Caribbean',
     'CCL': 'Carnival Corporation',
     'NCLH': 'Norwegian Cruise Line',
-    'RCL': 'Royal Caribbean',
-    'HST': 'Host Hotels & Resorts',
     'MAR': 'Marriott International',
     'HLT': 'Hilton Worldwide',
     'IHG': 'InterContinental Hotels Group',

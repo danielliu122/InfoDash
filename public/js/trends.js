@@ -24,7 +24,7 @@ export const fetchTrendsData = async (type = 'daily', category = 'all', language
         const data = JSON.parse(responseText);
         
         // Log the data response to the console
-        console.log('Fetched trends data:', data);
+        //console.log('Fetched trends data:', data);
         
         return data;
     } catch (error) {
@@ -325,7 +325,7 @@ function displayNoTrendsMessage() {
 }
 
 function processRealtimeTrends(data) {
-    console.log('Processing real-time trends data');
+    //console.log('Processing real-time trends data');
     const trendsSection = document.querySelector('#trends .data-container');
     trendsSection.innerHTML = ''; // Clear previous data
 
@@ -337,7 +337,7 @@ function processRealtimeTrends(data) {
 }
 
 function processDailyTrends(data) {
-    console.log('Processing daily trends data');
+    //console.log('Processing daily trends data');
     const trendsSection = document.querySelector('#trends .data-container');
     trendsSection.innerHTML = ''; // Clear previous data
 

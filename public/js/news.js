@@ -16,7 +16,7 @@ export const fetchNewsData = async (query = 'world', country = 'us', language = 
 
     // Check if cached data is available and still valid
     if (!forceRefresh && newsCache[cacheKey].data.length > 0 && (Date.now() - newsCache[cacheKey].timestamp < newsCache[cacheKey].ttl)) {
-        console.log('Using cached news data for:', cacheKey); // Log when cached data is used
+        //console.log('Using cached news data for:', cacheKey); // Log when cached data is used
         return newsCache[cacheKey].data;
     }
 
