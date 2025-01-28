@@ -293,18 +293,33 @@ export async function updateFinanceData(symbol, timeRange = '1d', interval = '1m
     await refreshFinanceData(symbol, timeRange, interval);
 }
 
-// Function to calculate change percentage
 export function calculateChangePercentage(prices) {
-    if (!prices || prices.length < 2) {
-        return 0;
+    // Check if the array is valid and contains at least two points
+    if (!Array.isArray(prices) || prices.length < 2) {
+        console.warn('Insufficient data points to calculate change percentage.');
+        return 0; // Default to 0% if there aren't enough points
     }
 
-    const startPrice = prices[0];
-    const endPrice = prices[prices.length - 1];
+    // Filter out invalid or zero/negative prices
+    const validPrices = prices.filter(price => price > 0 && price !== null && price !== undefined);
+
+    if (validPrices.length < 2) {
+        console.warn('Not enough valid prices to calculate change percentage.', validPrices);
+        return 0; // Default to 0% if there are less than two valid prices
+    }
+
+    // Use the first and last valid prices to calculate percentage change
+    const startPrice = validPrices[0];
+    const endPrice = validPrices[validPrices.length - 1];
+
+    // Calculate percentage change
     const changePercentage = ((endPrice - startPrice) / startPrice) * 100;
 
-    return changePercentage;
+    return parseFloat(changePercentage.toFixed(2)); // Round to two decimal places for display
 }
+
+
+
 
 // Function to display change percentage
 export function displayChangePercentage(change, changePercentage) {
