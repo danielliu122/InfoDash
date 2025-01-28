@@ -1,6 +1,7 @@
 // Global cache object for news data
 const newsCache = {};
 
+
 // Function to fetch news data with caching and support for flexible queries
 export const fetchNewsData = async (query = 'world', country = 'us', language = 'en', forceRefresh = false) => {
     const cacheKey = `${query}-${country}-${language}`;
@@ -10,7 +11,7 @@ export const fetchNewsData = async (query = 'world', country = 'us', language = 
         newsCache[cacheKey] = {
             data: [], // Set to an empty array instead of null
             timestamp: null,
-            ttl: 43200000 // Time-to-live in milliseconds (e.g., 12 hours)
+            ttl: 300000 // Time-to-live in milliseconds (e.g., 5 min)
         };
     }
 
