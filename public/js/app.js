@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Update the event listeners for the time range buttons
         document.getElementById('realtimeButton').addEventListener('click', () => updateFinanceData('5m', '1m'));
-        document.getElementById('hourlyButton').addEventListener('click', () => updateFinanceData('3h', '1m'));
+        document.getElementById('hourlyButton').addEventListener('click', () => updateFinanceData('60m', '1m'));
         document.getElementById('dailyButton').addEventListener('click', () => updateFinanceData('1d', '5m'));
         document.getElementById('weeklyButton').addEventListener('click', () => updateFinanceData('1wk', '1h'));
         document.getElementById('monthlyButton').addEventListener('click', () => updateFinanceData('1mo', '1d'));
