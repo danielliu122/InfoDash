@@ -219,6 +219,17 @@ export function updateFinance(data) {
         }
     });
     
+     // Add zoom button functionality
+     document.getElementById('zoomIn').addEventListener('click', () => {
+        window.financeChart.zoom(1.1); // Zoom in by 10%
+    });
+
+    document.getElementById('zoomOut').addEventListener('click', () => {
+        window.financeChart.zoom(0.9); // Zoom out by 10%
+    });
+
+
+
     // Slider functionality
     const slider = document.getElementById('chartSlider');
     slider.addEventListener('input', function(e) {
