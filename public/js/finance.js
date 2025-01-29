@@ -102,6 +102,8 @@ export function updateRealTimeFinance(data) {
     `;
 }
 
+
+
 // Function to update UI with financial data
 export function updateFinance(data) {
     const chartContainer = document.querySelector('#finance .chart-container');
@@ -180,9 +182,9 @@ export function updateFinance(data) {
                 },
                 x: {
                     type: 'time',
-                    time: {
-                        unit: 'minute'
-                    },
+                    // time: {
+                    //     unit: 'minute'
+                    // },
                     ticks: {
                         color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000'
                     },
