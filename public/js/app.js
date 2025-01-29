@@ -57,19 +57,19 @@ function updateFinanceData(timeRange, interval) {
     
     // Adjust timeRange for crypto based on interval
     let adjustedTimeRange = timeRange;
-    if (isCrypto) {
-        switch(interval) {
-            case '1m':
-                adjustedTimeRange = '15m';
-                break;
-            case '1h':
-                adjustedTimeRange = '1d';
-                break;
-            case '1d':
-                adjustedTimeRange = '7d';
-                break;
-        }
-    }
+    // if (isCrypto) {
+    //     switch(interval) {
+    //         case '1m':
+    //             adjustedTimeRange = '2m';
+    //         //     break;
+    //         // case '1h':
+    //         //     adjustedTimeRange = '1h';
+    //         //     break;
+    //         // case '1d':
+    //         //     adjustedTimeRange = '1d';
+    //         //     break;
+    //     }
+    // }
     
     updateFinanceDataWithPercentage(symbol, adjustedTimeRange, interval)
         .catch(error => {
