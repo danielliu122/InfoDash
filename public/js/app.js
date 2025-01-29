@@ -312,15 +312,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             console.warn('Theme toggle button not found');
         }
-
-        // Update the event listeners for the time range buttons
-        document.getElementById('realtimeButton').addEventListener('click', () => updateFinanceData('3m', '1m'));
-        document.getElementById('hourlyButton').addEventListener('click', () => updateFinanceData('2h', '1m'));
-        document.getElementById('openButton').addEventListener('click', () => updateFinanceData('1d', '1m'));
-        document.getElementById('dailyButton').addEventListener('click', () => updateFinanceData('2d', '1m'));
-        document.getElementById('weeklyButton').addEventListener('click', () => updateFinanceData('1wk', '15m'));
-        document.getElementById('monthlyButton').addEventListener('click', () => updateFinanceData('1mo', '1d'));
-        //document.getElementById('yearlyButton').addEventListener('click', () => updateFinanceData('3mo', '1d'));
     } catch (error) {
         console.error('Error initializing data:', error);
     }
