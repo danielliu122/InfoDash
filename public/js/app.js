@@ -55,21 +55,11 @@ function updateFinanceData(timeRange, interval) {
     const symbol = stockSymbolInput.value || '^IXIC';
     const isCrypto = symbol.endsWith('-USD');
     
-    // Adjust timeRange for crypto based on interval
+    // Adjust timeRange for crypto if it's '3m'
     let adjustedTimeRange = timeRange;
-    // if (isCrypto) {
-    //     switch(interval) {
-    //         case '1m':
-    //             adjustedTimeRange = '2m';
-    //             break;
-    //         case '1h':
-    //             adjustedTimeRange = '1h';
-    //             break;
-    //         case '1d':
-    //             adjustedTimeRange = '1d';
-    //             break;
-    //     }
-    // }
+    if (isCrypto && timeRange === '3m') {
+        adjustedTimeRange = '10m';
+    }
     
     updateFinanceDataWithPercentage(symbol, adjustedTimeRange, interval)
         .catch(error => {
@@ -90,6 +80,7 @@ function updateFinanceData(timeRange, interval) {
         }
     }
 }
+
 
 // Function to show loading state in a container
 function showLoading(container) {
@@ -323,10 +314,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Update the event listeners for the time range buttons
-        document.getElementById('realtimeButton').addEventListener('click', () => updateFinanceData('5m', '1m'));
-        document.getElementById('hourlyButton').addEventListener('click', () => updateFinanceData('60m', '1m'));
-        document.getElementById('dailyButton').addEventListener('click', () => updateFinanceData('1d', '5m'));
-        document.getElementById('weeklyButton').addEventListener('click', () => updateFinanceData('1wk', '1h'));
+        document.getElementById('realtimeButton').addEventListener('click', () => updateFinanceData('3m', '1m'));
+        document.getElementById('hourlyButton').addEventListener('click', () => updateFinanceData('2h', '1m'));
+        document.getElementById('openButton').addEventListener('click', () => updateFinanceData('1d', '1m'));
+        document.getElementById('dailyButton').addEventListener('click', () => updateFinanceData('2d', '1m'));
+        document.getElementById('weeklyButton').addEventListener('click', () => updateFinanceData('1wk', '15m'));
         document.getElementById('monthlyButton').addEventListener('click', () => updateFinanceData('1mo', '1d'));
         //document.getElementById('yearlyButton').addEventListener('click', () => updateFinanceData('3mo', '1d'));
     } catch (error) {
