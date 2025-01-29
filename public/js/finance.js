@@ -118,7 +118,6 @@ export function updateFinance(data) {
             <div class="zoom-controls">
                 <button class="zoom-button" id="zoomIn">+</button>
                 <button class="zoom-button" id="zoomOut">-</button>
-                <button class="zoom-button" id="mobileToggle">📱</button>
             </div>
             <canvas id="financeChart"></canvas>
             <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
@@ -168,7 +167,7 @@ export function updateFinance(data) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
             scales: {
                 y: {
                     ticks: {
@@ -206,7 +205,7 @@ export function updateFinance(data) {
                         mode: 'x',
                         onZoom: function(ctx) {
                             // If trying to zoom out, reset to previous state
-                            if (ctx.chart.getZoomLevel() < 1) {
+                            if (ctx.chart.getZoomLevel() < .5) {
                                 ctx.chart.resetZoom();
                             }
                         }
@@ -219,34 +218,7 @@ export function updateFinance(data) {
             }
         }
     });
-     // Add zoom button functionality
-     document.getElementById('zoomIn').addEventListener('click', () => {
-        window.financeChart.zoom(1.1); // Zoom in by 10%
-    });
-
-    document.getElementById('zoomOut').addEventListener('click', () => {
-        window.financeChart.zoom(0.9); // Zoom out by 10%
-    });
-
-
     
-    // Add mobile mode toggle functionality - ADD YOUR CODE HERE
-    const mobileToggle = document.getElementById('mobileToggle');
-    if (mobileToggle) {
-        mobileToggle.addEventListener('click', function() {
-            isMobileMode = !isMobileMode;
-            const chartContainer = document.querySelector('.chart-container');
-            const slider = document.getElementById('chartSlider');
-            const display = isMobileMode;
-            
-            chartContainer.style.height = isMobileMode ? '200px' : '400px';
-            slider.style.display = isMobileMode ? 'block' : 'none';
-            window.financeChart.options.scales.x.display = !isMobileMode;
-            window.financeChart.options.scales.y.display = !isMobileMode;
-            window.financeChart.update();
-        });
-    }
-
     // Slider functionality
     const slider = document.getElementById('chartSlider');
     slider.addEventListener('input', function(e) {
@@ -430,13 +402,6 @@ function decimateData(dates, prices, maxPoints = 200) {
     return { dates: decimatedDates, prices: decimatedPrices };
 }
 
-// Add this function at the top of the file
-function isMobile() {
-    return window.innerWidth <= 768;
-}
-
-// Add at the top of the file
-let isMobileMode = false;
 
 // Function to get the current theme
 function getCurrentTheme() {
