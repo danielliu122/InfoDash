@@ -242,7 +242,7 @@ footer {
     }
 
     #finance-content {
-        width: 85vw;
+        width: 95%;
         margin: 0 auto;
         padding: 10px 0;
     }
@@ -413,7 +413,7 @@ footer {
 @media (max-width: 768px) {
     .chart-container {
         height: 200px; /* Half of desktop height */
-        width: 100% !important;
+        width: 100%;
         margin: 0 auto;
     }
 
@@ -553,7 +553,7 @@ body.dark-theme #chat-input {
 
 /* Add new rule for container class */
 .container {
-    width: 95% !important; /* Changed from 95% to 85% to leave room for ads */
+    width: 95% !important; 
     max-width: none !important; /* Remove max-width restriction */
 }
 
@@ -690,14 +690,15 @@ body.dark-theme .autocomplete-item:hover {
 }
 
 /* Add this to your styles.css */
-#news-content, #trends-content {
+#news-content, #trends-content, #reddit-content {
     height: 600px; /* Set a fixed height based on the maximum expected content */
     overflow-y: auto; /* Allow vertical scrolling if content exceeds max height */
 }
 
 /* Hide scrollbars for WebKit browsers (Chrome, Safari) */
 #news-content::-webkit-scrollbar, 
-#trends-content::-webkit-scrollbar {
+#trends-content::-webkit-scrollbar,
+#reddit-content::-webkit-scrollbar {
     display: none; /* Hide scrollbar */
 }
 
