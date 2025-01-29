@@ -61,13 +61,13 @@ function updateFinanceData(timeRange, interval) {
     //     switch(interval) {
     //         case '1m':
     //             adjustedTimeRange = '2m';
-    //         //     break;
-    //         // case '1h':
-    //         //     adjustedTimeRange = '1h';
-    //         //     break;
-    //         // case '1d':
-    //         //     adjustedTimeRange = '1d';
-    //         //     break;
+    //             break;
+    //         case '1h':
+    //             adjustedTimeRange = '1h';
+    //             break;
+    //         case '1d':
+    //             adjustedTimeRange = '1d';
+    //             break;
     //     }
     // }
     
