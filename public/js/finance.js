@@ -446,54 +446,48 @@ export function togglePauseFinance() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const checkButtonExistence = setInterval(() => {
-        const fullscreenButton = document.getElementById('fullscreenButton');
-        const financeChart = document.getElementById('financeChart');  // The canvas element
-        const parentElement = financeChart ? financeChart.parentElement : null;  // The parent of the canvas
-        
-        if (fullscreenButton && financeChart && parentElement) {
-            fullscreenButton.addEventListener('click', () => {
-                // Check if the user is on mobile (example: width < 768px)
-                const isMobile = window.innerWidth <= 768;
+    function handleFullscreen(event) {
+        const fullscreenButton = event.target.closest('#fullscreenButton');
+        if (!fullscreenButton) return;
 
-                if (!document.fullscreenElement) {
-                    // Request fullscreen for the parent element
-                    parentElement.requestFullscreen().catch(err => {
-                        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+        const chartContainer = fullscreenButton.closest('.chart-container');
+        if (!chartContainer) return;
+
+        const financeChart = chartContainer.querySelector('#financeChart');
+        if (!financeChart) return;
+
+        const isMobile = window.innerWidth <= 768;
+
+        if (!document.fullscreenElement) {
+            chartContainer.requestFullscreen().then(() => {
+                if (isMobile && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(err => {
+                        console.warn('Orientation lock failed:', err);
                     });
-
-                    // Lock orientation to landscape if on mobile
-                    if (isMobile) {
-                        screen.orientation.lock('landscape').catch(err => {
-                            console.error(`Error locking orientation: ${err.message}`);
-                        });
-                    }
-
-                } else {
-                    // Exit fullscreen and reset everything
-                    document.exitFullscreen();
-
-                    // Reset the screen orientation when exiting fullscreen
-                    if (isMobile) {
-                        screen.orientation.unlock().catch(err => {
-                            console.error(`Error unlocking orientation: ${err.message}`);
-                        });
-                    }
-
-                    // Reset the parent element's dimensions and rotation
-                    parentElement.style.width = ''; // Reset to default width
-                    parentElement.style.height = ''; // Reset to default height
-
-                    // Reset the canvas size to its original dimensions
-                    financeChart.width = 800;  // Your original canvas width
-                    financeChart.height = 600;  // Your original canvas height
                 }
+            }).catch(err => {
+                console.error('Fullscreen request failed:', err);
             });
+        } else {
+            document.exitFullscreen().then(() => {
+                if (isMobile && screen.orientation.unlock) {
+                    screen.orientation.unlock().catch(err => {
+                        console.warn('Orientation unlock failed:', err);
+                    });
+                }
 
-            clearInterval(checkButtonExistence);  // Stop checking once the button is found
+                // Reset canvas size
+                financeChart.width = 818;
+                financeChart.height = 260;
+            });
         }
-    }, 100);  // Check every 100ms
+    }
+
+    // Use event delegation to handle dynamically added buttons
+    document.body.addEventListener('click', handleFullscreen);
 });
+
+
 
 
 
