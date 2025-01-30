@@ -221,6 +221,10 @@ export function updateFinance(data) {
             plugins: {
                 zoom: {
                     zoom: {
+                        limits: {
+                            y: {min: 0, max: 100},
+                            y2: {min: -5, max: 5}
+                        },
                         wheel: {
                             enabled: true,
                             modifierKey: null,
