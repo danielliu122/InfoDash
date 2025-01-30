@@ -127,11 +127,8 @@ export function updateRealTimeFinance(data) {
     `;
 }
 
-let currentData= none;
-
 // Function to update UI with financial data
 export function updateFinance(data) {
-    currentData=data;
     const chartContainer = document.querySelector('#finance .chart-container');
     if (data.error) {
         chartContainer.innerHTML = '<p>Unable to fetch financial data.</p>';
