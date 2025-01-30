@@ -563,6 +563,31 @@ body.dark-theme #chat-input {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 200px; /* Half of desktop height */
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    /* Show both zoom controls and slider on mobile */
+    .zoom-controls {
+        display: flex !important;
+        top: 5px; /* Reduced from 10px */
+        right: 5px; /* Reduced from 10px */
+    }
+
+    .zoom-button {
+        width: 24px; /* Smaller buttons on mobile */
+        height: 24px; /* Smaller buttons on mobile */
+        font-size: 16px; /* Smaller font on mobile */
+    }
+
+}
+
+
+
 .fullscreenButton {
     background-color: var(--button-bg);
     color: var(--primary-text);

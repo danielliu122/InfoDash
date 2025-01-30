@@ -487,6 +487,7 @@ export function togglePauseFinance() {
         button.classList.add('paused');
     }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     const checkButtonExistence = setInterval(() => {
         const fullscreenButton = document.getElementById('fullscreenButton');
@@ -495,32 +496,47 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (fullscreenButton && financeChart && parentElement) {
             fullscreenButton.addEventListener('click', () => {
+                // Check if the user is on mobile (example: width < 768px)
+                const isMobile = window.innerWidth <= 768;
+
                 if (!document.fullscreenElement) {
+                    // Request fullscreen for the parent element
                     parentElement.requestFullscreen().catch(err => {
                         console.error(`Error attempting to enable full-screen mode: ${err.message}`);
                     });
 
-                    // Resize the canvas to fullscreen dimensions once fullscreen is entered
-                    const resizeCanvas = () => {
-                        const width = window.innerWidth;
-                        const height = window.innerHeight;
-                        financeChart.width = width;  // Set the canvas width to the fullscreen width
-                        financeChart.height = height;  // Set the canvas height to the fullscreen height
-                    };
+                    // Lock orientation to landscape if on mobile
+                    if (isMobile) {
+                        screen.orientation.lock('landscape').catch(err => {
+                            console.error(`Error locking orientation: ${err.message}`);
+                        });
+                    }
 
-                    // Call resize function initially
-                    resizeCanvas();
-
-                    // Add resize event listener to update canvas size if window is resized
-                    window.addEventListener('resize', resizeCanvas);
                 } else {
+                    // Exit fullscreen and reset everything
                     document.exitFullscreen();
-                    // Optional: Reset canvas size to its original dimensions
+
+                    // Reset the screen orientation when exiting fullscreen
+                    if (isMobile) {
+                        screen.orientation.unlock().catch(err => {
+                            console.error(`Error unlocking orientation: ${err.message}`);
+                        });
+                    }
+
+                    // Reset the parent element's dimensions and rotation
+                    parentElement.style.width = ''; // Reset to default width
+                    parentElement.style.height = ''; // Reset to default height
+
+                    // Reset the canvas size to its original dimensions
                     financeChart.width = 800;  // Your original canvas width
                     financeChart.height = 600;  // Your original canvas height
                 }
             });
+
             clearInterval(checkButtonExistence);  // Stop checking once the button is found
         }
     }, 100);  // Check every 100ms
 });
+
+
+
