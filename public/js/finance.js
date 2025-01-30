@@ -127,10 +127,11 @@ export function updateRealTimeFinance(data) {
     `;
 }
 
-
+let currentData= none;
 
 // Function to update UI with financial data
 export function updateFinance(data) {
+    currentData=data;
     const chartContainer = document.querySelector('#finance .chart-container');
     if (data.error) {
         chartContainer.innerHTML = '<p>Unable to fetch financial data.</p>';
@@ -145,8 +146,9 @@ export function updateFinance(data) {
                 <button class="zoom-button" id="zoomOut">-</button>
                 <button class="fullscreenButton" id="fullscreenButton">FullScreen Mode</button>
             </div>
-            <canvas id="financeChart"></canvas>
+            <canvas id="financeChart">
             <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
+            </canvas>
         </div>
     `;
 
@@ -495,6 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.warn('Orientation lock failed:', err);
                     });
                 }
+                
             }).catch(err => {
                 console.error('Fullscreen request failed:', err);
             });
@@ -504,9 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     screen.orientation.unlock().catch(err => {
                         console.warn('Orientation unlock failed:', err);
                     });
-                }
-
-                // Reset canvas size
+                }                // Reset canvas size
                 financeChart.width = 818;
                 financeChart.height = 260;
             });
