@@ -352,13 +352,12 @@ export async function updateFinanceDataWithPercentage(symbol, timeRange, interva
 let lastKnownChange = null;
 let lastKnownChangePercent = null;
 
-// Function to start minutely updates
 export function startAutoRefresh(symbol, timeRange, interval) {
     // Stop any existing interval
     stopAutoRefresh();
 
     const isCrypto = symbol.endsWith('-USD');
-    
+
     // Only start auto-refresh if it's a crypto symbol or if using minute intervals
     if (interval === '1m') {
         // Initial update
@@ -366,11 +365,15 @@ export function startAutoRefresh(symbol, timeRange, interval) {
 
         updateInterval = setInterval(() => {
             updateFinanceDataWithPercentage(symbol, timeRange, interval);
-        }, Math.floor(Math.random() * (3000 - 2000 + 1) + 2000));
+        }, isCrypto 
+            ? Math.floor(Math.random() * (5000 - 2000 + 1) + 2000) // 2-5 sec for crypto
+            : Math.floor(Math.random() * (5000 - 3000 + 1) + 3000) // 3-5 sec for regular stocks
+        );
     } else if (!isCrypto) {
         console.log('Market is closed. Auto-refresh will not start.');
     }
 }
+
 
 // Function to stop minutely updates
 export function stopAutoRefresh() {

@@ -71,7 +71,7 @@ function updateFinanceData(timeRange, interval) {
         });
     
     // Start auto-refresh for minute intervals or crypto
-    if (interval === '1m' && (isMarketOpen() || isCrypto)) {
+    if (interval === '1m') {
         startAutoRefresh(symbol, adjustedTimeRange, interval);
     } else {
         stopAutoRefresh();
