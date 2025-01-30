@@ -420,49 +420,6 @@ function getCurrentTheme() {
     return document.body.classList.contains('dark-theme') ? 'dark' : 'light';
 }
 
-// Initialize the chart
-function initializeFinanceChart(data) {
-    const ctx = document.getElementById('financeChart').getContext('2d');
-
-    // Set colors based on the current theme
-    const axisLabelColor = getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000'; // Black for light mode, white for dark mode
-
-    const financeChart = new Chart(ctx, {
-        type: 'line', // or any other chart type
-        data: {
-            // your data here
-        },
-        options: {
-            scales: {
-                x: {
-                    ticks: {
-                        color: axisLabelColor // Set x-axis label color based on theme
-                    },
-                    grid: {
-                        color: getCurrentTheme() === 'dark' ? '#757575' : '#e0e0e0' // Optional: Set grid color based on theme
-                    }
-                },
-                y: {
-                    ticks: {
-                        color: axisLabelColor // Set y-axis label color based on theme
-                    },
-                    grid: {
-                        color: getCurrentTheme() === 'dark' ? '#757575' : '#e0e0e0' // Optional: Set grid color based on theme
-                    }
-                }
-            },
-            // other options...
-        }
-    });
-
-    // Refresh the chart to apply the new colors
-    financeChart.update();
-
-    return financeChart;
-}
-
-// Call this function with your data when you need to initialize the chart
-// Example: initializeFinanceChart(yourData);
 
 export function togglePauseFinance() {
     const isPaused = !updateInterval;
