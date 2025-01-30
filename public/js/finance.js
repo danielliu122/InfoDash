@@ -493,26 +493,26 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.warn('Orientation lock failed:', err);
                     });
                 }
-                
-            }).catch(err => {
-                console.error('Fullscreen request failed:', err);
-            });
+                }).catch(err => {
+                    console.error('Fullscreen request failed:', err);
+                });
         } else {
             document.exitFullscreen().then(() => {
                 if (isMobile && screen.orientation.unlock) {
                     screen.orientation.unlock().catch(err => {
                         console.warn('Orientation unlock failed:', err);
                     });
-                }                // Reset canvas size
+                }
+                // Reset canvas size after exiting fullscreen
                 financeChart.width = 818;
                 financeChart.height = 260;
             });
         }
     }
-
     // Use event delegation to handle dynamically added buttons
     document.body.addEventListener('click', handleFullscreen);
 });
+
 
 
 
