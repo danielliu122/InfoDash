@@ -6,6 +6,8 @@ const axios = require('axios');
 const googleTrends = require('google-trends-api');
 const yahooFinance = require('yahoo-finance2').default;
 const NodeCache = require('node-cache');
+const newsCache = new NodeCache({ stdTTL: 43200, checkperiod: 14400 }); 
+// Cache with TTL of 12 hours (43200 seconds)
 //const rateLimit = require('express-rate-limit');
 const geoip = require('geoip-lite');
 const OpenAI = require('openai'); // Import OpenAI directly
@@ -54,21 +56,31 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Route to fetch news data
 app.get('/api/news', async (req, res) => {
     const newsApiKey = process.env.NEWS_API_KEY;
     const { query, country, language } = req.query;
+    const cacheKey = `${query}-${country}-${language}`;
 
     if (!newsApiKey) {
         console.error('News API key is not set in the environment variables');
         return res.status(500).json({ error: 'Server configuration error' });
     }
 
+    // Check if data is cached
+    const cachedData = newsCache.get(cacheKey);
+    if (cachedData) {
+        //console.log('Using cached news data');
+        return res.json(cachedData);
+    }
+
+    // If not cached, fetch fresh data
     const newsUrl = `https://newsapi.org/v2/everything?q=${query}&language=${language}&apiKey=${newsApiKey}`;
 
     try {
         const response = await axios.get(newsUrl);
         if (response.status === 200 && response.data) {
+            // Cache the fresh news data
+            newsCache.set(cacheKey, response.data);
             res.json(response.data);
         } else {
             res.status(response.status).json({ error: 'Error fetching news data' });

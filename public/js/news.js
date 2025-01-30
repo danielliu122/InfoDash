@@ -1,48 +1,55 @@
 // Global cache object for news data
 const newsCache = {};
 
+const TTL_MS = 43200000;
 
-// Function to fetch news data with caching and support for flexible queries
 export const fetchNewsData = async (query = 'world', country = 'us', language = 'en', forceRefresh = false) => {
     const cacheKey = `${query}-${country}-${language}`;
 
-    // Initialize cache for the category if it doesn't exist
-    if (!newsCache[cacheKey]) {
-        newsCache[cacheKey] = {
-            data: [], // Set to an empty array instead of null
-            timestamp: null,
-            ttl: 300000 // Time-to-live in milliseconds (e.g., 5 min)
-        };
+    // Check if cache exists and remove expired data
+    if (newsCache[cacheKey] && (Date.now() - newsCache[cacheKey].timestamp >= newsCache[cacheKey].ttl)) {
+        console.log(`Cache expired for ${cacheKey}, clearing it...`);
+        delete newsCache[cacheKey];
     }
 
-    // Check if cached data is available and still valid
-    if (!forceRefresh && newsCache[cacheKey].data.length > 0 && (Date.now() - newsCache[cacheKey].timestamp < newsCache[cacheKey].ttl)) {
-        //console.log('Using cached news data for:', cacheKey); // Log when cached data is used
-        return newsCache[cacheKey].data;
-    }
-
+  // Check if cached data is available and still valid
+if (newsCache[cacheKey]?.data?.length > 0 && (Date.now() - newsCache[cacheKey].timestamp < TTL_MS)) {
+    console.log(`Using cached news data for: ${cacheKey}`);
+    return newsCache[cacheKey].data;
+} else {
+    console.log(`Fetching fresh news data for: ${cacheKey}`);
     const newsUrl = `/api/news?query=${query}&country=${country}&language=${language}`;
 
     try {
         const response = await fetch(newsUrl);
-        const data = await response.json();
-        //console.log('Fetched news data:', data);
-        if (response.ok && data.articles) {
-            // Cache the fetched data and timestamp for the category
-            newsCache[cacheKey].data = data.articles; // Store articles directly
-            newsCache[cacheKey].timestamp = Date.now();
-
-            return data.articles; // Return articles directly
-        } else {
-            // Log the response status for better debugging
-            console.error('Error fetching news data:', response.status, data);
-            throw new Error('Invalid response from news API');
+        if (!response.ok) {
+            console.error(`Error fetching news data: ${response.status}`);
+            return [];
         }
+
+        const data = await response.json();
+        if (data.articles) {
+            // Sort articles by `publishedAt` date (newest first)
+            const sortedArticles = data.articles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+
+            // Cache the fetched data and timestamp
+            newsCache[cacheKey] = {
+                data: sortedArticles,
+                timestamp: Date.now(),
+                ttl: TTL_MS, // 12-hour TTL
+            };
+
+            return sortedArticles;
+        }
+        console.error('Invalid news API response:', data);
+        return [];
     } catch (error) {
         console.error('Error fetching news data:', error);
         return []; // Return an empty array on error
     }
-};
+}}
+
+
 
 // Function to update UI with news data
 export function updateNews(data) {
