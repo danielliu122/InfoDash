@@ -118,6 +118,7 @@ export function updateFinance(data) {
             <div class="zoom-controls">
                 <button class="zoom-button" id="zoomIn">+</button>
                 <button class="zoom-button" id="zoomOut">-</button>
+                <button class="fullscreenButton" id="fullscreenButton">FullScreen Mode</button>
             </div>
             <canvas id="financeChart"></canvas>
             <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
@@ -486,3 +487,40 @@ export function togglePauseFinance() {
         button.classList.add('paused');
     }
 }
+document.addEventListener('DOMContentLoaded', () => {
+    const checkButtonExistence = setInterval(() => {
+        const fullscreenButton = document.getElementById('fullscreenButton');
+        const financeChart = document.getElementById('financeChart');  // The canvas element
+        const parentElement = financeChart ? financeChart.parentElement : null;  // The parent of the canvas
+        
+        if (fullscreenButton && financeChart && parentElement) {
+            fullscreenButton.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    parentElement.requestFullscreen().catch(err => {
+                        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+                    });
+
+                    // Resize the canvas to fullscreen dimensions once fullscreen is entered
+                    const resizeCanvas = () => {
+                        const width = window.innerWidth;
+                        const height = window.innerHeight;
+                        financeChart.width = width;  // Set the canvas width to the fullscreen width
+                        financeChart.height = height;  // Set the canvas height to the fullscreen height
+                    };
+
+                    // Call resize function initially
+                    resizeCanvas();
+
+                    // Add resize event listener to update canvas size if window is resized
+                    window.addEventListener('resize', resizeCanvas);
+                } else {
+                    document.exitFullscreen();
+                    // Optional: Reset canvas size to its original dimensions
+                    financeChart.width = 800;  // Your original canvas width
+                    financeChart.height = 600;  // Your original canvas height
+                }
+            });
+            clearInterval(checkButtonExistence);  // Stop checking once the button is found
+        }
+    }, 100);  // Check every 100ms
+});

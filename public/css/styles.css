@@ -563,6 +563,27 @@ body.dark-theme #chat-input {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.fullscreenButton {
+    background-color: var(--button-bg);
+    color: var(--primary-text);
+    border: none;
+    width: 40px;  /* Adjusted width for the + and - symbols */
+    height: 40px; /* Adjusted height for the button */
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px; /* Adjusted font size for better visibility */
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.fullscreenButton:hover {
+    background-color: var(--button-hover-bg);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 /* Hide zoom buttons on mobile */
 @media screen and (max-width: 768px) {
     .zoom-controls {
