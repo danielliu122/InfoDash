@@ -511,9 +511,8 @@ body.dark-theme #chat-input {
     scrollbar-color: #888 #f1f1f1;
 }
 
-/* Hide slider by default */
+/*Chart Slider*/
 .chart-slider {
-    display: none;
     width: 100%;
     margin-top: 10px;
 }
