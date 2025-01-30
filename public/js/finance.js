@@ -15,6 +15,31 @@ function processChartData(dates, prices) {
     return validData;
 }
 
+function isMarketOpen() {
+    const symbol = document.getElementById('stockSymbolInput').value.toUpperCase();
+    
+    // Check if it's a crypto symbol
+    if (symbol.endsWith('-USD')) {
+        return true; // Crypto markets are always open
+    }
+
+    // Existing stock market hour checks
+    const now = new Date();
+    const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    const day = etNow.getDay();
+    const hour = etNow.getHours();
+    const minute = etNow.getMinutes();
+
+    // Check if it's a weekday (Monday = 1, Friday = 5)
+    if (day >= 1 && day <= 5) {
+        // Check if it's between 9:30 AM and 4:00 PM ET
+        if ((hour === 9 && minute >= 30) || (hour > 9 && hour < 16) || (hour === 16 && minute === 0)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 // Function to fetch financial data
 export const fetchFinancialData = async (symbol = '^IXIC', timeRange = '5m', interval = '1m') => {
     try {
@@ -167,6 +192,7 @@ export function updateFinance(data) {
             }]
         },
         options: {
+            animation: false,
             responsive: true,
             maintainAspectRatio: true,
             scales: {
@@ -359,16 +385,13 @@ export function startAutoRefresh(symbol, timeRange, interval) {
     const isCrypto = symbol.endsWith('-USD');
 
     // Only start auto-refresh if it's a crypto symbol or if using minute intervals
-    if (interval === '1m') {
+    if (interval === '1m' && (isMarketOpen || isCrypto)) {
         // Initial update
         updateFinanceDataWithPercentage(symbol, timeRange, interval);
 
         updateInterval = setInterval(() => {
             updateFinanceDataWithPercentage(symbol, timeRange, interval);
-        }, isCrypto 
-            ? Math.floor(Math.random() * (5000 - 2000 + 1) + 2000) // 2-5 sec for crypto
-            : Math.floor(Math.random() * (5000 - 3000 + 1) + 3000) // 3-5 sec for regular stocks
-        );
+        }, 3000);
     } else if (!isCrypto) {
         console.log('Market is closed. Auto-refresh will not start.');
     }
