@@ -143,9 +143,8 @@ export function updateFinance(data) {
                 <button class="zoom-button" id="zoomOut">-</button>
                 <button class="fullscreenButton" id="fullscreenButton">FullScreen Mode</button>
             </div>
-            <canvas id="financeChart">
+            <canvas id="financeChart"></canvas>
             <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
-            </canvas>
         </div>
     `;
 

@@ -511,11 +511,7 @@ body.dark-theme #chat-input {
     scrollbar-color: #888 #f1f1f1;
 }
 
-/*Chart Slider*/
-.chart-slider {
-    width: 100%;
-    margin-top: 10px;
-}
+
 
 /* Add this to ensure slider doesn't interfere with other elements */
 .chart-container {
