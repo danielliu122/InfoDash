@@ -156,7 +156,6 @@ footer {
     outline: none;
     padding: 0 11px 0 13px;
     text-overflow: ellipsis;
-    width: 400px;
 }
 
 /* Info Window Styles */
@@ -218,10 +217,10 @@ footer {
 }
 
 /* Responsive adjustments for smaller screens */
-@media (max-width: 768px) {
+@media (max-width: 999px) {
     body {
         padding: 5px;
-        width: 95%; /* Set width to 85% on mobile */
+        width: 99%; /* Set width to 85% on mobile */
         margin: 0 auto;
     }
 
@@ -409,33 +408,7 @@ footer {
     padding: 10px;
 }
 
-/* Mobile adjustments */
-@media (max-width: 768px) {
-    .chart-container {
-        height: 200px; /* Half of desktop height */
-        width: 100%;
-        margin: 0 auto;
-    }
 
-    /* Show both zoom controls and slider on mobile */
-    .zoom-controls {
-        display: flex !important;
-        top: 5px; /* Reduced from 10px */
-        right: 5px; /* Reduced from 10px */
-    }
-
-    .zoom-button {
-        width: 24px; /* Smaller buttons on mobile */
-        height: 24px; /* Smaller buttons on mobile */
-        font-size: 16px; /* Smaller font on mobile */
-    }
-
-    .chart-slider {
-        display: block !important;
-        width: 100%;
-        margin-top: 5px; /* Reduced from 10px */
-    }
-}
 
 /* Autocomplete styles */
 .autocomplete-items {
@@ -482,7 +455,7 @@ footer {
 }
 
 #chat-input {
-    width: 95%;
+    width: 99%;
     padding: 10px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -553,7 +526,7 @@ body.dark-theme #chat-input {
 
 /* Add new rule for container class */
 .container {
-    width: 95% !important; 
+    width: 99% !important; 
     max-width: none !important; /* Remove max-width restriction */
 }
 
