@@ -29,7 +29,7 @@
     "yahoo-finance2": "^2.11.3"
   },
   "engines": {
-    "node": "18.x"
+    "node": "22.x"
   },
   "author": "dliu122",
   "license": "ISC"
