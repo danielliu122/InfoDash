@@ -1,7 +1,7 @@
 {
-  "name": "oneview",
+  "name": "InfoDash",
   "version": "1.0.0",
-  "description": "real time data dashboard",
+  "description": "Information Dashboard",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
