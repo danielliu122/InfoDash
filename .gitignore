@@ -4,6 +4,9 @@
 # Node modules
 node_modules/
 
+#Lightsail ssh
+.pem
+
 # Logs
 *.log
 npm-debug.log*
