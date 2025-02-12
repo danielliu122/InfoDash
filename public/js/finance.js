@@ -1,18 +1,61 @@
 // At the top of the file
 export let updateInterval;
 
+function addData(chart, label, newData) {
+    chart.data.labels.push(label);
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(newData);
+    });
+    chart.update();
+}
+
+function removeData(chart) {
+    chart.data.labels.pop();
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.pop();
+    });
+    chart.update();
+}
+
+function updateChartOptions(chart, newOptions) {
+    chart.options = {
+        ...chart.options,
+        ...newOptions
+    };
+    chart.update();
+}
+
 // Add this helper function to ensure data points are properly connected
 function processChartData(dates, prices) {
-    // Filter out any null/undefined prices and their corresponding dates
-    const validData = dates.reduce((acc, date, index) => {
-        if (prices[index] !== null && prices[index] !== undefined) {
-            acc.dates.push(date);
-            acc.prices.push(prices[index]);
-        }
-        return acc;
-    }, { dates: [], prices: [] });
+    // Create arrays to store valid data points
+    const validDates = [];
+    const validPrices = [];
+    
+    // Track the last valid price
+    let lastValidPrice = null;
 
-    return validData;
+    // Iterate through the data
+    for (let i = 0; i < prices.length; i++) {
+        // If current price is valid
+        if (prices[i] !== null && prices[i] !== undefined) {
+            // If there was a gap, add the last valid price to maintain continuity
+            if (lastValidPrice !== null && validPrices.length > 0 && 
+                dates[i] - validDates[validDates.length - 1] > 60 * 1000) {
+                validDates.push(new Date(validDates[validDates.length - 1].getTime() + 60 * 1000));
+                validPrices.push(lastValidPrice);
+            }
+            
+            // Add the current valid data point
+            validDates.push(new Date(dates[i]));
+            validPrices.push(prices[i]);
+            lastValidPrice = prices[i];
+        }
+    }
+
+    return {
+        dates: validDates,
+        prices: validPrices
+    };
 }
 
 function isMarketOpen() {
@@ -126,7 +169,84 @@ export function updateRealTimeFinance(data) {
         <p>Last Updated: ${timestamp}</p>
     `;
 }
-
+function initializeChart(ctx, data) {
+    return new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.dates,
+            datasets: [{
+                label: `${data.symbol} Closing Prices`,
+                data: data.prices,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                pointRadius: 2,
+                pointHoverRadius: 10,
+                spanGaps: true, // This allows the line to span gaps
+                segment: {
+                    borderColor: ctx => {
+                        // Optional: Add color coding for positive/negative segments
+                        const value = ctx.p0.parsed.y;
+                        const nextValue = ctx.p1.parsed.y;
+                        return nextValue >= value ? 'rgba(75, 192, 192, 1)' : 'rgba(255, 99, 132, 1)';
+                    }
+                }
+            }]
+        },
+        options: {
+            plugins: {
+                zoom: {
+                  zoom: {
+                    wheel: {
+                      enabled: true,
+                    },
+                    pinch: {
+                      enabled: true
+                    },
+                    mode: 'x',
+                    onZoom: function(ctx) {
+                        // If trying to zoom out, reset to previous state
+                        if (ctx.chart.getZoomLevel() < .2) {
+                            ctx.chart.resetZoom();
+                        }
+                    }
+                  }
+                }
+            },
+            animation: true,
+            responsive: true,
+            maintainAspectRatio: true,
+            
+            scales: {
+                y: {
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + Number(value).toFixed(2);
+                        },
+                        color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000'
+                    },
+                    offset: true,
+                    beginAtZero: false
+                },
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'minute',
+                        displayFormats: {
+                            minute: 'HH:mm'
+                        }
+                    },
+                    ticks: {
+                        color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000'
+                    },
+                    offset: true,
+                    bounds: 'data'
+                }
+            }
+            
+        }
+    });
+}
 // Function to update UI with financial data
 export function updateFinance(data) {
     const chartContainer = document.querySelector('#finance .chart-container');
@@ -135,7 +255,7 @@ export function updateFinance(data) {
         return;
     }
 
-    // Clear the inner HTML and destroy existing chart if it exists
+    // Clear the inner HTML
     chartContainer.innerHTML = `
         <div style="position: relative; width: 100%; height: 100%;">
             <div class="zoom-controls">
@@ -150,114 +270,29 @@ export function updateFinance(data) {
 
     const canvas = document.getElementById('financeChart');
     canvas.width = chartContainer.clientWidth;
-    canvas.height = chartContainer.clientHeight - 30; // Subtract space for slider
+    canvas.height = chartContainer.clientHeight - 30;
 
     const ctx = canvas.getContext('2d');
 
-    // Destroy the existing chart if it exists
+    // Destroy existing chart if it exists
     if (window.financeChart && window.financeChart instanceof Chart) {
         window.financeChart.destroy();
     }
 
-    // Ensure data.dates and data.prices are arrays and have the same length
-    if (!Array.isArray(data.dates) || !Array.isArray(data.prices) || data.dates.length !== data.prices.length) {
-        console.error('Invalid data format for chart:', data);
-        return;
-    }
-
-    // Check if data is empty or has only one data point
-    if (data.dates.length === 0 || data.prices.length === 0) {
-        console.error('No data available for chart:', data);
-        chartContainer.innerHTML = '<p>No data available for chart.</p>';
-        return;
-    }
-
-    // Process the data before creating the chart
+    // Process the data
     const processedData = processChartData(data.dates, data.prices);
-    // Create the new chart
-    window.financeChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: processedData.dates,
-            datasets: [{
-                label: `${data.symbol} Closing Prices`,
-                data: processedData.prices,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: true,
-                pointRadius: 2,
-                pointHoverRadius: 10
-            }]
-        },
-        options: {
-            animation: false,
-            responsive: true,
-            maintainAspectRatio: true,
-            scales: {
-                y: {
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + Number(value).toFixed(2);
-                        },
-                        color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000'
-                    },
-                    offset: true,
-                    beginAtZero: false
-                },
-                x: {
-                    type: 'time',
-                    // time: {
-                    //     unit: 'minute'
-                    // },
-                    ticks: {
-                        color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000'
-                    },
-                    offset: true,
-                    bounds: 'data'
-                }
-            },
-            plugins: {
-                zoom: {
-                    zoom: {
-                        limits: {
-                            y: {min: 0, max: 100},
-                            y2: {min: -5, max: 5}
-                        },
-                        wheel: {
-                            enabled: true,
-                            modifierKey: null,
-                            speed: 0.1
-                        },
-                        pinch: {
-                            enabled: true
-                        },
-                        mode: 'x',
-                        onZoom: function(ctx) {
-                            // If trying to zoom out, reset to previous state
-                            if (ctx.chart.getZoomLevel() < .5) {
-                                ctx.chart.resetZoom();
-                            }
-                        }
-                    },
-                    pan: {
-                        enabled: true,
-                        mode: 'x'
-                    }
-                }
-            }
-        }
-    });
     
-     // Add zoom button functionality
-     document.getElementById('zoomIn').addEventListener('click', () => {
-        window.financeChart.zoom(1.1); // Zoom in by 10%
+    // Initialize new chart
+    window.financeChart = initializeChart(ctx, processedData);
+
+    // Add zoom button functionality
+    document.getElementById('zoomIn').addEventListener('click', () => {
+        window.financeChart.zoom(1.1);
     });
 
     document.getElementById('zoomOut').addEventListener('click', () => {
-        window.financeChart.zoom(0.9); // Zoom out by 10%
+        window.financeChart.zoom(0.9);
     });
-
-
 
     // Slider functionality
     const slider = document.getElementById('chartSlider');
@@ -266,20 +301,17 @@ export function updateFinance(data) {
 
         const chart = window.financeChart;
         const totalPoints = chart.data.labels.length;
-        const visiblePoints = Math.floor(totalPoints * 0.1); // 10% of total points
+        const visiblePoints = Math.floor(totalPoints * 0.1);
 
-        // Calculate the start index based on slider position
         const percent = e.target.value / 100;
         const maxStartIndex = totalPoints - visiblePoints;
         const startIndex = Math.floor(percent * maxStartIndex);
 
-        // Set the viewport to show 10% of points starting from the calculated position
         chart.options.scales.x.min = chart.data.labels[startIndex];
         chart.options.scales.x.max = chart.data.labels[startIndex + visiblePoints];
-        chart.update('none'); // Update without animation
+        chart.update('none');
     });
 
-    // Initialize slider position
     if (slider) {
         slider.value = 0;
     }
@@ -288,6 +320,12 @@ export function updateFinance(data) {
 // Function to refresh real-time financial data
 export async function refreshRealTimeFinanceData(symbol) {
     const financeData = await fetchRealTimeYahooFinanceData(symbol);
+    
+    if (window.financeChart && financeData.price) {
+        const timestamp = financeData.timestamp.toISOString();
+        addData(window.financeChart, timestamp, financeData.price);
+    }
+    
     updateRealTimeFinance(financeData);
 }
 
@@ -381,24 +419,25 @@ let lastKnownChange = null;
 let lastKnownChangePercent = null;
 
 export function startAutoRefresh(symbol, timeRange, interval) {
-    // Stop any existing interval
     stopAutoRefresh();
 
     const isCrypto = symbol.endsWith('-USD');
 
-    // Only start auto-refresh if it's a crypto symbol or if using minute intervals
-    if (interval === '1m' && (isMarketOpen || isCrypto)) {
-        // Initial update
+    if (interval === '1m' && (isMarketOpen() || isCrypto)) {
         updateFinanceDataWithPercentage(symbol, timeRange, interval);
 
-        updateInterval = setInterval(() => {
-            updateFinanceDataWithPercentage(symbol, timeRange, interval);
+        updateInterval = setInterval(async () => {
+            const data = await fetchFinancialData(symbol, timeRange, interval);
+            if (window.financeChart) {
+                window.financeChart.data.labels = data.dates;
+                window.financeChart.data.datasets[0].data = data.prices;
+                window.financeChart.update('none');
+            }
         }, 3000);
     } else if (!isCrypto) {
         console.log('Market is closed. Auto-refresh will not start.');
     }
 }
-
 
 // Function to stop minutely updates
 export function stopAutoRefresh() {
@@ -425,22 +464,6 @@ document.getElementById('stockSymbolInput').addEventListener('change', (event) =
     
     startAutoRefresh(symbol, timeRange, interval);
 });
-
-// Add this helper function at the top of the file
-function decimateData(dates, prices, maxPoints = 200) {
-    if (dates.length <= maxPoints) return { dates, prices };
-    
-    const step = Math.ceil(dates.length / maxPoints);
-    const decimatedDates = [];
-    const decimatedPrices = [];
-    
-    for (let i = 0; i < dates.length; i += step) {
-        decimatedDates.push(dates[i]);
-        decimatedPrices.push(prices[i]);
-    }
-    
-    return { dates: decimatedDates, prices: decimatedPrices };
-}
 
 
 // Function to get the current theme
