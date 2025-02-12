@@ -62,6 +62,14 @@ function updateFinanceData(timeRange, interval) {
     }
     
     updateFinanceDataWithPercentage(symbol, adjustedTimeRange, interval)
+        .then(data => {
+            if (window.financeChart) {
+                // Update existing chart instead of destroying it
+                window.financeChart.data.labels = data.dates;
+                window.financeChart.data.datasets[0].data = data.prices;
+                window.financeChart.update();
+            }
+        })
         .catch(error => {
             console.error('Error updating finance data:', error);
             const chartContainer = document.querySelector('#finance .chart-container');

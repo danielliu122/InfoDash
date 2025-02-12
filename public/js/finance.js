@@ -230,12 +230,6 @@ function initializeChart(ctx, data) {
                 },
                 x: {
                     type: 'time',
-                    time: {
-                        unit: 'minute',
-                        displayFormats: {
-                            minute: 'HH:mm'
-                        }
-                    },
                     ticks: {
                         color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000'
                     },
