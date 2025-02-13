@@ -1,5 +1,5 @@
 // map.js
-let test= null;
+
 // Define light mode style with default colors
 const lightModeStyle = [
     {
