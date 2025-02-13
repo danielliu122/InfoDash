@@ -1,92 +1,19 @@
-import { loadGoogleMapsScript, initMap, startPeriodicTrafficUpdates, updateTrafficInfo } from './map.js';
+import { loadGoogleMapsScript, updateTrafficInfo } from './map.js';
 import { 
     updateInterval,
     fetchFinancialData, 
-    fetchRealTimeYahooFinanceData, 
-    updateRealTimeFinance, 
-    refreshRealTimeFinanceData, 
     updateFinance, 
-    updateFinanceDataWithPercentage, 
     startAutoRefresh, 
-    stopAutoRefresh 
+    stopAutoRefresh,
+    handleFinanceUpdate, 
+    isMarketOpen
 } from './finance.js';
 import { fetchNewsData, updateNews } from './news.js';
 import { fetchTrendsData, updateTrends } from './trends.js'; // Import from trends.js
 import { fetchRedditData, updateReddit } from './reddit.js'; // Import from reddit.js
 
-// Add these functions at the top of your file
-let lastUpdateTime = 0;
-
-function isMarketOpen() {
-    const symbol = document.getElementById('stockSymbolInput').value.toUpperCase();
-    
-    // Check if it's a crypto symbol
-    if (symbol.endsWith('-USD')) {
-        return true; // Crypto markets are always open
-    }
-
-    // Existing stock market hour checks
-    const now = new Date();
-    const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-    const day = etNow.getDay();
-    const hour = etNow.getHours();
-    const minute = etNow.getMinutes();
-
-    // Check if it's a weekday (Monday = 1, Friday = 5)
-    if (day >= 1 && day <= 5) {
-        // Check if it's between 9:30 AM and 4:00 PM ET
-        if ((hour === 9 && minute >= 30) || (hour > 9 && hour < 16) || (hour === 16 && minute === 0)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 function updateFinanceData(timeRange, interval) {
-    const now = Date.now();
-    if (now - lastUpdateTime < 250) {
-        console.log('Please wait before requesting new data');
-        return;
-    }
-    
-    lastUpdateTime = now;
-    
-    const stockSymbolInput = document.getElementById('stockSymbolInput');
-    const symbol = stockSymbolInput.value || '^IXIC';
-    const isCrypto = symbol.endsWith('-USD');
-    
-    // Adjust timeRange for crypto if it's '3m'
-    let adjustedTimeRange = timeRange;
-    if (isCrypto && timeRange === '3m') {
-        adjustedTimeRange = '10m';
-    }
-    
-    updateFinanceDataWithPercentage(symbol, adjustedTimeRange, interval)
-        .then(data => {
-            if (window.financeChart) {
-                // Update existing chart instead of destroying it
-                window.financeChart.data.labels = data.dates;
-                window.financeChart.data.datasets[0].data = data.prices;
-                window.financeChart.update();
-            }
-        })
-        .catch(error => {
-            console.error('Error updating finance data:', error);
-            const chartContainer = document.querySelector('#finance .chart-container');
-            if (chartContainer) {
-                chartContainer.innerHTML = '<p>Unable to fetch data. Please try again.</p>';
-            }
-        });
-    
-    // Start auto-refresh for minute intervals or crypto
-    if (interval === '1m') {
-        startAutoRefresh(symbol, adjustedTimeRange, interval);
-    } else {
-        stopAutoRefresh();
-        if (!isCrypto && !isMarketOpen()) {
-            console.log('Market is closed. Auto-refresh will not start.');
-        }
-    }
+    handleFinanceUpdate(timeRange, interval);
 }
 
 
@@ -150,56 +77,6 @@ async function refreshTrends() {
 
     const trendsData = await fetchTrendsData('daily', 'all', language, country);
     updateTrends(trendsData, 'daily');
-}
-
-// Function to refresh data for a module
-async function refreshData(module) {
-    const container = document.querySelector(`#${module} .data-container`);
-    showLoading(container);
-    
-    try {
-        let data;
-        switch (module) {
-            case 'news':
-                data = await fetchNewsData();
-                updateNews(data);
-                break;
-            case 'finance':
-                data = await fetchFinancialData();
-                updateFinance(data);
-                break;
-            case 'traffic':
-                if (map) {
-                    const currentCenter = map.getCenter();
-                    data = await updateTrafficInfo({
-                        lat: currentCenter.lat(),
-                        lng: currentCenter.lng()
-                    });
-                } else {
-                    console.warn('Map not initialized, skipping traffic update');
-                    data = { status: 'Map not initialized' };
-                }
-                updateTrafficUI(data);
-                break;
-            case 'trends':
-                data = await fetchTrendsData('daily');
-                updateTrends(data, 'daily');
-                break;
-            case 'realtime-trends':
-                data = await fetchTrendsData('realtime');
-                updateTrends(data, 'realtime');
-                break;
-            case 'reddit':
-                data = await fetchRedditData('day'); // Default to 'day' time period for Reddit
-                updateReddit(data);
-                break;
-            default:
-                console.log(`Module ${module} not supported.`);
-        }
-    } catch (error) {
-        container.innerHTML = '<p>Error loading data. Please try again later.</p>';
-        console.error(`Error fetching ${module} data:`, error);
-    }
 }
 
 // Function to handle button clicks
@@ -380,7 +257,7 @@ document.getElementById('stockSymbolInput').addEventListener('input', function()
         item.textContent = `${symbol} - ${stockSymbols[symbol]}`;
         item.classList.add('autocomplete-item');
         item.addEventListener('click', function() {
-            document.getElementById('stockSymbolInput').value = symbol; // Set input value
+            document.getElementById('stockSymbolInput').value = symbol;
             updateFinanceData('5m', '1m'); // Refresh chart with minutely data
             autocompleteList.innerHTML = ''; // Clear suggestions
         });
@@ -395,137 +272,16 @@ document.addEventListener('click', function(e) {
     }
 });
 
-const stockSymbols = {
-    'ETH-USD': 'Ethereum',
-    'BTC-USD': 'BTC',
-    'SOL-USD': 'Solana',
-    'XRP-USD': 'XRP',
-    'AAPL': 'Apple',
-    'GOOGL': 'Google',
-    'MSFT': 'Microsoft',
-    'AMZN': 'Amazon',
-    'TSLA': 'Tesla',
-    'META': 'Meta',
-    'NFLX': 'Netflix',
-    'NVDA': 'NVIDIA',
-    'BRK.A': 'Berkshire Hathaway',
-    'JPM': 'JPMorgan Chase',
-    'V': 'Visa',
-    'JNJ': 'Johnson & Johnson',
-    'PG': 'Procter & Gamble',
-    'UNH': 'UnitedHealth Group',
-    'HD': 'Home Depot',
-    'DIS': 'Walt Disney',
-    'PYPL': 'PayPal',
-    'VZ': 'Verizon',
-    'INTC': 'Intel',
-    'CMCSA': 'Comcast',
-    'PEP': 'PepsiCo',
-    'T': 'AT&T',
-    'CSCO': 'Cisco Systems',
-    'MRK': 'Merck & Co.',
-    'XOM': 'Exxon Mobil',
-    'NKE': 'Nike',
-    'PFE': 'Pfizer',
-    'TMO': 'Thermo Fisher Scientific',
-    'ABT': 'Abbott Laboratories',
-    'CVX': 'Chevron',
-    'LLY': 'Eli Lilly and Company',
-    'MDT': 'Medtronic',
-    'IBM': 'IBM',
-    'WMT': 'Walmart',
-    'CRM': 'Salesforce',
-    'TXN': 'Texas Instruments',
-    'QCOM': 'Qualcomm',
-    'NOW': 'ServiceNow',
-    'HON': 'Honeywell',
-    'COST': 'Costco',
-    'AMGN': 'Amgen',
-    'SBUX': 'Starbucks',
-    'LMT': 'Lockheed Martin',
-    'BA': 'Boeing',
-    'CAT': 'Caterpillar',
-    'GS': 'Goldman Sachs',
-    'BLK': 'BlackRock',
-    'MDLZ': 'Mondelez International',
-    'SYK': 'Stryker',
-    'ISRG': 'Intuitive Surgical',
-    'ADBE': 'Adobe',
-    'NFLX': 'Netflix',
-    'FISV': 'Fiserv',
-    'ATVI': 'Activision Blizzard',
-    'GILD': 'Gilead Sciences',
-    'AMAT': 'Applied Materials',
-    'VRTX': 'Vertex Pharmaceuticals',
-    'ADP': 'Automatic Data Processing',
-    'NEM': 'Newmont Corporation',
-    'SPGI': 'S&P Global',
-    'DHR': 'Danaher',
-    'ZTS': 'Zoetis',
-    'LRCX': 'Lam Research',
-    'KMX': 'Kimberly-Clark',
-    'CARR': 'Carrier Global',
-    '^IXIC': 'Nasdaq Composite',
-    'MCO': 'Moody\'s',
-    'C': 'Citigroup',
-    'USB': 'U.S. Bancorp',
-    'BKNG': 'Booking Holdings',
-    'TROW': 'T. Rowe Price',
-    'NTRS': 'Northern Trust',
-    'MS': 'Morgan Stanley',
-    'SCHW': 'Charles Schwab',
-    'AON': 'Aon plc',
-    'MMC': 'Marsh & McLennan',
-    'DOV': 'Dover Corporation',
-    'ETR': 'Entergy',
-    'DTE': 'DTE Energy',
-    'PGR': 'Progressive Corporation',
-    'CNP': 'CenterPoint Energy',
-    'WBA': 'Walgreens Boots Alliance',
-    'VTRS': 'Viatris',
-    'KHC': 'Kraft Heinz',
-    'OXY': 'Occidental Petroleum',
-    'HIG': 'The Hartford',
-    'CAG': 'Conagra Brands',
-    'NWL': 'Newell Brands',
-    'KMX': 'CarMax',
-    'DHI': 'D.R. Horton',
-    'PHM': 'PulteGroup',
-    'LEN': 'Lennar',
-    'RMD': 'ResMed',
-    'DRE': 'Duke Realty',
-    'PLD': 'Prologis',
-    'ESS': 'Essex Property Trust',
-    'VTR': 'Ventas',
-    'O': 'Realty Income',
-    'REG': 'Regency Centers',
-    'SPG': 'Simon Property Group',
-    'AMT': 'American Tower',
-    'PLD': 'Prologis',
-    'SBRA': 'Sabra Health Care REIT',
-    'WPC': 'W.P. Carey',
-    'DLR': 'Digital Realty',
-    'CPT': 'Camden Property Trust',
-    'AVB': 'AvalonBay Communities',
-    'EQR': 'Equity Residential',
-    'ESS': 'Essex Property Trust',
-    'HST': 'Host Hotels & Resorts',
-    'MPC': 'Marathon Petroleum',
-    'VFC': 'V.F. Corporation',
-    'NKE': 'Nike',
-    'LVS': 'Las Vegas Sands',
-    'WYNN': 'Wynn Resorts',
-    'MGM': 'MGM Resorts',
-    'RCL': 'Royal Caribbean',
-    'CCL': 'Carnival Corporation',
-    'NCLH': 'Norwegian Cruise Line',
-    'MAR': 'Marriott International',
-    'HLT': 'Hilton Worldwide',
-    'IHG': 'InterContinental Hotels Group',
-    'CHH': 'Choice Hotels',
-    'WYN': 'Wyndham Hotels & Resorts',
-    '^DJI': 'Dow Jones Industrial Average',
-}; // Top 100+ stock symbols
+let stockSymbols = {};
+
+async function loadStockSymbols() {
+    try {
+        const response = await fetch('/stockSymbols.json');
+        stockSymbols = await response.json();
+    } catch (error) {
+        console.error('Error loading stock symbols:', error);
+    }
+}
 
 document.onfullscreenchange = function ( event ) {
     let target = event.target;
@@ -589,22 +345,22 @@ document.getElementById('disButton').addEventListener('click', () => {
 
 document.getElementById('ethButton').addEventListener('click', () => {
     document.getElementById('stockSymbolInput').value = 'ETH-USD'; // Set input value
-    updateFinanceData('1d', '1m'); // Refresh chart with daily data
+    updateFinanceData('1d', '5m'); // Refresh chart with daily data
 });
 
 document.getElementById('btcButton').addEventListener('click', () => {
     document.getElementById('stockSymbolInput').value = 'BTC-USD'; // Set input value
-    updateFinanceData('1d', '1m'); // Refresh chart with daily data
+    updateFinanceData('1d', '5m'); // Refresh chart with daily data
 });
 
 document.getElementById('solButton').addEventListener('click', () => {
     document.getElementById('stockSymbolInput').value = 'SOL-USD'; // Set input value
-    updateFinanceData('1d', '1m'); // Refresh chart with daily data
+    updateFinanceData('1d', '5m'); // Refresh chart with daily data
 });
 
 document.getElementById('xrpButton').addEventListener('click', () => {
     document.getElementById('stockSymbolInput').value = 'XRP-USD'; // Set input value
-    updateFinanceData('1d', '1m'); // Refresh chart with daily data
+    updateFinanceData('1d', '5m'); // Refresh chart with daily data
 });
 
 function scrollToSection(sectionId) {
@@ -615,6 +371,7 @@ function scrollToSection(sectionId) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    loadStockSymbols();
     // Add click handlers for time range buttons
     document.querySelectorAll('.time-range-button').forEach(button => {
         button.addEventListener('click', function() {

@@ -1,6 +1,9 @@
 // At the top of the file
 export let updateInterval;
 
+// Add these functions at the top of your file
+let lastUpdateTime = 0;
+
 function addData(chart, label, newData) {
     chart.data.labels.push(label);
     chart.data.datasets.forEach((dataset) => {
@@ -9,56 +12,8 @@ function addData(chart, label, newData) {
     chart.update();
 }
 
-function removeData(chart) {
-    chart.data.labels.pop();
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.pop();
-    });
-    chart.update();
-}
 
-function updateChartOptions(chart, newOptions) {
-    chart.options = {
-        ...chart.options,
-        ...newOptions
-    };
-    chart.update();
-}
-
-// Add this helper function to ensure data points are properly connected
-function processChartData(dates, prices) {
-    // Create arrays to store valid data points
-    const validDates = [];
-    const validPrices = [];
-    
-    // Track the last valid price
-    let lastValidPrice = null;
-
-    // Iterate through the data
-    for (let i = 0; i < prices.length; i++) {
-        // If current price is valid
-        if (prices[i] !== null && prices[i] !== undefined) {
-            // If there was a gap, add the last valid price to maintain continuity
-            if (lastValidPrice !== null && validPrices.length > 0 && 
-                dates[i] - validDates[validDates.length - 1] > 60 * 1000) {
-                validDates.push(new Date(validDates[validDates.length - 1].getTime() + 60 * 1000));
-                validPrices.push(lastValidPrice);
-            }
-            
-            // Add the current valid data point
-            validDates.push(new Date(dates[i]));
-            validPrices.push(prices[i]);
-            lastValidPrice = prices[i];
-        }
-    }
-
-    return {
-        dates: validDates,
-        prices: validPrices
-    };
-}
-
-function isMarketOpen() {
+export function isMarketOpen() {
     const symbol = document.getElementById('stockSymbolInput').value.toUpperCase();
     
     // Check if it's a crypto symbol
@@ -82,6 +37,55 @@ function isMarketOpen() {
     }
     return false;
 }
+
+// Add this helper function to ensure data points are properly connected
+// Modify the processChartData function to accept symbol as a parameter
+// ... existing code ...
+
+function processChartData(dates, prices, symbol) {
+    // Create arrays to store valid data points
+    const validDates = [];
+    const validPrices = [];
+    
+    // Track the last valid price
+    let lastValidPrice = null;
+
+    // Check if it's a crypto symbol and set max points
+    const isCrypto = symbol.endsWith('-USD');
+    const maxPoints = 200;
+
+    // Iterate through the data
+    for (let i = 0; i < prices.length; i++) {
+        // If current price is valid
+        if (prices[i] !== null && prices[i] !== undefined) {
+            // If there was a gap, add the last valid price to maintain continuity
+            if (lastValidPrice !== null && validPrices.length > 0 && 
+                dates[i] - validDates[validDates.length - 1] > 60 * 1000) {
+                validDates.push(new Date(validDates[validDates.length - 1].getTime() + 60 * 1000));
+                validPrices.push(lastValidPrice);
+            }
+            
+            // Add the current valid data point
+            validDates.push(new Date(dates[i]));
+            validPrices.push(prices[i]);
+            lastValidPrice = prices[i];
+
+            // Stop if we've reached the maximum number of points for crypto
+            if (isCrypto && validPrices.length >= maxPoints) {
+                break;
+            }
+        }
+    }
+
+    return {
+        dates: validDates,
+        prices: validPrices,
+        symbol: symbol
+    };
+}
+
+// ... existing code ...
+
 
 // Function to fetch financial data
 export const fetchFinancialData = async (symbol = '^IXIC', timeRange = '5m', interval = '1m') => {
@@ -274,9 +278,8 @@ export function updateFinance(data) {
     }
 
     // Process the data
-    const processedData = processChartData(data.dates, data.prices);
-    
-    // Initialize new chart
+// Replace line 278
+const processedData = processChartData(data.dates, data.prices, data.symbol);    // Initialize new chart
     window.financeChart = initializeChart(ctx, processedData);
 
     // Add zoom button functionality
@@ -311,7 +314,7 @@ export function updateFinance(data) {
     }
 }
 
-// Function to refresh real-time financial data
+// Modify the refreshRealTimeFinanceData function
 export async function refreshRealTimeFinanceData(symbol) {
     const financeData = await fetchRealTimeYahooFinanceData(symbol);
     
@@ -320,6 +323,7 @@ export async function refreshRealTimeFinanceData(symbol) {
         addData(window.financeChart, timestamp, financeData.price);
     }
     
+    // Ensure labels are updated
     updateRealTimeFinance(financeData);
 }
 
@@ -412,22 +416,33 @@ export async function updateFinanceDataWithPercentage(symbol, timeRange, interva
 let lastKnownChange = null;
 let lastKnownChangePercent = null;
 
+// Modify the startAutoRefresh function
 export function startAutoRefresh(symbol, timeRange, interval) {
     stopAutoRefresh();
 
     const isCrypto = symbol.endsWith('-USD');
 
     if (interval === '1m' && (isMarketOpen() || isCrypto)) {
+        // Update both chart and labels initially
         updateFinanceDataWithPercentage(symbol, timeRange, interval);
 
         updateInterval = setInterval(async () => {
-            const data = await fetchFinancialData(symbol, timeRange, interval);
-            if (window.financeChart) {
-                window.financeChart.data.labels = data.dates;
-                window.financeChart.data.datasets[0].data = data.prices;
-                window.financeChart.update('none');
+            try {
+                const [data, realTimeData] = await Promise.all([
+                    fetchFinancialData(symbol, timeRange, interval),
+                    fetchRealTimeYahooFinanceData(symbol)
+                ]);
+                
+                if (window.financeChart) {
+                    window.financeChart.data.labels = data.dates;
+                    window.financeChart.data.datasets[0].data = data.prices;
+                    window.financeChart.update('none');
+                    updateRealTimeFinance(realTimeData);
+                }
+            } catch (error) {
+                console.error('Error in auto-refresh:', error);
             }
-        }, 3000);
+        }, 1000);
     } else if (!isCrypto) {
         console.log('Market is closed. Auto-refresh will not start.');
     }
@@ -489,6 +504,54 @@ export function togglePauseFinance() {
         button.classList.add('paused');
     }
 }
+
+export async function handleFinanceUpdate(timeRange, interval) {
+    const now = Date.now();
+    if (now - lastUpdateTime < 250) {
+        console.log('Please wait before requesting new data');
+        return;
+    }
+    
+    lastUpdateTime = now;
+    
+    const stockSymbolInput = document.getElementById('stockSymbolInput');
+    const symbol = stockSymbolInput.value || '^IXIC';
+    const isCrypto = symbol.endsWith('-USD');
+    
+    // Adjust timeRange for crypto if it's '3m'
+    let adjustedTimeRange = timeRange;
+    if (isCrypto && timeRange === '3m') {
+        adjustedTimeRange = '10m';
+    }
+    
+    try {
+        const data = await updateFinanceDataWithPercentage(symbol, adjustedTimeRange, interval);
+        
+        if (window.financeChart) {
+            window.financeChart.data.labels = data.dates;
+            window.financeChart.data.datasets[0].data = data.prices;
+            window.financeChart.update();
+        }
+        
+        // Start auto-refresh for minute intervals or crypto
+        if (interval === '1m') {
+            startAutoRefresh(symbol, adjustedTimeRange, interval);
+        } else {
+            stopAutoRefresh();
+            if (!isCrypto && !isMarketOpen()) {
+                console.log('Market is closed. Auto-refresh will not start.');
+            }
+        }
+    } catch (error) {
+        console.error('Error updating finance data:', error);
+        const chartContainer = document.querySelector('#finance .chart-container');
+        if (chartContainer) {
+            chartContainer.innerHTML = '<p>Unable to fetch data. Please try again.</p>';
+        }
+    }
+}
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
     function handleFullscreen(event) {
