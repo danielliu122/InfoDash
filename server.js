@@ -30,23 +30,23 @@ const port = process.env.PORT || 3000;
 //     }
 // });
 
-// Geo-restrictor middleware
-const restrictedCountries = [
-    'RU', 'CN', 'KP', 'IR', 'NG', 'UA', 'BR', 'BI', 'AF', 'SD', 'CD', 'VE', 'CU',
-];
+// // Geo-restrictor middleware
+// const restrictedCountries = [
+//     'RU', 'CN', 'KP', 'IR', 'NG', 'UA', 'BR', 'BI', 'AF', 'SD', 'CD', 'VE', 'CU',
+// ];
 
-const geoRestrictor = (req, res, next) => {
-    const ip = req.ip;
-    const geo = geoip.lookup(ip);
-    if (geo && restrictedCountries.includes(geo.country)) {
-        return res.status(403).json({ error: 'Access restricted from your location' });
-    }
-    next();
-};
+// const geoRestrictor = (req, res, next) => {
+//     const ip = req.ip;
+//     const geo = geoip.lookup(ip);
+//     if (geo && restrictedCountries.includes(geo.country)) {
+//         return res.status(403).json({ error: 'Access restricted from your location' });
+//     }
+//     next();
+// };
 
-// Apply rate limiter and geo-restrictor to all routes
-//app.use(limiter);
-app.use(geoRestrictor);
+// // Apply rate limiter and geo-restrictor to all routes
+// //app.use(limiter);
+// app.use(geoRestrictor);
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
