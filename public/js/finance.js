@@ -21,7 +21,22 @@ function addData(chart, label, newData) {
                 dataset.data.shift();
             });
         }
-        
+
+        // If there's a gap, add an intermediate point to maintain continuity
+        if (chart.data.labels.length > 0) {
+            const lastLabel = chart.data.labels[chart.data.labels.length - 1];
+            const lastData = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1];
+            const timeDiff = new Date(label) - new Date(lastLabel);
+            
+            // If gap is more than 2 minutes, add an intermediate point
+            if (timeDiff > 120000) {
+                chart.data.labels.push(new Date(new Date(lastLabel).getTime() + 60000).toISOString());
+                chart.data.datasets.forEach((dataset) => {
+                    dataset.data.push(lastData);
+                });
+            }
+        }
+
         // Add new data point
         chart.data.labels.push(label);
         chart.data.datasets.forEach((dataset) => {
