@@ -7,41 +7,18 @@ let lastTimestamp = null;
 function addData(chart, label, newData) {
     // Only add data if the timestamp is different from the last one
     if (label !== lastTimestamp) {
-        // Ensure labels and data arrays stay in sync
-        if (chart.data.labels.length !== chart.data.datasets[0].data.length) {
-            console.error('Chart data out of sync! Resetting...');
-            chart.data.labels = [];
-            chart.data.datasets[0].data = [];
-        }
-
+        // Ensure we're working with the first dataset
+        const dataset = chart.data.datasets[0];
+        
         // Keep only the last 200 points (adjust as needed)
         if (chart.data.labels.length > 200) {
             chart.data.labels.shift();
-            chart.data.datasets.forEach((dataset) => {
-                dataset.data.shift();
-            });
+            dataset.data.shift();
         }
-
-        // If there's a gap, add an intermediate point to maintain continuity
-        if (chart.data.labels.length > 0) {
-            const lastLabel = chart.data.labels[chart.data.labels.length - 1];
-            const lastData = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1];
-            const timeDiff = new Date(label) - new Date(lastLabel);
-            
-            // If gap is more than 2 minutes, add an intermediate point
-            if (timeDiff > 120000) {
-                chart.data.labels.push(new Date(new Date(lastLabel).getTime() + 60000).toISOString());
-                chart.data.datasets.forEach((dataset) => {
-                    dataset.data.push(lastData);
-                });
-            }
-        }
-
+        
         // Add new data point
         chart.data.labels.push(label);
-        chart.data.datasets.forEach((dataset) => {
-            dataset.data.push(newData);
-        });
+        dataset.data.push(newData);
         
         // Update the chart
         chart.update();
@@ -82,43 +59,24 @@ export function isMarketOpen() {
 // ... existing code ...
 
 function processChartData(dates, prices, symbol) {
-    // Create arrays to store valid data points
-    const validDates = [];
-    const validPrices = [];
-    
-    // Track the last valid price
-    let lastValidPrice = null;
-
     // Check if it's a crypto symbol and set max points
     const isCrypto = symbol.endsWith('-USD');
     const maxPoints = 200;
 
-    // Iterate through the data
-    for (let i = 0; i < prices.length; i++) {
-        // If current price is valid
-        if (prices[i] !== null && prices[i] !== undefined) {
-            // If there was a gap, add the last valid price to maintain continuity
-            if (lastValidPrice !== null && validPrices.length > 0 && 
-                dates[i] - validDates[validDates.length - 1] > 60 * 1000) {
-                validDates.push(new Date(validDates[validDates.length - 1].getTime() + 60 * 1000));
-                validPrices.push(lastValidPrice);
-            }
-            
-            // Add the current valid data point
-            validDates.push(new Date(dates[i]));
-            validPrices.push(prices[i]);
-            lastValidPrice = prices[i];
+    // Filter and map valid data points
+    const validData = prices
+        .map((price, index) => ({
+            date: new Date(dates[index]),
+            price: price
+        }))
+        .filter(data => data.price !== null && data.price !== undefined);
 
-            // Stop if we've reached the maximum number of points for crypto
-            if (isCrypto && validPrices.length >= maxPoints) {
-                break;
-            }
-        }
-    }
+    // If crypto, limit to maxPoints
+    const limitedData = isCrypto ? validData.slice(-maxPoints) : validData;
 
     return {
-        dates: validDates,
-        prices: validPrices,
+        dates: limitedData.map(data => data.date),
+        prices: limitedData.map(data => data.price),
         symbol: symbol
     };
 }
