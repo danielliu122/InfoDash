@@ -537,8 +537,8 @@ body.dark-theme #chat-input {
     background-color: var(--button-bg);
     color: var(--primary-text);
     border: none;
-    width: 30px;
-    height: 30px;
+    width: 10px;
+    height: 10px;
     border-radius: 4px;
     cursor: pointer;
     display: flex;
@@ -584,8 +584,8 @@ body.dark-theme #chat-input {
     background-color: var(--button-bg);
     color: var(--primary-text);
     border: none;
-    width: 40px;  /* Adjusted width for the + and - symbols */
-    height: 40px; /* Adjusted height for the button */
+    width: 10px;  /* Adjusted width for the + and - symbols */
+    height: 10px; /* Adjusted height for the button */
     border-radius: 4px;
     cursor: pointer;
     display: flex;
@@ -744,3 +744,4 @@ body.dark-theme .autocomplete-item:hover {
 .scroll-to-top:hover {
     background-color: #555; /* Darker background on hover */
 }
+

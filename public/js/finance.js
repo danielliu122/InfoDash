@@ -1,15 +1,39 @@
 // At the top of the file
 export let updateInterval;
-
-// Add these functions at the top of your file
 let lastUpdateTime = 0;
+let lastHistoricalUpdate = 0;
+let lastTimestamp = null;
 
 function addData(chart, label, newData) {
-    chart.data.labels.push(label);
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.push(newData);
-    });
-    chart.update();
+    // Only add data if the timestamp is different from the last one
+    if (label !== lastTimestamp) {
+        // Ensure labels and data arrays stay in sync
+        if (chart.data.labels.length !== chart.data.datasets[0].data.length) {
+            console.error('Chart data out of sync! Resetting...');
+            chart.data.labels = [];
+            chart.data.datasets[0].data = [];
+        }
+
+        // Keep only the last 200 points (adjust as needed)
+        if (chart.data.labels.length > 200) {
+            chart.data.labels.shift();
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.shift();
+            });
+        }
+        
+        // Add new data point
+        chart.data.labels.push(label);
+        chart.data.datasets.forEach((dataset) => {
+            dataset.data.push(newData);
+        });
+        
+        // Update the chart
+        chart.update();
+        
+        // Update the last timestamp
+        lastTimestamp = label;
+    }
 }
 
 
@@ -207,10 +231,10 @@ function initializeChart(ctx, data) {
                     pinch: {
                       enabled: true
                     },
-                    mode: 'x',
+                    mode: 'xy',
                     onZoom: function(ctx) {
                         // If trying to zoom out, reset to previous state
-                        if (ctx.chart.getZoomLevel() < .2) {
+                        if (ctx.chart.getZoomLevel() < .9) {
                             ctx.chart.resetZoom();
                         }
                     }
@@ -259,7 +283,7 @@ export function updateFinance(data) {
             <div class="zoom-controls">
                 <button class="zoom-button" id="zoomIn">+</button>
                 <button class="zoom-button" id="zoomOut">-</button>
-                <button class="fullscreenButton" id="fullscreenButton">FullScreen Mode</button>
+                <button class="fullscreenButton" id="fullscreenButton">FSM</button>
             </div>
             <canvas id="financeChart"></canvas>
             <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
@@ -428,21 +452,40 @@ export function startAutoRefresh(symbol, timeRange, interval) {
 
         updateInterval = setInterval(async () => {
             try {
-                const [data, realTimeData] = await Promise.all([
-                    fetchFinancialData(symbol, timeRange, interval),
-                    fetchRealTimeYahooFinanceData(symbol)
-                ]);
+                // Fetch real-time data only
+                const realTimeData = await fetchRealTimeYahooFinanceData(symbol);
                 
-                if (window.financeChart) {
-                    window.financeChart.data.labels = data.dates;
-                    window.financeChart.data.datasets[0].data = data.prices;
-                    window.financeChart.update('none');
+                if (window.financeChart && realTimeData.price) {
+                    // Add real-time data point to the chart
+                    const timestamp = realTimeData.timestamp.toISOString();
+                    addData(window.financeChart, timestamp, realTimeData.price);
+                    
+                    // Update real-time display
                     updateRealTimeFinance(realTimeData);
+                }
+
+                // Fetch historical data every 60 seconds
+                const now = Date.now();
+                if (!lastHistoricalUpdate || now - lastHistoricalUpdate >= 60000) {
+                    const historicalData = await fetchFinancialData(symbol, timeRange, interval);
+                    if (window.financeChart) {
+                        // Ensure we don't overwrite real-time data
+                        const existingLabels = window.financeChart.data.labels;
+                        const existingData = window.financeChart.data.datasets[0].data;
+                        
+                        // Only update if we have new historical data
+                        if (historicalData.dates.length > 0 && historicalData.prices.length > 0) {
+                            window.financeChart.data.labels = historicalData.dates;
+                            window.financeChart.data.datasets[0].data = historicalData.prices;
+                            window.financeChart.update('none');
+                        }
+                    }
+                    lastHistoricalUpdate = now;
                 }
             } catch (error) {
                 console.error('Error in auto-refresh:', error);
             }
-        }, 1000);
+        }, 1000); // Keep 1-second interval for real-time updates
     } else if (!isCrypto) {
         console.log('Market is closed. Auto-refresh will not start.');
     }
