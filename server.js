@@ -123,7 +123,7 @@ app.get('/api/trends', async (req, res) => {
 app.get('/api/finance/:symbol', async (req, res) => {
     const symbol = req.params.symbol;
     const range = req.query.range || '1d';
-    const interval = req.query.interval || '1d';
+    const interval = req.query.interval || '1m';
     const baseUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/';
     const url = `${baseUrl}${symbol}?range=${range}&interval=${interval}`;
 

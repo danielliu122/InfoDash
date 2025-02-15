@@ -345,22 +345,22 @@ document.getElementById('disButton').addEventListener('click', () => {
 
 document.getElementById('ethButton').addEventListener('click', () => {
     document.getElementById('stockSymbolInput').value = 'ETH-USD'; // Set input value
-    updateFinanceData('1d', '5m'); // Refresh chart with daily data
+    updateFinanceData('24h', '5m'); // Refresh chart with daily data
 });
 
 document.getElementById('btcButton').addEventListener('click', () => {
     document.getElementById('stockSymbolInput').value = 'BTC-USD'; // Set input value
-    updateFinanceData('1d', '5m'); // Refresh chart with daily data
+    updateFinanceData('24h', '5m'); // Refresh chart with daily data
 });
 
 document.getElementById('solButton').addEventListener('click', () => {
     document.getElementById('stockSymbolInput').value = 'SOL-USD'; // Set input value
-    updateFinanceData('1d', '5m'); // Refresh chart with daily data
+    updateFinanceData('24h', '5m'); // Refresh chart with daily data
 });
 
 document.getElementById('xrpButton').addEventListener('click', () => {
     document.getElementById('stockSymbolInput').value = 'XRP-USD'; // Set input value
-    updateFinanceData('1d', '5m'); // Refresh chart with daily data
+    updateFinanceData('24h', '5m'); // Refresh chart with daily data
 });
 
 function scrollToSection(sectionId) {
