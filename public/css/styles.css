@@ -569,13 +569,6 @@ body.dark-theme #chat-input {
         top: 5px; /* Reduced from 10px */
         right: 5px; /* Reduced from 10px */
     }
-
-    .zoom-button {
-        width: 24px; /* Smaller buttons on mobile */
-        height: 24px; /* Smaller buttons on mobile */
-        font-size: 16px; /* Smaller font on mobile */
-    }
-
 }
 
 
@@ -600,12 +593,6 @@ body.dark-theme #chat-input {
 .fullscreenButton:hover {
     background-color: var(--button-hover-bg);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-/* Hide zoom buttons on mobile */
-@media screen and (max-width: 768px) {
-    .zoom-controls {
-        display: none;
-    }
 }
 
 .pause-button {

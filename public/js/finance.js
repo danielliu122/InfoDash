@@ -59,24 +59,38 @@ export function isMarketOpen() {
 // ... existing code ...
 
 function processChartData(dates, prices, symbol) {
+    // Create arrays to store valid data points
+    const validDates = [];
+    const validPrices = [];
+    
+    // Track the last valid price
+    let lastValidPrice = null;
+
     // Check if it's a crypto symbol and set max points
     const isCrypto = symbol.endsWith('-USD');
     const maxPoints = 200;
 
-    // Filter and map valid data points
-    const validData = prices
-        .map((price, index) => ({
-            date: new Date(dates[index]),
-            price: price
-        }))
-        .filter(data => data.price !== null && data.price !== undefined);
-
-    // If crypto, limit to maxPoints
-    const limitedData = isCrypto ? validData.slice(-maxPoints) : validData;
+    // Iterate through the data
+    for (let i = 0; i < prices.length; i++) {
+        // If current price is valid
+        if (prices[i] !== null && prices[i] !== undefined) {
+            // If there was a gap, add the last valid price to maintain continuity
+            if (lastValidPrice !== null && validPrices.length > 0 && 
+                dates[i] - validDates[validDates.length - 1] > 60 * 1000) {
+                validDates.push(new Date(validDates[validDates.length - 1].getTime() + 60 * 1000));
+                validPrices.push(lastValidPrice);
+            }
+            
+            // Add the current valid data point
+            validDates.push(new Date(dates[i]));
+            validPrices.push(prices[i]);
+            lastValidPrice = prices[i];
+        }
+    }
 
     return {
-        dates: limitedData.map(data => data.date),
-        prices: limitedData.map(data => data.price),
+        dates: validDates,
+        prices: validPrices,
         symbol: symbol
     };
 }
