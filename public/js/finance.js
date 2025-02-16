@@ -289,8 +289,8 @@ export function updateFinance(data) {
     }
 
     // Process the data
-// Replace line 278
-const processedData = processChartData(data.dates, data.prices, data.symbol);    // Initialize new chart
+
+    const processedData = processChartData(data.dates, data.prices, data.symbol);    // Initialize new chart
     window.financeChart = initializeChart(ctx, processedData);
 
     // Add zoom button functionality
@@ -435,7 +435,10 @@ export function startAutoRefresh(symbol, timeRange, interval) {
 
     if (interval === '1m' && (isMarketOpen() || isCrypto)) {
         // Update both chart and labels initially
-        updateFinanceDataWithPercentage(symbol, timeRange, interval);
+        // Only run initial update if NOT crypto
+        if (!isCrypto) {
+            updateFinanceDataWithPercentage(symbol, timeRange, interval);
+        }
 
         updateInterval = setInterval(async () => {
             try {
@@ -534,6 +537,14 @@ export function togglePauseFinance() {
         button.classList.add('paused');
     }
 }
+
+document.querySelectorAll('.time-range-button').forEach(button => {
+    button.addEventListener('click', () => {
+        const timeRange = button.dataset.timeRange;
+        const interval = button.dataset.interval;
+        handleFinanceUpdate(timeRange, interval);
+    });
+});
 
 export async function handleFinanceUpdate(timeRange, interval) {
     const now = Date.now();

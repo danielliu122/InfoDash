@@ -12,25 +12,6 @@ import { fetchNewsData, updateNews } from './news.js';
 import { fetchTrendsData, updateTrends } from './trends.js'; // Import from trends.js
 import { fetchRedditData, updateReddit } from './reddit.js'; // Import from reddit.js
 
-function updateFinanceData(timeRange, interval) {
-    handleFinanceUpdate(timeRange, interval);
-}
-
-
-// Function to show loading state in a container
-function showLoading(container) {
-    container.innerHTML = '<p>Loading...</p>';
-}
-
-// Define variables to track pause state for each module
-let isPaused = {
-    'finance': false,
-    'news': false,
-    'traffic': false,
-    'trends': false,
-    'reddit': false
-};
-
 // Update the togglePauseFinance function in app.js
 export function togglePauseFinance() {
     const isPaused = !updateInterval; // Check if currently paused
@@ -41,7 +22,7 @@ export function togglePauseFinance() {
     // Get the currently active time range button
     const activeButton = document.querySelector('.time-range-button.active') || document.getElementById('realtimeButton');
     const [timeRange, interval] = activeButton.getAttribute('onclick')
-        .match(/updateFinanceData\('([^']*)', '([^']*)'\)/i)
+        .match(/handleFinanceUpdate\('([^']*)', '([^']*)'\)/i)
         .slice(1);
     
     if (isPaused) {
@@ -103,12 +84,6 @@ async function handleButtonClick(type, category, subCategory) {
     }
 }
 
-// Attach functions to the window object to make them globally accessible
-window.handleButtonClick = handleButtonClick;
-window.updateFinanceData = updateFinanceData;
-window.togglePauseFinance = togglePauseFinance;
-window.refreshTrends = refreshTrends;
-window.refreshNews = refreshNews; // Add this line
 
 // Function to toggle section visibility
 window.toggleSection = function(sectionContentId) {
@@ -165,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             console.log('Market is closed. Auto-refresh will not start.');
             // Update the chart once even if the market is closed
-            updateFinanceData('1d', '1m');
+            handleFinanceUpdate('1d', '1m');
         }
 
         // Theme toggle functionality
@@ -258,7 +233,7 @@ document.getElementById('stockSymbolInput').addEventListener('input', function()
         item.classList.add('autocomplete-item');
         item.addEventListener('click', function() {
             document.getElementById('stockSymbolInput').value = symbol;
-            updateFinanceData('5m', '1m'); // Refresh chart with minutely data
+            handleFinanceUpdate('5m', '1m'); // Refresh chart with minutely data
             autocompleteList.innerHTML = ''; // Clear suggestions
         });
         autocompleteList.appendChild(item);
@@ -298,69 +273,12 @@ document.onfullscreenchange = function ( event ) {
     }
   };
 
-document.getElementById('nvdaButton').addEventListener('click', () => {
-    document.getElementById('stockSymbolInput').value = 'NVDA'; // Set input value
-    updateFinanceData('1d', '1m'); // Refresh chart with daily data
-});
-
-document.getElementById('aaplButton').addEventListener('click', () => {
-    document.getElementById('stockSymbolInput').value = 'AAPL'; // Set input value
-    updateFinanceData('1d', '1m'); // Refresh chart with daily data
-});
-
-document.getElementById('msftButton').addEventListener('click', () => {
-    document.getElementById('stockSymbolInput').value = 'MSFT'; // Set input value
-    updateFinanceData('1d', '1m'); // Refresh chart with daily data
-});
-
-document.getElementById('googlButton').addEventListener('click', () => {
-    document.getElementById('stockSymbolInput').value = 'GOOGL'; // Set input value
-    updateFinanceData('1d', '1m'); // Refresh chart with daily data
-});
-
-document.getElementById('amznButton').addEventListener('click', () => {
-    document.getElementById('stockSymbolInput').value = 'AMZN'; // Set input value
-    updateFinanceData('1d', '1m'); // Refresh chart with daily data
-});
-
-document.getElementById('tslaButton').addEventListener('click', () => {
-    document.getElementById('stockSymbolInput').value = 'TSLA'; // Set input value
-    updateFinanceData('1d', '1m'); // Refresh chart with daily data
-});
-
-document.getElementById('fbButton').addEventListener('click', () => {
-    document.getElementById('stockSymbolInput').value = 'META'; // Set input value to META
-    updateFinanceData('1d', '1m'); // Refresh chart with daily data
-});
-
-document.getElementById('nflxButton').addEventListener('click', () => {
-    document.getElementById('stockSymbolInput').value = 'NFLX'; // Set input value
-    updateFinanceData('1d', '1m'); // Refresh chart with daily data
-});
-
-document.getElementById('disButton').addEventListener('click', () => {
-    document.getElementById('stockSymbolInput').value = 'DIS'; // Set input value
-    updateFinanceData('1d', '1m'); // Refresh chart with daily data
-});
-
-document.getElementById('ethButton').addEventListener('click', () => {
-    document.getElementById('stockSymbolInput').value = 'ETH-USD'; // Set input value
-    updateFinanceData('24h', '5m'); // Refresh chart with daily data
-});
-
-document.getElementById('btcButton').addEventListener('click', () => {
-    document.getElementById('stockSymbolInput').value = 'BTC-USD'; // Set input value
-    updateFinanceData('24h', '5m'); // Refresh chart with daily data
-});
-
-document.getElementById('solButton').addEventListener('click', () => {
-    document.getElementById('stockSymbolInput').value = 'SOL-USD'; // Set input value
-    updateFinanceData('24h', '5m'); // Refresh chart with daily data
-});
-
-document.getElementById('xrpButton').addEventListener('click', () => {
-    document.getElementById('stockSymbolInput').value = 'XRP-USD'; // Set input value
-    updateFinanceData('24h', '5m'); // Refresh chart with daily data
+  document.querySelectorAll('[data-stock-symbol]').forEach(button => {
+    button.addEventListener('click', (e) => {
+        const symbol = e.currentTarget.dataset.stockSymbol;
+        document.getElementById('stockSymbolInput').value = symbol;
+        handleFinanceUpdate('1d', '1m');
+    });
 });
 
 function scrollToSection(sectionId) {

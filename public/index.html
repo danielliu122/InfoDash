@@ -261,31 +261,31 @@
                                 <div id="autocomplete-list" class="autocomplete-items"></div>
                             </div>
                             <div class="col s12">
-                                <button id="realtimeButton" class="btn waves-effect waves-light time-range-button" onclick="updateFinanceData('3m', '1m')">Minute</button>
-                                <button id="hourlyButton" class="btn waves-effect waves-light time-range-button" onclick="updateFinanceData('2h', '1m')">Hour</button>
-                                <button id="openButton" class="btn waves-effect waves-light time-range-button" onclick="updateFinanceData('24h', '5m')">Open</button>                               
-                                <button id="weeklyButton" class="btn waves-effect waves-light time-range-button" onclick="updateFinanceData('7d', '1d')">Week</button>
-                                <button id="monthlyButton" class="btn waves-effect waves-light time-range-button" onclick="updateFinanceData('1mo', '1d')">Month</button>
-                                <button id="yearlyButton" class="btn waves-effect waves-light time-range-button" onclick="updateFinanceData('12mo', '1mo')">Year</button>
-                                <button id="5yrButton" class="btn waves-effect waves-light time-range-button" onclick="updateFinanceData('5y', '3mo')">5 Years</button>
-                                <button id="10yrButton" class="btn waves-effect waves-light time-range-button" onclick="updateFinanceData('10y', '1mo')">10 Years</button>
-                                <button id="20yrButton" class="btn waves-effect waves-light time-range-button" onclick="updateFinanceData('20y', '1mo')">20 Years</button>
-                                <button id="maxButton" class="btn waves-effect waves-light time-range-button" onclick="updateFinanceData('99y', '1mo')">Max</button>
+                                <button id="realtimeButton" class="btn waves-effect waves-light time-range-button" data-time-range="3m" data-interval="1m">Minute</button>
+                                <button id="hourlyButton" class="btn waves-effect waves-light time-range-button" data-time-range="2h" data-interval="1m">Hour</button>
+                                <button id="openButton" class="btn waves-effect waves-light time-range-button" data-time-range="24h" data-interval="5m">Open</button>                               
+                                <button id="weeklyButton" class="btn waves-effect waves-light time-range-button" data-time-range="7d" data-interval="1d">Week</button>
+                                <button id="monthlyButton" class="btn waves-effect waves-light time-range-button" data-time-range="1mo" data-interval="1d">Month</button>
+                                <button id="yearlyButton" class="btn waves-effect waves-light time-range-button" data-time-range="12m" data-interval="1m">Year</button>
+                                <button id="5yrButton" class="btn waves-effect waves-light time-range-button" data-time-range="5y" data-interval="3mo">5 Years</button>
+                                <button id="10yrButton" class="btn waves-effect waves-light time-range-button" data-time-range="10y" data-interval="1mo">10 Years</button>
+                                <button id="20yrButton" class="btn waves-effect waves-light time-range-button" data-time-range="20y" data-interval="1mo">20 Years</button>
+                                <button id="maxButton" class="btn waves-effect waves-light time-range-button" data-time-range="99y" data-interval="1mo">Max</button>
                             </div>
                             <div class="col s12">
-                                <button id="ethButton" class="btn waves-effect waves-light">ETH</button>
-                                <button id="btcButton" class="btn waves-effect waves-light">BTC</button>
-                                <button id="solButton" class="btn waves-effect waves-light">SOL</button>
-                                <button id="xrpButton" class="btn waves-effect waves-light">XRP</button>
-                                <button id="nvdaButton" class="btn waves-effect waves-light">NVDA</button>
-                                <button id="aaplButton" class="btn waves-effect waves-light">AAPL</button>
-                                <button id="msftButton" class="btn waves-effect waves-light">MSFT</button>
-                                <button id="googlButton" class="btn waves-effect waves-light">GOOGL</button>
-                                <button id="amznButton" class="btn waves-effect waves-light">AMZN</button>
-                                <button id="tslaButton" class="btn waves-effect waves-light">TSLA</button>
-                                <button id="fbButton" class="btn waves-effect waves-light">META</button>
-                                <button id="nflxButton" class="btn waves-effect waves-light">NFLX</button>
-                                <button id="disButton" class="btn waves-effect waves-light">DIS</button>
+                                <button id="ethButton" class="btn waves-effect waves-light" data-stock-symbol="ETH-USD">ETH</button>
+                                <button id="btcButton" class="btn waves-effect waves-light" data-stock-symbol="BTC-USD">BTC</button>
+                                <button id="solButton" class="btn waves-effect waves-light" data-stock-symbol="SOL-USD">SOL</button>
+                                <button id="xrpButton" class="btn waves-effect waves-light" data-stock-symbol="XRP-USD">XRP</button>
+                                <button id="nvdaButton" class="btn waves-effect waves-light" data-stock-symbol="NVDA">NVDA</button>
+                                <button id="aaplButton" class="btn waves-effect waves-light" data-stock-symbol="AAPL">AAPL</button>
+                                <button id="msftButton" class="btn waves-effect waves-light" data-stock-symbol="MSFT">MSFT</button>
+                                <button id="googlButton" class="btn waves-effect waves-light" data-stock-symbol="GOOGL">GOOGL</button>
+                                <button id="amznButton" class="btn waves-effect waves-light" data-stock-symbol="AMZN">AMZN</button>
+                                <button id="tslaButton" class="btn waves-effect waves-light" data-stock-symbol="TSLA">TSLA</button>
+                                <button id="fbButton" class="btn waves-effect waves-light" data-stock-symbol="META">META</button>
+                                <button id="nflxButton" class="btn waves-effect waves-light" data-stock-symbol="NFLX">NFLX</button>
+                                <button id="disButton" class="btn waves-effect waves-light" data-stock-symbol="DIS">DIS</button>
                             </div>
                         </div>
                         <div class="real-time-data-container"></div>
@@ -336,7 +336,7 @@
             <div class="col s12">
                 <section id="chat" class="section">
                     <div class="section-header">
-                        <h3>Chat with AI</h3>
+                        <h3>Chat</h3>
                     </div>
                     <div id="chat-content" class="section-content">
                         <div class="chat-container">
