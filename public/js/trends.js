@@ -294,34 +294,9 @@ export const updateTrends = (data, category) => {
     renderPage(currentPage);
 }
 
-async function fetchTrends(type = 'daily', geo = 'US', category = 'all', language = 'en') {
-    try {
-        const response = await fetch(`/api/trends?type=${type}&geo=${geo}&category=${category}&language=${language}`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-
-        if (data.default && data.default.trendingSearchesDays.length > 0) {
-            const trendingSearches = data.default.trendingSearchesDays[0].trendingSearches;
-            if (trendingSearches.length === 0) {
-                displayNoTrendsMessage();
-            } else {
-                processTrendingSearches(trendingSearches);
-            }
-        } else {
-            displayNoTrendsMessage();
-        }
-    } catch (error) {
-        console.error('Error fetching trends data:', error);
-    }
-}
-
 function displayNoTrendsMessage() {
-    const messageElement = document.getElementById('noTrendsMessage');
-    messageElement.innerText = 'No trending searches available at this time.';
-    messageElement.style.display = 'block'; // Show the message
+    const trendsSection = document.querySelector('#trends .data-container');
+    trendsSection.innerHTML = '<p>No trending searches available at this time.</p>';
 }
 
 function processRealtimeTrends(data) {

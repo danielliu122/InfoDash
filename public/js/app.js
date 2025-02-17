@@ -61,8 +61,8 @@ async function refreshTrends() {
 }
 
 // Function to handle button clicks
-async function handleButtonClick(type, category, subCategory) {
-    //console.log(`handleButtonClick called with type: ${type}, category: ${category}, subCategory: ${subCategory}`);
+// Function to handle button clicks - must be global for HTML onclick
+window.handleButtonClick = async function(type, category, subCategory = 'all') {
     const countrySelect = document.getElementById('countrySelect');
     const languageSelect = document.getElementById('languageSelect');
     const trendsCountrySelect = document.getElementById('trendsCountrySelect');
@@ -70,19 +70,24 @@ async function handleButtonClick(type, category, subCategory) {
 
     const country = type === 'trends' ? trendsCountrySelect.value : countrySelect.value;
     const language = type === 'trends' ? trendsLanguageSelect.value : languageSelect.value;
-    //console.log(`Country: ${country}, Language: ${language}`);
-    let data;
-    if (type === 'news') {
-        data = await fetchNewsData(category, country, language);
-        updateNews(data);
-    } else if (type === 'reddit') {
-        data = await fetchRedditData(category);
-        updateReddit(data);
-    } else if (type === 'trends') {
-        data = await fetchTrendsData(category, subCategory, country);
-        updateTrends(data, category);
+
+    try {
+        let data;
+        if (type === 'news') {
+            data = await fetchNewsData(category, country, language);
+            updateNews(data);
+        } else if (type === 'reddit') {
+            data = await fetchRedditData(category);
+            updateReddit(data);
+        } else if (type === 'trends') {
+            data = await fetchTrendsData(category, subCategory, language, country);
+            updateTrends(data, category);
+        }
+    } catch (error) {
+        console.error(`Error handling ${type} request:`, error);
+        alert(`Failed to load ${type} data. Please try again.`);
     }
-}
+};
 
 
 // Function to toggle section visibility
