@@ -592,8 +592,6 @@ export async function handleFinanceUpdate(timeRange, interval) {
     }
 }
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
     function handleFullscreen(event) {
         const fullscreenButton = event.target.closest('#fullscreenButton');
@@ -602,35 +600,38 @@ document.addEventListener('DOMContentLoaded', () => {
         const chartContainer = fullscreenButton.closest('.chart-container');
         if (!chartContainer) return;
 
-        const financeChart = chartContainer.querySelector('#financeChart');
-        if (!financeChart) return;
-
         const isMobile = window.innerWidth <= 768;
 
         if (!document.fullscreenElement) {
             chartContainer.requestFullscreen().then(() => {
                 if (isMobile && screen.orientation.lock) {
-                    screen.orientation.lock('landscape').catch(err => {
-                        console.warn('Orientation lock failed:', err);
-                    });
+                    screen.orientation.lock('landscape').catch(console.warn);
                 }
-                }).catch(err => {
-                    console.error('Fullscreen request failed:', err);
-                });
+            }).catch(console.error);
         } else {
             document.exitFullscreen().then(() => {
                 if (isMobile && screen.orientation.unlock) {
-                    screen.orientation.unlock().catch(err => {
-                        console.warn('Orientation unlock failed:', err);
-                    });
+                    screen.orientation.unlock().catch(console.warn);
                 }
-                // Reset canvas size after exiting fullscreen
-                financeChart.width = 818;
-                financeChart.height = 260;
             });
         }
     }
-    // Use event delegation to handle dynamically added buttons
+
+    // Add resize observer for automatic chart updates
+    const resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+            if (window.financeChart && !window.financeChart.destroyed) {
+                window.financeChart.resize();
+            }
+        }
+    });
+
+    // Observe the chart container
+    const chartContainer = document.querySelector('.chart-container');
+    if (chartContainer) {
+        resizeObserver.observe(chartContainer);
+    }
+
     document.body.addEventListener('click', handleFullscreen);
 });
 
