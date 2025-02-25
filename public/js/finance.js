@@ -617,21 +617,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Add resize observer for automatic chart updates
-    const resizeObserver = new ResizeObserver(entries => {
-        for (let entry of entries) {
-            if (window.financeChart && !window.financeChart.destroyed) {
-                window.financeChart.resize();
-            }
-        }
-    });
-
-    // Observe the chart container
-    const chartContainer = document.querySelector('.chart-container');
-    if (chartContainer) {
-        resizeObserver.observe(chartContainer);
-    }
-
     document.body.addEventListener('click', handleFullscreen);
 });
 

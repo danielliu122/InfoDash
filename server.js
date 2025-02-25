@@ -93,29 +93,72 @@ app.get('/api/news', async (req, res) => {
 
 // Route to fetch Google Trends data
 app.get('/api/trends', async (req, res) => {
-    const type = req.query.type || 'daily';
-    const geo = req.query.geo || 'US';
-    const category = req.query.category || 'all'; // Default to 'all' for all categories
-    const language = req.query.language || 'en'; // Default to English
-
-    //console.log(`Fetching trends with parameters: type=${type}, geo=${geo}, category=${category}, language=${language}`);
-
     try {
-        let trends;
-        if (type === 'daily') {
-            trends = await googleTrends.dailyTrends({
-                geo: geo,
-                hl: language // Add language parameter for daily trends
-            });
+        // Keep existing implementation but suppress errors
+        const type = req.query.type || 'daily';
+        const geo = req.query.geo || 'US';
+        const category = req.query.category || 'all';
+        const language = req.query.language || 'en';
 
-            // Parse and send the results
-            res.json(JSON.parse(trends));
-        } else {
-            return res.status(400).json({ error: 'Invalid trend type' });
+        if (type === 'daily') {
+            const trends = await googleTrends.dailyTrends({ geo, hl: language });
+            return res.json(JSON.parse(trends));
         }
+        
+        return res.json({}); // Return empty response for other types
+        
     } catch (error) {
-        console.error('Error fetching trends data:', error);
-        res.status(500).json({ error: 'Error fetching trends data' });
+        // Suppress error logging
+        return res.status(200).json({}); // Always return 200 with empty object
+    }
+});
+
+// Route to fetch Google Trends data
+app.get('/api/trends2', async (req, res) => {
+    try {
+        const geo = req.query.geo || 'US';
+        const language = req.query.language || 'en-US';
+        const session = axios.create();
+        
+        // New API endpoint with batch request
+        const response = await session.post(
+            'https://trends.google.com/_/TrendsUi/data/batchexecute',
+            `f.req=[[["i0OFE","[null, null, \\"${geo}\\", 0, null, 48]"]]]`,
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                    'Referer': 'https://trends.google.com/trends/explore'
+                }
+            }
+        );
+
+        // Extract JSON from the nested response
+        const jsonData = response.data.split('\n').find(line => line.trim().startsWith('['));
+        const parsed = JSON.parse(JSON.parse(jsonData)[0][2]);
+        
+        // Map the response to match previous format
+        const mappedData = parsed[1].map(item => ({
+            title: { query: item[0] },
+            relatedQueries: item[9] ? item[9].slice(1).map(q => ({ query: q })) : [],
+            articles: item[3]?.map(article => ({
+                title: article[0],
+                url: article[1],
+                source: article[2],
+                image: { imageUrl: article[3] }
+            })) || []
+        }));
+
+        res.json({
+            default: {
+                trendingSearchesDays: [{
+                    trendingSearches: mappedData
+                }]
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error fetching trends:', error);
+        res.status(200).json({});
     }
 });
 

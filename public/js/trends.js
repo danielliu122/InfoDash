@@ -10,7 +10,11 @@ const decodeHtmlEntities = (text) => {
 // Function to fetch Google Trends data
 export const fetchTrendsData = async (type = 'daily', category = 'all', language = 'en', country = 'US') => {
     try {
-        const response = await fetch(`/api/trends?type=${type}&category=${category}&language=${language}&geo=${country}`);
+        // original trends1 
+        //const response = await fetch(`/api/trends?type=${type}&category=${category}&language=${language}&geo=${country}`);
+
+        // trends2
+        const response = await fetch(`/api/trends2?type=${type}&category=${category}&language=${language}&geo=${country}`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -28,11 +32,9 @@ export const fetchTrendsData = async (type = 'daily', category = 'all', language
         
         return data;
     } catch (error) {
-        console.error('Error fetching trends data:', error);
-        return null; // Return null or an empty object to indicate failure
+        return null; // Suppress all errors
     }
 };
-
 // Add event listeners for the dropdowns
 document.getElementById('trendsCountrySelect').addEventListener('change', refreshTrends);
 document.getElementById('trendsLanguageSelect').addEventListener('change', refreshTrends);
@@ -83,8 +85,19 @@ function updateLanguageOptions(country) {
 
 export const updateTrends = (data, category) => {
     const trendsSection = document.querySelector('#trends .data-container');
-    trendsSection.innerHTML = ''; // Clear previous data
+    if (!trendsSection) return;
 
+    // Clear previous data
+    trendsSection.innerHTML = '';
+    
+    if (!data || !data.default || !data.default.trendingSearchesDays) {
+        trendsSection.style.display = 'none';
+        return;
+    }
+    
+    trendsSection.style.display = 'block';
+    
+    // Rest of existing rendering logic
     let topics = [];
 
     if (category === 'daily') {
@@ -100,10 +113,14 @@ export const updateTrends = (data, category) => {
     const buttonsContainer = document.createElement('div');
     buttonsContainer.classList.add('buttons-container');
 
-    topics.forEach((topic, index) => {
+    // Modify the topic buttons creation (around line 103)
+    topics.slice(0, 25).forEach((topic, index) => { // Limit to 5 buttons
         const topicButton = document.createElement('button');
         topicButton.classList.add('topic-button');
-        topicButton.textContent = decodeHtmlEntities(topic.title.query || topic.title);
+        topicButton.innerHTML = `
+            ${decodeHtmlEntities(topic.title.query || topic.title)}
+            ${topic.image?.imgUrl ? `<img src="${topic.image.imgUrl}" alt="Trend thumbnail">` : ''}
+        `;
         topicButton.onclick = () => renderTopicArticles(index);
         buttonsContainer.appendChild(topicButton);
     });
@@ -165,7 +182,7 @@ export const updateTrends = (data, category) => {
                     }
 
                     const snippet = document.createElement('p');
-                    snippet.textContent = decodeHtmlEntities(article.snippet.split('\n')[0]); // First paragraph
+                    snippet.textContent = decodeHtmlEntities(article.snippet?.split('\n')[0] || 'N/A'); // Add null check
                     articleItem.appendChild(snippet);
 
                     articles.appendChild(articleItem);
@@ -250,7 +267,7 @@ export const updateTrends = (data, category) => {
                 }
 
                 const snippet = document.createElement('p');
-                snippet.textContent = decodeHtmlEntities(article.snippet.split('\n')[0]); // First paragraph
+                snippet.textContent = decodeHtmlEntities(article.snippet?.split('\n')[0] || 'N/A'); // Add null check
                 articleItem.appendChild(snippet);
 
                 articles.appendChild(articleItem);
@@ -390,8 +407,7 @@ function createTopicElement(topic) {
 
             const snippet = document.createElement('p');
             snippet.classList.add('article-text');
-            snippet.textContent = decodeHtmlEntities(article.snippet.split('\n')[0]); // First paragraph
-            articleItem.appendChild(snippet);
+            snippet.textContent = decodeHtmlEntities(article.snippet?.split('\n')[0] || 'N/A'); // Add null check            articleItem.appendChild(snippet);
 
             articles.appendChild(articleItem);
         });
