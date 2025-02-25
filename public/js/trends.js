@@ -422,7 +422,7 @@ document.getElementById('dailyTrendsButton').addEventListener('click', () => {
     const type = 'daily';
     const geo = document.getElementById('trendsCountrySelect').value;
     const language = document.getElementById('trendsLanguageSelect').value;
-    fetchTrends(type, geo, 'all', language);
+    fetchTrendsData(type, 'all', language, geo);
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
