@@ -271,7 +271,7 @@ export function updateFinance(data) {
                 <button class="zoom-button" id="zoomIn">+</button>
                 <button class="zoom-button" id="zoomOut">-</button>
                 <button class="zoom-button" id="resetZoom">↺</button>
-                <button class="fullscreenButton" id="fullscreenButton">FSM</button>
+                <button class="fullscreenButton" id="fullscreenButton">⤢</button>
             </div>
             <canvas id="financeChart"></canvas>
             <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
