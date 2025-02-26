@@ -566,32 +566,19 @@ body.dark-theme #chat-input {
 
 .fullscreenButton {
     padding: 5px 10px;
-    background: var(--button-bg-color);
-    color: var(--button-text-color);
+    background: var(--button-bg);
+    color: var(--primary-text);
     border: none;
     border-radius: 3px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
+    transition: background-color 0.2s;
 }
 
-.fullscreenButton::before {
-    content: '⤢'; /* Fullscreen icon */
-    font-size: 16px;
-}
 
 .fullscreenButton:hover {
     background: var(--button-hover-bg-color);
-    transform: scale(1.1);
 }
 
-.fullscreenButton:active {
-    transform: scale(0.95);
-}
 
 /* For fullscreen mode */
 #finance .chart-container:fullscreen {
