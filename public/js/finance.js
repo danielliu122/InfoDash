@@ -270,6 +270,7 @@ export function updateFinance(data) {
             <div class="zoom-controls">
                 <button class="zoom-button" id="zoomIn">+</button>
                 <button class="zoom-button" id="zoomOut">-</button>
+                <button class="zoom-button" id="resetZoom">↺</button>
                 <button class="fullscreenButton" id="fullscreenButton">FSM</button>
             </div>
             <canvas id="financeChart"></canvas>
@@ -300,6 +301,27 @@ export function updateFinance(data) {
 
     document.getElementById('zoomOut').addEventListener('click', () => {
         window.financeChart.zoom(0.9);
+    });
+
+    // Add this after the existing zoom button event listeners
+    document.getElementById('resetZoom').addEventListener('click', () => {
+        if (window.financeChart) {
+            // Reset zoom plugin state
+            window.financeChart.resetZoom();
+            
+            // Reset axis bounds
+            window.financeChart.options.scales.x.min = undefined;
+            window.financeChart.options.scales.x.max = undefined;
+            
+            // Update chart
+            window.financeChart.update();
+            
+            // Reset slider position
+            const slider = document.getElementById('chartSlider');
+            if (slider) {
+                slider.value = 0;
+            }
+        }
     });
 
     // Slider functionality
@@ -619,7 +641,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         prices: existingData.datasets?.[0]?.data || [],
                         symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
                     });
-                }, 200); // 200msecond delay after entering fullscreen
+                }, 100); // second delay after entering fullscreen
             });
         } else {
             document.exitFullscreen().then(() => {
@@ -634,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         prices: existingData.datasets?.[0]?.data || [],
                         symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
                     });
-                }, 200); // 200msecond delay after exiting fullscreen
+                }, 100); // second delay after exiting fullscreen
             });
         }
     }

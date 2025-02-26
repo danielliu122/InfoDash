@@ -408,8 +408,6 @@ footer {
     padding: 10px;
 }
 
-
-
 /* Autocomplete styles */
 .autocomplete-items {
     position: absolute;
@@ -481,8 +479,6 @@ body.dark-theme #chat-input {
     font-weight: bold;
 }
 
-
-
 /* Add these styles for the chart scrollbar */
 .chart-container::-webkit-scrollbar {
     height: 12px;
@@ -508,8 +504,6 @@ body.dark-theme #chat-input {
     scrollbar-color: #888 #f1f1f1;
 }
 
-
-
 /* Add this to ensure slider doesn't interfere with other elements */
 .chart-container {
     position: relative;
@@ -527,32 +521,31 @@ body.dark-theme #chat-input {
     position: absolute;
     top: 10px;
     right: 10px;
+    z-index: 100;
     display: flex;
-    flex-direction: column;
-    gap: 5px;
-    z-index: 3;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .zoom-button {
-    background-color: var(--button-bg);
+    padding: 5px 10px;
+    background: var(--button-bg);
     color: var(--primary-text);
     border: none;
-    width: 10px;
-    height: 10px;
-    border-radius: 4px;
+    border-radius: 3px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: bold;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s, box-shadow 0.3s;
+    transition: background-color 0.2s;
 }
 
 .zoom-button:hover {
-    background-color: var(--button-hover-bg);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background: var(--button-hover-bg);
+}
+
+#resetZoom {
+    padding: 5px 12px;
 }
 
 /* Mobile adjustments */
@@ -571,23 +564,33 @@ body.dark-theme #chat-input {
     }
 }
 
-
-
 .fullscreenButton {
-    background-color: var(--button-bg);
-    color: var(--primary-text);
+    padding: 5px 10px;
+    background: var(--button-bg-color);
+    color: var(--button-text-color);
     border: none;
-    width: 10px;  /* Adjusted width for the + and - symbols */
-    height: 10px; /* Adjusted height for the button */
-    border-radius: 4px;
+    border-radius: 3px;
     cursor: pointer;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px; /* Adjusted font size for better visibility */
-    font-weight: bold;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s, box-shadow 0.3s;
+    width: 32px;
+    height: 32px;
+}
+
+.fullscreenButton::before {
+    content: '⤢'; /* Fullscreen icon */
+    font-size: 16px;
+}
+
+.fullscreenButton:hover {
+    background: var(--button-hover-bg-color);
+    transform: scale(1.1);
+}
+
+.fullscreenButton:active {
+    transform: scale(0.95);
 }
 
 /* For fullscreen mode */
@@ -595,17 +598,6 @@ body.dark-theme #chat-input {
     height: 100vh !important;
     width: 100vw !important;
     background: var(--background-color);
-}
-
-/* For fullscreen canvas */
-#finance .chart-container:fullscreen canvas {
-    height: 100% !important;
-    width: 100% !important;
-}
-
-.fullscreenButton:hover {
-    background-color: var(--button-hover-bg);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .pause-button {
