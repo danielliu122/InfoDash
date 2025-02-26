@@ -221,7 +221,7 @@ function initializeChart(ctx, data) {
                     mode: 'xy',
                     onZoom: function(ctx) {
                         // If trying to zoom out, reset to previous state
-                        if (ctx.chart.getZoomLevel() < .9) {
+                        if (ctx.chart.getZoomLevel() < 1) {
                             ctx.chart.resetZoom();
                         }
                     }
@@ -596,23 +596,45 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleFullscreen(event) {
         const fullscreenButton = event.target.closest('#fullscreenButton');
         if (!fullscreenButton) return;
-
+    
         const chartContainer = fullscreenButton.closest('.chart-container');
         if (!chartContainer) return;
-
-        const isMobile = window.innerWidth <= 768;
-
+    
+        const canvas = chartContainer.querySelector('canvas');
+        if (!canvas) return;
+    
+        const existingData = window.financeChart?.data || {};
+        const ctx = canvas.getContext('2d');
+    
         if (!document.fullscreenElement) {
             chartContainer.requestFullscreen().then(() => {
-                if (isMobile && screen.orientation.lock) {
-                    screen.orientation.lock('landscape').catch(console.warn);
-                }
-            }).catch(console.error);
+                setTimeout(() => {
+                    if (window.financeChart) window.financeChart.destroy();
+                    
+                    canvas.width = chartContainer.clientWidth;
+                    canvas.height = chartContainer.clientHeight;
+                    
+                    window.financeChart = initializeChart(ctx, {
+                        dates: existingData.labels || [],
+                        prices: existingData.datasets?.[0]?.data || [],
+                        symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
+                    });
+                }, 200); // 200msecond delay after entering fullscreen
+            });
         } else {
             document.exitFullscreen().then(() => {
-                if (isMobile && screen.orientation.unlock) {
-                    screen.orientation.unlock().catch(console.warn);
-                }
+                setTimeout(() => {
+                    if (window.financeChart) window.financeChart.destroy();
+                    
+                    canvas.width = chartContainer.clientWidth;
+                    canvas.height = 400;
+                    
+                    window.financeChart = initializeChart(ctx, {
+                        dates: existingData.labels || [],
+                        prices: existingData.datasets?.[0]?.data || [],
+                        symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
+                    });
+                }, 200); // 200msecond delay after exiting fullscreen
             });
         }
     }

@@ -590,16 +590,22 @@ body.dark-theme #chat-input {
     transition: background-color 0.3s, box-shadow 0.3s;
 }
 
+/* For fullscreen mode */
+#finance .chart-container:fullscreen {
+    height: 100vh !important;
+    width: 100vw !important;
+    background: var(--background-color);
+}
+
+/* For fullscreen canvas */
+#finance .chart-container:fullscreen canvas {
+    height: 100% !important;
+    width: 100% !important;
+}
+
 .fullscreenButton:hover {
     background-color: var(--button-hover-bg);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Add this rule to properly scale the canvas */
-.chart-container:fullscreen canvas {
-    position: relative;
-    top: 0;
-    left: 0;
 }
 
 .pause-button {
