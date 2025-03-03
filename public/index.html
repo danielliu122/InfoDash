@@ -340,9 +340,18 @@
                     </div>
                     <div id="chat-content" class="section-content">
                         <div class="chat-container">
+                            <div class="input-field">
+                                <select id="model-select">
+                                    <option value="deepseek/deepseek-r1:free">DeepSeek (Accurate) [10-60s response time]</option>
+                                    <option value="google/gemini-2.0-pro-exp-02-05:free">Google Gemini (Fast) [3-30s response time]</option>
+                                </select>
+                                <label>Select Model</label>
+                            </div>
                             <div id="chat-log" class="data-container"></div>
-                            <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off">
-                            <button id="send-button" class="btn waves-effect waves-light">Send</button>
+                            <div class="chat-input-container">
+                                <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off">
+                                <button id="send-button" class="btn waves-effect waves-light">Send</button>
+                            </div>
                         </div>
                     </div>
                 </section>

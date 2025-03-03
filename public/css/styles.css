@@ -440,7 +440,7 @@ footer {
 .chat-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
 }
 
 #chat-log {
@@ -722,5 +722,34 @@ body.dark-theme .autocomplete-item:hover {
 
 .scroll-to-top:hover {
     background-color: #555; /* Darker background on hover */
+}
+
+/* Style for model select dropdown */
+#model-select {
+    margin-bottom: 5px;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 14px;
+}
+
+#model-select:focus {
+    outline: none;
+    border-color: #666;
+}
+
+/* Style for the label */
+.input-field label {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 2px;
+    display: block;
+}
+
+/* Adjust chat input container */
+.chat-input-container {
+    margin-top: 5px;
 }
 

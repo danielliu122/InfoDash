@@ -13,8 +13,10 @@ const geoip = require('geoip-lite');
 const OpenAI = require('openai'); // Import OpenAI directly
 // Initialize OpenAI API directly with the API key
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY, // Ensure your API key is set in the environment
+    baseURL: 'https://openrouter.ai/api/v1',
+    apiKey: process.env.DEEPSEEK_API_KEY,
 });
+const DDG = require('duck-duck-scrape');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -94,7 +96,6 @@ app.get('/api/news', async (req, res) => {
 // Route to fetch Google Trends data
 app.get('/api/trends', async (req, res) => {
     try {
-        // Keep existing implementation but suppress errors
         const type = req.query.type || 'daily';
         const geo = req.query.geo || 'US';
         const category = req.query.category || 'all';
@@ -102,14 +103,16 @@ app.get('/api/trends', async (req, res) => {
 
         if (type === 'daily') {
             const trends = await googleTrends.dailyTrends({ geo, hl: language });
-            return res.json(JSON.parse(trends));
+            res.json(JSON.parse(trends));
+        } else if (type === 'realtime') {
+            const trends = await googleTrends.realTimeTrends({ geo, hl: language });
+            res.json(JSON.parse(trends));
+        } else {
+            res.status(400).json({ error: 'Invalid type specified' });
         }
-        
-        return res.json({}); // Return empty response for other types
-        
     } catch (error) {
-        // Suppress error logging
-        return res.status(200).json({}); // Always return 200 with empty object
+        console.error('Error fetching trends:', error);
+        res.status(200).json({});
     }
 });
 
@@ -194,35 +197,77 @@ app.get('/api/googlemaps/script', (req, res) => {
 
 app.post('/api/chat', async (req, res) => {
     let body = '';
-
-    // Collect data from the request body
+    
     req.on('data', chunk => {
-        body += chunk.toString(); // Convert Buffer to string
+        body += chunk.toString();
     });
 
     req.on('end', async () => {
         try {
-            const { messages } = JSON.parse(body); // Parse the JSON body
-
+            const { messages, model = 'deepseek/deepseek-r1:free' } = JSON.parse(body);
+            
             if (!messages || messages.length === 0) {
                 return res.status(400).json({ error: 'Messages are required' });
             }
 
             const response = await openai.chat.completions.create({
-                model: 'gpt-3.5-turbo',
-                messages: messages.map(msg => ({ role: 'user', content: msg })), // Map messages to the required format
-                max_tokens: 333 // Limit to 333 tokens
+                model,
+                messages: messages.map(msg => ({ role: 'user', content: msg })),
+                max_tokens: 3333,
             });
 
             const reply = response.choices[0].message.content;
             res.json({ reply });
         } catch (error) {
-            console.error('Error communicating with OpenAI:', error);
-            res.status(500).json({ error: 'Error communicating with OpenAI' });
+            console.error('Error communicating with OpenRouter:', error);
+            res.status(500).json({ error: 'Error communicating with OpenRouter' });
         }
     });
 });
 
+// Update lookup endpoint to use selected model
+app.post('/api/lookup', async (req, res) => {
+    try {
+        const { query, model = 'deepseek/deepseek-r1:free' } = req.body;
+        if (!query) {
+            return res.status(400).json({ error: 'Query is required' });
+        }
+
+        // First try DuckDuckGo
+        const searchResults = await DDG.search(query, {
+            safeSearch: DDG.SafeSearchType.STRICT
+        });
+
+        if (searchResults.noResults || !searchResults.results || searchResults.results.length === 0) {
+            return res.json({ result: null });
+        }
+
+        // Get the first result
+        const firstResult = searchResults.results[0];
+        const rawResult = firstResult.description || firstResult.title || null;
+
+        // If it's a direct answer (like weather), return it
+        if (rawResult && (rawResult.includes("°") || rawResult.includes("weather"))) {
+            return res.json({ result: rawResult });
+        }
+
+        // Otherwise, use selected model to process the result
+        const processedResponse = await openai.chat.completions.create({
+            model,
+            messages: [{
+                role: 'user',
+                content: `Based on this information: "${rawResult}", answer: ${query}`
+            }],
+            max_tokens: 500
+        });
+
+        const finalResult = processedResponse.choices[0].message.content;
+        res.json({ result: finalResult });
+    } catch (error) {
+        console.error('Error performing lookup:', error);
+        res.status(500).json({ error: 'Error performing lookup' });
+    }
+});
 
 // Catch-all route for undefined routes
 app.use((req, res) => {
