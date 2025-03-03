@@ -76,10 +76,23 @@ async function fetchAIResponse(history) {
         const selectedModel = document.getElementById('model-select').value;
         const lastMessage = history[history.length - 1];
         
-        // Check if it's a lookup request
-        if (lastMessage.toLowerCase().includes('lookup:')) {
-            const query = lastMessage.split('lookup:')[1].trim();
-            return await handleLookupWithReasoning(query, history, selectedModel);
+        // Prepare conversation context with system prompt
+        const messages = [
+            {
+                role: 'system',
+                content: 'This is a conversation between a user and an AI engine. ' +
+                         'Please determine the next appropriate response to the current user query. ' +
+                         'Each user query is independent unless explicitly related to previous queries.'
+            },
+            ...history.map((message, index) => ({
+                role: index % 2 === 0 ? 'user' : 'assistant',
+                content: message
+            }))
+        ];
+
+        // Check if it's a simple factual question
+        if (isSimpleQuery(lastMessage)) {
+            return await handleSimpleQuery(lastMessage, messages, selectedModel);
         }
 
         // Regular chat response
@@ -89,7 +102,7 @@ async function fetchAIResponse(history) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ 
-                messages: history,
+                messages,
                 model: selectedModel 
             }),
         });
@@ -101,11 +114,19 @@ async function fetchAIResponse(history) {
     }
 }
 
-async function handleLookupWithReasoning(query, history, model) {
+// Function to check if a message is a simple factual question
+function isSimpleQuery(message) {
+    const firstWord = message.trim().split(' ')[0].toLowerCase();
+    const questionWords = ['what', 'where', 'when', 'why', 'who', 'how'];
+    return questionWords.includes(firstWord);
+}
+
+async function handleSimpleQuery(query, history, model) {
     try {
         const lookupResult = await performOnlineLookup(query);
         
         if (lookupResult) {
+            // Add lookup result to the conversation context
             const messages = [
                 ...history.slice(0, -1),
                 {
@@ -128,6 +149,7 @@ async function handleLookupWithReasoning(query, history, model) {
             return data.reply;
         }
         
+        // If no lookup result, ask directly
         const messages = [
             ...history.slice(0, -1),
             {
@@ -149,7 +171,7 @@ async function handleLookupWithReasoning(query, history, model) {
         const data = await response.json();
         return data.reply;
     } catch (error) {
-        console.error('Error handling lookup with reasoning:', error);
+        console.error('Error handling simple query:', error);
         return 'Error: Unable to process your request.';
     }
 }

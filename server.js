@@ -212,15 +212,27 @@ app.post('/api/chat', async (req, res) => {
 
             const response = await openai.chat.completions.create({
                 model,
-                messages: messages.map(msg => ({ role: 'user', content: msg })),
+                messages,
                 max_tokens: 3333,
             });
+
+            // Validate API response structure
+            if (!response || !response.choices || !response.choices[0] || !response.choices[0].message) {
+                console.error('Invalid API response structure:', response);
+                return res.status(500).json({ 
+                    error: 'Invalid response from AI service',
+                    details: 'The AI service returned an unexpected response format'
+                });
+            }
 
             const reply = response.choices[0].message.content;
             res.json({ reply });
         } catch (error) {
             console.error('Error communicating with OpenRouter:', error);
-            res.status(500).json({ error: 'Error communicating with OpenRouter' });
+            res.status(500).json({ 
+                error: 'Error communicating with OpenRouter',
+                details: error.message 
+            });
         }
     });
 });
@@ -246,8 +258,8 @@ app.post('/api/lookup', async (req, res) => {
         const firstResult = searchResults.results[0];
         const rawResult = firstResult.description || firstResult.title || null;
 
-        // If it's a direct answer (like weather), return it
-        if (rawResult && (rawResult.includes("°") || rawResult.includes("weather"))) {
+        // If it's a direct answer (for a simple query), return it
+        if (rawResult) {
             return res.json({ result: rawResult });
         }
 
@@ -258,7 +270,7 @@ app.post('/api/lookup', async (req, res) => {
                 role: 'user',
                 content: `Based on this information: "${rawResult}", answer: ${query}`
             }],
-            max_tokens: 500
+            max_tokens: 3333
         });
 
         const finalResult = processedResponse.choices[0].message.content;
