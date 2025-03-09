@@ -50,68 +50,74 @@
                                     <button id="eventsNewsButton" class="btn waves-effect waves-light" onclick="handleButtonClick('news', 'events')">Events News</button>
                                     <button id="otherNewsButton" class="btn waves-effect waves-light" onclick="handleButtonClick('news', 'other')">Other News</button>
                                     <button id="healthNewsButton" class="btn waves-effect waves-light" onclick="handleButtonClick('news', 'health')">Health News</button>
+                                    <button id="topHeadlinesButton" class="btn waves-effect waves-light" onclick="handleNewsTypeClick('top-headlines')">Top Headlines</button>
+                                    <button id="everythingButton" class="btn waves-effect waves-light" onclick="handleNewsTypeClick('everything')">Everything</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col s12">
+                                    <div class="input-field col s12 m3">
+                                        <select id="dateRangeSelect" onchange="handleDateRangeChange()" disabled>
+                                            <option value="24h">Last 24 hours</option>
+                                            <option value="7d">Last week</option>
+                                            <option value="30d">Last month</option>
+                                            <option value="all">All time</option>
+                                        </select>
+                                        <label>Date Range</label>
+                                    </div>
                                 </div>
                             </div>
                             <div id="news-controls" class="row">
                                 <div class="input-field col s6">
-                                    <select id="countrySelect" onchange="refreshNews()" disabled>
+                                    <select id="countrySelect">
                                         <option value="All">All</option>
-                                        <option value="us">United States</option>
-                                        <option value="ca">Canada</option>
-                                        <option value="gb">United Kingdom</option>
-                                        <option value="au">Australia</option>
-                                        <option value="fr">France</option>
-                                        <option value="it">Italy</option>
-                                        <option value="jp">Japan</option>
-                                        <option value="in">India</option>
-                                        <option value="br">Brazil</option>
-                                        <option value="mx">Mexico</option>
-                                        <option value="za">South Africa</option>
-                                        <option value="kr">South Korea</option>
-                                        <option value="ng">Nigeria</option>
-                                        <option value="ar">Argentina</option>
-                                        <option value="at">Austria</option>
-                                        <option value="be">Belgium</option>
-                                        <option value="bg">Bulgaria</option>
-                                        <option value="ch">Switzerland</option>
-                                        <option value="co">Colombia</option>
-                                        <option value="cu">Cuba</option>
-                                        <option value="cz">Czech Republic</option>
-                                        <option value="de">Germany</option>
-                                        <option value="eg">Egypt</option>
-                                        <option value="gr">Greece</option>
-                                        <option value="hk">Hong Kong</option>
-                                        <option value="hu">Hungary</option>
-                                        <option value="id">Indonesia</option>
-                                        <option value="ie">Ireland</option>
-                                        <option value="il">Israel</option>
-                                        <option value="iq">Iraq</option>
-                                        <option value="ir">Iran</option>
-                                        <option value="lt">Lithuania</option>
-                                        <option value="lv">Latvia</option>
-                                        <option value="ma">Morocco</option>
-                                        <option value="my">Malaysia</option>
-                                        <option value="nl">Netherlands</option>
-                                        <option value="no">Norway</option>
-                                        <option value="nz">New Zealand</option>
-                                        <option value="ph">Philippines</option>
-                                        <option value="pk">Pakistan</option>
-                                        <option value="pl">Poland</option>
-                                        <option value="pt">Portugal</option>
-                                        <option value="ro">Romania</option>
-                                        <option value="rs">Serbia</option>
-                                        <option value="ru">Russia</option>
-                                        <option value="sa">Saudi Arabia</option>
-                                        <option value="se">Sweden</option>
-                                        <option value="sg">Singapore</option>
-                                        <option value="si">Slovenia</option>
-                                        <option value="sk">Slovakia</option>
-                                        <option value="th">Thailand</option>
-                                        <option value="tr">Turkey</option>
-                                        <option value="tw">Taiwan</option>
-                                        <option value="ua">Ukraine</option>
-                                        <option value="ve">Venezuela</option>
-                                        <option value="vn">Vietnam</option>
+                                        <option value="US">United States</option>
+                                        <option value="CA">Canada</option>
+                                        <option value="GB">United Kingdom</option>
+                                        <option value="AU">Australia</option>
+                                        <option value="DE">Germany</option>
+                                        <option value="FR">France</option>
+                                        <option value="JP">Japan</option>
+                                        <option value="IN">India</option>
+                                        <option value="BR">Brazil</option>
+                                        <option value="KR">South Korea</option>
+                                        <option value="IT">Italy</option>
+                                        <option value="ES">Spain</option>
+                                        <option value="MX">Mexico</option>
+                                        <option value="RU">Russia</option>
+                                        <option value="ZA">South Africa</option>
+                                        <option value="TR">Turkey</option>
+                                        <option value="NL">Netherlands</option>
+                                        <option value="SE">Sweden</option>
+                                        <option value="CH">Switzerland</option>
+                                        <option value="SG">Singapore</option>
+                                        <option value="SA">Saudi Arabia</option>
+                                        <option value="AR">Argentina</option>
+                                        <option value="ID">Indonesia</option>
+                                        <option value="TH">Thailand</option>
+                                        <option value="VN">Vietnam</option>
+                                        <option value="PL">Poland</option>
+                                        <option value="NO">Norway</option>
+                                        <option value="FI">Finland</option>
+                                        <option value="DK">Denmark</option>
+                                        <option value="AT">Austria</option>
+                                        <option value="BE">Belgium</option>
+                                        <option value="PT">Portugal</option>
+                                        <option value="IE">Ireland</option>
+                                        <option value="NZ">New Zealand</option>
+                                        <option value="IL">Israel</option>
+                                        <option value="HK">Hong Kong</option>
+                                        <option value="TW">Taiwan</option>
+                                        <option value="MY">Malaysia</option>
+                                        <option value="PH">Philippines</option>
+                                        <option value="CL">Chile</option>
+                                        <option value="CO">Colombia</option>
+                                        <option value="PE">Peru</option>
+                                        <option value="CZ">Czech Republic</option>
+                                        <option value="HU">Hungary</option>
+                                        <option value="GR">Greece</option>
+                                        <option value="RO">Romania</option>
+                                        <option value="UA">Ukraine</option>
                                     </select>
                                     <label for="countrySelect">Country</label>
                                 </div>

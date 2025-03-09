@@ -3,8 +3,11 @@ const newsCache = {};
 
 const TTL_MS = 43200000;
 
-export const fetchNewsData = async (query = 'world', country = 'us', language = 'en', forceRefresh = false) => {
-    const cacheKey = `${query}-${country}-${language}`;
+// Define priority countries
+const PRIORITY_COUNTRIES = ['us', 'ca', 'gb'];
+
+export const fetchNewsData = async (query = 'world', country = 'us', language = 'en', forceRefresh = false, newsType = 'everything') => {
+    const cacheKey = `${query}-${country}-${language}-${newsType}`;
 
     // Check if cache exists and remove expired data
     if (newsCache[cacheKey] && (Date.now() - newsCache[cacheKey].timestamp >= newsCache[cacheKey].ttl)) {
@@ -12,44 +15,59 @@ export const fetchNewsData = async (query = 'world', country = 'us', language = 
         delete newsCache[cacheKey];
     }
 
-  // Check if cached data is available and still valid
-if (newsCache[cacheKey]?.data?.length > 0 && (Date.now() - newsCache[cacheKey].timestamp < TTL_MS)) {
-    console.log(`Using cached news data for: ${cacheKey}`);
-    return newsCache[cacheKey].data;
-} else {
-    console.log(`Fetching fresh news data for: ${cacheKey}`);
-    const newsUrl = `/api/news?query=${query}&country=${country}&language=${language}`;
+    // Check if cached data is available and still valid
+    if (newsCache[cacheKey]?.data?.length > 0 && (Date.now() - newsCache[cacheKey].timestamp < TTL_MS)) {
+        console.log(`Using cached news data for: ${cacheKey}`);
+        return newsCache[cacheKey].data;
+    }
 
     try {
-        const response = await fetch(newsUrl);
-        if (!response.ok) {
-            console.error(`Error fetching news data: ${response.status}`);
-            return [];
+        let articles = [];
+        
+        if (newsType === 'top-headlines') {
+            // Fetch top headlines from priority countries
+            for (const priorityCountry of PRIORITY_COUNTRIES) {
+                const headlinesUrl = `/api/news?query=${query}&country=${priorityCountry}&language=${language}&category=${query === 'world' ? 'general' : query}`;
+                const headlinesResponse = await fetch(headlinesUrl);
+                if (headlinesResponse.ok) {
+                    const headlinesData = await headlinesResponse.json();
+                    if (headlinesData.articles) {
+                        articles.push(...headlinesData.articles);
+                    }
+                }
+            }
+        } else {
+            // Fetch from the everything API
+            const everythingUrl = `/api/news?query=${query}&country=${country}&language=${language}`;
+            const everythingResponse = await fetch(everythingUrl);
+            if (everythingResponse.ok) {
+                const everythingData = await everythingResponse.json();
+                if (everythingData.articles) {
+                    articles.push(...everythingData.articles);
+                }
+            }
         }
 
-        const data = await response.json();
-        if (data.articles) {
-            // Sort articles by `publishedAt` date (newest first)
-            const sortedArticles = data.articles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+        // Sort articles by date (newest first) and then by popularity
+        const sortedArticles = articles.sort((a, b) => {
+            const dateDiff = new Date(b.publishedAt) - new Date(a.publishedAt);
+            if (dateDiff !== 0) return dateDiff;
+            return (b.popularity || 0) - (a.popularity || 0);
+        });
 
-            // Cache the fetched data and timestamp
-            newsCache[cacheKey] = {
-                data: sortedArticles,
-                timestamp: Date.now(),
-                ttl: TTL_MS, // 12-hour TTL
-            };
+        // Cache the fetched data and timestamp
+        newsCache[cacheKey] = {
+            data: sortedArticles,
+            timestamp: Date.now(),
+            ttl: TTL_MS,
+        };
 
-            return sortedArticles;
-        }
-        console.error('Invalid news API response:', data);
-        return [];
+        return sortedArticles;
     } catch (error) {
         console.error('Error fetching news data:', error);
-        return []; // Return an empty array on error
+        return [];
     }
-}}
-
-
+}
 
 // Function to update UI with news data
 export function updateNews(data) {

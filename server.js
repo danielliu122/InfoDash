@@ -60,8 +60,8 @@ app.get('/', (req, res) => {
 
 app.get('/api/news', async (req, res) => {
     const newsApiKey = process.env.NEWS_API_KEY;
-    const { query, country, language } = req.query;
-    const cacheKey = `${query}-${country}-${language}`;
+    const { query, country, language, category, from } = req.query;
+    const cacheKey = `${query}-${country}-${language}-${category || 'general'}-${from || 'all'}`;
 
     if (!newsApiKey) {
         console.error('News API key is not set in the environment variables');
@@ -71,12 +71,16 @@ app.get('/api/news', async (req, res) => {
     // Check if data is cached
     const cachedData = newsCache.get(cacheKey);
     if (cachedData) {
-        //console.log('Using cached news data');
         return res.json(cachedData);
     }
 
-    // If not cached, fetch fresh data
-    const newsUrl = `https://newsapi.org/v2/everything?q=${query}&language=${language}&apiKey=${newsApiKey}`;
+    // Build API URL based on parameters
+    let newsUrl;
+    if (category) {
+        newsUrl = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&language=${language}&apiKey=${newsApiKey}`;
+    } else {
+        newsUrl = `https://newsapi.org/v2/everything?q=${query}&language=${language}&sortBy=popularity${from ? `&from=${from}` : ''}&apiKey=${newsApiKey}`;
+    }
 
     try {
         const response = await axios.get(newsUrl);

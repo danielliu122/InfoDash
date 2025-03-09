@@ -38,8 +38,8 @@ export function togglePauseFinance() {
     }
 }
 
-// Function to refresh news data
-async function refreshNews() {
+// Export refreshNews function
+export async function refreshNews() {
     const countrySelect = document.getElementById('countrySelect');
     const languageSelect = document.getElementById('languageSelect');
     const country = countrySelect.value;
@@ -74,6 +74,7 @@ window.handleButtonClick = async function(type, category, subCategory = 'all') {
     try {
         let data;
         if (type === 'news') {
+            // Fetch news data with the specified category
             data = await fetchNewsData(category, country, language);
             updateNews(data);
         } else if (type === 'reddit') {
@@ -100,7 +101,41 @@ window.toggleSection = function(sectionContentId) {
     }
 };
 
+// Add theme toggle functionality
+function toggleTheme() {
+    const body = document.body;
+    const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    // Update the theme class
+    body.classList.remove(`${currentTheme}-theme`);
+    body.classList.add(`${newTheme}-theme`);
+
+    // Save the theme preference in localStorage
+    localStorage.setItem('theme', newTheme);
+
+    // Update the theme toggle button text
+    const themeToggleButton = document.getElementById('themeToggleButton');
+    if (themeToggleButton) {
+        themeToggleButton.textContent = `${currentTheme}`;
+    }
+}
+
+// Initialize theme based on user preference
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.body.classList.add(`${savedTheme}`);
+
+    const themeToggleButton = document.getElementById('themeToggleButton');
+    if (themeToggleButton) {
+        themeToggleButton.textContent = `${savedTheme === 'light' ? 'dark' : 'light'}`;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+    // Initialize theme
+    initializeTheme();
+
     // Scroll to the top of the page on reload
     window.scrollTo(0, 0);
 
@@ -117,6 +152,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    // Enable the country select dropdown
+    countrySelect.disabled = false;
+
     // Add event listener for country and language select to update trends data
     trendsCountrySelect.addEventListener('change', refreshTrends);
     trendsLanguageSelect.addEventListener('change', refreshTrends);
@@ -130,9 +168,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const country = countrySelect.value;
         const language = languageSelect.value;
 
+        // Fetch prioritized news data
         const newsData = await fetchNewsData('world', country, language);
         updateNews(newsData);
 
+        // Fetch other default data
         const redditData = await fetchRedditData('day');
         updateReddit(redditData);
 
@@ -151,34 +191,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Theme toggle functionality
         const themeToggleButton = document.getElementById('themeToggleButton');
         if (themeToggleButton) {
-            themeToggleButton.addEventListener('click', async () => {
-                // Toggle the theme class on the body
-                document.body.classList.toggle('dark-theme');
-
-                // Destroy the existing chart if it exists
-                if (window.financeChart && window.financeChart instanceof Chart) {
-                    window.financeChart.destroy();
-                }
-
-                // Get the current stock symbol and time range/interval
-                const stockSymbolInput = document.getElementById('stockSymbolInput');
-                const symbol = stockSymbolInput.value || '^IXIC';
-                const timeRange = '1d'; // Set your default time range
-                const interval = '1m'; // Set your default interval
-
-                // Fetch the financial data again to recreate the chart
-                try {
-                    const data = await fetchFinancialData(symbol, timeRange, interval);
-                    updateFinance(data); // This will recreate the chart with the new theme
-                } catch (error) {
-                    console.error('Error fetching financial data after theme toggle:', error);
-                }
-            });
-        } else {
-            console.warn('Theme toggle button not found');
+            themeToggleButton.addEventListener('click', toggleTheme);
         }
     } catch (error) {
-        console.error('Error initializing data:', error);
+        console.error('Error during initial data fetch:', error);
     }
     console.log("DOM fully loaded")
 
@@ -313,3 +329,45 @@ document.addEventListener('DOMContentLoaded', () => {
         realtimeButton.classList.add('active');
     }
 });
+
+// Add handleDateRangeChange function
+window.handleDateRangeChange = async function() {
+    const countrySelect = document.getElementById('countrySelect');
+    const languageSelect = document.getElementById('languageSelect');
+    const dateRangeSelect = document.getElementById('dateRangeSelect');
+    
+    if (!countrySelect || !languageSelect || !dateRangeSelect) {
+        console.error('Required elements not found');
+        return;
+    }
+
+    const country = countrySelect.value;
+    const language = languageSelect.value;
+    const dateRange = dateRangeSelect.value;
+
+    try {
+        // Force refresh to get new data with the selected date range
+        const newsData = await fetchNewsData('world', country, language, true);
+        updateNews(newsData);
+    } catch (error) {
+        console.error('Error updating news with new date range:', error);
+        alert('Failed to update news with new date range. Please try again.');
+    }
+};
+
+// Add handleNewsTypeClick function
+window.handleNewsTypeClick = async function(newsType) {
+    const countrySelect = document.getElementById('countrySelect');
+    const languageSelect = document.getElementById('languageSelect');
+    const country = countrySelect.value;
+    const language = languageSelect.value;
+
+    try {
+        // Force refresh to get new data with the selected news type
+        const newsData = await fetchNewsData('world', country, language, true, newsType);
+        updateNews(newsData);
+    } catch (error) {
+        console.error('Error updating news with new type:', error);
+        alert('Failed to update news. Please try again.');
+    }
+};
