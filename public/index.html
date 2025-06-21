@@ -78,6 +78,88 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col s12 center-align">
+                                    <button class="btn waves-effect waves-light" onclick="saveCurrentSummary()">💾 Save Today's Summary</button>
+                                    <p class="center-align" style="font-size: 0.9em; color: var(--secondary-text); margin-top: 10px;">
+                                        <strong>Note:</strong> The first summary generated each day is automatically saved and shared with all users. 
+                                        Use "Refresh" to generate a new summary without saving.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Historical Summaries Section -->
+        <div class="row">
+            <div class="col s12">
+                <section id="historical-summaries" class="section">
+                    <div class="section-header">
+                        <h3>📚 Daily Summaries Archive</h3>
+                        <div class="right">
+                            <button class="btn-small waves-effect waves-light" onclick="toggleSection('historical-summaries-content')">Show/Hide</button>
+                        </div>
+                    </div>
+                    <div id="historical-summaries-content" class="section-content" style="display: none;">
+                        <div class="row">
+                            <div class="col s12">
+                                <p class="center-align" style="font-size: 0.9em; color: var(--secondary-text); margin-bottom: 20px;">
+                                    <strong>Shared Daily Summaries:</strong> These summaries are automatically saved once per day and shared across all users.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="input-field col s6">
+                                    <input type="date" id="summaryDate" onchange="loadSummaryForDate()">
+                                    <label for="summaryDate">Select Date</label>
+                                </div>
+                                <div class="col s6">
+                                    <button class="btn waves-effect waves-light" onclick="loadSummaryForDate()">📅 Load Summary</button>
+                                    <button class="btn waves-effect waves-light red" onclick="deleteSelectedSummary()">🗑️ Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <h5>Saved Summaries</h5>
+                                <div id="saved-summaries-list" class="saved-summaries-container">
+                                    <!-- Saved summaries will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div id="historical-summary-display" class="historical-summary-content" style="display: none;">
+                            <div class="row">
+                                <div class="col s12 m4">
+                                    <div class="summary-card historical-news-summary">
+                                        <h5>📰 Top Headlines</h5>
+                                        <div class="summary-text"></div>
+                                    </div>
+                                </div>
+                                <div class="col s12 m4">
+                                    <div class="summary-card historical-trends-summary">
+                                        <h5>🔥 Trending Topics</h5>
+                                        <div class="summary-text"></div>
+                                    </div>
+                                </div>
+                                <div class="col s12 m4">
+                                    <div class="summary-card historical-finance-summary">
+                                        <h5>📈 Market Overview</h5>
+                                        <div class="summary-text"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col s12">
+                                    <div class="summary-card historical-overall-summary">
+                                        <h5>🎯 Key Insights</h5>
+                                        <div class="summary-text"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>

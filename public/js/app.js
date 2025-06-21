@@ -11,7 +11,7 @@ import {
 import { fetchNewsData, updateNews } from './news.js';
 import { fetchTrendsData, updateTrends } from './trends.js'; // Import from trends.js
 import { fetchRedditData, updateReddit } from './reddit.js'; // Import from reddit.js
-import { generateAndDisplaySummary, refreshSummary } from './summary.js'; // Import summary functionality
+import { generateAndDisplaySummary, refreshSummary, initializeHistoricalSummaries } from './summary.js'; // Import summary functionality
 
 // Update the togglePauseFinance function in app.js
 export function togglePauseFinance() {
@@ -136,6 +136,9 @@ function initializeTheme() {
 document.addEventListener('DOMContentLoaded', async () => {
     // Initialize theme
     initializeTheme();
+
+    // Initialize historical summaries
+    initializeHistoricalSummaries();
 
     // Scroll to the top of the page on reload
     window.scrollTo(0, 0);

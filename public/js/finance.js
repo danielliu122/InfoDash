@@ -63,28 +63,11 @@ function processChartData(dates, prices, symbol) {
     const validDates = [];
     const validPrices = [];
     
-    // Track the last valid price
-    let lastValidPrice = null;
-
-    // Check if it's a crypto symbol and set max points
-    const isCrypto = symbol.endsWith('-USD');
-    const maxPoints = 200;
-
-    // Iterate through the data
+    // Simply collect all valid data points
     for (let i = 0; i < prices.length; i++) {
-        // If current price is valid
         if (prices[i] !== null && prices[i] !== undefined) {
-            // If there was a gap, add the last valid price to maintain continuity
-            if (lastValidPrice !== null && validPrices.length > 0 && 
-                dates[i] - validDates[validDates.length - 1] > 60 * 1000) {
-                validDates.push(new Date(validDates[validDates.length - 1].getTime() + 60 * 1000));
-                validPrices.push(lastValidPrice);
-            }
-            
-            // Add the current valid data point
             validDates.push(new Date(dates[i]));
             validPrices.push(prices[i]);
-            lastValidPrice = prices[i];
         }
     }
 
@@ -185,6 +168,9 @@ export function updateRealTimeFinance(data) {
     `;
 }
 function initializeChart(ctx, data) {
+    // Check if it's a crypto symbol
+    const isCrypto = data.symbol.endsWith('-USD');
+    
     return new Chart(ctx, {
         type: 'line',
         data: {
@@ -197,7 +183,7 @@ function initializeChart(ctx, data) {
                 fill: true,
                 pointRadius: 2,
                 pointHoverRadius: 10,
-                spanGaps: true, // This allows the line to span gaps
+                spanGaps: true,
                 segment: {
                     borderColor: ctx => {
                         // Optional: Add color coding for positive/negative segments
@@ -210,6 +196,20 @@ function initializeChart(ctx, data) {
         },
         options: {
             plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            const date = new Date(context[0].label);
+                            return date.toLocaleString();
+                        },
+                        label: function(context) {
+                            if (context.parsed.y === null) {
+                                return 'Market Closed - No Data';
+                            }
+                            return `${context.dataset.label}: $${context.parsed.y.toFixed(2)}`;
+                        }
+                    }
+                },
                 zoom: {
                   zoom: {
                     wheel: {
@@ -290,8 +290,11 @@ export function updateFinance(data) {
     }
 
     // Process the data
-
-    const processedData = processChartData(data.dates, data.prices, data.symbol);    // Initialize new chart
+    const processedData = processChartData(data.dates, data.prices, data.symbol);
+    // Add timeRange to processed data for chart configuration
+    processedData.timeRange = data.timeRange;
+    
+    // Initialize new chart
     window.financeChart = initializeChart(ctx, processedData);
 
     // Add zoom button functionality

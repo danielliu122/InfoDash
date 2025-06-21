@@ -1046,6 +1046,143 @@ body.dark-theme .trend-traffic.high .traffic-value {
 }
 
 .overall-summary {
-    border-left: 4px solid #9C27B0;
-    background: linear-gradient(135deg, var(--secondary-bg) 0%, rgba(156, 39, 176, 0.05) 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Historical Summaries Styles */
+.saved-summaries-container {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 10px;
+    background-color: var(--input-bg);
+}
+
+.saved-summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.saved-summary-item:hover {
+    background-color: var(--button-hover-bg);
+    transform: translateX(5px);
+}
+
+.saved-summary-item.selected {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.saved-summary-date {
+    font-weight: bold;
+    color: var(--primary-text);
+}
+
+.saved-summary-item.selected .saved-summary-date {
+    color: white;
+}
+
+.saved-summary-time {
+    font-size: 0.9em;
+    color: var(--secondary-text);
+}
+
+.saved-summary-item.selected .saved-summary-time {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.historical-summary-content {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.historical-summary-content .summary-card {
+    background: var(--primary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.historical-summary-content .summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.historical-news-summary {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+}
+
+.historical-trends-summary {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+.historical-finance-summary {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.historical-overall-summary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+#summaryDate {
+    background-color: var(--input-bg);
+    color: var(--primary-text);
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 14px;
+}
+
+body.dark-theme #summaryDate {
+    background-color: var(--input-bg);
+    color: var(--primary-text);
+    border-color: var(--input-border);
+}
+
+body.dark-theme #summaryDate::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+/* Empty state for saved summaries */
+.saved-summaries-container:empty::after {
+    content: "No daily summaries available yet. The first summary generated each day will be automatically saved and shared with all users.";
+    display: block;
+    text-align: center;
+    color: var(--secondary-text);
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Responsive design for historical summaries */
+@media (max-width: 768px) {
+    .saved-summary-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .historical-summary-content .summary-card {
+        margin-bottom: 10px;
+    }
+    
+    #historical-summaries-content .row .col.s6 {
+        width: 100%;
+        margin-bottom: 10px;
+    }
 }

@@ -17,9 +17,121 @@ const openai = new OpenAI({
     apiKey: process.env.DEEPSEEK_API_KEY,
 });
 const DDG = require('duck-duck-scrape');
+const fs = require('fs').promises;
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Middleware to parse JSON requests
+app.use(express.json());
+
+// Global variable to store the daily summary
+let dailySummary = null;
+let lastSummaryDate = null;
+
+// Function to check if market is closed (4:00 PM ET)
+function isMarketClosed() {
+    const now = new Date();
+    const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    const day = etNow.getDay();
+    const hour = etNow.getHours();
+    const minute = etNow.getMinutes();
+    
+    // Check if it's a weekday and past 4:00 PM ET
+    if (day >= 1 && day <= 5) {
+        return hour >= 16; // 4:00 PM or later
+    }
+    return true; // Weekend
+}
+
+// Function to save daily summary to file
+async function saveDailySummary(summaryData) {
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        const summaryFile = path.join(__dirname, 'data', 'daily-summaries.json');
+        
+        // Ensure data directory exists
+        const dataDir = path.join(__dirname, 'data');
+        try {
+            await fs.access(dataDir);
+        } catch {
+            await fs.mkdir(dataDir, { recursive: true });
+        }
+        
+        // Read existing summaries
+        let summaries = {};
+        try {
+            const existingData = await fs.readFile(summaryFile, 'utf8');
+            summaries = JSON.parse(existingData);
+        } catch (error) {
+            // File doesn't exist or is invalid, start fresh
+            summaries = {};
+        }
+        
+        // Add today's summary
+        summaries[today] = {
+            ...summaryData,
+            timestamp: new Date().toISOString(),
+            marketClosed: isMarketClosed()
+        };
+        
+        // Keep only last 30 days of summaries
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        
+        Object.keys(summaries).forEach(date => {
+            if (new Date(date) < thirtyDaysAgo) {
+                delete summaries[date];
+            }
+        });
+        
+        // Save to file
+        await fs.writeFile(summaryFile, JSON.stringify(summaries, null, 2));
+        
+        // Update global variables
+        dailySummary = summaryData;
+        lastSummaryDate = today;
+        
+        console.log(`Daily summary saved for ${today}`);
+        return true;
+    } catch (error) {
+        console.error('Error saving daily summary:', error);
+        return false;
+    }
+}
+
+// Function to load daily summary from file
+async function loadDailySummary(date = null) {
+    try {
+        const targetDate = date || new Date().toISOString().split('T')[0];
+        const summaryFile = path.join(__dirname, 'data', 'daily-summaries.json');
+        
+        const data = await fs.readFile(summaryFile, 'utf8');
+        const summaries = JSON.parse(data);
+        
+        return summaries[targetDate] || null;
+    } catch (error) {
+        console.error('Error loading daily summary:', error);
+        return null;
+    }
+}
+
+// Initialize daily summary on server start
+async function initializeDailySummary() {
+    const today = new Date().toISOString().split('T')[0];
+    const savedSummary = await loadDailySummary(today);
+    
+    if (savedSummary) {
+        dailySummary = savedSummary;
+        lastSummaryDate = today;
+        console.log(`Loaded existing daily summary for ${today}`);
+    } else {
+        console.log('No existing daily summary found');
+    }
+}
+
+// Call initialization
+initializeDailySummary();
 
 // Rate limiter middleware
 // const limiter = rateLimit({
@@ -179,14 +291,14 @@ app.get('/api/finance/:symbol', async (req, res) => {
 
     try {
         const response = await axios.get(url);
-        console.log(`Finance API response for ${symbol}:`, {
-            status: response.status,
-            hasData: !!response.data,
-            hasChart: !!response.data?.chart,
-            hasResult: !!response.data?.chart?.result,
-            resultLength: response.data?.chart?.result?.length || 0,
-            metaKeys: response.data?.chart?.result?.[0]?.meta ? Object.keys(response.data.chart.result[0].meta) : []
-        });
+        // console.log(`Finance API response for ${symbol}:`, {
+        //     status: response.status,
+        //     hasData: !!response.data,
+        //     hasChart: !!response.data?.chart,
+        //     hasResult: !!response.data?.chart?.result,
+        //     resultLength: response.data?.chart?.result?.length || 0,
+        //     metaKeys: response.data?.chart?.result?.[0]?.meta ? Object.keys(response.data.chart.result[0].meta) : []
+        // });
         res.json(response.data);
     } catch (error) {
         console.error('Error fetching financial data:', error);
@@ -208,45 +320,46 @@ app.get('/api/googlemaps/script', (req, res) => {
 });
 
 app.post('/api/chat', async (req, res) => {
-    let body = '';
-    
-    req.on('data', chunk => {
-        body += chunk.toString();
-    });
+    try {
+        console.log('Chat API: Received request');
+        const { messages, model = 'deepseek/deepseek-r1:free' } = req.body;
+        
+        console.log('Chat API: Request body parsed, model:', model);
+        console.log('Chat API: Messages count:', messages?.length || 0);
+        
+        if (!messages || messages.length === 0) {
+            console.log('Chat API: No messages provided');
+            return res.status(400).json({ error: 'Messages are required' });
+        }
 
-    req.on('end', async () => {
-        try {
-            const { messages, model = 'deepseek/deepseek-r1:free' } = JSON.parse(body);
-            
-            if (!messages || messages.length === 0) {
-                return res.status(400).json({ error: 'Messages are required' });
-            }
+        console.log('Chat API: Making OpenAI API call...');
+        const response = await openai.chat.completions.create({
+            model,
+            messages,
+            max_tokens: 3333,
+        });
 
-            const response = await openai.chat.completions.create({
-                model,
-                messages,
-                max_tokens: 3333,
-            });
+        console.log('Chat API: OpenAI response received');
 
-            // Validate API response structure
-            if (!response || !response.choices || !response.choices[0] || !response.choices[0].message) {
-                console.error('Invalid API response structure:', response);
-                return res.status(500).json({ 
-                    error: 'Invalid response from AI service',
-                    details: 'The AI service returned an unexpected response format'
-                });
-            }
-
-            const reply = response.choices[0].message.content;
-            res.json({ reply });
-        } catch (error) {
-            console.error('Error communicating with OpenRouter:', error);
-            res.status(500).json({ 
-                error: 'Error communicating with OpenRouter',
-                details: error.message 
+        // Validate API response structure
+        if (!response || !response.choices || !response.choices[0] || !response.choices[0].message) {
+            console.error('Chat API: Invalid API response structure:', response);
+            return res.status(500).json({ 
+                error: 'Invalid response from AI service',
+                details: 'The AI service returned an unexpected response format'
             });
         }
-    });
+
+        const reply = response.choices[0].message.content;
+        console.log('Chat API: Sending response, length:', reply.length);
+        res.json({ reply });
+    } catch (error) {
+        console.error('Chat API: Error communicating with OpenRouter:', error);
+        res.status(500).json({ 
+            error: 'Error communicating with OpenRouter',
+            details: error.message 
+        });
+    }
 });
 
 // Update lookup endpoint to use selected model
@@ -293,12 +406,139 @@ app.post('/api/lookup', async (req, res) => {
     }
 });
 
+// Daily Summary API endpoints
+app.post('/api/summary/save', async (req, res) => {
+    try {
+        console.log('Received summary save request');
+        console.log('Request body:', req.body);
+        
+        const today = new Date().toISOString().split('T')[0];
+        console.log('Today\'s date:', today);
+        
+        // Check if we already have a summary for today
+        if (lastSummaryDate === today && dailySummary) {
+            console.log('Daily summary already exists for today');
+            return res.json({ 
+                success: false, 
+                message: 'Daily summary already exists for today',
+                summary: dailySummary 
+            });
+        }
+        
+        const { news, trends, finance, overall } = req.body;
+        console.log('Extracted summary data:', { news: !!news, trends: !!trends, finance: !!finance, overall: !!overall });
+        
+        if (!news && !trends && !finance && !overall) {
+            console.log('No summary data provided');
+            return res.status(400).json({ 
+                success: false, 
+                message: 'No summary data provided' 
+            });
+        }
+        
+        const summaryData = {
+            news,
+            trends,
+            finance,
+            overall,
+            generatedAt: new Date().toISOString()
+        };
+        
+        console.log('Saving summary data...');
+        const saved = await saveDailySummary(summaryData);
+        
+        if (saved) {
+            console.log('Summary saved successfully');
+            res.json({ 
+                success: true, 
+                message: 'Daily summary saved successfully',
+                summary: summaryData
+            });
+        } else {
+            console.log('Failed to save summary');
+            res.status(500).json({ 
+                success: false, 
+                message: 'Failed to save daily summary' 
+            });
+        }
+    } catch (error) {
+        console.error('Error saving summary:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error while saving summary' 
+        });
+    }
+});
+
+app.get('/api/summary/daily', async (req, res) => {
+    try {
+        const { date } = req.query;
+        const targetDate = date || new Date().toISOString().split('T')[0];
+        
+        const summary = await loadDailySummary(targetDate);
+        
+        if (summary) {
+            res.json({ 
+                success: true, 
+                summary,
+                date: targetDate
+            });
+        } else {
+            res.json({ 
+                success: false, 
+                message: 'No summary found for the specified date',
+                date: targetDate
+            });
+        }
+    } catch (error) {
+        console.error('Error retrieving daily summary:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error while retrieving summary' 
+        });
+    }
+});
+
+app.get('/api/summary/history', async (req, res) => {
+    try {
+        const summaryFile = path.join(__dirname, 'data', 'daily-summaries.json');
+        
+        try {
+            const data = await fs.readFile(summaryFile, 'utf8');
+            const summaries = JSON.parse(data);
+            
+            // Convert to array format for easier frontend consumption
+            const summaryArray = Object.entries(summaries).map(([date, summary]) => ({
+                date,
+                timestamp: summary.timestamp,
+                marketClosed: summary.marketClosed,
+                hasData: !!(summary.news || summary.trends || summary.finance || summary.overall)
+            })).sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            res.json({ 
+                success: true, 
+                summaries: summaryArray
+            });
+        } catch (error) {
+            // File doesn't exist
+            res.json({ 
+                success: true, 
+                summaries: []
+            });
+        }
+    } catch (error) {
+        console.error('Error retrieving summary history:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error while retrieving summary history' 
+        });
+    }
+});
+
 // Catch-all route for undefined routes
 app.use((req, res) => {
     res.status(404).send('404 Not Found');
 });
-
-app.use(express.json());
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
