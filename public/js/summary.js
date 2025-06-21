@@ -852,11 +852,19 @@ export async function initializeHistoricalSummaries() {
 // New function to generate summary for the selected date
 export async function generateSummaryForSelectedDate() {
     const date = getSelectedDate();
+    const today = getLocalDateString();
+
+    // Block generation for any date other than today
+    if (date !== today) {
+        alert('You can only generate a new summary for the current date.');
+        return;
+    }
     
     // Check if a summary already exists
     const existingSummary = await loadDailySummary(date);
     if (existingSummary) {
-        const overwrite = confirm(`A summary for ${date} already exists. Do you want to view it instead of generating a new one?`);
+        const selectedDateFormatted = new Date(date + 'T00:00:00').toLocaleDateString();
+        const overwrite = confirm(`A summary for ${selectedDateFormatted} already exists. Do you want to view it instead of generating a new one?`);
         if (overwrite) {
             displayHistoricalSummary(existingSummary);
             return;
