@@ -132,23 +132,38 @@ async function collectFinanceData() {
     
     try {
         // Fetch NASDAQ data
+        console.log('Fetching NASDAQ data...');
         const nasdaqResponse = await fetch('/api/finance/^IXIC?range=1d&interval=1m');
         if (nasdaqResponse.ok) {
             const nasdaqData = await nasdaqResponse.json();
+            console.log('Raw NASDAQ API response:', nasdaqData);
             if (nasdaqData.chart && nasdaqData.chart.result && nasdaqData.chart.result[0]) {
                 const result = nasdaqData.chart.result[0];
                 const meta = result.meta;
+                console.log('NASDAQ meta data:', meta);
+                
+                // Calculate change and percentage change
+                const currentPrice = meta.regularMarketPrice;
+                const previousClose = meta.previousClose;
+                const change = currentPrice - previousClose;
+                const changePercent = (change / previousClose) * 100;
+                
                 financeData.nasdaq = {
-                    price: meta.regularMarketPrice?.toFixed(2) || 'N/A',
-                    change: meta.regularMarketChange?.toFixed(2) || 'N/A',
-                    changePercent: meta.regularMarketChangePercent?.toFixed(2) || 'N/A'
+                    price: currentPrice?.toFixed(2) || 'N/A',
+                    change: change?.toFixed(2) || 'N/A',
+                    changePercent: changePercent?.toFixed(2) || 'N/A'
                 };
-                // console.log('NASDAQ data collected:', financeData.nasdaq);
+                //console.log('NASDAQ data collected:', financeData.nasdaq);
+            } else {
+                //console.log('NASDAQ data structure invalid:', nasdaqData);
             }
+        } else {
+            console.log('NASDAQ response not ok:', nasdaqResponse.status);
         }
         
         // Fetch tech stocks data
         const techStocks = ['META', 'AAPL', 'GOOGL', 'AMZN', 'TSLA'];
+        //console.log('Fetching tech stocks data...');
         for (const symbol of techStocks) {
             try {
                 const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
@@ -157,13 +172,24 @@ async function collectFinanceData() {
                     if (data.chart && data.chart.result && data.chart.result[0]) {
                         const result = data.chart.result[0];
                         const meta = result.meta;
+                        
+                        // Calculate change and percentage change
+                        const currentPrice = meta.regularMarketPrice;
+                        const previousClose = meta.previousClose;
+                        const change = currentPrice - previousClose;
+                        const changePercent = (change / previousClose) * 100;
+                        
                         financeData.techStocks[symbol] = {
-                            price: meta.regularMarketPrice?.toFixed(2) || 'N/A',
-                            change: meta.regularMarketChange?.toFixed(2) || 'N/A',
-                            changePercent: meta.regularMarketChangePercent?.toFixed(2) || 'N/A'
+                            price: currentPrice?.toFixed(2) || 'N/A',
+                            change: change?.toFixed(2) || 'N/A',
+                            changePercent: changePercent?.toFixed(2) || 'N/A'
                         };
-                        // console.log(`${symbol} data collected:`, financeData.techStocks[symbol]);
+                        //console.log(`${symbol} data collected:`, financeData.techStocks[symbol]);
+                    } else {
+                        //console.log(`${symbol} data structure invalid:`, data);
                     }
+                } else {
+                    //console.log(`${symbol} response not ok:`, response.status);
                 }
             } catch (error) {
                 console.error(`Error fetching ${symbol} data:`, error);
@@ -172,6 +198,7 @@ async function collectFinanceData() {
         
         // Fetch cryptocurrency data
         const cryptoStocks = ['BTC-USD', 'ETH-USD', 'SOL-USD', 'XRP-USD'];
+        //console.log('Fetching crypto data...');
         for (const symbol of cryptoStocks) {
             try {
                 const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
@@ -181,13 +208,30 @@ async function collectFinanceData() {
                         const result = data.chart.result[0];
                         const meta = result.meta;
                         const shortSymbol = symbol.replace('-USD', '');
+                        
+                        // Debug the first crypto symbol (BTC)
+                        if (symbol === 'BTC-USD') {
+                            //console.log('Raw BTC API response:', data);
+                            //console.log('BTC meta data:', meta);
+                        }
+                        
+                        // Calculate change and percentage change
+                        const currentPrice = meta.regularMarketPrice;
+                        const previousClose = meta.previousClose;
+                        const change = currentPrice - previousClose;
+                        const changePercent = (change / previousClose) * 100;
+                        
                         financeData.crypto[shortSymbol] = {
-                            price: meta.regularMarketPrice?.toFixed(2) || 'N/A',
-                            change: meta.regularMarketChange?.toFixed(2) || 'N/A',
-                            changePercent: meta.regularMarketChangePercent?.toFixed(2) || 'N/A'
+                            price: currentPrice?.toFixed(2) || 'N/A',
+                            change: change?.toFixed(2) || 'N/A',
+                            changePercent: changePercent?.toFixed(2) || 'N/A'
                         };
-                        // console.log(`${shortSymbol} data collected:`, financeData.crypto[shortSymbol]);
+                        //console.log(`${shortSymbol} data collected:`, financeData.crypto[shortSymbol]);
+                    } else {
+                        //console.log(`${symbol} data structure invalid:`, data);
                     }
+                } else {
+                    //console.log(`${symbol} response not ok:`, response.status);
                 }
             } catch (error) {
                 console.error(`Error fetching ${symbol} data:`, error);
@@ -223,7 +267,7 @@ async function generateSummary(sectionData) {
                 messages: [
                     {
                         role: 'system',
-                        content: 'You are a data analyst specializing in creating concise, informative summaries of current events, trends, and market data. Provide clear, actionable insights in a professional tone.'
+                        content: 'You are a data analyst specializing in creating concise, informative summaries of current events, trends, and market data. CRITICAL INSTRUCTIONS: 1) Only report the exact data provided to you. 2) Do not make assumptions about market movements, trends, or sentiment. 3) If the data shows a negative percentage change, report it as "declining", "down", or "fell". 4) If it shows a positive percentage change, report it as "gaining", "up", or "rose". 5) For small changes (less than 1%), use "minimal change" or "slight movement". 6) NEVER use dramatic terms like "surged", "plunged", "soared", "crashed", "exploded", or "collapsed" unless the percentage change is substantial (more than 10%). 7) Always base your analysis on the factual data provided, not on general market knowledge or assumptions. 8) If you see cryptocurrency data, do not assume it represents a "surge" or positive movement unless the percentage data explicitly shows positive values. 9) The market data provided represents DAILY changes (24-hour period), so describe them as such.'
                     },
                     {
                         role: 'user',
@@ -275,7 +319,7 @@ function createAnalysisPrompt(sectionData) {
     }
     
     if (sectionData.finance) {
-        prompt += '📈 MARKET DATA:\n';
+        prompt += '📈 MARKET DATA (Daily Changes):\n';
         if (sectionData.finance.nasdaq) {
             prompt += `NASDAQ (^IXIC): $${sectionData.finance.nasdaq.price} (${sectionData.finance.nasdaq.changePercent}%)\n`;
         }

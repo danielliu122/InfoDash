@@ -179,6 +179,14 @@ app.get('/api/finance/:symbol', async (req, res) => {
 
     try {
         const response = await axios.get(url);
+        console.log(`Finance API response for ${symbol}:`, {
+            status: response.status,
+            hasData: !!response.data,
+            hasChart: !!response.data?.chart,
+            hasResult: !!response.data?.chart?.result,
+            resultLength: response.data?.chart?.result?.length || 0,
+            metaKeys: response.data?.chart?.result?.[0]?.meta ? Object.keys(response.data.chart.result[0].meta) : []
+        });
         res.json(response.data);
     } catch (error) {
         console.error('Error fetching financial data:', error);
