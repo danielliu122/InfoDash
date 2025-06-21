@@ -36,18 +36,18 @@
             <div class="col s12">
                 <section id="summary" class="section">
                     <div class="section-header">
-                        <h3>📊 Today's Summary</h3>
+                        <h3>📊 Daily Summary</h3>
                         <div class="right">
-                            <button class="btn-small waves-effect waves-light" onclick="refreshSummaryData()">🔄 Refresh</button>
-                            <button class="btn-small waves-effect waves-light" onclick="toggleSection('summary-content')">Show/Hide</button>
+                            <button class="btn-small waves-effect waves-light" onclick="refreshSummary()">🔄 Refresh</button>
+                            <button class="btn-small waves-effect waves-light" onclick="toggleSection('summary-content-container')">Show/Hide</button>
                         </div>
                     </div>
-                    <div id="summary-content" class="section-content">
+                    <div id="summary-content-container" class="section-content">
                         <div class="summary-loading">
                             <div class="progress">
                                 <div class="indeterminate"></div>
                             </div>
-                            <p class="center-align">Analyzing current data...</p>
+                            <p class="center-align">Analyzing current data for <span id="summary-date-display">today</span>...</p>
                         </div>
                         <div class="summary-content" style="display: none;">
                             <div class="row">
@@ -80,10 +80,9 @@
                             </div>
                             <div class="row">
                                 <div class="col s12 center-align">
-                                    <button class="btn waves-effect waves-light" onclick="saveCurrentSummary()">💾 Save Today's Summary</button>
+                                    <button class="btn waves-effect waves-light" onclick="saveCurrentSummary()">💾 Save Summary</button>
                                     <p class="center-align" style="font-size: 0.9em; color: var(--secondary-text); margin-top: 10px;">
-                                        <strong>Note:</strong> The first summary generated each day is automatically saved and shared with all users. 
-                                        Use "Refresh" to generate a new summary without saving.
+                                        <strong>Note:</strong> If a summary for the selected date doesn't exist, a new one will be generated and saved.
                                     </p>
                                 </div>
                             </div>
@@ -107,19 +106,19 @@
                         <div class="row">
                             <div class="col s12">
                                 <p class="center-align" style="font-size: 0.9em; color: var(--secondary-text); margin-bottom: 20px;">
-                                    <strong>Shared Daily Summaries:</strong> These summaries are automatically saved once per day and shared across all users.
+                                    Select a date to view a saved summary or generate a new one.
                                 </p>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col s12">
-                                <div class="input-field col s6">
-                                    <input type="date" id="summaryDate" onchange="loadSummaryForDate()">
+                                <div class="input-field col s4">
+                                    <input type="date" id="summaryDate">
                                     <label for="summaryDate">Select Date</label>
                                 </div>
-                                <div class="col s6">
-                                    <button class="btn waves-effect waves-light" onclick="loadSummaryForDate()">📅 Load Summary</button>
-                                    <button class="btn waves-effect waves-light red" onclick="deleteSelectedSummary()">🗑️ Delete</button>
+                                <div class="col s8">
+                                    <button class="btn waves-effect waves-light" onclick="loadSummaryForDate()">📅 Load Saved Summary</button>
+                                    <button class="btn waves-effect waves-light" onclick="generateSummaryForSelectedDate()">✨ Generate New Summary</button>
                                 </div>
                             </div>
                         </div>
@@ -127,7 +126,7 @@
                             <div class="col s12">
                                 <h5>Saved Summaries</h5>
                                 <div id="saved-summaries-list" class="saved-summaries-container">
-                                    <!-- Saved summaries will be populated here -->
+                                    <p class_empty-state">No summaries found for the last 30 days.</p>
                                 </div>
                             </div>
                         </div>

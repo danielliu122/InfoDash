@@ -45,9 +45,8 @@ function isMarketClosed() {
 }
 
 // Function to save daily summary to file
-async function saveDailySummary(summaryData) {
+async function saveDailySummary(summaryData, date) {
     try {
-        const today = new Date().toISOString().split('T')[0];
         const summaryFile = path.join(__dirname, 'data', 'daily-summaries.json');
         
         // Ensure data directory exists
@@ -69,30 +68,23 @@ async function saveDailySummary(summaryData) {
         }
         
         // Add today's summary
-        summaries[today] = {
+        summaries[date] = {
             ...summaryData,
             timestamp: new Date().toISOString(),
             marketClosed: isMarketClosed()
         };
         
-        // Keep only last 30 days of summaries
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        Object.keys(summaries).forEach(date => {
-            if (new Date(date) < thirtyDaysAgo) {
-                delete summaries[date];
-            }
-        });
-        
         // Save to file
         await fs.writeFile(summaryFile, JSON.stringify(summaries, null, 2));
         
-        // Update global variables
-        dailySummary = summaryData;
-        lastSummaryDate = today;
+        // Update global variables if it's for today
+        const today = new Date().toISOString().split('T')[0];
+        if (date === today) {
+            dailySummary = summaryData;
+            lastSummaryDate = today;
+        }
         
-        console.log(`Daily summary saved for ${today}`);
+        console.log(`Daily summary saved for ${date}`);
         return true;
     } catch (error) {
         console.error('Error saving daily summary:', error);
@@ -412,20 +404,25 @@ app.post('/api/summary/save', async (req, res) => {
         console.log('Received summary save request');
         console.log('Request body:', req.body);
         
-        const today = new Date().toISOString().split('T')[0];
-        console.log('Today\'s date:', today);
+        const { news, trends, finance, overall, date } = req.body;
         
-        // Check if we already have a summary for today
-        if (lastSummaryDate === today && dailySummary) {
-            console.log('Daily summary already exists for today');
+        if (!date) {
+            return res.status(400).json({ success: false, message: 'Date is required' });
+        }
+
+        console.log('Provided date:', date);
+        
+        // Check if we already have a summary for the given date
+        const existingSummary = await loadDailySummary(date);
+        if (existingSummary) {
+            console.log(`Daily summary already exists for ${date}`);
             return res.json({ 
                 success: false, 
-                message: 'Daily summary already exists for today',
-                summary: dailySummary 
+                message: `Daily summary already exists for ${date}`,
+                summary: existingSummary 
             });
         }
         
-        const { news, trends, finance, overall } = req.body;
         console.log('Extracted summary data:', { news: !!news, trends: !!trends, finance: !!finance, overall: !!overall });
         
         if (!news && !trends && !finance && !overall) {
@@ -445,10 +442,10 @@ app.post('/api/summary/save', async (req, res) => {
         };
         
         console.log('Saving summary data...');
-        const saved = await saveDailySummary(summaryData);
+        const saved = await saveDailySummary(summaryData, date);
         
         if (saved) {
-            console.log('Summary saved successfully');
+            console.log(`Summary saved successfully for ${date}`);
             res.json({ 
                 success: true, 
                 message: 'Daily summary saved successfully',
