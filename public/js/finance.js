@@ -196,20 +196,6 @@ function initializeChart(ctx, data) {
         },
         options: {
             plugins: {
-                tooltip: {
-                    callbacks: {
-                        title: function(context) {
-                            const date = new Date(context[0].label);
-                            return date.toLocaleString();
-                        },
-                        label: function(context) {
-                            if (context.parsed.y === null) {
-                                return 'Market Closed - No Data';
-                            }
-                            return `${context.dataset.label}: $${context.parsed.y.toFixed(2)}`;
-                        }
-                    }
-                },
                 zoom: {
                   zoom: {
                     wheel: {
