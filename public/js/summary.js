@@ -837,6 +837,25 @@ export async function deleteSelectedSummary() {
     alert('Daily summaries are shared across all users and cannot be deleted. Contact the administrator if you need to remove a summary.');
 }
 
+// Function to update summary display from saved data
+function updateSummaryDisplayFromData(summaryData) {
+    const newsSummary = document.querySelector('.news-summary .summary-text');
+    const trendsSummary = document.querySelector('.trends-summary .summary-text');
+    const financeSummary = document.querySelector('.finance-summary .summary-text');
+    const overallSummary = document.querySelector('.overall-summary .summary-text');
+    const summaryContentDiv = document.querySelector('.summary-content');
+    
+    if (summaryContentDiv) {
+        summaryContentDiv.style.display = 'block';
+        summaryContentDiv.classList.add('show');
+    }
+    
+    if (newsSummary) newsSummary.innerHTML = summaryData.news || '<p>No news data available</p>';
+    if (trendsSummary) trendsSummary.innerHTML = summaryData.trends || '<p>No trends data available</p>';
+    if (financeSummary) financeSummary.innerHTML = summaryData.finance || '<p>No finance data available</p>';
+    if (overallSummary) overallSummary.innerHTML = summaryData.overall || '<p>No overall insights available</p>';
+}
+
 // This function will now orchestrate the entire summary section's initial state
 async function loadOrGenerateTodaySummary() {
     const today = getLocalDateString();
