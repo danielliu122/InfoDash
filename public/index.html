@@ -39,8 +39,26 @@
                     <div class="section-header">
                         <h3>📊 Daily Summary</h3>
                         <div class="right">
+                            <button id="set-location-btn" class="btn-small waves-effect waves-light" onclick="showLocationModal()">📍 Set Location</button>
                             <button id="summary-refresh-btn" class="btn-small waves-effect waves-light" onclick="refreshSummary()">🔄 Refresh</button>
                             <button class="btn-small waves-effect waves-light" onclick="toggleSection('summary-content-container')">Show/Hide</button>
+                        </div>
+                    </div>
+
+                    <!-- Location Modal -->
+                    <div id="locationModal" class="modal">
+                        <div class="modal-content">
+                            <h4>Set Weather Location</h4>
+                            <p>Enter your location for weather information in the summary:</p>
+                            <div class="input-field">
+                                <input type="text" id="weatherLocationInput" placeholder="e.g., New York, NY or 10001">
+                                <label for="weatherLocationInput">Location (City, State or ZIP)</label>
+                            </div>
+                            <p class="small-text">Examples: "San Francisco, CA", "New York, NY", "90210", "London, UK"</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="modal-close waves-effect waves-light btn" onclick="setWeatherLocation()">Set Location</button>
+                            <button class="modal-close waves-effect waves-light btn-flat" onclick="closeLocationModal()">Cancel</button>
                         </div>
                     </div>
 
@@ -83,7 +101,13 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col s12">
+                                <div class="col s12 m6">
+                                    <div class="summary-card weather-summary">
+                                        <h5>🌤️ Weather Update</h5>
+                                        <div class="summary-text"></div>
+                                    </div>
+                                </div>
+                                <div class="col s12 m6">
                                     <div class="summary-card overall-summary">
                                         <h5>🎯 Key Insights</h5>
                                         <div class="summary-text"></div>
@@ -477,6 +501,79 @@
                 await refreshSummary();
             } catch (error) {
                 console.error('Error refreshing summary:', error);
+            }
+        }
+
+        // Location modal functions - make them globally available
+        function showLocationModal() {
+            const modal = document.getElementById('locationModal');
+            const input = document.getElementById('weatherLocationInput');
+            
+            // Set current location if it exists
+            const currentLocation = localStorage.getItem('userWeatherLocation');
+            if (currentLocation) {
+                input.value = currentLocation;
+            }
+            
+            // Initialize modal if not already done
+            if (!modal.classList.contains('initialized')) {
+                M.Modal.init(modal);
+                modal.classList.add('initialized');
+            }
+            
+            // Open modal
+            const instance = M.Modal.getInstance(modal);
+            instance.open();
+            
+            // Focus on input
+            setTimeout(() => {
+                input.focus();
+            }, 300);
+        }
+
+        function setWeatherLocation() {
+            const input = document.getElementById('weatherLocationInput');
+            const location = input.value.trim();
+            
+            if (!location) {
+                alert('Please enter a location');
+                return;
+            }
+            
+            // Save location to localStorage
+            localStorage.setItem('userWeatherLocation', location);
+            
+            // Close modal
+            closeLocationModal();
+            
+            // Show confirmation
+            if (window.showNotification) {
+                window.showNotification(`Weather location set to: ${location}`, 3000);
+            } else {
+                alert(`Weather location set to: ${location}`);
+            }
+            
+            // Update location button text
+            const locationBtn = document.getElementById('set-location-btn');
+            if (locationBtn) {
+                locationBtn.textContent = `📍 ${location.split(',')[0]}`;
+            }
+            
+            // Refresh weather display if summary is currently shown
+            const weatherSummary = document.querySelector('.weather-summary .summary-text');
+            if (weatherSummary && weatherSummary.innerHTML && !weatherSummary.innerHTML.includes('No weather data')) {
+                // Call the global displayCurrentWeather function
+                if (window.displayCurrentWeather) {
+                    window.displayCurrentWeather();
+                }
+            }
+        }
+
+        function closeLocationModal() {
+            const modal = document.getElementById('locationModal');
+            const instance = M.Modal.getInstance(modal);
+            if (instance) {
+                instance.close();
             }
         }
     </script>

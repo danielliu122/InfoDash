@@ -3,7 +3,8 @@
 let summaryData = {
     news: null,
     trends: null,
-    finance: null
+    finance: null,
+    weather: null
 };
 
 let summaryGenerated = false;
@@ -18,15 +19,13 @@ function getLocalDateString(date = new Date()) {
 
 // Function to check if user has already generated a summary today
 function hasGeneratedToday() {
-    const today = getLocalDateString();
-    const lastGenerated = localStorage.getItem('lastSummaryGenerated');
-    return lastGenerated === today;
+    // TEMP: Always allow summary generation for testing
+    return false;
 }
 
 // Function to mark that a summary was generated today
 function markGeneratedToday() {
-    const today = getLocalDateString();
-    localStorage.setItem('lastSummaryGenerated', today);
+    // TEMP: No-op for testing
 }
 
 // Function to get selected date or today's date
@@ -43,6 +42,7 @@ async function collectSectionData() {
         news: collectNewsData(),
         trends: await collectTrendsData(),
         finance: await collectFinanceData()
+        // Weather is excluded from saved data - will be fetched separately
     };
     
     // console.log('Section data collection completed:', {
@@ -323,6 +323,32 @@ async function collectFinanceData() {
     }
 }
 
+// Function to collect weather data
+async function collectWeatherData() {
+    // console.log('Collecting weather data...');
+    
+    try {
+        // Get the user's location from localStorage or use default
+        const userLocation = localStorage.getItem('userWeatherLocation') || 'New York, NY';
+        
+        const response = await fetch(`/api/weather?location=${encodeURIComponent(userLocation)}`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.description) {
+                // console.log('Weather data collected for:', userLocation);
+                return { [userLocation]: data };
+            }
+        }
+        
+        // console.log('No weather data available');
+        return null;
+        
+    } catch (error) {
+        console.error('Error collecting weather data:', error);
+        return null;
+    }
+}
+
 // Function to generate summary using AI
 async function generateSummary(sectionData) {
     try {
@@ -467,6 +493,31 @@ Keep each section's summary concise (2-3 sentences) and focus on the most import
     return prompt;
 }
 
+// Function to fetch and display current weather
+async function displayCurrentWeather() {
+    const weatherSummary = document.querySelector('.weather-summary .summary-text');
+    if (!weatherSummary) return;
+    
+    try {
+        const userLocation = localStorage.getItem('userWeatherLocation') || 'New York, NY';
+        
+        const response = await fetch(`/api/weather?location=${encodeURIComponent(userLocation)}`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.description) {
+                weatherSummary.innerHTML = `<p><strong>${data.location}</strong>: ${data.description}</p>`;
+            } else {
+                weatherSummary.innerHTML = '<p>Weather information unavailable</p>';
+            }
+        } else {
+            weatherSummary.innerHTML = '<p>Unable to fetch weather data</p>';
+        }
+    } catch (error) {
+        console.error('Error fetching weather:', error);
+        weatherSummary.innerHTML = '<p>Weather service temporarily unavailable</p>';
+    }
+}
+
 // Function to update summary display
 function updateSummaryDisplay(summaryText) {
     // console.log('Updating summary display with:', summaryText);
@@ -475,6 +526,7 @@ function updateSummaryDisplay(summaryText) {
     const newsSummary = document.querySelector('.news-summary .summary-text');
     const trendsSummary = document.querySelector('.trends-summary .summary-text');
     const financeSummary = document.querySelector('.finance-summary .summary-text');
+    const weatherSummary = document.querySelector('.weather-summary .summary-text');
     const overallSummary = document.querySelector('.overall-summary .summary-text');
     const summaryContentDiv = document.querySelector('.summary-content');
     
@@ -482,6 +534,7 @@ function updateSummaryDisplay(summaryText) {
     //     newsSummary: !!newsSummary,
     //     trendsSummary: !!trendsSummary,
     //     financeSummary: !!financeSummary,
+    //     weatherSummary: !!weatherSummary,
     //     overallSummary: !!overallSummary,
     //     summaryContentDiv: !!summaryContentDiv
     // });
@@ -498,6 +551,7 @@ function updateSummaryDisplay(summaryText) {
         if (newsSummary) newsSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
         if (trendsSummary) trendsSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
         if (financeSummary) financeSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
+        if (weatherSummary) weatherSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
         if (overallSummary) overallSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
         return;
     }
@@ -522,6 +576,9 @@ function updateSummaryDisplay(summaryText) {
     if (sections.insights && overallSummary) {
         overallSummary.innerHTML = sections.insights;
     }
+    
+    // Fetch and display current weather separately
+    displayCurrentWeather();
 }
 
 // Function to parse summary sections
@@ -647,7 +704,7 @@ export async function saveCurrentSummary() {
     try {
         const date = getSelectedDate();
         
-        // Get the current summary data from the DOM
+        // Get current summary content
         const newsSummary = document.querySelector('.news-summary .summary-text')?.innerHTML || '';
         const trendsSummary = document.querySelector('.trends-summary .summary-text')?.innerHTML || '';
         const financeSummary = document.querySelector('.finance-summary .summary-text')?.innerHTML || '';
@@ -664,39 +721,27 @@ export async function saveCurrentSummary() {
             finance: financeSummary,
             overall: overallSummary,
             date: date
+            // Weather is excluded from saved data - will be fetched fresh each time
         };
         
-        console.log('Sending summary data to server:', summaryData);
-        
-        // Send to server
         const response = await fetch('/api/summary/save', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(summaryData)
+            body: JSON.stringify(summaryData),
         });
         
-        console.log('Server response status:', response.status);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        console.log('Server response:', result);
-        
-        if (result.success) {
-            showNotification(`Summary for ${date} saved successfully!`);
-            currentDailySummary = result.summary;
-            await updateSavedSummariesList(); // Refresh the list
+        if (response.ok) {
+            showNotification('Summary saved successfully!', 3000);
+            await loadSummaryHistory(); // Refresh the archive list
         } else {
-            showNotification(`Error: ${result.message}`);
+            const errorData = await response.json();
+            showNotification(`Error saving summary: ${errorData.error}`, 5000);
         }
-        
     } catch (error) {
         console.error('Error saving summary:', error);
-        showNotification('An error occurred while saving the summary.');
+        showNotification('Error saving summary. Please try again.', 5000);
     }
 }
 
@@ -833,7 +878,18 @@ export async function loadSummaryForDate() {
 
 // Function to display historical summary (now combined with main display)
 function displayHistoricalSummary(summary) {
-    updateSummaryDisplayFromData(summary);
+    const newsSummary = document.querySelector('.news-summary .summary-text');
+    const trendsSummary = document.querySelector('.trends-summary .summary-text');
+    const financeSummary = document.querySelector('.finance-summary .summary-text');
+    const overallSummary = document.querySelector('.overall-summary .summary-text');
+    
+    if (newsSummary) newsSummary.innerHTML = summary.news || '<p>No news data available</p>';
+    if (trendsSummary) trendsSummary.innerHTML = summary.trends || '<p>No trends data available</p>';
+    if (financeSummary) financeSummary.innerHTML = summary.finance || '<p>No finance data available</p>';
+    if (overallSummary) overallSummary.innerHTML = summary.overall || '<p>No overall insights available</p>';
+    
+    // Fetch and display current weather (not historical)
+    displayCurrentWeather();
 }
 
 // Function to delete selected summary (disabled for server-side summaries)
@@ -847,17 +903,14 @@ function updateSummaryDisplayFromData(summaryData) {
     const trendsSummary = document.querySelector('.trends-summary .summary-text');
     const financeSummary = document.querySelector('.finance-summary .summary-text');
     const overallSummary = document.querySelector('.overall-summary .summary-text');
-    const summaryContentDiv = document.querySelector('.summary-content');
-    
-    if (summaryContentDiv) {
-        summaryContentDiv.style.display = 'block';
-        summaryContentDiv.classList.add('show');
-    }
     
     if (newsSummary) newsSummary.innerHTML = summaryData.news || '<p>No news data available</p>';
     if (trendsSummary) trendsSummary.innerHTML = summaryData.trends || '<p>No trends data available</p>';
     if (financeSummary) financeSummary.innerHTML = summaryData.finance || '<p>No finance data available</p>';
     if (overallSummary) overallSummary.innerHTML = summaryData.overall || '<p>No overall insights available</p>';
+    
+    // Fetch and display current weather separately
+    displayCurrentWeather();
 }
 
 // This function will now orchestrate the entire summary section's initial state
@@ -928,24 +981,35 @@ async function loadOrGenerateTodaySummary() {
 
 // Function to initialize the entire summary feature
 async function initializeSummarySection() {
-    // 1. Set up the historical summaries archive
-    await updateSavedSummariesList();
+    // console.log('Initializing summary section...');
+    
+    // Initialize location button
+    initializeLocationButton();
+    
+    // Set today's date as default
+    const today = new Date().toISOString().split('T')[0];
     const dateInput = document.getElementById('summaryDate');
     if (dateInput) {
-        const today = getLocalDateString();
         dateInput.value = today;
     }
-
-    // 2. Set initial control states based on daily limit
-    setControlsDisabled(false);
-
-    // 3. Load or generate the summary for the current day
+    
+    // Set initial control states based on daily limit
+    setControlsDisabled(true);
+    
+    // Load or generate today's summary
     await loadOrGenerateTodaySummary();
+    
+    // Load summary history
+    await loadSummaryHistory();
     
     // Initialize Materialize collapsible
     const M = window.M;
-    const collapsibleElems = document.querySelectorAll('.collapsible');
-    M.Collapsible.init(collapsibleElems);
+    if (M && M.Collapsible) {
+        const collapsibleElems = document.querySelectorAll('.collapsible');
+        M.Collapsible.init(collapsibleElems);
+    }
+    
+    // console.log('Summary section initialized');
 }
 
 // Function to refresh summary (generates new one but doesn't save to server)
@@ -1012,4 +1076,19 @@ window.saveCurrentSummary = saveCurrentSummary;
 window.loadSummaryForDate = loadSummaryForDate;
 window.deleteSelectedSummary = deleteSelectedSummary;
 window.refreshSummary = refreshSummary;
-window.toggleSection = toggleSection; 
+window.toggleSection = toggleSection;
+
+// Function to initialize location button
+function initializeLocationButton() {
+    const currentLocation = localStorage.getItem('userWeatherLocation');
+    const locationBtn = document.getElementById('set-location-btn');
+    
+    if (currentLocation && locationBtn) {
+        const cityName = currentLocation.split(',')[0];
+        locationBtn.textContent = `📍 ${cityName}`;
+    }
+}
+
+// Make functions globally available
+window.initializeLocationButton = initializeLocationButton;
+window.displayCurrentWeather = displayCurrentWeather; 

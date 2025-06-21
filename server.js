@@ -17,6 +17,7 @@ const openai = new OpenAI({
     apiKey: process.env.DEEPSEEK_API_KEY,
 });
 const DDG = require('duck-duck-scrape');
+const weather = require('weather-js');
 const fs = require('fs').promises;
 
 const app = express();
@@ -394,6 +395,137 @@ app.post('/api/lookup', async (req, res) => {
         res.json({ result: finalResult });
     } catch (error) {
         console.error('Error performing lookup:', error);
+        res.status(500).json({ error: 'Error performing lookup' });
+    }
+});
+
+// New weather API endpoint using weather-js
+app.get('/api/weather', async (req, res) => {
+    try {
+        const { location = 'New York, NY' } = req.query;
+        
+        // Use weather-js to get weather information
+        weather.find({search: location, degreeType: 'F'}, function(err, result) {
+            if(err) {
+                console.error('Error fetching weather:', err);
+                return res.status(500).json({ error: 'Error fetching weather information' });
+            }
+            
+            if (!result || result.length === 0) {
+                return res.status(404).json({ error: 'Weather information not found for this location' });
+            }
+            
+            const weatherData = result[0];
+            const current = weatherData.current;
+            const location = weatherData.location;
+            
+            const formattedWeather = {
+                location: location.name,
+                temperature: current.temperature,
+                condition: current.skytext,
+                humidity: current.humidity,
+                wind: current.winddisplay,
+                feelslike: current.feelslike,
+                description: `Current weather in ${location.name}: ${current.temperature}°F, ${current.skytext}, ${current.humidity}% humidity, wind ${current.winddisplay}`
+            };
+            
+            res.json(formattedWeather);
+        });
+    } catch (error) {
+        console.error('Error fetching weather:', error);
+        res.status(500).json({ error: 'Error fetching weather information' });
+    }
+});
+
+// Enhanced lookup endpoint for real-time information
+app.post('/api/enhanced-lookup', async (req, res) => {
+    try {
+        const { query, model = 'deepseek/deepseek-r1:free' } = req.body;
+        if (!query) {
+            return res.status(400).json({ error: 'Query is required' });
+        }
+
+        const queryLower = query.toLowerCase();
+        let result = null;
+
+        // Check if it's a weather query
+        if (queryLower.includes('weather') || queryLower.includes('temperature') || queryLower.includes('forecast')) {
+            // Extract location from query
+            const locationMatch = query.match(/(?:weather|temperature|forecast)\s+(?:in\s+)?([^?]+)/i);
+            const location = locationMatch ? locationMatch[1].trim() : 'New York';
+            
+            try {
+                const weatherResponse = await fetch(`${req.protocol}://${req.get('host')}/api/weather?location=${encodeURIComponent(location)}`);
+                if (weatherResponse.ok) {
+                    const weatherData = await weatherResponse.json();
+                    result = weatherData.description || `Weather in ${location}: ${weatherData.temperature || 'N/A'} ${weatherData.condition || ''}`;
+                }
+            } catch (weatherError) {
+                console.error('Weather lookup error:', weatherError);
+            }
+        }
+        
+        // Check if it's a stock query
+        else if (queryLower.includes('stock') || queryLower.includes('price') || queryLower.includes('market') || 
+                 queryLower.includes('nasdaq') || queryLower.includes('dow') || queryLower.includes('s&p')) {
+            try {
+                // Extract stock symbol from query
+                const stockMatch = query.match(/\$?([A-Z]{1,5})/);
+                if (stockMatch) {
+                    const symbol = stockMatch[1];
+                    const stockResponse = await fetch(`${req.protocol}://${req.get('host')}/api/finance/${symbol}?range=1d&interval=1m`);
+                    if (stockResponse.ok) {
+                        const stockData = await stockResponse.json();
+                        if (stockData.chart && stockData.chart.result && stockData.chart.result[0]) {
+                            const meta = stockData.chart.result[0].meta;
+                            const price = meta.regularMarketPrice;
+                            const change = meta.regularMarketPrice - meta.previousClose;
+                            const changePercent = (change / meta.previousClose) * 100;
+                            result = `${symbol} stock: $${price.toFixed(2)} (${change >= 0 ? '+' : ''}${change.toFixed(2)}, ${changePercent.toFixed(2)}%)`;
+                        }
+                    }
+                }
+            } catch (stockError) {
+                console.error('Stock lookup error:', stockError);
+            }
+        }
+
+        // If no specific data found, use general DuckDuckGo search
+        if (!result) {
+            const searchResults = await DDG.search(query, {
+                safeSearch: DDG.SafeSearchType.STRICT
+            });
+
+            if (searchResults.noResults || !searchResults.results || searchResults.results.length === 0) {
+                return res.json({ result: null });
+            }
+
+            const firstResult = searchResults.results[0];
+            result = firstResult.description || firstResult.title || null;
+        }
+
+        // If we have a result, optionally enhance it with AI
+        if (result) {
+            try {
+                const enhancedResponse = await openai.chat.completions.create({
+                    model,
+                    messages: [{
+                        role: 'user',
+                        content: `Based on this information: "${result}", provide a clear and concise answer to: ${query}`
+                    }],
+                    max_tokens: 200
+                });
+
+                result = enhancedResponse.choices[0].message.content;
+            } catch (aiError) {
+                console.error('Error enhancing result:', aiError);
+                // Return the raw result if AI enhancement fails
+            }
+        }
+
+        res.json({ result });
+    } catch (error) {
+        console.error('Error performing enhanced lookup:', error);
         res.status(500).json({ error: 'Error performing lookup' });
     }
 });

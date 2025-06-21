@@ -1218,5 +1218,53 @@ body.dark-theme #summaryDate::-webkit-calendar-picker-indicator {
 }
 
 .dark-theme .collapsible-header:hover {
-    background-color: #3a3a3a;
+    background-color: #616161;
+}
+
+/* Location Modal Styles */
+#locationModal .modal-content {
+    background-color: var(--secondary-bg);
+    color: var(--primary-text);
+}
+
+#locationModal .modal-footer {
+    background-color: var(--secondary-bg);
+    border-top: 1px solid var(--border-color);
+}
+
+#locationModal .input-field input {
+    background-color: var(--input-bg);
+    color: var(--primary-text);
+    border-bottom: 1px solid var(--input-border);
+}
+
+#locationModal .input-field input:focus {
+    border-bottom: 1px solid var(--accent-color);
+    box-shadow: 0 1px 0 0 var(--accent-color);
+}
+
+#locationModal .input-field label {
+    color: var(--secondary-text);
+}
+
+#locationModal .input-field input:focus + label {
+    color: var(--accent-color);
+}
+
+.small-text {
+    font-size: 0.8em;
+    color: var(--secondary-text);
+    margin-top: 10px;
+    font-style: italic;
+}
+
+/* Location button styles */
+#set-location-btn {
+    background-color: var(--accent-color) !important;
+    color: white !important;
+    margin-right: 10px;
+}
+
+#set-location-btn:hover {
+    background-color: #303f9f !important;
 }

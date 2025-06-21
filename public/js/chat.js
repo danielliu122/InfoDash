@@ -178,7 +178,7 @@ async function handleSimpleQuery(query, history, model) {
 
 async function performOnlineLookup(query) {
     try {
-        const response = await fetch('/api/lookup', {
+        const response = await fetch('/api/enhanced-lookup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
