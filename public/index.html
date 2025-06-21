@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Info Dash</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
@@ -31,18 +32,28 @@
     </header>
     
     <main class="container">
-        <!-- New Summary Section -->
+        <!-- Unified Summary Section -->
         <div class="row">
             <div class="col s12">
-                <section id="summary" class="section">
+                <section id="summary-section" class="section">
                     <div class="section-header">
-                        <h3>📊 Today's Summary</h3>
+                        <h3>📊 Daily Summary</h3>
                         <div class="right">
-                            <button class="btn-small waves-effect waves-light" onclick="refreshSummary()">🔄 Refresh</button>
+                            <button id="summary-refresh-btn" class="btn-small waves-effect waves-light" onclick="refreshSummary()">🔄 Refresh</button>
                             <button class="btn-small waves-effect waves-light" onclick="toggleSection('summary-content-container')">Show/Hide</button>
                         </div>
                     </div>
+
                     <div id="summary-content-container" class="section-content">
+                        <!-- Date Picker -->
+                        <div class="row">
+                            <div class="input-field col s12 m6">
+                                <input type="date" id="summaryDate" onchange="loadSummaryForDate()">
+                                <label for="summaryDate" class="active">Select Date</label>
+                            </div>
+                        </div>
+
+                        <!-- Summary Display -->
                         <div class="summary-loading">
                             <div class="progress">
                                 <div class="indeterminate"></div>
@@ -50,6 +61,7 @@
                             <p class="center-align" id="summary-loading-text">Loading today's summary...</p>
                         </div>
                         <div class="summary-content" style="display: none;">
+                            <!-- Summary cards will be here -->
                             <div class="row">
                                 <div class="col s12 m4">
                                     <div class="summary-card news-summary">
@@ -79,76 +91,20 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </section>
-            </div>
-        </div>
 
-        <!-- Historical Summaries Section -->
-        <div class="row">
-            <div class="col s12">
-                <section id="historical-summaries" class="section">
-                    <div class="section-header">
-                        <h3>📚 Daily Summaries Archive</h3>
-                        <div class="right">
-                            <button class="btn-small waves-effect waves-light" onclick="toggleSection('historical-summaries-content')">Show/Hide</button>
-                        </div>
-                    </div>
-                    <div id="historical-summaries-content" class="section-content" style="display: none;">
+                        <!-- Archive List (Collapsible) -->
                         <div class="row">
                             <div class="col s12">
-                                <p class="center-align" style="font-size: 0.9em; color: var(--secondary-text); margin-bottom: 20px;">
-                                    Select a date to view a previously saved summary.
-                                </p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col s12">
-                                <div class="input-field col s6">
-                                    <input type="date" id="summaryDate">
-                                    <label for="summaryDate">Select Date</label>
-                                </div>
-                                <div class="col s6">
-                                    <button class="btn waves-effect waves-light" onclick="loadSummaryForDate()">📅 View Past Summary</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col s12">
-                                <h5>Saved Summaries</h5>
-                                <div id="saved-summaries-list" class="saved-summaries-container">
-                                    <p class_empty-state">No summaries found for the last 30 days.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="historical-summary-display" class="historical-summary-content" style="display: none;">
-                            <div class="row">
-                                <div class="col s12 m4">
-                                    <div class="summary-card historical-news-summary">
-                                        <h5>📰 Top Headlines</h5>
-                                        <div class="summary-text"></div>
-                                    </div>
-                                </div>
-                                <div class="col s12 m4">
-                                    <div class="summary-card historical-trends-summary">
-                                        <h5>🔥 Trending Topics</h5>
-                                        <div class="summary-text"></div>
-                                    </div>
-                                </div>
-                                <div class="col s12 m4">
-                                    <div class="summary-card historical-finance-summary">
-                                        <h5>📈 Market Overview</h5>
-                                        <div class="summary-text"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col s12">
-                                    <div class="summary-card historical-overall-summary">
-                                        <h5>🎯 Key Insights</h5>
-                                        <div class="summary-text"></div>
-                                    </div>
-                                </div>
+                                <ul class="collapsible">
+                                    <li>
+                                        <div class="collapsible-header"><i class="material-icons">archive</i>Summary Archive</div>
+                                        <div class="collapsible-body">
+                                            <div id="saved-summaries-list" class="saved-summaries-container">
+                                                <p class="empty-state">No past summaries found.</p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -525,5 +481,8 @@
         }
     </script>
     <button id="scrollToTopBtn" class="scroll-to-top" style="display: none;">↑</button>
+
+    <!-- Notification Bar -->
+    <div id="notification-bar"></div>
 </body>
 </html>

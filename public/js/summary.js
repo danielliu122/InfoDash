@@ -334,7 +334,7 @@ async function generateSummary(sectionData) {
                 messages: [
                     {
                         role: 'system',
-                        content: 'You are a data analyst specializing in creating concise, informative summaries of current events, trends, and market data. CRITICAL INSTRUCTIONS: 1) Only report the exact data provided to you. 2) Do not make assumptions about market movements, trends, or sentiment. 3) If the data shows a negative percentage change, report it as "declining", "down", or "fell". 4) If it shows a positive percentage change, report it as "gaining", "up", or "rose". 5) For small changes (less than 1%), use "minimal change" or "slight movement". 6) NEVER use dramatic terms like "surged", "plunged", "soared", "crashed", "exploded", or "collapsed" unless the percentage change is substantial (more than 10%). 7) Always base your analysis on the factual data provided, not on general market knowledge or assumptions. 8) If you see cryptocurrency data, do not assume it represents a "surge" or positive movement unless the percentage data explicitly shows positive values. 9) The market data provided represents CURRENT TRADING DAY performance (open-to-close or latest), so describe them as "today\'s trading" or "current session".'
+                        "content": "You are a data analyst specializing in creating clear, concise summaries of current news, trends, and market data. Use simple HTML formatting tags, including <p>, <strong>, <ul>, and <li>, to enhance readability.\n\n<strong>CRITICAL INSTRUCTIONS:</strong>\n<ul>\n  <li>Only report the specific data provided. Do <strong>not</strong> infer, speculate, or add context from outside knowledge.</li>\n  <li>For percentage changes:\n    <ul>\n      <li>If the change is positive, describe it as <strong>\"up,\" \"gaining,\" or \"rose\"</strong>.</li>\n      <li>If the change is negative, describe it as <strong>\"down,\" \"declining,\" or \"fell\"</strong>.</li>\n      <li>If the change is between -1% and +1%, refer to it as a <strong>\"slight movement\"</strong> or <strong>\"minimal change\"</strong>.</li>\n      <li>Only use dramatic terms like <strong>\"surged,\" \"plunged,\" or \"soared\"</strong> for percentage changes greater than ±10%.</li>\n    </ul>\n  </li>\n  <li>Do not interpret sentiment or market trends unless explicitly stated in the data.</li>\n  <li>For cryptocurrency, follow the same rules—do not infer excitement, volatility, or interest unless shown by large percentage changes.</li>\n  <li>Always refer to performance as part of <strong>\"today's trading\"</strong> or the <strong>\"current session\"</strong> (not longer timeframes) unless otherwise specified.</li>\n</ul>\n\n<p>Ensure your tone remains professional, neutral, and fact-based at all times.</p>"
                     },
                     {
                         role: 'user',
@@ -422,23 +422,23 @@ function createAnalysisPrompt(sectionData) {
         prompt += '\n';
     }
     
-    prompt += `Please provide a structured summary with the following sections (use plain text format, not markdown):
+    prompt += `Please provide a structured summary with the following sections. Use the exact headers shown (e.g., "1. NEWS HIGHLIGHTS:").
 
-1. NEWS HIGHLIGHTS: Summarize the key news stories and their significance
-2. TRENDING TOPICS: Highlight the top 25 most important trending topics and their context  
+1. NEWS HIGHLIGHTS: Summarize the key news stories. Place each distinct story in its own <p> tag for readability.
+2. TRENDING TOPICS: List the top trending topics. For each topic, use <strong>Topic Name</strong> followed by a concise, one-sentence explanation of its context. Place each topic in a separate <p> tag.
 `;
 
     if (isWeekend) {
         prompt += `3. MARKET OVERVIEW: Provide insights on cryptocurrency performance. Note that traditional stock markets are closed.
-4. KEY INSIGHTS: Overall analysis and what users should pay attention to`;
+4. KEY INSIGHTS: Overall analysis and what users should pay attention to.`;
     } else {
-        prompt += `3. MARKET OVERVIEW: Provide insights on today's trading session including tech stocks and crypto performance
-4. KEY INSIGHTS: Overall analysis and what users should pay attention to`;
+        prompt += `3. MARKET OVERVIEW: Provide insights on today's trading session including tech stocks and crypto performance.
+4. KEY INSIGHTS: Overall analysis and what users should pay attention to.`;
     }
 
     prompt += `
 
-Keep each section concise (2-3 sentences) and focus on the most important information. Use a professional but accessible tone. Format each section with the exact headers shown above (e.g., "1. NEWS HIGHLIGHTS:"). Avoid numbered lists within sections and use proper grammar and punctuation. For trending topics, mention at least the top 25 trends. For market overview, focus on today's trading session performance for both traditional tech stocks and cryptocurrency movements.`;
+Keep each section's summary concise (2-3 sentences) and focus on the most important information. Use a professional but accessible tone.`;
 
     return prompt;
 }
@@ -482,47 +482,22 @@ function updateSummaryDisplay(summaryText) {
     const sections = parseSummarySections(summaryText);
     // console.log('Parsed sections:', sections);
     
-    // Clean up the content before displaying
-    const cleanContent = (content) => {
-        if (!content) return '';
-        return content
-            .replace(/^\d+\.\s*/, '') // Remove leading numbers like "2."
-            .replace(/\d+\.\s*$/, '') // Remove trailing numbers like "3."
-            .replace(/\/\/\/\/.*$/, '') // Remove any trailing slashes
-            .trim();
-    };
-    
     // Update each section with specific selectors
     if (sections.news && newsSummary) {
-        const cleanedNews = cleanContent(sections.news);
-        newsSummary.innerHTML = `<p>${cleanedNews}</p>`;
-        // console.log('Updated news section');
+        newsSummary.innerHTML = sections.news;
     }
     
     if (sections.trends && trendsSummary) {
-        const cleanedTrends = cleanContent(sections.trends);
-        trendsSummary.innerHTML = `<p>${cleanedTrends}</p>`;
-        // console.log('Updated trends section');
+        trendsSummary.innerHTML = sections.trends;
     }
     
     if (sections.finance && financeSummary) {
-        const cleanedFinance = cleanContent(sections.finance);
-        financeSummary.innerHTML = `<p>${cleanedFinance}</p>`;
-        // console.log('Updated finance section');
+        financeSummary.innerHTML = sections.finance;
     }
     
     if (sections.insights && overallSummary) {
-        const cleanedInsights = cleanContent(sections.insights);
-        overallSummary.innerHTML = `<p>${cleanedInsights}</p>`;
-        // console.log('Updated insights section');
+        overallSummary.innerHTML = sections.insights;
     }
-    
-    // Final check - log the actual content
-    // console.log('Final summary content check:');
-    // if (newsSummary) console.log('News content:', newsSummary.innerHTML);
-    // if (trendsSummary) console.log('Trends content:', trendsSummary.innerHTML);
-    // if (financeSummary) console.log('Finance content:', financeSummary.innerHTML);
-    // if (overallSummary) console.log('Overall content:', overallSummary.innerHTML);
 }
 
 // Function to parse summary sections
@@ -608,6 +583,24 @@ function setSummaryLoadingText(text) {
     }
 }
 
+// Function to show a non-blocking notification
+function showNotification(message, duration = 3000) {
+    const notificationBar = document.getElementById('notification-bar');
+    if (notificationBar) {
+        notificationBar.textContent = message;
+        notificationBar.classList.add('show');
+        setTimeout(() => {
+            notificationBar.classList.remove('show');
+        }, duration);
+    }
+}
+
+// Function to enable/disable summary controls
+function setControlsDisabled(disabled) {
+    document.getElementById('summaryDate').disabled = disabled;
+    document.getElementById('summary-refresh-btn').disabled = disabled;
+}
+
 // Export functions for use in other modules
 export { collectSectionData, generateSummary, initializeSummarySection }; 
 
@@ -659,25 +652,16 @@ export async function saveCurrentSummary() {
         console.log('Server response:', result);
         
         if (result.success) {
-            alert(`Summary for ${date} saved successfully! This will be available to all users.`);
+            showNotification(`Summary for ${date} saved successfully!`);
             currentDailySummary = result.summary;
             await updateSavedSummariesList(); // Refresh the list
-            displayHistoricalSummary(result.summary); // Display it in the historical section
         } else {
-            if (result.message.includes('already exists')) {
-                alert(`A daily summary already exists for ${date}. You can view it in the Daily Summaries Archive section.`);
-            } else {
-                alert('Error saving summary: ' + result.message);
-            }
+            showNotification(`Error: ${result.message}`);
         }
         
     } catch (error) {
         console.error('Error saving summary:', error);
-        console.error('Error details:', {
-            message: error.message,
-            stack: error.stack
-        });
-        alert('Error saving summary. Please try again. Check console for details.');
+        showNotification('An error occurred while saving the summary.');
     }
 }
 
@@ -724,11 +708,13 @@ async function updateSavedSummariesList() {
     if (!container) return;
     
     const summaries = await loadSummaryHistory();
+    const list = container.querySelector('.collapsible-body') || container; // Handle new structure
     
-    container.innerHTML = '';
+    list.innerHTML = '';
     
     if (summaries.length === 0) {
-        return; // The CSS will show the empty state message
+        list.innerHTML = '<p class="empty-state">No past summaries found.</p>';
+        return; 
     }
     
     summaries.forEach((summary, index) => {
@@ -756,7 +742,7 @@ async function updateSavedSummariesList() {
             </div>
         `;
         
-        container.appendChild(item);
+        list.appendChild(item);
     });
 }
 
@@ -783,53 +769,36 @@ async function selectSummaryItem(date) {
     }
 }
 
-// Function to load summary for a specific date
+// Function to load summary for a specific date from the datepicker
 export async function loadSummaryForDate() {
     const dateInput = document.getElementById('summaryDate');
-    const dateString = dateInput.value;
+    const date = dateInput.value;
+    const today = getLocalDateString();
     
-    if (!dateString) {
-        alert('Please select a date first.');
-        return;
-    }
-    
+    setControlsDisabled(true);
+    setSummaryLoadingText(`Loading summary for ${new Date(date + 'T00:00:00').toLocaleDateString()}...`);
     showSummaryLoading();
-    const summary = await loadDailySummary(dateString);
-    hideSummaryLoading();
     
-    if (!summary) {
-        alert('No saved summary found for the selected date. You can generate a new one.');
-        // Clear the historical display
-        const displayContainer = document.getElementById('historical-summary-display');
-        if (displayContainer) displayContainer.style.display = 'none';
-        return;
+    const summary = await loadDailySummary(date);
+    
+    if (summary) {
+        updateSummaryDisplayFromData(summary);
+    } else {
+        // No summary exists for this date. Clear the display.
+        updateSummaryDisplay(null); 
+        showNotification('No summary found for the selected date.');
     }
     
-    // Display the historical summary
-    displayHistoricalSummary(summary);
+    // The refresh button should only be active for the current day
+    document.getElementById('summary-refresh-btn').style.display = (date === today) ? 'inline-block' : 'none';
+
+    hideSummaryLoading();
+    setControlsDisabled(false);
 }
 
-// Function to display historical summary
+// Function to display historical summary (now combined with main display)
 function displayHistoricalSummary(summary) {
-    const displayContainer = document.getElementById('historical-summary-display');
-    if (!displayContainer) return;
-    
-    // Update the historical summary cards
-    const newsCard = document.querySelector('.historical-news-summary .summary-text');
-    const trendsCard = document.querySelector('.historical-trends-summary .summary-text');
-    const financeCard = document.querySelector('.historical-finance-summary .summary-text');
-    const overallCard = document.querySelector('.historical-overall-summary .summary-text');
-    
-    if (newsCard) newsCard.innerHTML = summary.news || '<p>No news data available</p>';
-    if (trendsCard) trendsCard.innerHTML = summary.trends || '<p>No trends data available</p>';
-    if (financeCard) financeCard.innerHTML = summary.finance || '<p>No finance data available</p>';
-    if (overallCard) overallCard.innerHTML = summary.overall || '<p>No overall insights available</p>';
-    
-    // Show the display container
-    displayContainer.style.display = 'block';
-    
-    // Scroll to the historical summary
-    displayContainer.scrollIntoView({ behavior: 'smooth' });
+    updateSummaryDisplayFromData(summary);
 }
 
 // Function to delete selected summary (disabled for server-side summaries)
@@ -859,6 +828,8 @@ function updateSummaryDisplayFromData(summaryData) {
 // This function will now orchestrate the entire summary section's initial state
 async function loadOrGenerateTodaySummary() {
     const today = getLocalDateString();
+    setControlsDisabled(true);
+    
     setSummaryLoadingText(`Loading summary for ${new Date(today + 'T00:00:00').toLocaleDateString()}...`);
     showSummaryLoading();
     
@@ -886,6 +857,7 @@ async function loadOrGenerateTodaySummary() {
     }
     
     hideSummaryLoading();
+    setControlsDisabled(false);
 }
 
 // Function to initialize the entire summary feature
@@ -900,6 +872,11 @@ async function initializeSummarySection() {
 
     // 2. Load or generate the summary for the current day
     await loadOrGenerateTodaySummary();
+    
+    // Initialize Materialize collapsible
+    const M = window.M;
+    const collapsibleElems = document.querySelectorAll('.collapsible');
+    M.Collapsible.init(collapsibleElems);
 }
 
 // Function to refresh summary (generates new one but doesn't save to server)
@@ -907,6 +884,8 @@ export async function refreshSummary() {
     const today = getLocalDateString();
     setSummaryLoadingText(`Generating a new summary for ${new Date(today + 'T00:00:00').toLocaleDateString()}...`);
     summaryGenerated = false;
+    
+    setControlsDisabled(true);
     showSummaryLoading();
     
     try {
@@ -919,6 +898,7 @@ export async function refreshSummary() {
         updateSummaryDisplay('Error: Unable to refresh summary. Please try again later.');
     } finally {
         hideSummaryLoading();
+        setControlsDisabled(false);
     }
 }
 

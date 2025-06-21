@@ -721,7 +721,7 @@ body.dark-theme .autocomplete-item:hover {
 }
 
 .scroll-to-top:hover {
-    background-color: #555; /* Darker background on hover */
+    background-color: var(--primary-accent-hover);
 }
 
 /* Style for model select dropdown */
@@ -1185,4 +1185,38 @@ body.dark-theme #summaryDate::-webkit-calendar-picker-indicator {
         width: 100%;
         margin-bottom: 10px;
     }
+}
+
+/* Notification Bar */
+#notification-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s, visibility 0.5s, transform 0.5s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#notification-bar.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Materialize Overrides */
+.dark-theme .collapsible-header {
+    background-color: #2d2d2d; /* A dark tan/brown that fits the theme */
+    color: var(--primary-text);
+    border-bottom: 1px solid #444;
+}
+
+.dark-theme .collapsible-header:hover {
+    background-color: #3a3a3a;
 }
