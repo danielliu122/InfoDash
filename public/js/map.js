@@ -151,6 +151,7 @@ let trafficLayer;
 let trafficUpdateInterval;
 let isMapInitialized = false;
 let currentMapStyle = lightModeStyle; // Default to light mode
+const defaultCenter = { lat: 40.674, lng: -73.945 }; // Default center coordinates
 
 function debounce(func, wait) {
     let timeout;
@@ -216,12 +217,12 @@ async function initMap() {
     let currentColorScheme = ColorScheme.DARK;
 
     const mapOptions = {
-        center: { lat: 40.674, lng: -73.945 }, // Example coordinates
+        center: defaultCenter, // Use the default center variable
         zoom: 12,
         colorScheme: currentColorScheme, // Set the initial color scheme to DARK
     };
 
-    const map = new google.maps.Map(document.getElementById("map"), mapOptions);
+    map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
     const input = document.createElement("input");
     input.id = "MapsInput";
@@ -316,6 +317,11 @@ const updateTrafficInfo = async (location) => {
 
 // New function to request location
 function requestLocation() {
+    if (!map) {
+        console.error('Map not initialized yet');
+        return;
+    }
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -323,17 +329,28 @@ function requestLocation() {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 };
+                console.log('User location obtained:', pos);
                 map.setCenter(pos);
                 map.setZoom(12);
                 updateTrafficInfo(pos);
             },
-            () => {
-                console.warn('Geolocation permission denied or failed. Using default center.');
+            (error) => {
+                console.warn('Geolocation error:', error.message);
+                console.warn('Using default center:', defaultCenter);
+                map.setCenter(defaultCenter);
+                map.setZoom(12);
                 updateTrafficInfo(defaultCenter);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000
             }
         );
     } else {
         console.warn('Geolocation not supported. Using default center.');
+        map.setCenter(defaultCenter);
+        map.setZoom(12);
         updateTrafficInfo(defaultCenter);
     }
 }

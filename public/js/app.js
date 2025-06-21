@@ -11,6 +11,7 @@ import {
 import { fetchNewsData, updateNews } from './news.js';
 import { fetchTrendsData, updateTrends } from './trends.js'; // Import from trends.js
 import { fetchRedditData, updateReddit } from './reddit.js'; // Import from reddit.js
+import { generateAndDisplaySummary, refreshSummary } from './summary.js'; // Import summary functionality
 
 // Update the togglePauseFinance function in app.js
 export function togglePauseFinance() {
@@ -169,7 +170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const language = languageSelect.value;
 
         // Fetch prioritized news data
-        const newsData = await fetchNewsData('world', country, language);
+        const newsData = await fetchNewsData('world', country, language, false, 'top-headlines');
         updateNews(newsData);
 
         // Fetch other default data
@@ -187,6 +188,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Update the chart once even if the market is closed
             handleFinanceUpdate('1d', '1m');
         }
+
+        // Generate summary after all data is loaded
+        setTimeout(async () => {
+            try {
+                await generateAndDisplaySummary();
+            } catch (error) {
+                console.error('Error generating summary:', error);
+            }
+        }, 3000); // Wait 3 seconds for all data to load
 
         // Theme toggle functionality
         const themeToggleButton = document.getElementById('themeToggleButton');

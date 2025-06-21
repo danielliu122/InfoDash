@@ -753,3 +753,299 @@ body.dark-theme .autocomplete-item:hover {
     margin-top: 5px;
 }
 
+.zoom {
+    transition: transform .2s; /* Animation */
+    width: 400px;
+    height: 400px;
+    margin: 0 auto;
+}
+    .zoom:hover {
+    transform: scale(1.5); /* 150% zoom */
+}
+
+/* New Trends Grid Styles */
+.trends-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    color: white;
+}
+
+.trends-header h2 {
+    margin: 0 0 5px 0;
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.trends-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.9em;
+}
+
+.trends-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.trend-card {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.trend-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.trend-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: var(--accent-color);
+}
+
+.trend-card:hover::before {
+    transform: scaleX(1);
+}
+
+.trend-rank {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1em;
+    flex-shrink: 0;
+}
+
+.trend-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.trend-title {
+    margin: 0 0 8px 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--primary-text);
+    line-height: 1.3;
+    word-wrap: break-word;
+}
+
+.trend-traffic {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+}
+
+.traffic-label {
+    color: var(--secondary-text);
+    font-weight: 500;
+}
+
+.traffic-value {
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.85em;
+}
+
+.trend-traffic.low .traffic-value {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+}
+
+.trend-traffic.medium .traffic-value {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.trend-traffic.high .traffic-value {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.trend-arrow {
+    color: var(--accent-color);
+    font-size: 1.5em;
+    font-weight: bold;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.trend-card:hover .trend-arrow {
+    opacity: 1;
+    transform: translateX(3px);
+}
+
+/* Dark theme adjustments for trends */
+body.dark-theme .trend-card {
+    background: var(--secondary-bg);
+    border-color: var(--border-color);
+}
+
+body.dark-theme .trend-traffic.low .traffic-value {
+    background-color: #1b5e20;
+    color: #81c784;
+}
+
+body.dark-theme .trend-traffic.medium .traffic-value {
+    background-color: #e65100;
+    color: #ffb74d;
+}
+
+body.dark-theme .trend-traffic.high .traffic-value {
+    background-color: #b71c1c;
+    color: #ef5350;
+}
+
+/* Responsive design for trends */
+@media (max-width: 768px) {
+    .trends-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .trend-card {
+        padding: 15px;
+        gap: 12px;
+    }
+    
+    .trend-rank {
+        width: 35px;
+        height: 35px;
+        font-size: 1em;
+    }
+    
+    .trend-title {
+        font-size: 1em;
+    }
+    
+    .trends-header h2 {
+        font-size: 1.5em;
+    }
+}
+
+/* Summary Section Styles */
+.summary-card {
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: block !important;
+    visibility: visible !important;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.summary-card h5 {
+    margin-bottom: 15px;
+    color: var(--primary-text);
+    font-size: 1.2em;
+    font-weight: 600;
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 8px;
+}
+
+.summary-text {
+    color: var(--primary-text);
+    line-height: 1.6;
+    font-size: 0.95em;
+    display: block !important;
+    visibility: visible !important;
+}
+
+.summary-text p {
+    margin-bottom: 10px;
+    color: var(--primary-text);
+}
+
+.summary-loading {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.summary-loading .progress {
+    margin-bottom: 20px;
+}
+
+.summary-loading p {
+    color: var(--secondary-text);
+    font-size: 1.1em;
+}
+
+#summary .section-header .right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#summary .section-header .right button {
+    margin: 0;
+    padding: 8px 16px;
+    font-size: 0.9em;
+}
+
+/* Summary content animations */
+.summary-content {
+    display: none; /* Initially hidden */
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Ensure summary content is visible when displayed */
+.summary-content[style*="display: block"],
+.summary-content.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Summary card specific themes */
+.news-summary {
+    border-left: 4px solid #2196F3;
+}
+
+.trends-summary {
+    border-left: 4px solid #FF5722;
+}
+
+.finance-summary {
+    border-left: 4px solid #4CAF50;
+}
+
+.overall-summary {
+    border-left: 4px solid #9C27B0;
+    background: linear-gradient(135deg, var(--secondary-bg) 0%, rgba(156, 39, 176, 0.05) 100%);
+}

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Blog Page - Info Dash</title>
+    <link rel="stylesheet" href="/css/SimpleDark.css">
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">🌓</button>
+    
+    <div class="tos-container">
+        <h1>My Personal Blog</h1>
+        
+        <button type="button" class="collapsible">
+            <span class="chevron" style="display:inline-block; transition: transform 0.2s;">&#9660;</span>
+            Open Collapsible 1
+        </button>
+        <div class="collapsible-wrapper" style="display: block;">
+            <div class="section">
+                <h2>The Online Chess Cheating Problem</h2>
+                <p>
+                    If you don't want to read my story, here is a picture: 
+                    <br>
+                    <br>
+                    <a href="https://old.reddit.com/r/chess/comments/xyx3i4/there_are_a_lot_of_cheaters_on_chesscom/irj68l2/">
+                        <img src="/static/chesscheaters.png" alt="Chess Cheaters" class="zoom" style="display: block">
+                    </a>
+                    <br>
+                    What is says is that 15.7% of online chess players are cheaters, and over 20% have admitted to cheating
+                    in the past. Does this mean everyone online is a cheater? No, especially not at the lower levels, below 1600 elo. 
+                    <br>
+                    Losing points, not improving, and wasting time is not worth the effort. 
+                </p>
+            </div>
+        </div>
+        <button type="button" class="collapsible">
+            <span class="chevron" style="display:inline-block; transition: transform 0.2s;">&#9660;</span>
+            Open Collapsible 2
+        </button>
+        <div class="collapsible-wrapper" style="display: block;">
+            <div class="section">
+                <h2>The Wiggle That Killed Tarkov</h2>
+                <p>
+                    Credit: g0at
+                    <br>
+                    <br>
+                    <a href="https://www.youtube.com/watch?v=p5LfGcDB7Ek">
+                        <img src="/static/wiggletarkov.png" alt="Wiggle Tarkov" class="zoom" style="display: block">
+                    </a>
+                    <br>
+                    Tarkov player goes undercover and wiggles to find wallhackers. 
+                </p>
+                <p>
+                    g0at, the creator of this YouTube video, goes on the first person shooter survival game, Escape from Tarkov, and pretends to be a cheater in order to find cheaters. In game, he leans left and right, which is a movement mechanic normally used to peek around corners, or to indicate friendliness. He wiggles facing  walls, even though he cannot see through walls. On ther other end, certain cheaters will see him peek, but since they are cheating, the wall is not a visual deterrent, and some might even think that he is also wallhacking. However, he isn't. g0at pretends to be friendly, doesn't get shot, and even gets a few cheaters to admit to hacking. 
+                    This video shows that it's a general waste of time to play competitive games, as cheaters will always exist, and there is nothing you can do about it.
+                </p>
+            </div>
+        </div>
+        
+        <footer>
+            <h3>Disclaimer:</h3>
+            <p><i>This website is not intended to provide any legal, financial, medical, or other professional advice. The content is for general information purposes only and does not constitute professional advice. Always seek the advice of a qualified professional with any questions you may have regarding a legal, financial, medical, or other matter.</i></p>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        
+        // Check for saved theme preference or system preference
+        const getPreferredTheme = () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                return savedTheme;
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        // Apply theme
+        const setTheme = (theme) => {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        };
+
+        // Initialize theme
+        setTheme(getPreferredTheme());
+
+        // Theme toggle click handler
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select all collapsible buttons
+            const collapsibleBtns = document.querySelectorAll('.collapsible');
+            collapsibleBtns.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    // The wrapper is the next sibling element
+                    const wrapper = btn.nextElementSibling;
+                    const chevron = btn.querySelector('.chevron');
+                    if (wrapper.style.display === 'none') {
+                        wrapper.style.display = 'block';
+                        chevron.style.transform = 'rotate(0deg)';
+                    } else {
+                        wrapper.style.display = 'none';
+                        chevron.style.transform = 'rotate(-90deg)';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
