@@ -600,8 +600,16 @@ function hideSummaryLoading() {
     }
 }
 
+// Function to update the loading text
+function setSummaryLoadingText(text) {
+    const loadingText = document.getElementById('summary-loading-text');
+    if (loadingText) {
+        loadingText.textContent = text;
+    }
+}
+
 // Export functions for use in other modules
-export { collectSectionData, generateSummary}; 
+export { collectSectionData, generateSummary, initializeSummarySection }; 
 
 // Daily Summary Management (Server-side)
 let currentDailySummary = null;
@@ -829,116 +837,56 @@ export async function deleteSelectedSummary() {
     alert('Daily summaries are shared across all users and cannot be deleted. Contact the administrator if you need to remove a summary.');
 }
 
-// Function to initialize historical summaries on page load
-export async function initializeHistoricalSummaries() {
-    await updateSavedSummariesList();
-    
-    const dateInput = document.getElementById('summaryDate');
-    if (dateInput) {
-        const today = getLocalDateString();
-        dateInput.value = today;
-        document.getElementById('summary-date-display').textContent = new Date(today + 'T00:00:00').toLocaleDateString();
-
-        dateInput.addEventListener('change', () => {
-            const selectedDate = new Date(dateInput.value + 'T00:00:00').toLocaleDateString();
-            document.getElementById('summary-date-display').textContent = selectedDate;
-        });
-    }
-    
-    // Automatically load today's summary if it exists
-    await loadSummaryForDate();
-}
-
-// New function to generate summary for the selected date
-export async function generateSummaryForSelectedDate() {
-    const date = getSelectedDate();
+// This function will now orchestrate the entire summary section's initial state
+async function loadOrGenerateTodaySummary() {
     const today = getLocalDateString();
-
-    // Block generation for any date other than today
-    if (date !== today) {
-        alert('You can only generate a new summary for the current date.');
-        return;
-    }
-    
-    // Check if a summary already exists
-    const existingSummary = await loadDailySummary(date);
-    if (existingSummary) {
-        const selectedDateFormatted = new Date(date + 'T00:00:00').toLocaleDateString();
-        const overwrite = confirm(`A summary for ${selectedDateFormatted} already exists. Do you want to view it instead of generating a new one?`);
-        if (overwrite) {
-            displayHistoricalSummary(existingSummary);
-            return;
-        }
-    }
-
-    if (summaryGenerated) {
-        // console.log('Summary already generated for this session');
-        // return;
-    }
-
-    document.getElementById('summary-date-display').textContent = new Date(date).toLocaleDateString();
+    setSummaryLoadingText(`Loading summary for ${new Date(today + 'T00:00:00').toLocaleDateString()}...`);
     showSummaryLoading();
     
-    const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Summary generation timed out after 60 seconds')), 60000);
-    });
+    const summary = await loadDailySummary(today);
     
-    try {
-        const summaryPromise = (async () => {
+    if (summary) {
+        // A summary for today already exists, just display it
+        updateSummaryDisplayFromData(summary);
+    } else {
+        // No summary for today, we need to generate and save one
+        setSummaryLoadingText(`No summary found for today. Generating a new one...`);
+        try {
             const sectionData = await collectSectionData();
             const summaryText = await generateSummary(sectionData);
             updateSummaryDisplay(summaryText);
             
-            // Automatically save the summary
+            // Automatically save the newly generated summary
             await saveCurrentSummary();
+            await updateSavedSummariesList(); // Refresh the archive list
             
-            summaryGenerated = true;
-        })();
-        
-        await Promise.race([summaryPromise, timeoutPromise]);
-        
-    } catch (error) {
-        console.error('Error in summary generation:', error);
-        console.error('Error stack:', error.stack);
-        
-        if (error.message.includes('timed out')) {
-            updateSummaryDisplay('Error: Summary generation timed out. Please try refreshing the page and try again.');
-        } else {
-            updateSummaryDisplay('Error: Unable to generate summary. Please try again later.');
+        } catch (error) {
+            console.error('Error auto-generating summary:', error);
+            updateSummaryDisplay('Error: Unable to automatically generate the daily summary.');
         }
-    } finally {
-        hideSummaryLoading();
     }
+    
+    hideSummaryLoading();
 }
 
-// Function to update summary display from saved data
-function updateSummaryDisplayFromData(summaryData) {
-    const newsSummary = document.querySelector('.news-summary .summary-text');
-    const trendsSummary = document.querySelector('.trends-summary .summary-text');
-    const financeSummary = document.querySelector('.finance-summary .summary-text');
-    const overallSummary = document.querySelector('.overall-summary .summary-text');
-    const summaryContentDiv = document.querySelector('.summary-content');
-    
-    if (summaryContentDiv) {
-        summaryContentDiv.style.display = 'block';
-        summaryContentDiv.classList.add('show');
+// Function to initialize the entire summary feature
+async function initializeSummarySection() {
+    // 1. Set up the historical summaries archive
+    await updateSavedSummariesList();
+    const dateInput = document.getElementById('summaryDate');
+    if (dateInput) {
+        const today = getLocalDateString();
+        dateInput.value = today;
     }
-    
-    if (newsSummary) newsSummary.innerHTML = summaryData.news || '<p>No news data available</p>';
-    if (trendsSummary) trendsSummary.innerHTML = summaryData.trends || '<p>No trends data available</p>';
-    if (financeSummary) financeSummary.innerHTML = summaryData.finance || '<p>No finance data available</p>';
-    if (overallSummary) overallSummary.innerHTML = summaryData.overall || '<p>No overall insights available</p>';
+
+    // 2. Load or generate the summary for the current day
+    await loadOrGenerateTodaySummary();
 }
 
 // Function to refresh summary (generates new one but doesn't save to server)
 export async function refreshSummary() {
-    const date = getSelectedDate();
-    
-    const summaryHeader = document.querySelector('#summary .section-header h3');
-    if (summaryHeader) {
-        summaryHeader.textContent = `📊 Daily Summary (${new Date(date).toLocaleDateString()})`;
-    }
-    
+    const today = getLocalDateString();
+    setSummaryLoadingText(`Generating a new summary for ${new Date(today + 'T00:00:00').toLocaleDateString()}...`);
     summaryGenerated = false;
     showSummaryLoading();
     
@@ -970,6 +918,5 @@ function toggleSection(sectionId) {
 window.saveCurrentSummary = saveCurrentSummary;
 window.loadSummaryForDate = loadSummaryForDate;
 window.deleteSelectedSummary = deleteSelectedSummary;
-window.generateSummaryForSelectedDate = generateSummaryForSelectedDate;
 window.refreshSummary = refreshSummary;
 window.toggleSection = toggleSection; 
