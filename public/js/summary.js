@@ -16,6 +16,19 @@ function getLocalDateString(date = new Date()) {
     return `${year}-${month}-${day}`;
 }
 
+// Function to check if user has already generated a summary today
+function hasGeneratedToday() {
+    const today = getLocalDateString();
+    const lastGenerated = localStorage.getItem('lastSummaryGenerated');
+    return lastGenerated === today;
+}
+
+// Function to mark that a summary was generated today
+function markGeneratedToday() {
+    const today = getLocalDateString();
+    localStorage.setItem('lastSummaryGenerated', today);
+}
+
 // Function to get selected date or today's date
 function getSelectedDate() {
     const dateInput = document.getElementById('summaryDate');
@@ -316,7 +329,7 @@ async function generateSummary(sectionData) {
         // console.log('generateSummary: Starting AI generation...');
         // console.log('Generating summary with data:', sectionData);
         
-        const selectedModel = document.getElementById('model-select')?.value || 'deepseek/deepseek-r1:free';
+        const selectedModel = document.getElementById('model-select')?.value || 'deepseek/deepseek-chat-v3-0324:free';
         // console.log('generateSummary: Using model:', selectedModel);
         
         // Prepare the data for AI analysis
@@ -350,7 +363,18 @@ async function generateSummary(sectionData) {
         
         if (!response.ok) {
             console.error('generateSummary: API response not ok:', response.status, response.statusText);
-            throw new Error(`HTTP error! status: ${response.status}`);
+            
+            // Try to get more details about the error
+            let errorDetails = '';
+            try {
+                const errorResponse = await response.text();
+                errorDetails = errorResponse;
+                console.error('generateSummary: Error response body:', errorResponse);
+            } catch (e) {
+                console.error('generateSummary: Could not read error response body');
+            }
+            
+            throw new Error(`HTTP error! status: ${response.status}${errorDetails ? ` - ${errorDetails}` : ''}`);
         }
         
         // console.log('generateSummary: Parsing JSON response...');
@@ -597,8 +621,19 @@ function showNotification(message, duration = 3000) {
 
 // Function to enable/disable summary controls
 function setControlsDisabled(disabled) {
-    document.getElementById('summaryDate').disabled = disabled;
-    document.getElementById('summary-refresh-btn').disabled = disabled;
+    const dateInput = document.getElementById('summaryDate');
+    const refreshBtn = document.getElementById('summary-refresh-btn');
+    
+    if (dateInput) dateInput.disabled = disabled;
+    if (refreshBtn) {
+        refreshBtn.disabled = disabled || hasGeneratedToday();
+        // Add visual indication when refresh is disabled due to daily limit
+        if (hasGeneratedToday()) {
+            refreshBtn.title = 'You have already generated a summary today';
+        } else {
+            refreshBtn.title = 'Refresh current summary';
+        }
+    }
 }
 
 // Export functions for use in other modules
@@ -841,18 +876,49 @@ async function loadOrGenerateTodaySummary() {
     } else {
         // No summary for today, we need to generate and save one
         setSummaryLoadingText(`No summary found for today. Generating a new one...`);
+        
+        // Check if user has already generated a summary today
+        if (hasGeneratedToday()) {
+            showNotification('You have already generated a summary today. You can refresh the current summary or view past summaries.');
+            hideSummaryLoading();
+            setControlsDisabled(false);
+            return;
+        }
+        
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Summary generation timed out after 90 seconds')), 90000);
+        });
+        
         try {
-            const sectionData = await collectSectionData();
-            const summaryText = await generateSummary(sectionData);
-            updateSummaryDisplay(summaryText);
+            const summaryPromise = (async () => {
+                const sectionData = await collectSectionData();
+                const summaryText = await generateSummary(sectionData);
+                
+                // Only save if the summary was successfully generated (not an error message)
+                if (summaryText && !summaryText.includes('Error:') && !summaryText.includes('Unable to generate')) {
+                    updateSummaryDisplay(summaryText);
+                    
+                    // Mark that a summary was generated today
+                    markGeneratedToday();
+                    
+                    // Automatically save the newly generated summary
+                    await saveCurrentSummary();
+                    await updateSavedSummariesList(); // Refresh the archive list
+                } else {
+                    // If generation failed, just display the error without saving
+                    updateSummaryDisplay(summaryText);
+                }
+            })();
             
-            // Automatically save the newly generated summary
-            await saveCurrentSummary();
-            await updateSavedSummariesList(); // Refresh the archive list
+            await Promise.race([summaryPromise, timeoutPromise]);
             
         } catch (error) {
             console.error('Error auto-generating summary:', error);
-            updateSummaryDisplay('Error: Unable to automatically generate the daily summary.');
+            if (error.message.includes('timed out')) {
+                updateSummaryDisplay('Error: Summary generation timed out. Please try refreshing the page.');
+            } else {
+                updateSummaryDisplay('Error: Unable to automatically generate the daily summary.');
+            }
         }
     }
     
@@ -870,7 +936,10 @@ async function initializeSummarySection() {
         dateInput.value = today;
     }
 
-    // 2. Load or generate the summary for the current day
+    // 2. Set initial control states based on daily limit
+    setControlsDisabled(false);
+
+    // 3. Load or generate the summary for the current day
     await loadOrGenerateTodaySummary();
     
     // Initialize Materialize collapsible
@@ -882,20 +951,45 @@ async function initializeSummarySection() {
 // Function to refresh summary (generates new one but doesn't save to server)
 export async function refreshSummary() {
     const today = getLocalDateString();
+    
+    // Check if user has already generated a summary today
+    if (hasGeneratedToday()) {
+        showNotification('You have already generated a summary today. You can view the existing summary or check the archive for past summaries.');
+        return;
+    }
+    
     setSummaryLoadingText(`Generating a new summary for ${new Date(today + 'T00:00:00').toLocaleDateString()}...`);
     summaryGenerated = false;
     
     setControlsDisabled(true);
     showSummaryLoading();
     
+    const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Summary generation timed out after 90 seconds')), 90000);
+    });
+    
     try {
-        const sectionData = await collectSectionData();
-        const summaryText = await generateSummary(sectionData);
-        updateSummaryDisplay(summaryText);
+        const summaryPromise = (async () => {
+            const sectionData = await collectSectionData();
+            const summaryText = await generateSummary(sectionData);
+            updateSummaryDisplay(summaryText);
+            
+            // Mark that a summary was generated today
+            markGeneratedToday();
+            
+            // Update control states after generation
+            setControlsDisabled(false);
+        })();
+        
+        await Promise.race([summaryPromise, timeoutPromise]);
         
     } catch (error) {
         console.error('Error refreshing summary:', error);
-        updateSummaryDisplay('Error: Unable to refresh summary. Please try again later.');
+        if (error.message.includes('timed out')) {
+            updateSummaryDisplay('Error: Summary generation timed out. Please try again.');
+        } else {
+            updateSummaryDisplay('Error: Unable to refresh summary. Please try again later.');
+        }
     } finally {
         hideSummaryLoading();
         setControlsDisabled(false);
