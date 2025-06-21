@@ -10,7 +10,7 @@ let summaryGenerated = false;
 
 // Function to collect data from all sections
 async function collectSectionData() {
-    console.log('Starting to collect section data...');
+    // console.log('Starting to collect section data...');
     
     const data = {
         news: collectNewsData(),
@@ -18,11 +18,11 @@ async function collectSectionData() {
         finance: await collectFinanceData()
     };
     
-    console.log('Section data collection completed:', {
-        hasNews: !!data.news,
-        hasTrends: !!data.trends,
-        hasFinance: !!data.finance
-    });
+    // console.log('Section data collection completed:', {
+    //     hasNews: !!data.news,
+    //     hasTrends: !!data.trends,
+    //     hasFinance: !!data.finance
+    // });
     
     // console.log('Collected section data:', data);
     return data;
@@ -30,20 +30,20 @@ async function collectSectionData() {
 
 // Function to collect news data
 function collectNewsData() {
-    console.log('Collecting news data...');
+    // console.log('Collecting news data...');
     const newsContainer = document.querySelector('#news .data-container');
     // console.log('News container found:', !!newsContainer);
     
     if (!newsContainer) {
-        console.log('No news container found');
+        // console.log('No news container found');
         return null;
     }
     
     const newsItems = newsContainer.querySelectorAll('li');
-    console.log('News items found:', newsItems.length);
+    // console.log('News items found:', newsItems.length);
     
     if (newsItems.length === 0) {
-        console.log('No news items found');
+        // console.log('No news items found');
         return null;
     }
     
@@ -66,14 +66,14 @@ function collectNewsData() {
         }
     });
     
-    console.log('News data collected:', newsData.length, 'items');
+    // console.log('News data collected:', newsData.length, 'items');
     // console.log('Processed news data:', newsData);
     return newsData.length > 0 ? newsData : null;
 }
 
 // Function to collect trends data
 async function collectTrendsData() {
-    console.log('Collecting trends data...');
+    // console.log('Collecting trends data...');
     
     try {
         // Get the current country and language settings
@@ -81,14 +81,14 @@ async function collectTrendsData() {
         const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
         
         if (!trendsCountrySelect || !trendsLanguageSelect) {
-            console.log('Trends select elements not found');
+            // console.log('Trends select elements not found');
             return null;
         }
         
         const country = trendsCountrySelect.value;
         const language = trendsLanguageSelect.value;
         
-        console.log(`Fetching trends for country: ${country}, language: ${language}`);
+        // console.log(`Fetching trends for country: ${country}, language: ${language}`);
         
         // Fetch trends data directly from the API
         const response = await fetch(`/api/trends2?type=daily&category=all&language=${language}&geo=${country}`);
@@ -97,10 +97,10 @@ async function collectTrendsData() {
         }
         
         const data = await response.json();
-        console.log('Raw trends data received');
+        // console.log('Raw trends data received');
         
         if (!data || !data.default || !data.default.trendingSearchesDays) {
-            console.log('No trends data available');
+            // console.log('No trends data available');
             return null;
         }
         
@@ -113,7 +113,7 @@ async function collectTrendsData() {
             }
         });
         
-        console.log(`Total trends found: ${allTopics.length}`);
+        // console.log(`Total trends found: ${allTopics.length}`);
         
         // Take the top 25 trends
         const top25Trends = allTopics.slice(0, 25).map(topic => ({
@@ -121,7 +121,7 @@ async function collectTrendsData() {
             traffic: topic.formattedTraffic || 'N/A'
         }));
         
-        console.log('Top 25 trends processed');
+        // console.log('Top 25 trends processed');
         // console.log('Top 25 trends processed:', top25Trends);
         return top25Trends.length > 0 ? top25Trends : null;
         
@@ -133,7 +133,7 @@ async function collectTrendsData() {
 
 // Function to collect finance data
 async function collectFinanceData() {
-    console.log('Collecting finance data...');
+    // console.log('Collecting finance data...');
     
     const financeData = {
         nasdaq: null,
@@ -143,15 +143,15 @@ async function collectFinanceData() {
     
     try {
         // Fetch NASDAQ data
-        console.log('Fetching NASDAQ data...');
+        // console.log('Fetching NASDAQ data...');
         const nasdaqResponse = await fetch('/api/finance/^IXIC?range=1d&interval=1m');
         if (nasdaqResponse.ok) {
             const nasdaqData = await nasdaqResponse.json();
-            console.log('NASDAQ data received');
+            // console.log('NASDAQ data received');
             if (nasdaqData.chart && nasdaqData.chart.result && nasdaqData.chart.result[0]) {
                 const result = nasdaqData.chart.result[0];
                 const meta = result.meta;
-                console.log('NASDAQ meta data processed');
+                // console.log('NASDAQ meta data processed');
                 
                 // Calculate current day's open-to-close (or latest) change
                 const currentPrice = meta.regularMarketPrice;
@@ -182,17 +182,17 @@ async function collectFinanceData() {
                         timeframe: 'Since Previous Close'
                     };
                 }
-                console.log('NASDAQ data collected');
+                // console.log('NASDAQ data collected');
             } else {
-                console.log('NASDAQ data structure invalid');
+                // console.log('NASDAQ data structure invalid');
             }
         } else {
-            console.log('NASDAQ response not ok:', nasdaqResponse.status);
+            // console.log('NASDAQ response not ok:', nasdaqResponse.status);
         }
         
         // Fetch tech stocks data
         const techStocks = ['META', 'AAPL', 'GOOGL', 'AMZN', 'TSLA'];
-        console.log('Fetching tech stocks data...');
+        // console.log('Fetching tech stocks data...');
         for (const symbol of techStocks) {
             try {
                 const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
@@ -202,7 +202,6 @@ async function collectFinanceData() {
                         const result = data.chart.result[0];
                         const meta = result.meta;
                         
-                        // Calculate current day's open-to-close (or latest) change
                         const currentPrice = meta.regularMarketPrice;
                         const openPrice = meta.regularMarketOpen;
                         
@@ -218,7 +217,6 @@ async function collectFinanceData() {
                                 timeframe: 'Today'
                             };
                         } else {
-                            // Fallback to previous close if open price not available
                             const previousClose = meta.previousClose;
                             const change = currentPrice - previousClose;
                             const changePercent = (change / previousClose) * 100;
@@ -231,20 +229,16 @@ async function collectFinanceData() {
                                 timeframe: 'Since Previous Close'
                             };
                         }
-                    } else {
-                        console.log(`${symbol} data structure invalid`);
                     }
-                } else {
-                    console.log(`${symbol} response not ok:`, response.status);
                 }
             } catch (error) {
-                console.error(`Error fetching ${symbol} data:`, error);
+                // console.log(`Error fetching ${symbol} data:`, error);
             }
         }
         
-        // Fetch cryptocurrency data
+        // Fetch crypto data
         const cryptoStocks = ['BTC-USD', 'ETH-USD', 'SOL-USD', 'XRP-USD'];
-        console.log('Fetching crypto data...');
+        // console.log('Fetching crypto data...');
         for (const symbol of cryptoStocks) {
             try {
                 const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
@@ -253,9 +247,7 @@ async function collectFinanceData() {
                     if (data.chart && data.chart.result && data.chart.result[0]) {
                         const result = data.chart.result[0];
                         const meta = result.meta;
-                        const shortSymbol = symbol.replace('-USD', '');
                         
-                        // Calculate current day's open-to-close (or latest) change
                         const currentPrice = meta.regularMarketPrice;
                         const openPrice = meta.regularMarketOpen;
                         
@@ -263,7 +255,7 @@ async function collectFinanceData() {
                             const change = currentPrice - openPrice;
                             const changePercent = (change / openPrice) * 100;
                             
-                            financeData.crypto[shortSymbol] = {
+                            financeData.crypto[symbol] = {
                                 price: currentPrice?.toFixed(2) || 'N/A',
                                 open: openPrice?.toFixed(2) || 'N/A',
                                 change: change?.toFixed(2) || 'N/A',
@@ -271,12 +263,11 @@ async function collectFinanceData() {
                                 timeframe: 'Today'
                             };
                         } else {
-                            // Fallback to previous close if open price not available
                             const previousClose = meta.previousClose;
                             const change = currentPrice - previousClose;
                             const changePercent = (change / previousClose) * 100;
                             
-                            financeData.crypto[shortSymbol] = {
+                            financeData.crypto[symbol] = {
                                 price: currentPrice?.toFixed(2) || 'N/A',
                                 open: 'N/A',
                                 change: change?.toFixed(2) || 'N/A',
@@ -284,18 +275,19 @@ async function collectFinanceData() {
                                 timeframe: 'Since Previous Close'
                             };
                         }
-                    } else {
-                        console.log(`${symbol} data structure invalid`);
                     }
-                } else {
-                    console.log(`${symbol} response not ok:`, response.status);
                 }
             } catch (error) {
-                console.error(`Error fetching ${symbol} data:`, error);
+                // console.log(`Error fetching ${symbol} data:`, error);
             }
         }
         
-        console.log('Finance data collection completed');
+        // console.log('Finance data collected:', {
+        //     hasNasdaq: !!financeData.nasdaq,
+        //     techStocksCount: Object.keys(financeData.techStocks).length,
+        //     cryptoCount: Object.keys(financeData.crypto).length
+        // });
+        
         return financeData;
         
     } catch (error) {
@@ -307,18 +299,18 @@ async function collectFinanceData() {
 // Function to generate summary using AI
 async function generateSummary(sectionData) {
     try {
-        console.log('generateSummary: Starting AI generation...');
+        // console.log('generateSummary: Starting AI generation...');
         // console.log('Generating summary with data:', sectionData);
         
         const selectedModel = document.getElementById('model-select')?.value || 'deepseek/deepseek-r1:free';
-        console.log('generateSummary: Using model:', selectedModel);
+        // console.log('generateSummary: Using model:', selectedModel);
         
         // Prepare the data for AI analysis
         const analysisPrompt = createAnalysisPrompt(sectionData);
-        console.log('generateSummary: Analysis prompt created, length:', analysisPrompt.length);
+        // console.log('generateSummary: Analysis prompt created, length:', analysisPrompt.length);
         // console.log('Analysis prompt:', analysisPrompt);
         
-        console.log('generateSummary: Making API call to /api/chat...');
+        // console.log('generateSummary: Making API call to /api/chat...');
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: {
@@ -339,7 +331,7 @@ async function generateSummary(sectionData) {
             }),
         });
         
-        console.log('generateSummary: API response received, status:', response.status);
+        // console.log('generateSummary: API response received, status:', response.status);
         // console.log('API response status:', response.status);
         
         if (!response.ok) {
@@ -347,13 +339,13 @@ async function generateSummary(sectionData) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        console.log('generateSummary: Parsing JSON response...');
+        // console.log('generateSummary: Parsing JSON response...');
         const data = await response.json();
-        console.log('generateSummary: JSON parsed successfully');
+        // console.log('generateSummary: JSON parsed successfully');
         // console.log('API response data:', data);
         
         const result = data.reply || 'Unable to generate summary at this time.';
-        console.log('generateSummary: Returning result, length:', result.length);
+        // console.log('generateSummary: Returning result, length:', result.length);
         return result;
         
     } catch (error) {
@@ -814,18 +806,18 @@ export async function initializeHistoricalSummaries() {
     const todaySummary = await loadDailySummary();
     if (todaySummary) {
         currentDailySummary = todaySummary;
-        console.log('Loaded today\'s daily summary from server');
+        // console.log('Loaded today\'s daily summary from server');
     }
 }
 
 // Enhanced generateAndDisplaySummary to automatically save the first summary of the day
 export async function generateAndDisplaySummary() {
     if (summaryGenerated) {
-        console.log('Summary already generated for this session');
+        // console.log('Summary already generated for this session');
         return;
     }
 
-    console.log('Generating summary...');
+    // console.log('Generating summary...');
     
     showSummaryLoading();
     
@@ -836,11 +828,11 @@ export async function generateAndDisplaySummary() {
     
     try {
         const summaryPromise = (async () => {
-            console.log('Step 1: Checking for existing daily summary...');
+            // console.log('Step 1: Checking for existing daily summary...');
             // Check if we already have a daily summary for today
             const todaySummary = await loadDailySummary();
             if (todaySummary) {
-                console.log('Using existing daily summary for today');
+                // console.log('Using existing daily summary for today');
                 currentDailySummary = todaySummary;
                 updateSummaryDisplayFromData(todaySummary);
                 summaryGenerated = true;
@@ -848,31 +840,31 @@ export async function generateAndDisplaySummary() {
                 return;
             }
             
-            console.log('Step 2: No existing summary found, collecting section data...');
+            // console.log('Step 2: No existing summary found, collecting section data...');
             // Generate new summary
             const sectionData = await collectSectionData();
-            console.log('Section data collected:', {
-                hasNews: !!sectionData.news,
-                hasTrends: !!sectionData.trends,
-                hasFinance: !!sectionData.finance,
-                newsCount: sectionData.news?.length || 0,
-                trendsCount: sectionData.trends?.length || 0
-            });
+            // console.log('Section data collected:', {
+            //     hasNews: !!sectionData.news,
+            //     hasTrends: !!sectionData.trends,
+            //     hasFinance: !!sectionData.finance,
+            //     newsCount: sectionData.news?.length || 0,
+            //     trendsCount: sectionData.trends?.length || 0
+            // });
             
-            console.log('Step 3: Generating summary with AI...');
+            // console.log('Step 3: Generating summary with AI...');
             const summaryText = await generateSummary(sectionData);
-            console.log('Summary text generated, length:', summaryText?.length || 0);
+            // console.log('Summary text generated, length:', summaryText?.length || 0);
             
-            console.log('Step 4: Updating display...');
+            // console.log('Step 4: Updating display...');
             // Update display
             updateSummaryDisplay(summaryText);
             
-            console.log('Step 5: Automatically saving first summary of the day...');
+            // console.log('Step 5: Automatically saving first summary of the day...');
             // Automatically save the first summary of the day
             await saveCurrentSummary();
             
             summaryGenerated = true;
-            console.log('Summary generation completed successfully');
+            // console.log('Summary generation completed successfully');
         })();
         
         await Promise.race([summaryPromise, timeoutPromise]);
@@ -887,7 +879,7 @@ export async function generateAndDisplaySummary() {
             updateSummaryDisplay('Error: Unable to generate summary. Please try again later.');
         }
     } finally {
-        console.log('Step 6: Hiding loading state...');
+        // console.log('Step 6: Hiding loading state...');
         hideSummaryLoading();
     }
 }
@@ -913,7 +905,7 @@ function updateSummaryDisplayFromData(summaryData) {
 
 // Function to refresh summary (generates new one but doesn't save to server)
 export async function refreshSummary() {
-    console.log('Refreshing summary...');
+    // console.log('Refreshing summary...');
     
     // Reset the header to show it's today's summary
     const summaryHeader = document.querySelector('#summary .section-header h3');
@@ -935,7 +927,7 @@ export async function refreshSummary() {
         updateSummaryDisplay(summaryText);
         
         // Don't save this one - it's just a refresh
-        console.log('Summary refreshed (not saved to server)');
+        // console.log('Summary refreshed (not saved to server)');
         
     } catch (error) {
         console.error('Error refreshing summary:', error);
