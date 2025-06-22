@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Info Dash</title>
+    <link rel="stylesheet" href="/css/SimpleDark.css">
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">🌓</button>
+    
+    <div class="tos-container">
+        <h1>Privacy Policy</h1>
+        <p class="last-updated">Last updated: January 27, 2025</p>
+
+        <div class="section">
+            <h2>1. Information We Collect</h2>
+            <p>Info Dash collects information to provide better services to our users. The types of information we collect include:</p>
+            <ul>
+                <li><strong>User Preferences:</strong> Location settings, theme preferences, watchlist data, and other customization options are stored locally in your browser</li>
+                <li><strong>Usage Data:</strong> Information about how you interact with our services, including which features you use most frequently</li>
+                <li><strong>Technical Information:</strong> Browser type, device information, and IP address for service optimization</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>2. How We Use Information</h2>
+            <p>We use the collected information for the following purposes:</p>
+            <ul>
+                <li>To provide and maintain our services</li>
+                <li>To personalize your experience and remember your preferences</li>
+                <li>To improve our services and develop new features</li>
+                <li>To communicate with you about service updates and changes</li>
+                <li>To ensure the security and integrity of our platform</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>3. Data Storage and Security</h2>
+            <p>Your data is primarily stored locally in your browser using localStorage. This means:</p>
+            <ul>
+                <li>Your preferences and settings are saved on your device</li>
+                <li>Data is not transmitted to our servers unless necessary for service functionality</li>
+                <li>You can clear this data at any time by clearing your browser's local storage</li>
+                <li>We implement appropriate security measures to protect any data transmitted to our servers</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>4. Third-Party Services</h2>
+            <p>Info Dash integrates with several third-party services to provide comprehensive information:</p>
+            <ul>
+                <li><strong>News APIs:</strong> For current news and headlines</li>
+                <li><strong>Financial APIs:</strong> For stock market data and financial information</li>
+                <li><strong>Weather APIs:</strong> For weather forecasts and conditions</li>
+                <li><strong>AI Services:</strong> For chat functionality and content generation</li>
+            </ul>
+            <p>These services have their own privacy policies, and we encourage you to review them.</p>
+        </div>
+
+        <div class="section">
+            <h2>5. Cookies and Tracking</h2>
+            <p>Info Dash uses minimal cookies and tracking technologies:</p>
+            <ul>
+                <li>Essential cookies for service functionality</li>
+                <li>Analytics cookies to understand usage patterns (with user consent)</li>
+                <li>No third-party advertising cookies without explicit consent</li>
+            </ul>
+            <p>You can control cookie settings through your browser preferences.</p>
+        </div>
+
+        <div class="section">
+            <h2>6. Your Rights and Choices</h2>
+            <p>You have the following rights regarding your personal information:</p>
+            <ul>
+                <li><strong>Access:</strong> You can view and manage your stored preferences through the User Preferences section</li>
+                <li><strong>Modification:</strong> You can update your preferences at any time</li>
+                <li><strong>Deletion:</strong> You can clear all stored data by clearing your browser's local storage</li>
+                <li><strong>Opt-out:</strong> You can disable certain features or data collection</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>7. Data Retention</h2>
+            <p>We retain your information as follows:</p>
+            <ul>
+                <li><strong>Local Storage:</strong> Data stored in your browser remains until you clear it</li>
+                <li><strong>Server Logs:</strong> Technical logs are retained for up to 30 days for security and debugging purposes</li>
+                <li><strong>Analytics Data:</strong> Aggregated usage statistics may be retained longer for service improvement</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>8. Children's Privacy</h2>
+            <p>Info Dash is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us immediately.</p>
+        </div>
+
+        <div class="section">
+            <h2>9. International Data Transfers</h2>
+            <p>Info Dash may process and store your information in countries other than your own. By using our services, you consent to the transfer of your information to countries that may have different data protection laws than your country of residence.</p>
+        </div>
+
+        <div class="section">
+            <h2>10. Changes to This Privacy Policy</h2>
+            <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date. We encourage you to review this Privacy Policy periodically for any changes.</p>
+        </div>
+
+        <div class="section">
+            <h2>11. Contact Information</h2>
+            <p>If you have any questions about this Privacy Policy or our data practices, please contact us at:</p>
+            <ul>
+                <li>Email: privacy@infodash.app</li>
+                <li>Website: <a href="https://infodash.app">infodash.app</a></li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>12. Legal Basis for Processing</h2>
+            <p>We process your personal information based on the following legal grounds:</p>
+            <ul>
+                <li><strong>Consent:</strong> When you explicitly agree to data processing</li>
+                <li><strong>Legitimate Interest:</strong> To provide and improve our services</li>
+                <li><strong>Contract Performance:</strong> To fulfill our service obligations</li>
+                <li><strong>Legal Obligation:</strong> To comply with applicable laws and regulations</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        
+        // Check for saved theme preference or system preference
+        const getPreferredTheme = () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                return savedTheme;
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        // Apply theme
+        const setTheme = (theme) => {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        };
+
+        // Initialize theme
+        setTheme(getPreferredTheme());
+
+        // Theme toggle click handler
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+    </script>
+</body>
+</html> 

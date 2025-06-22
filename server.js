@@ -20,6 +20,44 @@ const DDG = require('duck-duck-scrape');
 const weather = require('weather-js');
 const fs = require('fs').promises;
 
+// News cache file path
+const NEWS_CACHE_FILE = path.join(__dirname, 'data', 'news-cache.json');
+
+// Function to load news cache from file
+async function loadNewsCache() {
+    try {
+        const data = await fs.readFile(NEWS_CACHE_FILE, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.log('No existing news cache found, starting fresh');
+        return {};
+    }
+}
+
+// Function to save news cache to file
+async function saveNewsCache(cacheData) {
+    try {
+        // Ensure data directory exists
+        const dataDir = path.join(__dirname, 'data');
+        try {
+            await fs.access(dataDir);
+        } catch {
+            await fs.mkdir(dataDir, { recursive: true });
+        }
+        
+        await fs.writeFile(NEWS_CACHE_FILE, JSON.stringify(cacheData, null, 2));
+        console.log('News cache saved to file');
+    } catch (error) {
+        console.error('Error saving news cache:', error);
+    }
+}
+
+// Function to check if cache is stale (older than 6 hours)
+function isCacheStale(timestamp) {
+    const sixHours = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+    return Date.now() - timestamp > sixHours;
+}
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -173,31 +211,90 @@ app.get('/api/news', async (req, res) => {
         return res.status(500).json({ error: 'Server configuration error' });
     }
 
-    // Check if data is cached
-    const cachedData = newsCache.get(cacheKey);
-    if (cachedData) {
-        return res.json(cachedData);
-    }
-
-    // Build API URL based on parameters
-    let newsUrl;
-    if (category) {
-        newsUrl = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&language=${language}&apiKey=${newsApiKey}`;
-    } else {
-        newsUrl = `https://newsapi.org/v2/everything?q=${query}&language=${language}&sortBy=popularity${from ? `&from=${from}` : ''}&apiKey=${newsApiKey}`;
-    }
-
     try {
+        // Load existing cache from file
+        let fileCache = await loadNewsCache();
+        
+        // Check if we have cached data for this request
+        if (fileCache[cacheKey] && !isCacheStale(fileCache[cacheKey].timestamp)) {
+            console.log(`Using cached news data for: ${cacheKey}`);
+            return res.json(fileCache[cacheKey].data);
+        }
+
+        // If cache is stale or doesn't exist, fetch fresh data
+        console.log(`Fetching fresh news data for: ${cacheKey}`);
+        
+        // Build API URL based on parameters
+        let newsUrl;
+        if (category) {
+            newsUrl = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&language=${language}&apiKey=${newsApiKey}`;
+        } else {
+            newsUrl = `https://newsapi.org/v2/everything?q=${query}&language=${language}&sortBy=popularity${from ? `&from=${from}` : ''}&apiKey=${newsApiKey}`;
+        }
+
         const response = await axios.get(newsUrl);
+        
         if (response.status === 200 && response.data) {
-            // Cache the fresh news data
-            newsCache.set(cacheKey, response.data);
+            // Store the fresh data in file cache
+            fileCache[cacheKey] = {
+                data: response.data,
+                timestamp: Date.now()
+            };
+            
+            // Save updated cache to file
+            await saveNewsCache(fileCache);
+            
+            console.log(`Fresh news data cached for: ${cacheKey}`);
             res.json(response.data);
         } else {
             res.status(response.status).json({ error: 'Error fetching news data' });
         }
+        
     } catch (error) {
-        console.error('Error fetching news data:', error);
+        console.error('Error in news API:', error);
+        
+        // Check if it's a rate limit error
+        if (error.response && error.response.status === 429) {
+            console.log('News API rate limit reached, checking for cached data...');
+            
+            // Try to load any cached data, even if stale
+            const fileCache = await loadNewsCache();
+            if (fileCache[cacheKey]) {
+                console.log(`Using stale cached data for: ${cacheKey}`);
+                return res.json({
+                    ...fileCache[cacheKey].data,
+                    _cached: true,
+                    _stale: isCacheStale(fileCache[cacheKey].timestamp),
+                    _message: 'Rate limit reached, showing cached data'
+                });
+            } else {
+                return res.status(429).json({ 
+                    error: 'News API rate limit reached and no cached data available',
+                    message: 'Please try again later or upgrade your API plan'
+                });
+            }
+        }
+        
+        // Check if it's an API key error
+        if (error.response && error.response.status === 401) {
+            console.log('News API key error, checking for cached data...');
+            
+            const fileCache = await loadNewsCache();
+            if (fileCache[cacheKey]) {
+                console.log(`Using cached data due to API key error for: ${cacheKey}`);
+                return res.json({
+                    ...fileCache[cacheKey].data,
+                    _cached: true,
+                    _message: 'API key error, showing cached data'
+                });
+            } else {
+                return res.status(401).json({ 
+                    error: 'News API key error and no cached data available',
+                    message: 'Please check your API key configuration'
+                });
+            }
+        }
+        
         res.status(500).json({ error: 'Error fetching news data' });
     }
 });
@@ -417,16 +514,26 @@ app.get('/api/weather', async (req, res) => {
             
             const weatherData = result[0];
             const current = weatherData.current;
-            const location = weatherData.location;
+            const locationData = weatherData.location;
             
+            // Return the complete weather data structure
             const formattedWeather = {
-                location: location.name,
-                temperature: current.temperature,
-                condition: current.skytext,
-                humidity: current.humidity,
-                wind: current.winddisplay,
-                feelslike: current.feelslike,
-                description: `Current weather in ${location.name}: ${current.temperature}°F, ${current.skytext}, ${current.humidity}% humidity, wind ${current.winddisplay}`
+                location: {
+                    name: locationData.name,
+                    country: locationData.country,
+                    timezone: locationData.timezone
+                },
+                current: {
+                    temperature: current.temperature,
+                    temperatureUnit: 'F',
+                    condition: current.skytext,
+                    humidity: current.humidity,
+                    wind: current.winddisplay,
+                    windUnit: 'mph',
+                    feelslike: current.feelslike,
+                    uv: current.uv || 'N/A',
+                    description: `Current weather in ${locationData.name}: ${current.temperature}°F, ${current.skytext}, ${current.humidity}% humidity, wind ${current.winddisplay}`
+                }
             };
             
             res.json(formattedWeather);
@@ -661,6 +768,41 @@ app.get('/api/summary/history', async (req, res) => {
             success: false, 
             message: 'Server error while retrieving summary history' 
         });
+    }
+});
+
+// Endpoint to clear news cache (for testing/maintenance)
+app.post('/api/news/clear-cache', async (req, res) => {
+    try {
+        await saveNewsCache({});
+        console.log('News cache cleared');
+        res.json({ success: true, message: 'News cache cleared successfully' });
+    } catch (error) {
+        console.error('Error clearing news cache:', error);
+        res.status(500).json({ error: 'Error clearing news cache' });
+    }
+});
+
+// Endpoint to get cache status (for debugging)
+app.get('/api/news/cache-status', async (req, res) => {
+    try {
+        const fileCache = await loadNewsCache();
+        const cacheKeys = Object.keys(fileCache);
+        const cacheInfo = cacheKeys.map(key => ({
+            key,
+            timestamp: fileCache[key].timestamp,
+            age: Date.now() - fileCache[key].timestamp,
+            stale: isCacheStale(fileCache[key].timestamp),
+            articleCount: fileCache[key].data.articles?.length || 0
+        }));
+        
+        res.json({
+            totalEntries: cacheKeys.length,
+            entries: cacheInfo
+        });
+    } catch (error) {
+        console.error('Error getting cache status:', error);
+        res.status(500).json({ error: 'Error getting cache status' });
     }
 });
 

@@ -1,5 +1,7 @@
 // summary.js - Handles the summary section functionality
 
+import { userPrefs } from './userPreferences.js';
+
 let summaryData = {
     news: null,
     trends: null,
@@ -19,13 +21,15 @@ function getLocalDateString(date = new Date()) {
 
 // Function to check if user has already generated a summary today
 function hasGeneratedToday() {
-    // TEMP: Always allow summary generation for testing
-    return false;
+    const today = getLocalDateString();
+    const lastGeneratedDate = localStorage.getItem('lastSummaryGeneratedDate');
+    return lastGeneratedDate === today;
 }
 
 // Function to mark that a summary was generated today
 function markGeneratedToday() {
-    // TEMP: No-op for testing
+    const today = getLocalDateString();
+    localStorage.setItem('lastSummaryGeneratedDate', today);
 }
 
 // Function to get selected date or today's date
@@ -325,24 +329,21 @@ async function collectFinanceData() {
 
 // Function to collect weather data
 async function collectWeatherData() {
-    // console.log('Collecting weather data...');
+    const location = userPrefs.getWeatherLocation();
+    
+    if (!location) {
+        return null;
+    }
     
     try {
-        // Get the user's location from localStorage or use default
-        const userLocation = localStorage.getItem('userWeatherLocation') || 'New York, NY';
+        const response = await fetch(`/api/weather?location=${encodeURIComponent(location)}`);
         
-        const response = await fetch(`/api/weather?location=${encodeURIComponent(userLocation)}`);
-        if (response.ok) {
-            const data = await response.json();
-            if (data.description) {
-                // console.log('Weather data collected for:', userLocation);
-                return { [userLocation]: data };
-            }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        // console.log('No weather data available');
-        return null;
-        
+        const data = await response.json();
+        return data;
     } catch (error) {
         console.error('Error collecting weather data:', error);
         return null;
@@ -373,7 +374,18 @@ async function generateSummary(sectionData) {
                 messages: [
                     {
                         role: 'system',
-                        "content": "You are a data analyst specializing in creating clear, concise summaries of current news, trends, and market data. Use simple HTML formatting tags, including <p>, <strong>, <ul>, and <li>, to enhance readability.\n\n<strong>CRITICAL INSTRUCTIONS:</strong>\n<ul>\n  <li>Only report the specific data provided. Do <strong>not</strong> infer, speculate, or add context from outside knowledge.</li>\n  <li>For percentage changes:\n    <ul>\n      <li>If the change is positive, describe it as <strong>\"up,\" \"gaining,\" or \"rose\"</strong>.</li>\n      <li>If the change is negative, describe it as <strong>\"down,\" \"declining,\" or \"fell\"</strong>.</li>\n      <li>If the change is between -1% and +1%, refer to it as a <strong>\"slight movement\"</strong> or <strong>\"minimal change\"</strong>.</li>\n      <li>Only use dramatic terms like <strong>\"surged,\" \"plunged,\" or \"soared\"</strong> for percentage changes greater than ±10%.</li>\n    </ul>\n  </li>\n  <li>Do not interpret sentiment or market trends unless explicitly stated in the data.</li>\n  <li>For cryptocurrency, follow the same rules—do not infer excitement, volatility, or interest unless shown by large percentage changes.</li>\n  <li>Always refer to performance as part of <strong>\"today's trading\"</strong> or the <strong>\"current session\"</strong> (not longer timeframes) unless otherwise specified.</li>\n</ul>\n\n<p>Ensure your tone remains professional, neutral, and fact-based at all times.</p>"
+                        content: `You are a data analyst specializing in creating clear, concise summaries of current news, trends, and market data.
+                        CRITICAL INSTRUCTIONS:
+                            - Only report the specific data provided. Do **not** infer, speculate, or add context from outside knowledge.
+                            - For percentage changes:
+                            - If the change is positive, describe it as "up," "gaining," or "rose."
+                            - If the change is negative, describe it as "down," "declining," or "fell."
+                            - If the change is between -1% and +1%, refer to it as a "slight movement" or "minimal change."
+                            - Only use dramatic terms like "surged," "plunged," or "soared" for percentage changes greater than ±10%.
+                            - Do not interpret sentiment or market trends unless explicitly stated in the data.
+                            - For cryptocurrency, follow the same rules—do not infer excitement, volatility, or interest unless shown by large percentage changes.
+                            - Always refer to performance as part of "today's trading" or the "current session" (not longer timeframes) unless otherwise specified.
+                        Ensure your tone remains professional, neutral, and fact-based at all times.`
                     },
                     {
                         role: 'user',
@@ -472,49 +484,152 @@ function createAnalysisPrompt(sectionData) {
         prompt += '\n';
     }
     
-    prompt += `Please provide a structured summary with the following sections. Use the exact headers shown (e.g., "1. NEWS HIGHLIGHTS:").
+    prompt += `Please provide a structured summary with the following sections. Use the exact headers shown (e.g., "NEWS HIGHLIGHTS:").
 
-1. NEWS HIGHLIGHTS: Summarize the key news stories. Place each distinct story in its own <p> tag for readability.
-2. TRENDING TOPICS: List the top trending topics. For each topic, use <strong>Topic Name</strong> followed by a concise, one-sentence explanation of its context. Place each topic in a separate <p> tag.
+NEWS HIGHLIGHTS: Summarize the key news stories. Place each distinct story in its own paragraph for readability.
+TRENDING TOPICS: List the top trending topics. For each topic, use **Topic Name** followed by a concise, one-sentence explanation of its context. Place each topic in a separate paragraph.
 `;
 
     if (isWeekend) {
-        prompt += `3. MARKET OVERVIEW: Provide insights on cryptocurrency performance. Note that traditional stock markets are closed.
-4. KEY INSIGHTS: Overall analysis and what users should pay attention to.`;
+        prompt += `MARKET OVERVIEW: Provide insights on cryptocurrency performance. Note that traditional stock markets are closed.
+KEY INSIGHTS: Overall analysis and what users should pay attention to.`;
     } else {
-        prompt += `3. MARKET OVERVIEW: Provide insights on today's trading session including tech stocks and crypto performance.
-4. KEY INSIGHTS: Overall analysis and what users should pay attention to.`;
+        prompt += `MARKET OVERVIEW: Provide insights on today's trading session including tech stocks and crypto performance.
+KEY INSIGHTS: Overall analysis and what users should pay attention to.`;
     }
 
-    prompt += `
-
-Keep each section's summary concise (2-3 sentences) and focus on the most important information. Use a professional but accessible tone.`;
+    prompt += `Keep each section's summary concise (2-3 sentences) and focus on the most important information. Use a professional but accessible tone.`;
 
     return prompt;
 }
 
-// Function to fetch and display current weather
+// Function to display current weather in the summary and preferences sections
 async function displayCurrentWeather() {
-    const weatherSummary = document.querySelector('.weather-summary .summary-text');
-    if (!weatherSummary) return;
+    const location = userPrefs.getWeatherLocation();
+    
+    const weatherSummaryContainer = document.querySelector('.weather-summary .summary-text');
+    const preferencesWeatherContainer = document.getElementById('preferences-weather');
+
+    if (!location) {
+        if (weatherSummaryContainer) {
+            // Check if cookies are declined
+            const cookiesDeclined = localStorage.getItem('cookiesDeclined') === 'true';
+            
+            if (cookiesDeclined) {
+                weatherSummaryContainer.innerHTML = `
+                    <p>No location set. <button onclick="showLocationModal()">Set Location</button></p>
+                    <p style="font-style: italic; color: #9e9e9e; font-size: 0.85em; margin-top: 10px;">
+                        ⚠️ Cookies are disabled. Please click "🍪 Reset Cookies" above and accept cookies to save your weather location.
+                    </p>
+                `;
+            } else {
+                weatherSummaryContainer.innerHTML = '<p>No location set. <button onclick="showLocationModal()">Set Location</button></p>';
+            }
+        }
+        if (preferencesWeatherContainer) {
+            preferencesWeatherContainer.innerHTML = '<p>No location set.</p>';
+        }
+        return;
+    }
     
     try {
-        const userLocation = localStorage.getItem('userWeatherLocation') || 'New York, NY';
+        const weatherData = await collectWeatherData();
         
-        const response = await fetch(`/api/weather?location=${encodeURIComponent(userLocation)}`);
-        if (response.ok) {
-            const data = await response.json();
-            if (data.description) {
-                weatherSummary.innerHTML = `<p><strong>${data.location}</strong>: ${data.description}</p>`;
-            } else {
-                weatherSummary.innerHTML = '<p>Weather information unavailable</p>';
-            }
+        // Handle both old flat format and new nested format
+        let current, locationData;
+        
+        if (weatherData && weatherData.current && weatherData.location) {
+            // New nested format
+            current = weatherData.current;
+            locationData = weatherData.location;
+        } else if (weatherData && weatherData.temperature) {
+            // Old flat format - convert to new format
+            current = {
+                temperature: weatherData.temperature,
+                temperatureUnit: 'F',
+                condition: weatherData.condition,
+                humidity: weatherData.humidity,
+                wind: weatherData.wind,
+                windUnit: 'mph',
+                feelslike: weatherData.feelslike
+            };
+            locationData = {
+                name: weatherData.location || location,
+                country: 'Unknown',
+                timezone: 'Unknown'
+            };
         } else {
-            weatherSummary.innerHTML = '<p>Unable to fetch weather data</p>';
+            console.error('Weather data structure is invalid:', weatherData);
+            if (weatherSummaryContainer) {
+                weatherSummaryContainer.innerHTML = '<p>No weather data available.</p>';
+            }
+            if (preferencesWeatherContainer) {
+                preferencesWeatherContainer.innerHTML = '<p>No weather data available.</p>';
+            }
+            return;
+        }
+        
+        // Clean up location display - handle undefined country properly
+        const locationName = locationData.name || 'Unknown Location';
+        const locationCountry = locationData.country;
+        
+        // Only show country if it exists and is not empty/undefined
+        const locationDisplay = locationCountry && locationCountry !== 'undefined' && locationCountry.trim() !== '' 
+            ? `${locationName}, ${locationCountry}` 
+            : locationName;
+        
+        // Fix wind display - remove duplicate units and clean up the data
+        let wind = current.wind || 'N/A';
+        let windUnit = current.windUnit || '';
+        
+        // If wind already contains the unit, extract just the number
+        if (typeof wind === 'string' && wind.includes('mph')) {
+            wind = wind.replace(' mph', '').replace('mph', '').trim();
+            windUnit = 'mph';
+        } else if (typeof wind === 'string' && wind.includes('m/s')) {
+            wind = wind.replace(' m/s', '').replace('m/s', '').trim();
+            windUnit = 'm/s';
+        }
+        
+        // Get current timestamp for when the request was made
+        const now = new Date();
+        const timestamp = now.toLocaleTimeString('en-US', { 
+            hour12: true, 
+            hour: 'numeric', 
+            minute: '2-digit', 
+            second: '2-digit' 
+        });
+        
+        const weatherHtml = `
+            <div class="weather-info">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                    <h4>📍 ${locationDisplay}</h4>
+                    <div style="font-size: 0.8em; color: var(--text-secondary); text-align: right;">
+                        <div>🕐 Updated: ${timestamp}</div>
+                    </div>
+                </div>
+                <p><strong>${current.condition}</strong></p>
+                <p>Temperature: ${current.temperature}°${current.temperatureUnit}</p>
+                <p>Feels like: ${current.feelslike}°${current.temperatureUnit}</p>
+                <p>Humidity: ${current.humidity}%</p>
+                <p>Wind: ${wind} ${windUnit}</p>
+            </div>
+        `;
+        
+        if (weatherSummaryContainer) {
+            weatherSummaryContainer.innerHTML = weatherHtml;
+        }
+        if (preferencesWeatherContainer) {
+            preferencesWeatherContainer.innerHTML = weatherHtml;
         }
     } catch (error) {
-        console.error('Error fetching weather:', error);
-        weatherSummary.innerHTML = '<p>Weather service temporarily unavailable</p>';
+        console.error('Error displaying weather:', error);
+        if (weatherSummaryContainer) {
+            weatherSummaryContainer.innerHTML = '<p>Error loading weather data.</p>';
+        }
+        if (preferencesWeatherContainer) {
+            preferencesWeatherContainer.innerHTML = '<p>Error loading weather data.</p>';
+        }
     }
 }
 
@@ -925,18 +1040,24 @@ async function loadOrGenerateTodaySummary() {
     
     if (summary) {
         // A summary for today already exists, just display it
+        console.log('Found existing summary for today, displaying without API calls');
         updateSummaryDisplayFromData(summary);
-    } else {
-        // No summary for today, we need to generate and save one
-        setSummaryLoadingText(`No summary found for today. Generating a new one...`);
         
-        // Check if user has already generated a summary today
+        // Mark that a summary was generated today (since one exists)
+        markGeneratedToday();
+    } else {
+        // No summary for today, check if user has already generated one today
         if (hasGeneratedToday()) {
+            console.log('User has already generated a summary today, showing notification');
             showNotification('You have already generated a summary today. You can refresh the current summary or view past summaries.');
             hideSummaryLoading();
             setControlsDisabled(false);
+            updateRefreshButtonStatus();
             return;
         }
+        
+        // No summary exists and user hasn't generated one today, so generate a new one
+        setSummaryLoadingText(`No summary found for today. Generating a new one...`);
         
         const timeoutPromise = new Promise((_, reject) => {
             setTimeout(() => reject(new Error('Summary generation timed out after 90 seconds')), 90000);
@@ -977,39 +1098,33 @@ async function loadOrGenerateTodaySummary() {
     
     hideSummaryLoading();
     setControlsDisabled(false);
+    updateRefreshButtonStatus();
 }
 
 // Function to initialize the entire summary feature
 async function initializeSummarySection() {
-    // console.log('Initializing summary section...');
+    console.log('Initializing summary section...');
     
-    // Initialize location button
-    initializeLocationButton();
+    // Set up event listeners
+    document.getElementById('summaryDate').addEventListener('change', loadSummaryForDate);
     
-    // Set today's date as default
-    const today = new Date().toISOString().split('T')[0];
-    const dateInput = document.getElementById('summaryDate');
-    if (dateInput) {
-        dateInput.value = today;
-    }
-    
-    // Set initial control states based on daily limit
-    setControlsDisabled(true);
+    // Initialize the date picker with today's date
+    const today = getLocalDateString();
+    document.getElementById('summaryDate').value = today;
     
     // Load or generate today's summary
     await loadOrGenerateTodaySummary();
     
-    // Load summary history
-    await loadSummaryHistory();
+    // Update saved summaries list
+    await updateSavedSummariesList();
     
-    // Initialize Materialize collapsible
-    const M = window.M;
-    if (M && M.Collapsible) {
-        const collapsibleElems = document.querySelectorAll('.collapsible');
-        M.Collapsible.init(collapsibleElems);
-    }
+    // Initialize weather display
+    displayCurrentWeather();
     
-    // console.log('Summary section initialized');
+    // Update refresh button status
+    updateRefreshButtonStatus();
+    
+    console.log('Summary section initialized');
 }
 
 // Function to refresh summary (generates new one but doesn't save to server)
@@ -1018,7 +1133,7 @@ export async function refreshSummary() {
     
     // Check if user has already generated a summary today
     if (hasGeneratedToday()) {
-        showNotification('You have already generated a summary today. You can view the existing summary or check the archive for past summaries.');
+        showNotification('You have already generated a summary today. You can view the existing summary or check the archive for past summaries. Daily limit: 1 generation per day.');
         return;
     }
     
@@ -1041,6 +1156,9 @@ export async function refreshSummary() {
             // Mark that a summary was generated today
             markGeneratedToday();
             
+            // Show success message with daily limit info
+            showNotification('Summary refreshed successfully! Daily limit: 1 generation per day.');
+            
             // Update control states after generation
             setControlsDisabled(false);
         })();
@@ -1057,6 +1175,7 @@ export async function refreshSummary() {
     } finally {
         hideSummaryLoading();
         setControlsDisabled(false);
+        updateRefreshButtonStatus();
     }
 }
 
@@ -1080,15 +1199,69 @@ window.toggleSection = toggleSection;
 
 // Function to initialize location button
 function initializeLocationButton() {
-    const currentLocation = localStorage.getItem('userWeatherLocation');
-    const locationBtn = document.getElementById('set-location-btn');
-    
-    if (currentLocation && locationBtn) {
-        const cityName = currentLocation.split(',')[0];
-        locationBtn.textContent = `📍 ${cityName}`;
-    }
+    // Location button functionality moved to modal and weather card header
+    // No longer need to initialize a specific button
 }
 
 // Make functions globally available
 window.initializeLocationButton = initializeLocationButton;
-window.displayCurrentWeather = displayCurrentWeather; 
+window.displayCurrentWeather = displayCurrentWeather;
+
+// After setting weather location, update weather display in both sections
+window.setWeatherLocation = function() {
+    const input = document.getElementById('weatherLocationInput');
+    const location = input.value.trim();
+    if (!location) {
+        alert('Please enter a location');
+        return;
+    }
+    
+    // Save location using userPrefs system
+    userPrefs.setWeatherLocation(location);
+    
+    // Close modal
+    const modal = document.getElementById('locationModal');
+    const instance = M.Modal.getInstance(modal);
+    if (instance) {
+        instance.close();
+    }
+    
+    // Show notification
+    if (window.showNotification) {
+        window.showNotification(`Weather location set to: ${location}`, 3000);
+    } else {
+        alert(`Weather location set to: ${location}`);
+    }
+    
+    // Update weather in both summary and preferences
+    displayCurrentWeather();
+};
+
+// Function to reset daily summary generation limit (for testing or admin use)
+export function resetDailySummaryLimit() {
+    localStorage.removeItem('lastSummaryGeneratedDate');
+    console.log('Daily summary generation limit reset');
+    showNotification('Daily summary limit reset. You can now generate a new summary.');
+    updateRefreshButtonStatus();
+}
+
+// Function to update refresh button status based on daily limit
+function updateRefreshButtonStatus() {
+    const refreshBtn = document.getElementById('summary-refresh-btn');
+    if (!refreshBtn) return;
+    
+    if (hasGeneratedToday()) {
+        refreshBtn.textContent = '🔄 Daily Limit Reached';
+        refreshBtn.title = 'You have already generated a summary today. Daily limit: 1 generation per day.';
+        refreshBtn.disabled = true;
+        refreshBtn.style.opacity = '0.6';
+    } else {
+        refreshBtn.textContent = '🔄 Refresh';
+        refreshBtn.title = 'Generate a new summary (Daily limit: 1 generation per day)';
+        refreshBtn.disabled = false;
+        refreshBtn.style.opacity = '1';
+    }
+}
+
+// Make functions globally available
+window.resetDailySummaryLimit = resetDailySummaryLimit; 

@@ -6,6 +6,9 @@ const TTL_MS = 43200000;
 // Define priority countries
 const PRIORITY_COUNTRIES = ['us', 'ca', 'gb'];
 
+// Import user preferences
+import { userPrefs } from './userPreferences.js';
+
 export const fetchNewsData = async (query = 'world', country = 'us', language = 'en', forceRefresh = false, newsType = 'everything') => {
     const cacheKey = `${query}-${country}-${language}-${newsType}`;
 
@@ -75,8 +78,36 @@ export function updateNews(data) {
     container.innerHTML = ''; // Clear previous data
 
     if (!data || !Array.isArray(data) || data.length === 0) {
-        container.innerHTML = '<p>No news articles found.</p>';
+        container.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <h4>📰 No News Available</h4>
+                <p>Unable to fetch news at this time.</p>
+                <p><small>This could be due to API rate limits or network issues.</small></p>
+            </div>
+        `;
         return;
+    }
+
+    // Check if we have cached data indicators
+    const isCached = data._cached;
+    const isStale = data._stale;
+    const cacheMessage = data._message;
+    
+    if (isCached) {
+        // Show cache status message
+        const cacheDiv = document.createElement('div');
+        cacheDiv.style.cssText = 'background-color: #e3f2fd; border: 1px solid #2196f3; padding: 10px; margin-bottom: 15px; border-radius: 4px;';
+        
+        let message = '📋 Showing cached news data';
+        if (isStale) {
+            message += ' (data may be outdated)';
+        }
+        if (cacheMessage) {
+            message += ` - ${cacheMessage}`;
+        }
+        
+        cacheDiv.innerHTML = `<strong>${message}</strong>`;
+        container.appendChild(cacheDiv);
     }
 
     // Use the original data and filter to ensure each article has an image and description
@@ -88,7 +119,13 @@ export function updateNews(data) {
     const totalPages = Math.ceil(articlesToDisplay.length / itemsPerPage);
 
     const renderPage = (page) => {
-        container.innerHTML = ''; // Clear previous data
+        // Clear previous data but keep cache message
+        const existingCacheMessage = container.querySelector('div[style*="background-color: #e3f2fd"]');
+        container.innerHTML = '';
+        if (existingCacheMessage) {
+            container.appendChild(existingCacheMessage);
+        }
+        
         const start = (page - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         const pageData = articlesToDisplay.slice(start, end);

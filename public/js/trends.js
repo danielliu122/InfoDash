@@ -1,5 +1,7 @@
 // trends.js
 
+import { userPrefs } from './userPreferences.js';
+
 // Function to decode HTML entities
 const decodeHtmlEntities = (text) => {
     const tempElement = document.createElement('div');
@@ -56,6 +58,10 @@ async function refreshTrends() {
         return; // Exit the function to prevent further execution
     }
 
+    // Save preferences
+    userPrefs.setTrendsCountry(country);
+    userPrefs.setTrendsLanguage(language);
+
     try {
         const trendsData = await fetchTrendsData('daily', 'all', language, country);
         updateTrends(trendsData, 'daily');
@@ -97,7 +103,7 @@ export const updateTrends = (data, category) => {
     
     trendsSection.style.display = 'block';
     
-    // Rest of existing rendering logic
+    // Extract trending topics
     let topics = [];
 
     if (category === 'daily') {
@@ -113,203 +119,28 @@ export const updateTrends = (data, category) => {
     const buttonsContainer = document.createElement('div');
     buttonsContainer.classList.add('buttons-container');
 
-    // Modify the topic buttons creation (around line 103)
-    topics.slice(0, 25).forEach((topic, index) => { // Limit to 5 buttons
+    // Create trend buttons (simplified - no thumbnails or descriptions)
+    topics.slice(0, 25).forEach((topic, index) => {
         const topicButton = document.createElement('button');
         topicButton.classList.add('topic-button');
-        topicButton.innerHTML = `
-            ${decodeHtmlEntities(topic.title.query || topic.title)}
-            ${topic.image?.imgUrl ? `<img src="${topic.image.imgUrl}" alt="Trend thumbnail">` : ''}
-        `;
-        topicButton.onclick = () => renderTopicArticles(index);
+        topicButton.textContent = decodeHtmlEntities(topic.title.query || topic.title);
+        
+        // Add traffic info if available
+        if (topic.formattedTraffic) {
+            topicButton.title = `Traffic: ${topic.formattedTraffic}`;
+        }
+        
         buttonsContainer.appendChild(topicButton);
     });
 
-    trendsSection.appendChild(buttonsContainer); // Ensure buttons are added first
+    trendsSection.appendChild(buttonsContainer);
 
-    let currentPage = 1;
-    const itemsPerPage = 1;
-    const totalPages = Math.ceil(topics.length / itemsPerPage);
-
-    const renderPage = (page) => {
-        trendsSection.innerHTML = ''; // Clear previous data
-        trendsSection.appendChild(buttonsContainer); // Re-add the buttons container first
-
-        const start = (page - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        const pageData = topics.slice(start, end);
-
-        pageData.forEach(topic => {
-            const topicElement = document.createElement('div');
-            topicElement.classList.add('trend-item');
-
-            const title = document.createElement('h4');
-            title.textContent = decodeHtmlEntities(topic.title.query || topic.title);
-            topicElement.appendChild(title);
-
-            const traffic = document.createElement('p');
-            traffic.textContent = `Traffic: ${topic.formattedTraffic || 'N/A'}`;
-            topicElement.appendChild(traffic);
-
-            if (topic.articles && Array.isArray(topic.articles)) {
-                const articles = document.createElement('ul');
-                topic.articles.slice(0, 5).forEach(article => { // Limit to 5 articles per topic
-                    const articleItem = document.createElement('li');
-                    const articleLink = document.createElement('a');
-                    articleLink.href = article.url;
-                    articleLink.textContent = decodeHtmlEntities(article.title || article.articleTitle);
-                    articleLink.target = '_blank';
-                    articleItem.appendChild(articleLink);
-
-                    // New: Display source for each article
-                    const source = document.createElement('p');
-                    source.textContent = `Source: ${article.source || 'N/A'}`; // Accessing the source from the article
-                    articleItem.appendChild(source);
-
-                    // Handle image for daily trends
-                    if (article.image && article.image.imageUrl) {
-                        const image = document.createElement('img');
-                        image.src = article.image.imageUrl;
-                        image.alt = decodeHtmlEntities(article.title || article.articleTitle);
-                        articleItem.appendChild(image);
-                    }
-
-                    if (article.videoUrl) {
-                        const video = document.createElement('video');
-                        video.src = article.videoUrl;
-                        video.controls = true;
-                        articleItem.appendChild(video);
-                    }
-
-                    const snippet = document.createElement('p');
-                    snippet.textContent = decodeHtmlEntities(article.snippet?.split('\n')[0] || 'N/A'); // Add null check
-                    articleItem.appendChild(snippet);
-
-                    articles.appendChild(articleItem);
-                });
-                topicElement.appendChild(articles);
-            }
-
-            trendsSection.appendChild(topicElement);
-        });
-
-        // Pagination controls
-        const paginationControls = document.createElement('div');
-        paginationControls.classList.add('pagination-controls');
-
-        if (currentPage > 1) {
-            const prevButton = document.createElement('button');
-            prevButton.textContent = 'Previous';
-            prevButton.onclick = () => {
-                currentPage--;
-                renderPage(currentPage);
-            };
-            paginationControls.appendChild(prevButton);
-        }
-
-        if (currentPage < totalPages) {
-            const nextButton = document.createElement('button');
-            nextButton.textContent = 'Next';
-            nextButton.onclick = () => {
-                currentPage++;
-                renderPage(currentPage);
-            };
-            paginationControls.appendChild(nextButton);
-        }
-
-        trendsSection.appendChild(paginationControls);
-    };
-
-    const renderTopicArticles = (index) => {
-        trendsSection.innerHTML = ''; // Clear previous data
-        trendsSection.appendChild(buttonsContainer); // Re-add the buttons container first
-
-        const topic = topics[index];
-        const topicElement = document.createElement('div');
-        topicElement.classList.add('trend-item');
-
-        const title = document.createElement('h4');
-        title.textContent = decodeHtmlEntities(topic.title.query || topic.title);
-        topicElement.appendChild(title);
-
-        const traffic = document.createElement('p');
-        traffic.textContent = `Traffic: ${topic.formattedTraffic || 'N/A'}`;
-        topicElement.appendChild(traffic);
-
-        if (topic.articles && Array.isArray(topic.articles)) {
-            const articles = document.createElement('ul');
-            topic.articles.slice(0, 5).forEach(article => { // Limit to 5 articles per topic
-                const articleItem = document.createElement('li');
-                const articleLink = document.createElement('a');
-                articleLink.href = article.url;
-                articleLink.textContent = decodeHtmlEntities(article.title || article.articleTitle);
-                articleLink.target = '_blank';
-                articleItem.appendChild(articleLink);
-
-                // New: Display source for each article
-                const source = document.createElement('p');
-                source.textContent = `Source: ${article.source || 'N/A'}`; // Accessing the source from the article
-                articleItem.appendChild(source);
-
-                // Handle image for daily trends
-                if (article.image && article.image.imageUrl) {
-                    const image = document.createElement('img');
-                    image.src = article.image.imageUrl;
-                    image.alt = decodeHtmlEntities(article.title || article.articleTitle);
-                    articleItem.appendChild(image);
-                }
-
-                if (article.videoUrl) {
-                    const video = document.createElement('video');
-                    video.src = article.videoUrl;
-                    video.controls = true;
-                    articleItem.appendChild(video);
-                }
-
-                const snippet = document.createElement('p');
-                snippet.textContent = decodeHtmlEntities(article.snippet?.split('\n')[0] || 'N/A'); // Add null check
-                articleItem.appendChild(snippet);
-
-                articles.appendChild(articleItem);
-            });
-            topicElement.appendChild(articles);
-        }
-
-        trendsSection.appendChild(topicElement);
-
-        // Re-render pagination controls
-        renderPaginationControls();
-    };
-
-    const renderPaginationControls = () => {
-        const paginationControls = document.createElement('div');
-        paginationControls.classList.add('pagination-controls');
-
-        if (currentPage > 1) {
-            const prevButton = document.createElement('button');
-            prevButton.textContent = 'Previous';
-            prevButton.onclick = () => {
-                currentPage--;
-                renderPage(currentPage);
-            };
-            paginationControls.appendChild(prevButton);
-        }
-
-        if (currentPage < totalPages) {
-            const nextButton = document.createElement('button');
-            nextButton.textContent = 'Next';
-            nextButton.onclick = () => {
-                currentPage++;
-                renderPage(currentPage);
-            };
-            paginationControls.appendChild(nextButton);
-        }
-
-        trendsSection.appendChild(paginationControls);
-    };
-
-    renderPage(currentPage);
-}
+    // Add a simple info message about the simplified display
+    const infoMessage = document.createElement('div');
+    infoMessage.style.cssText = 'text-align: center; padding: 15px; color: var(--secondary-text); font-style: italic;';
+    infoMessage.innerHTML = '<p>📊 Showing trending topics for the selected country. Click on topics to see more details (when available).</p>';
+    trendsSection.appendChild(infoMessage);
+};
 
 function displayNoTrendsMessage() {
     const trendsSection = document.querySelector('#trends .data-container');
@@ -407,7 +238,8 @@ function createTopicElement(topic) {
 
             const snippet = document.createElement('p');
             snippet.classList.add('article-text');
-            snippet.textContent = decodeHtmlEntities(article.snippet?.split('\n')[0] || 'N/A'); // Add null check            articleItem.appendChild(snippet);
+            snippet.textContent = decodeHtmlEntities(article.snippet?.split('\n')[0] || 'N/A'); // Add null check
+            articleItem.appendChild(snippet);
 
             articles.appendChild(articleItem);
         });
@@ -417,26 +249,11 @@ function createTopicElement(topic) {
     return topicElement;
 }
 
-// Example usage
-document.getElementById('dailyTrendsButton').addEventListener('click', () => {
-    const type = 'daily';
-    const geo = document.getElementById('trendsCountrySelect').value;
-    const language = document.getElementById('trendsLanguageSelect').value;
-    fetchTrendsData(type, 'all', language, geo);
-});
+// Remove the dailyTrendsButton event listener since the button no longer exists
+// The trends data is now loaded automatically in app.js
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // Show loading state
-    const trendsSection = document.getElementById('trends'); // Updated to match the correct ID
-    trendsSection.style.display = 'none'; // Hide trends section initially
-
-    try {
-        await refreshTrends(); // Fetch and display trends data
-        trendsSection.style.display = 'block'; // Show trends section after data is loaded
-    } catch (error) {
-        console.error('Error loading trends data:', error);
-    }
-});
+// Note: DOMContentLoaded event listener is handled in app.js
+// No need for duplicate event listeners here
 
 const validLanguageCountryMap = {
     'US': ['en'],

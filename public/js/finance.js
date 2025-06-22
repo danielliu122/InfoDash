@@ -1,8 +1,29 @@
+import { userPrefs } from './userPreferences.js';
+
 // At the top of the file
 export let updateInterval;
 let lastUpdateTime = 0;
 let lastHistoricalUpdate = 0;
 let lastTimestamp = null;
+let watchlist = JSON.parse(localStorage.getItem('financeWatchlist') || '[]');
+let stockSymbols = {};
+let currentSymbol = '^IXIC';
+let topStocks = [];
+let stockDashboardInterval = null;
+let previousStockData = {};
+
+// Load stock symbols for autocomplete
+async function loadStockSymbols() {
+    try {
+        const response = await fetch('/stockSymbols.json');
+        stockSymbols = await response.json();
+    } catch (error) {
+        console.error('Error loading stock symbols:', error);
+    }
+}
+
+// Initialize stock symbols on load
+loadStockSymbols();
 
 function addData(chart, label, newData) {
     // Only add data if the timestamp is different from the last one
@@ -28,6 +49,159 @@ function addData(chart, label, newData) {
     }
 }
 
+// Watchlist management functions
+export function addToWatchlist(symbol) {
+    if (!watchlist.includes(symbol)) {
+        watchlist.push(symbol);
+        userPrefs.setFinanceWatchlist(watchlist);
+        updateWatchlistUI();
+    }
+}
+
+export function removeFromWatchlist(symbol) {
+    watchlist = watchlist.filter(s => s !== symbol);
+    userPrefs.setFinanceWatchlist(watchlist);
+    updateWatchlistUI();
+}
+
+export function updateWatchlistUI() {
+    const watchlistContainer = document.getElementById('watchlist-container');
+    if (!watchlistContainer) return;
+
+    watchlistContainer.innerHTML = '';
+    
+    if (watchlist.length === 0) {
+        watchlistContainer.innerHTML = '<p class="no-watchlist">No stocks in watchlist. Add some stocks to get started!</p>';
+    } else {
+        watchlist.forEach(symbol => {
+            const watchlistItem = document.createElement('div');
+            watchlistItem.className = 'watchlist-item';
+            watchlistItem.innerHTML = `
+                <span class="symbol">${symbol}</span>
+                <span class="company-name">${stockSymbols[symbol] || symbol}</span>
+                <button class="btn-small remove-watchlist" onclick="removeFromWatchlist('${symbol}')">×</button>
+            `;
+            watchlistItem.addEventListener('click', () => {
+                document.getElementById('stockSymbolInput').value = symbol;
+                updateFinanceData(symbol);
+            });
+            watchlistContainer.appendChild(watchlistItem);
+        });
+    }
+    
+    // Update preferences display if available
+    if (window.updatePreferencesDisplay) {
+        window.updatePreferencesDisplay();
+    }
+}
+
+// Load watchlist from preferences
+export function loadWatchlistFromPreferences() {
+    watchlist = userPrefs.getFinanceWatchlist();
+    updateWatchlistUI();
+}
+
+// Enhanced autocomplete functionality
+export function setupAutocomplete() {
+    const input = document.getElementById('stockSymbolInput');
+    const autocompleteList = document.getElementById('autocomplete-list');
+    
+    if (!input || !autocompleteList) return;
+
+    input.addEventListener('input', function() {
+        const value = this.value.toUpperCase();
+        autocompleteList.innerHTML = '';
+        
+        if (value.length < 1) {
+            autocompleteList.style.display = 'none';
+            return;
+        }
+
+        const matches = Object.entries(stockSymbols)
+            .filter(([symbol, name]) => 
+                symbol.includes(value) || name.toUpperCase().includes(value)
+            )
+            .slice(0, 10);
+
+        if (matches.length > 0) {
+            autocompleteList.style.display = 'block';
+            matches.forEach(([symbol, name]) => {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                item.innerHTML = `
+                    <span class="symbol">${symbol}</span>
+                    <span class="name">${name}</span>
+                    <button class="btn-small add-watchlist" onclick="addToWatchlist('${symbol}')">+</button>
+                `;
+                item.addEventListener('click', () => {
+                    input.value = symbol;
+                    autocompleteList.style.display = 'none';
+                    updateFinanceData(symbol);
+                    fetchStockInfo(symbol); // Show stock info card
+                });
+                autocompleteList.appendChild(item);
+            });
+        } else {
+            autocompleteList.style.display = 'none';
+        }
+    });
+
+    // Hide autocomplete when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!input.contains(e.target) && !autocompleteList.contains(e.target)) {
+            autocompleteList.style.display = 'none';
+        }
+    });
+}
+
+// Enhanced stock information display
+export async function fetchStockInfo(symbol) {
+    try {
+        const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
+        if (!response.ok) throw new Error('Failed to fetch stock info');
+        
+        const data = await response.json();
+        const result = data.chart.result[0];
+        const meta = result.meta;
+        
+        return {
+            symbol: meta.symbol,
+            name: meta.shortName || stockSymbols[symbol] || symbol,
+            price: meta.regularMarketPrice,
+            change: meta.regularMarketChange,
+            changePercent: meta.regularMarketChangePercent,
+            marketCap: meta.marketCap,
+            volume: meta.volume,
+            avgVolume: meta.averageVolume,
+            high: meta.regularMarketDayHigh,
+            low: meta.regularMarketDayLow,
+            open: meta.regularMarketOpen,
+            previousClose: meta.previousClose,
+            marketState: meta.marketState
+        };
+    } catch (error) {
+        console.error('Error fetching stock info:', error);
+        return null;
+    }
+}
+
+// Enhanced real-time data display
+export function updateRealTimeFinance(data) {
+    const realTimeContainer = document.querySelector('#finance .real-time-data-container');
+    if (data.error) {
+        realTimeContainer.innerHTML = '<p>Unable to fetch real-time financial data.</p>';
+        return;
+    }
+
+    // Update last known values if new data is available
+    if (data.change !== undefined && data.changePercent !== undefined) {
+        lastKnownChange = data.change;
+        lastKnownChangePercent = data.changePercent;
+    }
+
+    // Clear the container - no more stock info card
+    realTimeContainer.innerHTML = '';
+}
 
 export function isMarketOpen() {
     const symbol = document.getElementById('stockSymbolInput').value.toUpperCase();
@@ -119,12 +293,32 @@ export const fetchRealTimeYahooFinanceData = async (symbol = '^IXIC') => {
         const response = await fetch(`/api/finance/${symbol}?range=5m&interval=1m`, {
             redirect: 'follow' // Ensure fetch follows redirects
         });
+        
         if (!response.ok) {
+            if (response.status === 404) {
+                console.warn(`Stock symbol ${symbol} not found (404)`);
+                return { error: `Stock ${symbol} not found` };
+            }
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
         const data = await response.json();
+        
+        // Check if the data has the expected structure
+        if (!data.chart || !data.chart.result || !data.chart.result[0]) {
+            console.warn(`Invalid data structure for ${symbol}`);
+            return { error: `Invalid data for ${symbol}` };
+        }
+        
         const result = data.chart.result[0];
         const meta = result.meta;
+        
+        // Check if meta data exists
+        if (!meta) {
+            console.warn(`No meta data for ${symbol}`);
+            return { error: `No data available for ${symbol}` };
+        }
+        
         const price = meta.regularMarketPrice;
         const change = meta.regularMarketChange;
         const changePercent = meta.regularMarketChangePercent;
@@ -132,116 +326,11 @@ export const fetchRealTimeYahooFinanceData = async (symbol = '^IXIC') => {
 
         return { symbol, price, change, changePercent, timestamp };
     } catch (error) {
-        console.error('Error fetching real-time Yahoo Finance data:', error);
-        return { error: 'Unable to fetch real-time financial data' };
+        console.error(`Error fetching real-time Yahoo Finance data for ${symbol}:`, error);
+        return { error: `Unable to fetch data for ${symbol}` };
     }
 };
 
-// Function to update UI with real-time financial data
-export function updateRealTimeFinance(data) {
-    const realTimeContainer = document.querySelector('#finance .real-time-data-container');
-    if (data.error) {
-        realTimeContainer.innerHTML = '<p>Unable to fetch real-time financial data.</p>';
-        return;
-    }
-
-    // Update last known values if new data is available
-    if (data.change !== undefined && data.changePercent !== undefined) {
-        lastKnownChange = data.change;
-        lastKnownChangePercent = data.changePercent;
-    }
-    //console.log("finance data" + data);
-
-    // Use last known values or 'N/A' if not available
-    const price = data.price !== undefined ? data.price.toFixed(2) : 'N/A';
-    const timestamp = data.timestamp ? data.timestamp.toLocaleTimeString() : 'N/A';
-    const change = lastKnownChange !== null ? lastKnownChange.toFixed(2) : 'N/A';
-    const changePercent = lastKnownChangePercent !== null ? lastKnownChangePercent.toFixed(2) : 'N/A';
-
-    const changeColor = lastKnownChange >= 0 ? 'green' : 'red';
-
-    realTimeContainer.innerHTML = `
-        <h3>Stock Data (${data.symbol})</h3>
-        <p>Price: $${price}</p>
-        <p>Change: <span style="color: ${changeColor}">$${change} (${changePercent}%)</span></p>
-        <p>Last Updated: ${timestamp}</p>
-    `;
-}
-function initializeChart(ctx, data) {
-    // Check if it's a crypto symbol
-    const isCrypto = data.symbol.endsWith('-USD');
-    
-    return new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.dates,
-            datasets: [{
-                label: `${data.symbol} Closing Prices`,
-                data: data.prices,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: true,
-                pointRadius: 2,
-                pointHoverRadius: 10,
-                spanGaps: true,
-                segment: {
-                    borderColor: ctx => {
-                        // Optional: Add color coding for positive/negative segments
-                        const value = ctx.p0.parsed.y;
-                        const nextValue = ctx.p1.parsed.y;
-                        return nextValue >= value ? 'rgba(75, 192, 192, 1)' : 'rgba(255, 99, 132, 1)';
-                    }
-                }
-            }]
-        },
-        options: {
-            plugins: {
-                zoom: {
-                  zoom: {
-                    wheel: {
-                      enabled: true,
-                    },
-                    pinch: {
-                      enabled: true
-                    },
-                    mode: 'xy',
-                    onZoom: function(ctx) {
-                        // If trying to zoom out, reset to previous state
-                        if (ctx.chart.getZoomLevel() < 1) {
-                            ctx.chart.resetZoom();
-                        }
-                    }
-                  }
-                }
-            },
-            animation: true,
-            responsive: true,
-            maintainAspectRatio: true,
-            
-            scales: {
-                y: {
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + Number(value).toFixed(2);
-                        },
-                        color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000'
-                    },
-                    offset: true,
-                    beginAtZero: false
-                },
-                x: {
-                    type: 'time',
-                    ticks: {
-                        color: getCurrentTheme() === 'dark' ? '#FFFFFF' : '#000000'
-                    },
-                    offset: true,
-                    bounds: 'data'
-                }
-            }
-            
-        }
-    });
-}
 // Function to update UI with financial data
 export function updateFinance(data) {
     const chartContainer = document.querySelector('#finance .chart-container');
@@ -361,8 +450,27 @@ export async function refreshFinanceData(symbol, timeRange, interval) {
 
 // Function to update both real-time and chart data
 export async function updateFinanceData(symbol, timeRange = '1d', interval = '1m') {
-    await refreshRealTimeFinanceData(symbol);
-    await refreshFinanceData(symbol, timeRange, interval);
+    try {
+        currentSymbol = symbol;
+        
+        // Update real-time data
+        const realTimeData = await fetchRealTimeYahooFinanceData(symbol);
+        updateRealTimeFinance(realTimeData);
+        
+        // Update chart data
+        const chartData = await fetchFinancialData(symbol, timeRange, interval);
+        updateFinance(chartData);
+        
+        // Update watchlist UI if needed
+        updateWatchlistUI();
+        
+    } catch (error) {
+        console.error('Error updating finance data:', error);
+        const realTimeContainer = document.querySelector('#finance .real-time-data-container');
+        if (realTimeContainer) {
+            realTimeContainer.innerHTML = '<p class="error">Error loading stock data. Please try again.</p>';
+        }
+    }
 }
 
 export function calculateChangePercentage(prices) {
@@ -551,8 +659,16 @@ export function togglePauseFinance() {
 
 document.querySelectorAll('.time-range-button').forEach(button => {
     button.addEventListener('click', () => {
-        const timeRange = button.dataset.timeRange;
-        const interval = button.dataset.interval;
+        // Remove active class from all buttons
+        document.querySelectorAll('.time-range-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        // Add active class to clicked button
+        button.classList.add('active');
+        
+        const timeRange = button.getAttribute('data-time-range');
+        const interval = button.getAttribute('data-interval');
+        const symbol = document.getElementById('stockSymbolInput').value || '^IXIC';
         handleFinanceUpdate(timeRange, interval);
     });
 });
@@ -652,6 +768,710 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.body.addEventListener('click', handleFullscreen);
 });
+
+function initializeChart(ctx, data) {
+    // Check if it's a crypto symbol
+    const isCrypto = data.symbol.endsWith('-USD');
+    
+    // Get current theme with debugging
+    const isDarkTheme = document.body.classList.contains('dark-theme');
+    console.log('Chart initialization - Theme detection:', {
+        isDarkTheme: isDarkTheme,
+        bodyClasses: document.body.className,
+        hasDarkTheme: document.body.classList.contains('dark-theme')
+    });
+    
+    // Set colors based on theme
+    const backgroundColor = isDarkTheme ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+    const textColor = isDarkTheme ? '#FFFFFF' : '#000000';
+    const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+    const borderColor = isDarkTheme ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
+    
+    console.log('Chart colors:', {
+        backgroundColor,
+        textColor,
+        gridColor,
+        borderColor
+    });
+    
+    return new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.dates,
+            datasets: [{
+                label: `${data.symbol} Closing Prices`,
+                data: data.prices,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                pointRadius: 2,
+                pointHoverRadius: 10,
+                spanGaps: true,
+                segment: {
+                    borderColor: ctx => {
+                        // Optional: Add color coding for positive/negative segments
+                        const value = ctx.p0.parsed.y;
+                        const nextValue = ctx.p1.parsed.y;
+                        return nextValue >= value ? 'rgba(75, 192, 192, 1)' : 'rgba(255, 99, 132, 1)';
+                    }
+                }
+            }]
+        },
+        options: {
+            plugins: {
+                zoom: {
+                  zoom: {
+                    wheel: {
+                      enabled: true,
+                    },
+                    pinch: {
+                      enabled: true
+                    },
+                    mode: 'xy',
+                    onZoom: function(ctx) {
+                        // If trying to zoom out, reset to previous state
+                        if (ctx.chart.getZoomLevel() < 1) {
+                            ctx.chart.resetZoom();
+                        }
+                    }
+                  }
+                }
+            },
+            animation: true,
+            responsive: true,
+            maintainAspectRatio: true,
+            backgroundColor: backgroundColor,
+            
+            scales: {
+                y: {
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + Number(value).toFixed(2);
+                        },
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    },
+                    border: {
+                        color: borderColor
+                    },
+                    offset: true,
+                    beginAtZero: false
+                },
+                x: {
+                    type: 'time',
+                    ticks: {
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    },
+                    border: {
+                        color: borderColor
+                    },
+                    offset: true,
+                    bounds: 'data'
+                }
+            }
+            
+        }
+    });
+}
+
+// Initialize finance features when DOM is loaded
+export function initializeFinance() {
+    setupAutocomplete();
+    loadWatchlistFromPreferences();
+    setupDraggableCards();
+    
+    // Set up event listeners for stock symbol buttons
+    document.querySelectorAll('[data-stock-symbol]').forEach(button => {
+        button.addEventListener('click', function() {
+            const symbol = this.getAttribute('data-stock-symbol');
+            document.getElementById('stockSymbolInput').value = symbol;
+            updateFinanceData(symbol);
+        });
+    });
+    
+    // Set up event listeners for time range buttons
+    document.querySelectorAll('.time-range-button').forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all buttons
+            document.querySelectorAll('.time-range-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Add active class to clicked button
+            button.classList.add('active');
+            
+            const timeRange = button.getAttribute('data-time-range');
+            const interval = button.getAttribute('data-interval');
+            const symbol = document.getElementById('stockSymbolInput').value || '^IXIC';
+            handleFinanceUpdate(timeRange, interval);
+        });
+    });
+    
+    // Set initial active state
+    const realtimeButton = document.getElementById('realtimeButton');
+    if (realtimeButton) {
+        realtimeButton.classList.add('active');
+    }
+}
+
+// Setup draggable cards functionality
+function setupDraggableCards() {
+    const cards = document.querySelectorAll('#finance .card');
+    const chartContainer = document.querySelector('#finance .chart-container');
+    const financeSection = document.getElementById('finance');
+    
+    if (!financeSection) return;
+    
+    // Combine cards and chart container for draggable functionality
+    const draggableElements = [...cards];
+    if (chartContainer) {
+        draggableElements.push(chartContainer);
+    }
+    
+    draggableElements.forEach(card => {
+        let isDragging = false;
+        let isResizing = false;
+        let currentX;
+        let currentY;
+        let initialX;
+        let initialY;
+        let xOffset = 0;
+        let yOffset = 0;
+        let initialWidth;
+        let initialHeight;
+        
+        // Add drag handle and resize button to card header (only for actual cards)
+        if (card.classList.contains('card')) {
+            const cardTitle = card.querySelector('.card-title');
+            if (cardTitle) {
+                cardTitle.innerHTML = `
+                    <span>${cardTitle.textContent}</span>
+                    <div class="card-controls">
+                        <span class="drag-handle">⋮⋮</span>
+                        <span class="resize-handle" title="Resize">⤡</span>
+                    </div>
+                `;
+            }
+        } else if (card === chartContainer) {
+            // Add drag handle to chart container
+            const chartHeader = document.createElement('div');
+            chartHeader.className = 'chart-header';
+            chartHeader.innerHTML = `
+                <span>Stock Chart</span>
+                <div class="card-controls">
+                    <span class="drag-handle">⋮⋮</span>
+                    <span class="resize-handle" title="Resize">⤡</span>
+                </div>
+            `;
+            chartContainer.insertBefore(chartHeader, chartContainer.firstChild);
+        }
+        
+        card.addEventListener('mousedown', dragStart);
+        card.addEventListener('mousemove', drag);
+        card.addEventListener('mouseup', dragEnd);
+        card.addEventListener('mouseleave', dragEnd);
+        
+        function dragStart(e) {
+            // Check if clicking on resize handle
+            if (e.target.closest('.resize-handle')) {
+                isResizing = true;
+                initialWidth = card.offsetWidth;
+                initialHeight = card.offsetHeight;
+                initialX = e.clientX;
+                initialY = e.clientY;
+                card.classList.add('resizing');
+                return;
+            }
+            
+            // Only start dragging if clicking on the header or drag handle
+            if (!e.target.closest('.card-header') && !e.target.closest('.chart-header') && !e.target.closest('.drag-handle')) {
+                return;
+            }
+            
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+            
+            if (e.target === card || card.contains(e.target)) {
+                isDragging = true;
+                card.classList.add('dragging');
+            }
+        }
+        
+        function drag(e) {
+            if (isResizing) {
+                e.preventDefault();
+                const deltaX = e.clientX - initialX;
+                const deltaY = e.clientY - initialY;
+                
+                const newWidth = Math.max(300, initialWidth + deltaX); // Minimum 300px width
+                const newHeight = Math.max(200, initialHeight + deltaY); // Minimum 200px height
+                
+                card.style.width = newWidth + 'px';
+                card.style.height = newHeight + 'px';
+                return;
+            }
+            
+            if (isDragging) {
+                e.preventDefault();
+                
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+                
+                // Get current finance section bounds
+                const currentFinanceBounds = financeSection.getBoundingClientRect();
+                const cardBounds = card.getBoundingClientRect();
+                
+                // Calculate boundaries to keep card within finance section
+                const maxX = currentFinanceBounds.width - cardBounds.width;
+                const maxY = currentFinanceBounds.height - cardBounds.height;
+                
+                // Constrain movement to finance section boundaries
+                currentX = Math.max(0, Math.min(currentX, maxX));
+                currentY = Math.max(0, Math.min(currentY, maxY));
+                
+                // Update offsets
+                xOffset = currentX;
+                yOffset = currentY;
+                
+                setTranslate(currentX, currentY, card);
+            }
+        }
+        
+        function dragEnd(e) {
+            if (isDragging) {
+                initialX = currentX;
+                initialY = currentY;
+                isDragging = false;
+                card.classList.remove('dragging');
+            }
+            
+            if (isResizing) {
+                isResizing = false;
+                card.classList.remove('resizing');
+            }
+        }
+        
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+        }
+    });
+}
+
+// Clear entire watchlist
+export function clearWatchlist() {
+    if (confirm('Are you sure you want to clear your entire watchlist?')) {
+        watchlist = [];
+        userPrefs.setFinanceWatchlist(watchlist);
+        updateWatchlistUI();
+    }
+}
+
+// Reset chart zoom
+export function resetChartZoom() {
+    const chart = Chart.getChart('financeChart');
+    if (chart) {
+        chart.resetZoom();
+    }
+}
+
+// Reset finance card positions to original grid layout
+export function resetFinanceCardPositions() {
+    const cards = document.querySelectorAll('#finance .card');
+    const chartContainer = document.querySelector('#finance .chart-container');
+    
+    // Combine cards and chart container for reset
+    const allElements = [...cards];
+    if (chartContainer) {
+        allElements.push(chartContainer);
+    }
+    
+    allElements.forEach((card, index) => {
+        // Store current position for animation
+        const currentTransform = window.getComputedStyle(card).transform;
+        if (currentTransform && currentTransform !== 'none') {
+            const matrix = new DOMMatrix(currentTransform);
+            card.style.setProperty('--current-x', `${matrix.m41}px`);
+            card.style.setProperty('--current-y', `${matrix.m42}px`);
+        }
+        
+        // Add resetting class for animation
+        card.classList.add('resetting');
+        
+        // Remove the resetting class after animation completes
+        setTimeout(() => {
+            card.classList.remove('resetting');
+            // Clear any inline transform styles and positioning
+            card.style.transform = '';
+            card.style.left = '';
+            card.style.top = '';
+            card.style.position = '';
+            card.style.zIndex = '';
+            
+            // Ensure card returns to its proper grid position
+            card.style.float = 'left';
+            card.style.width = '100%';
+            card.style.margin = '0 0 20px 0';
+        }, 500);
+    });
+    
+    // Force a reflow to ensure proper grid layout
+    setTimeout(() => {
+        const financeSection = document.getElementById('finance');
+        if (financeSection) {
+            financeSection.style.display = 'none';
+            financeSection.offsetHeight; // Force reflow
+            financeSection.style.display = '';
+        }
+    }, 600);
+    
+    // Show success message
+    if (window.showNotification) {
+        window.showNotification('Card positions reset to grid layout', 2000);
+    } else {
+        console.log('Card positions reset to grid layout');
+    }
+}
+
+// Update chart theme when switching between light/dark modes
+export function updateChartTheme() {
+    const chart = Chart.getChart('financeChart');
+    if (chart) {
+        // Get current theme
+        const isDarkTheme = document.body.classList.contains('dark-theme');
+        
+        console.log('Updating chart theme:', {
+            isDarkTheme: isDarkTheme,
+            bodyClasses: document.body.className,
+            hasDarkTheme: document.body.classList.contains('dark-theme')
+        });
+        
+        // Set colors based on theme
+        const backgroundColor = isDarkTheme ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+        const textColor = isDarkTheme ? '#FFFFFF' : '#000000';
+        const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+        const borderColor = isDarkTheme ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
+        
+        console.log('Updated chart colors:', {
+            backgroundColor,
+            textColor,
+            gridColor,
+            borderColor
+        });
+        
+        // Update chart options
+        chart.options.backgroundColor = backgroundColor;
+        chart.options.scales.y.ticks.color = textColor;
+        chart.options.scales.y.grid.color = gridColor;
+        chart.options.scales.y.border.color = borderColor;
+        chart.options.scales.x.ticks.color = textColor;
+        chart.options.scales.x.grid.color = gridColor;
+        chart.options.scales.x.border.color = borderColor;
+        
+        // Update the chart
+        chart.update();
+        console.log('Chart theme updated successfully');
+    } else {
+        console.log('No chart found to update theme');
+    }
+}
+
+// Fetch historical data for stocks to calculate open-to-close percentage
+async function fetchStockHistoricalData(symbol) {
+    try {
+        // Fetch 1 day of data with 1-minute intervals to get open and close prices
+        const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
+        if (!response.ok) throw new Error('Failed to fetch historical data');
+        
+        const data = await response.json();
+        const result = data.chart.result[0];
+        
+        if (!result || !result.timestamp || !result.indicators.quote[0].open || !result.indicators.quote[0].close) {
+            return null;
+        }
+        
+        const timestamps = result.timestamp;
+        const opens = result.indicators.quote[0].open;
+        const closes = result.indicators.quote[0].close;
+        
+        // Find the first valid open price (market open)
+        let marketOpen = null;
+        for (let i = 0; i < opens.length; i++) {
+            if (opens[i] !== null && opens[i] !== undefined) {
+                marketOpen = opens[i];
+                break;
+            }
+        }
+        
+        // Find the last valid close price (market close)
+        let marketClose = null;
+        for (let i = closes.length - 1; i >= 0; i--) {
+            if (closes[i] !== null && closes[i] !== undefined) {
+                marketClose = closes[i];
+                break;
+            }
+        }
+        
+        if (marketOpen && marketClose) {
+            const change = marketClose - marketOpen;
+            const changePercent = (change / marketOpen) * 100;
+            
+            return {
+                symbol: symbol,
+                openPrice: marketOpen,
+                closePrice: marketClose,
+                change: change,
+                changePercent: changePercent
+            };
+        }
+        
+        return null;
+    } catch (error) {
+        console.error(`Error fetching historical data for ${symbol}:`, error);
+        return null;
+    }
+}
+
+// Fetch top 100 stocks data
+export async function fetchTopStocks() {
+    try {
+        // Define popular tech stocks and major indices
+        const popularStocks = [
+            // Major indices
+            '^GSPC', '^IXIC', '^DJI',  // S&P 500, NASDAQ, Dow Jones
+            // Tech giants
+            'NVDA', 'AAPL', 'GOOGL', 'META', 'NFLX', 'MSFT', 'AMZN', 'TSLA',
+            // Other popular stocks
+            'JPM', 'V', 'WMT', 'DIS', 'JNJ', 'PG', 'UNH', 'HD',
+            // Cryptocurrencies (always open)
+            'BTC-USD', 'ETH-USD', 'BNB-USD', 'SOL-USD', 'ADA-USD',
+            'XRP-USD', 'DOT-USD', 'DOGE-USD', 'AVAX-USD', 'MATIC-USD'
+        ];
+
+        // Combine watchlist with popular stocks, removing duplicates
+        let symbolsToFetch = [];
+        const allSymbols = new Set();
+        
+        // Add watchlist items first (priority)
+        if (watchlist && watchlist.length > 0) {
+            watchlist.forEach(symbol => {
+                if (!allSymbols.has(symbol)) {
+                    symbolsToFetch.push(symbol);
+                    allSymbols.add(symbol);
+                }
+            });
+        }
+        
+        // Add popular stocks (avoiding duplicates)
+        popularStocks.forEach(symbol => {
+            if (!allSymbols.has(symbol)) {
+                symbolsToFetch.push(symbol);
+                allSymbols.add(symbol);
+            }
+        });
+
+        // Limit to a reasonable number (e.g., 20-25 stocks) to avoid API overload
+        symbolsToFetch = symbolsToFetch.slice(0, 25);
+
+        console.log(`Fetching data for ${symbolsToFetch.length} stocks and cryptocurrencies...`);
+        console.log('Symbols to fetch:', symbolsToFetch);
+
+        const promises = symbolsToFetch.map(async (symbol) => {
+            try {
+                console.log(`Fetching ${symbol}...`);
+                const isCrypto = symbol.endsWith('-USD');
+                if (isCrypto) {
+                    const data = await fetchRealTimeYahooFinanceData(symbol);
+                    if (data.error) {
+                        console.warn(`Failed to fetch ${symbol}: ${data.error}`);
+                        return null;
+                    }
+                    console.log(`Successfully fetched crypto ${symbol}: $${data.price}`);
+                    return data;
+                } else {
+                    const historicalData = await fetchStockHistoricalData(symbol);
+                    if (!historicalData) {
+                        console.warn(`Failed to fetch historical data for ${symbol}`);
+                        return null;
+                    }
+                    const currentData = await fetchRealTimeYahooFinanceData(symbol);
+                    if (currentData.error) {
+                        console.warn(`Failed to fetch current price for ${symbol}: ${currentData.error}`);
+                        return null;
+                    }
+                    const combinedData = {
+                        ...currentData,
+                        openToCloseChange: historicalData.change,
+                        openToCloseChangePercent: historicalData.changePercent,
+                        openPrice: historicalData.openPrice,
+                        closePrice: historicalData.closePrice
+                    };
+                    console.log(`Successfully fetched stock ${symbol}: $${currentData.price} (Open-to-Close: ${historicalData.changePercent.toFixed(2)}%)`);
+                    return combinedData;
+                }
+            } catch (error) {
+                console.error(`Error fetching ${symbol}:`, error);
+                return null;
+            }
+        });
+
+        const results = await Promise.all(promises);
+        topStocks = results.filter(stock => stock && !stock.error);
+        console.log(`Successfully loaded ${topStocks.length} stocks/cryptocurrencies out of ${symbolsToFetch.length}`);
+        updateStockDashboard();
+    } catch (error) {
+        console.error('Error fetching top stocks:', error);
+    }
+}
+
+// Update stock dashboard with animations
+function updateStockDashboard() {
+    const dashboardContainer = document.getElementById('stock-dashboard');
+    if (!dashboardContainer) {
+        console.error('Dashboard container not found');
+        return;
+    }
+
+    if (!topStocks || topStocks.length === 0) {
+        console.warn('No stocks loaded, showing error message');
+        dashboardContainer.innerHTML = `
+            <div class="stock-dashboard-error">
+                <p>Unable to load stock data. Please check your connection and try again.</p>
+                <button class="btn-small waves-effect waves-light" onclick="startStockDashboard()">Retry</button>
+            </div>
+        `;
+        return;
+    }
+
+    console.log(`Updating dashboard with ${topStocks.length} stocks`);
+
+    const marketStatus = isMarketOpen() ? 'OPEN' : 'CLOSED';
+    const marketColor = isMarketOpen() ? '#4caf50' : '#f44336';
+
+    const stocksPerRow = 4;
+    let html = `
+        <div class="market-status-indicator" style="text-align: center; margin-bottom: 15px; padding: 8px; background: ${marketColor}; color: white; border-radius: 6px; font-weight: bold;">
+            Market: ${marketStatus}
+        </div>
+        <div class="stock-dashboard-grid">
+    `;
+
+    topStocks.forEach((stock, index) => {
+        if (!stock || stock.error) {
+            console.warn(`Skipping invalid stock at index ${index}:`, stock);
+            return;
+        }
+
+        const previousData = previousStockData[stock.symbol];
+        const isCrypto = stock.symbol.endsWith('-USD');
+        
+        // Determine which percentage to show
+        let priceChange, priceChangePercent, changeLabel;
+        
+        if (isCrypto) {
+            // For crypto, use regular change percentage
+            priceChange = stock.change || 0;
+            priceChangePercent = stock.changePercent || 0;
+            changeLabel = 'Change';
+        } else {
+            // For stocks, use open-to-close percentage
+            priceChange = stock.openToCloseChange || 0;
+            priceChangePercent = stock.openToCloseChangePercent || 0;
+            changeLabel = 'Open→Close';
+        }
+        
+        // Determine animation class based on price change
+        let animationClass = '';
+        if (previousData && isMarketOpen()) {
+            const prevPrice = previousData.price || 0;
+            const currentPrice = stock.price || 0;
+            if (currentPrice > prevPrice) {
+                animationClass = 'price-up';
+            } else if (currentPrice < prevPrice) {
+                animationClass = 'price-down';
+            }
+        }
+
+        const changeColor = priceChange >= 0 ? 'green' : 'red';
+        const changeIcon = priceChange >= 0 ? '↗' : '↘';
+        const price = stock.price ? stock.price.toFixed(2) : 'N/A';
+        const change = priceChange.toFixed(2);
+        const changePercent = priceChangePercent.toFixed(2);
+
+        html += `
+            <div class="stock-card ${animationClass}" onclick="selectStock('${stock.symbol}')">
+                <div class="stock-header">
+                    <span class="stock-symbol">${stock.symbol}</span>
+                    <span class="stock-name">${stockSymbols[stock.symbol] || stock.symbol}</span>
+                </div>
+                <div class="stock-price" style="color: ${changeColor};">$${price}</div>
+                <div class="stock-change">
+                    ${changeIcon} $${change} <span class="percentage ${changeColor}">(${changePercent}%)</span>
+                    <div class="change-label">${changeLabel}</div>
+                </div>
+            </div>
+        `;
+
+        // Add row break every 4 stocks
+        if ((index + 1) % stocksPerRow === 0) {
+            html += '</div><div class="stock-dashboard-grid">';
+        }
+    });
+
+    html += '</div>';
+    dashboardContainer.innerHTML = html;
+
+    // Store current data for next comparison
+    topStocks.forEach(stock => {
+        if (stock && !stock.error) {
+            previousStockData[stock.symbol] = { ...stock };
+        }
+    });
+
+    console.log('Dashboard updated successfully');
+}
+
+// Select stock for detailed view
+export function selectStock(symbol) {
+    document.getElementById('stockSymbolInput').value = symbol;
+    updateFinanceData(symbol);
+    
+    // Scroll to chart
+    const chartSection = document.querySelector('.chart-container');
+    if (chartSection) {
+        chartSection.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// Start stock dashboard auto-refresh
+export function startStockDashboard() {
+    if (stockDashboardInterval) {
+        clearInterval(stockDashboardInterval);
+    }
+    
+    // Initial fetch
+    fetchTopStocks();
+    
+    // Set up auto-refresh every 3 seconds only if market is open
+    stockDashboardInterval = setInterval(() => {
+        if (isMarketOpen()) {
+            fetchTopStocks();
+        } else {
+            console.log('Market is closed, skipping stock dashboard update');
+        }
+    }, 3000);
+}
+
+// Stop stock dashboard auto-refresh
+export function stopStockDashboard() {
+    if (stockDashboardInterval) {
+        clearInterval(stockDashboardInterval);
+        stockDashboardInterval = null;
+    }
+}
 
 
 

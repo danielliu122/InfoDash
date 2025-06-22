@@ -6,38 +6,95 @@ import {
     startAutoRefresh, 
     stopAutoRefresh,
     handleFinanceUpdate, 
-    isMarketOpen
+    isMarketOpen,
+    initializeFinance,
+    clearWatchlist,
+    resetChartZoom,
+    updateChartTheme,
+    startStockDashboard,
+    resetFinanceCardPositions
 } from './finance.js';
 import { fetchNewsData, updateNews } from './news.js';
 import { fetchTrendsData, updateTrends } from './trends.js'; // Import from trends.js
 import { fetchRedditData, updateReddit } from './reddit.js'; // Import from reddit.js
 import { refreshSummary, initializeSummarySection } from './summary.js'; // Import summary functionality
+import { userPrefs } from './userPreferences.js'; // Import user preferences
+
+// Make functions globally available immediately for HTML onclick handlers
+window.handleButtonClick = async function(type, category, subCategory = 'all') {
+    const countrySelect = document.getElementById('countrySelect');
+    const languageSelect = document.getElementById('languageSelect');
+    const trendsCountrySelect = document.getElementById('trendsCountrySelect');
+    const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
+
+    let country = 'us';
+    let language = 'en';
+
+    if (type === 'news') {
+        country = countrySelect ? countrySelect.value : 'us';
+        language = languageSelect ? languageSelect.value : 'en';
+    } else if (type === 'trends') {
+        country = trendsCountrySelect ? trendsCountrySelect.value : 'US';
+        language = trendsLanguageSelect ? trendsLanguageSelect.value : 'en';
+    }
+
+    try {
+        let data;
+        if (type === 'news') {
+            // Fetch news data with the specified category
+            data = await fetchNewsData(category, country, language);
+            updateNews(data);
+        } else if (type === 'reddit') {
+            data = await fetchRedditData(category);
+            updateReddit(data);
+        } else if (type === 'trends') {
+            data = await fetchTrendsData(category, subCategory, language, country);
+            updateTrends(data, category);
+        }
+    } catch (error) {
+        console.error(`Error handling ${type} request:`, error);
+        alert(`Failed to load ${type} data. Please try again.`);
+    }
+};
+
+// Add handleNewsTypeClick function
+window.handleNewsTypeClick = async function(newsType) {
+    const countrySelect = document.getElementById('countrySelect');
+    const languageSelect = document.getElementById('languageSelect');
+    
+    const country = countrySelect ? countrySelect.value : 'us';
+    const language = languageSelect ? languageSelect.value : 'en';
+
+    try {
+        const data = await fetchNewsData('world', country, language, false, newsType);
+        updateNews(data);
+    } catch (error) {
+        console.error('Error handling news type request:', error);
+        alert('Failed to load news data. Please try again.');
+    }
+};
 
 // Update the togglePauseFinance function in app.js
 export function togglePauseFinance() {
-    const isPaused = !updateInterval; // Check if currently paused
-    const button = document.querySelector('#finance .pause-button');
-    const stockSymbolInput = document.getElementById('stockSymbolInput');
-    const symbol = stockSymbolInput.value || '^IXIC';
-    
-    // Get the currently active time range button
-    const activeButton = document.querySelector('.time-range-button.active') || document.getElementById('realtimeButton');
-    const [timeRange, interval] = activeButton.getAttribute('onclick')
-        .match(/handleFinanceUpdate\('([^']*)', '([^']*)'\)/i)
-        .slice(1);
-    
-    if (isPaused) {
-        // Resume updates
-        startAutoRefresh(symbol, timeRange, interval);
-        button.textContent = 'Pause';
-        button.classList.remove('paused');
+    const pauseButton = document.querySelector('.pause-button');
+    if (pauseButton.classList.contains('paused')) {
+        // Resume auto-refresh
+        pauseButton.classList.remove('paused');
+        pauseButton.textContent = 'Pause';
+        startAutoRefresh('^IXIC', '5m', '1m');
     } else {
-        // Pause updates
+        // Pause auto-refresh
+        pauseButton.classList.add('paused');
+        pauseButton.textContent = 'Resume';
         stopAutoRefresh();
-        button.textContent = 'Resume';
-        button.classList.add('paused');
     }
 }
+
+// Make togglePauseFinance globally available
+window.togglePauseFinance = togglePauseFinance;
+
+// Make resetFinanceCardPositions globally available
+window.resetFinanceCardPositions = resetFinanceCardPositions;
 
 // Export refreshNews function
 export async function refreshNews() {
@@ -61,37 +118,6 @@ async function refreshTrends() {
     updateTrends(trendsData, 'daily');
 }
 
-// Function to handle button clicks
-// Function to handle button clicks - must be global for HTML onclick
-window.handleButtonClick = async function(type, category, subCategory = 'all') {
-    const countrySelect = document.getElementById('countrySelect');
-    const languageSelect = document.getElementById('languageSelect');
-    const trendsCountrySelect = document.getElementById('trendsCountrySelect');
-    const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
-
-    const country = type === 'trends' ? trendsCountrySelect.value : countrySelect.value;
-    const language = type === 'trends' ? trendsLanguageSelect.value : languageSelect.value;
-
-    try {
-        let data;
-        if (type === 'news') {
-            // Fetch news data with the specified category
-            data = await fetchNewsData(category, country, language);
-            updateNews(data);
-        } else if (type === 'reddit') {
-            data = await fetchRedditData(category);
-            updateReddit(data);
-        } else if (type === 'trends') {
-            data = await fetchTrendsData(category, subCategory, language, country);
-            updateTrends(data, category);
-        }
-    } catch (error) {
-        console.error(`Error handling ${type} request:`, error);
-        alert(`Failed to load ${type} data. Please try again.`);
-    }
-};
-
-
 // Function to toggle section visibility
 window.toggleSection = function(sectionContentId) {
     const sectionContent = document.getElementById(sectionContentId);
@@ -112,20 +138,26 @@ function toggleTheme() {
     body.classList.remove(`${currentTheme}-theme`);
     body.classList.add(`${newTheme}-theme`);
 
-    // Save the theme preference in localStorage
-    localStorage.setItem('theme', newTheme);
+    // Save the theme preference
+    userPrefs.setTheme(newTheme);
 
     // Update the theme toggle button text
     const themeToggleButton = document.getElementById('themeToggleButton');
     if (themeToggleButton) {
         themeToggleButton.textContent = `${currentTheme}`;
     }
+    
+    // Update chart theme
+    updateChartTheme();
 }
+
+// Make toggleTheme globally available for HTML onclick handlers
+window.toggleTheme = toggleTheme;
 
 // Initialize theme based on user preference
 function initializeTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.body.classList.add(`${savedTheme}`);
+    const savedTheme = userPrefs.getTheme();
+    document.body.classList.add(`${savedTheme}-theme`);
 
     const themeToggleButton = document.getElementById('themeToggleButton');
     if (themeToggleButton) {
@@ -137,8 +169,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize theme
     initializeTheme();
 
+    // Apply user preferences to UI
+    userPrefs.applyPreferences();
+    
+    // Make userPrefs globally available for HTML functions
+    window.userPrefs = userPrefs;
+    
+    // Update preferences display
+    if (window.updatePreferencesDisplay) {
+        window.updatePreferencesDisplay();
+    }
+
+    // Show cookie notification if consent not given
+    if (window.showCookieNotification) {
+        window.showCookieNotification();
+    }
+
     // Initialize the summary section (this will load or generate today's summary)
     initializeSummarySection();
+
+    // Initialize finance features
+    initializeFinance();
+
+    // Start the stock dashboard automatically
+    startStockDashboard();
 
     // Scroll to the top of the page on reload
     window.scrollTo(0, 0);
@@ -159,13 +213,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Enable the country select dropdown
     countrySelect.disabled = false;
 
-    // Add event listener for country and language select to update trends data
-    trendsCountrySelect.addEventListener('change', refreshTrends);
-    trendsLanguageSelect.addEventListener('change', refreshTrends);
+    // Add event listeners for country and language select to update trends data and save preferences
+    trendsCountrySelect.addEventListener('change', () => {
+        refreshTrends();
+        userPrefs.saveCurrentState();
+    });
+    trendsLanguageSelect.addEventListener('change', () => {
+        refreshTrends();
+        userPrefs.saveCurrentState();
+    });
 
-    // Add event listener for country and language select to update news data
-    countrySelect.addEventListener('change', refreshNews);
-    languageSelect.addEventListener('change', refreshNews);
+    // Add event listeners for country and language select to update news data and save preferences
+    countrySelect.addEventListener('change', () => {
+        refreshNews();
+        userPrefs.saveCurrentState();
+    });
+    languageSelect.addEventListener('change', () => {
+        refreshNews();
+        userPrefs.saveCurrentState();
+    });
 
     // Fetch and display world news and top Reddit posts of the day by default
     try {
@@ -315,19 +381,7 @@ function scrollToSection(sectionId) {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadStockSymbols();
-    // Add click handlers for time range buttons
-    document.querySelectorAll('.time-range-button').forEach(button => {
-        button.addEventListener('click', function() {
-            // Remove active class from all buttons
-            document.querySelectorAll('.time-range-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            // Add active class to clicked button
-            this.classList.add('active');
-        });
-    });
-    
-    // Set initial active state
+    // Set initial active state for time range buttons
     const realtimeButton = document.getElementById('realtimeButton');
     if (realtimeButton) {
         realtimeButton.classList.add('active');
@@ -359,19 +413,4 @@ window.handleDateRangeChange = async function() {
     }
 };
 
-// Add handleNewsTypeClick function
-window.handleNewsTypeClick = async function(newsType) {
-    const countrySelect = document.getElementById('countrySelect');
-    const languageSelect = document.getElementById('languageSelect');
-    const country = countrySelect.value;
-    const language = languageSelect.value;
-
-    try {
-        // Force refresh to get new data with the selected news type
-        const newsData = await fetchNewsData('world', country, language, true, newsType);
-        updateNews(newsData);
-    } catch (error) {
-        console.error('Error updating news with new type:', error);
-        alert('Failed to update news. Please try again.');
-    }
-};
+// Note: Global functions are already assigned at the top of the file

@@ -17,6 +17,17 @@
     --border-color: #BDBDBD;
     --input-bg: #FFFFFF;
     --input-border: #BDBDBD;
+    --primary-color: #2196F3;
+    --secondary-color: #FF9800;
+    --success-color: #4CAF50;
+    --error-color: #f44336;
+    --warning-color: #ff9800;
+    --info-color: #2196F3;
+    --text-color: #333;
+    --text-secondary: #666;
+    --background-color: #f5f5f5;
+    --card-bg: #ffffff;
+    --hover-bg: #f0f0f0;
 }
 
 /* Dark theme colors */
@@ -31,15 +42,27 @@ body.dark-theme {
     --border-color: #757575;
     --input-bg: #424242;
     --input-border: #757575;
+    --text-color: #ffffff;
+    --text-secondary: #b0b0b0;
+    --background-color: #121212;
+    --card-bg: #1e1e1e;
+    --hover-bg: #2a2a2a;
 }
 
 /* Body styles */
-body {
-    font-family: 'Roboto', sans-serif;
+body, html {
+    font-family: 'Google Sans Text', 'Google Sans', 'Roboto', 'Noto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif !important;
     line-height: 1.6;
     background-color: var(--primary-bg);
     color: var(--primary-text);
-    padding: 20px;
+    margin: 0;
+    min-height: 100vh;
+}
+
+/* Dark theme body adjustments */
+body.dark-theme {
+    background-color: var(--primary-bg);
+    color: var(--primary-text);
 }
 
 /* Header styles */
@@ -47,6 +70,7 @@ header {
     text-align: center;
     margin-bottom: 20px;
     color: var(--primary-text);
+    padding: 20px 20px 0 20px;
 }
 
 /* Main section styles */
@@ -54,6 +78,7 @@ main {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+    padding: 0 20px 20px 20px;
 }
 
 /* Section styles */
@@ -93,6 +118,7 @@ footer {
     text-align: center;
     margin-top: 20px;
     color: var(--secondary-text);
+    padding: 0 20px 20px 20px;
 }
 
 /* Button styles */
@@ -219,14 +245,14 @@ footer {
 /* Responsive adjustments for smaller screens */
 @media (max-width: 999px) {
     body {
-        padding: 5px;
-        width: 99%; /* Set width to 85% on mobile */
+        width: 99%; /* Set width to 99% on mobile */
         margin: 0 auto;
     }
 
     main {
         flex-direction: column;
         gap: 10px;
+        padding: 0 5px 5px 5px;
     }
 
     section {
@@ -366,6 +392,15 @@ footer {
 /* Ensure full width for sections */
 .section {
     width: 100%;
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Dark theme sections */
+body.dark-theme .section {
+    background: #1a1a1a;
 }
 
 /* Ensure proper layout for data containers */
@@ -378,6 +413,61 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
+}
+
+/* Section toggle box */
+.section-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.6;
+}
+
+.section-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.section-toggle .toggle-icon {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--text-color);
+    line-height: 1;
+}
+
+/* Dark theme adjustments */
+body.dark-theme .section-toggle {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-theme .section-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Light theme adjustments */
+body:not(.dark-theme) .section-toggle {
+    background: rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body:not(.dark-theme) .section-toggle:hover {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(0, 0, 0, 0.4);
 }
 
 .topic-button {
@@ -408,32 +498,322 @@ footer {
     padding: 10px;
 }
 
+/* Chart axis labels for light mode */
+body:not(.dark-theme) .chart-container canvas {
+    filter: invert(0);
+}
+
+body:not(.dark-theme) .chart-container canvas {
+    background-color: var(--card-bg);
+}
+
+/* Chart axis labels for dark mode */
+body.dark-theme .chart-container canvas {
+    background-color: #1a1a1a;
+}
+
 /* Autocomplete styles */
 .autocomplete-items {
     position: absolute;
-    border: 1px solid #d4d4d4;
-    border-bottom: none;
+    border: 1px solid var(--border-color);
     border-top: none;
     z-index: 99;
     top: 100%;
     left: 0;
     right: 0;
-    background-color: white; /* Ensure background is white */
+    max-height: 200px;
+    overflow-y: auto;
+    background: var(--card-bg);
+    border-radius: 0 0 4px 4px;
+    display: none;
 }
 
 .autocomplete-item {
     padding: 10px;
     cursor: pointer;
-    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .autocomplete-item:hover {
-    background-color: #e9e9e9; /* Highlight on hover */
+    background-color: var(--hover-bg);
 }
 
-#stockSymbolInput {
-    width: 100%; /* Ensures the input fits within its parent container */
-    box-sizing: border-box; /* Includes padding and border in the element's total width */
+.autocomplete-item .symbol {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.autocomplete-item .name {
+    color: var(--text-color);
+    font-size: 0.9em;
+}
+
+.add-watchlist {
+    background: var(--success-color) !important;
+    color: white !important;
+    border-radius: 50% !important;
+    width: 24px !important;
+    height: 24px !important;
+    line-height: 24px !important;
+    padding: 0 !important;
+    font-size: 12px !important;
+}
+
+/* Watchlist Styles */
+.watchlist-container {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.watchlist-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin: 4px 0;
+    background: var(--hover-bg);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.watchlist-item:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.watchlist-item .symbol {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.watchlist-item:hover .symbol {
+    color: white;
+}
+
+.watchlist-item .company-name {
+    flex: 1;
+    margin: 0 10px;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+}
+
+.watchlist-item:hover .company-name {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.remove-watchlist {
+    background: var(--error-color) !important;
+    color: white !important;
+    border-radius: 50% !important;
+    width: 20px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+    padding: 0 !important;
+    font-size: 10px !important;
+}
+
+.no-watchlist {
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Time Range Buttons */
+.time-range-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.time-range-buttons button {
+    margin: 2px;
+    font-size: 0.8em;
+}
+
+/* Stock Dashboard */
+.stock-dashboard {
+    margin-top: 15px;
+}
+
+.stock-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.stock-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stock-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.stock-header {
+    margin-bottom: 2px;
+}
+
+.stock-symbol {
+    font-weight: bold;
+    font-size: 20px;
+    color: var(--text-color);
+    display: block;
+}
+
+.stock-name {
+    font-size: 14px;
+    color: var(--secondary-text);
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stock-price {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--text-color);
+    margin: 1px 0;
+}
+
+.stock-change {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.stock-change .percentage.green {
+    color: #4caf50;
+}
+
+.stock-change .percentage.red {
+    color: #f44336;
+}
+
+.change-label {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 1px;
+    font-weight: normal;
+}
+
+/* Price change animations */
+.price-up {
+    animation: priceUp 0.5s ease-out;
+}
+
+.price-down {
+    animation: priceDown 0.5s ease-out;
+}
+
+@keyframes priceUp {
+    0% { background-color: rgba(76, 175, 80, 0.1); }
+    100% { background-color: transparent; }
+}
+
+@keyframes priceDown {
+    0% { background-color: rgba(244, 67, 54, 0.1); }
+    100% { background-color: transparent; }
+}
+
+.market-status-indicator {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.stock-dashboard-error {
+    text-align: center;
+    padding: 20px;
+    color: var(--secondary-text);
+}
+
+/* Real-time data container */
+.real-time-data-container {
+    margin: 8px 0;
+    padding: 8px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    max-width: 400px;
+}
+
+.real-time-data-container .stock-info-card {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    margin: 0;
+}
+
+.real-time-data-container .stock-header {
+    margin-bottom: 6px;
+}
+
+.real-time-data-container .stock-header h3 {
+    font-size: 12px;
+}
+
+.real-time-data-container .stock-price {
+    margin-bottom: 6px;
+    gap: 8px;
+}
+
+.real-time-data-container .stock-price .price {
+    font-size: 1.2em;
+}
+
+.real-time-data-container .stock-price .change {
+    font-size: 0.8em;
+}
+
+.real-time-data-container .stock-details {
+    font-size: 0.7em;
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* Chart Controls */
+.chart-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.chart-slider {
+    width: 100%;
+    margin: 10px 0;
+}
+
+/* Dashboard Controls */
+.dashboard-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 /* Chat styles */
@@ -479,73 +859,10 @@ body.dark-theme #chat-input {
     font-weight: bold;
 }
 
-/* Add these styles for the chart scrollbar */
-.chart-container::-webkit-scrollbar {
-    height: 12px;
-}
-
-.chart-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-.chart-container::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 10px;
-}
-
-.chart-container::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-/* For Firefox */
-.chart-container {
-    scrollbar-width: thin;
-    scrollbar-color: #888 #f1f1f1;
-}
-
-/* Add this to ensure slider doesn't interfere with other elements */
-.chart-container {
-    position: relative;
-    z-index: 0;
-}
-
 /* Add new rule for container class */
 .container {
     width: 99% !important; 
     max-width: none !important; /* Remove max-width restriction */
-}
-
-/* Zoom control styles */
-.zoom-controls {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 100;
-    display: flex;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 5px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.zoom-button {
-    padding: 5px 10px;
-    background: var(--button-bg);
-    color: var(--primary-text);
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.zoom-button:hover {
-    background: var(--button-hover-bg);
-}
-
-#resetZoom {
-    padding: 5px 12px;
 }
 
 /* Mobile adjustments */
@@ -555,36 +872,6 @@ body.dark-theme #chat-input {
         width: 100%;
         margin: 0 auto;
     }
-
-    /* Show both zoom controls and slider on mobile */
-    .zoom-controls {
-        display: flex !important;
-        top: 5px; /* Reduced from 10px */
-        right: 5px; /* Reduced from 10px */
-    }
-}
-
-.fullscreenButton {
-    padding: 5px 10px;
-    background: var(--button-bg);
-    color: var(--primary-text);
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-
-.fullscreenButton:hover {
-    background: var(--button-hover-bg-color);
-}
-
-
-/* For fullscreen mode */
-#finance .chart-container:fullscreen {
-    height: 100vh !important;
-    width: 100vw !important;
-    background: var(--background-color);
 }
 
 .pause-button {
@@ -641,7 +928,7 @@ body.dark-theme .dropdown-content {
 
 /* Ensure the label is visible in dark mode */
 body.dark-theme .input-field label {
-    color: #BDBDBD; /* Light text for labels */
+    color: var(--secondary-text);
 }
 
 /* Additional styles to ensure dropdown text is white */
@@ -729,20 +1016,21 @@ body.dark-theme .autocomplete-item:hover {
     margin-bottom: 5px;
     width: 100%;
     padding: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    background-color: white;
+    background-color: var(--input-bg);
     font-size: 14px;
+    color: var(--primary-text);
 }
 
 #model-select:focus {
     outline: none;
-    border-color: #666;
+    border-color: var(--accent-color);
 }
 
 /* Style for the label */
 .input-field label {
-    color: #666;
+    color: var(--secondary-text);
     font-size: 14px;
     margin-bottom: 2px;
     display: block;
@@ -1267,4 +1555,510 @@ body.dark-theme #summaryDate::-webkit-calendar-picker-indicator {
 
 #set-location-btn:hover {
     background-color: #303f9f !important;
+}
+
+/* Finance Section Styles */
+#finance {
+    background: var(--section-bg);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    min-height: 400px;
+}
+
+#finance .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#finance .section-header h2 {
+    margin: 0;
+    color: var(--text-color);
+}
+
+#finance .section-header .controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#finance .reset-layout-btn {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s;
+}
+
+#finance .reset-layout-btn:hover {
+    background: var(--accent-hover);
+}
+
+/* Finance Cards Grid Layout */
+#finance .cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    position: relative;
+    min-height: 400px;
+}
+
+/* Individual Card Styles */
+#finance .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s, transform 0.3s;
+    cursor: move;
+    position: relative;
+    min-width: 300px;
+    min-height: 200px;
+    max-height: 400px;
+    user-select: none;
+    overflow: hidden;
+}
+
+#finance .card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+#finance .card.dragging {
+    z-index: 1000;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+#finance .card.resizing {
+    z-index: 1000;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Card Header Styles */
+#finance .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: move;
+}
+
+#finance .card-title {
+    font-weight: bold;
+    color: var(--text-color);
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+#finance .card-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+#finance .drag-handle {
+    cursor: move;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 2px;
+    border-radius: 3px;
+    transition: color 0.3s;
+}
+
+#finance .drag-handle:hover {
+    color: var(--accent-color);
+}
+
+#finance .resize-handle {
+    cursor: nw-resize;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 2px;
+    border-radius: 3px;
+    transition: color 0.3s;
+    transform: rotate(45deg);
+}
+
+#finance .resize-handle:hover {
+    color: var(--accent-color);
+}
+
+/* Specific Card Widths */
+#finance .card.stock-dashboard {
+    grid-column: span 2; /* Takes 2 columns (50% width) */
+}
+
+#finance .card.time-range {
+    grid-column: span 1; /* Takes 1 column (33% width) */
+    min-height: auto;
+    max-height: none;
+}
+
+#finance .card.stock-info,
+#finance .card.watchlist {
+    grid-column: span 1; /* Takes 1 column (33% width) */
+}
+
+/* Card Content Styles */
+#finance .card-content {
+    height: calc(100% - 60px); /* Subtract header height */
+    overflow-x: hidden;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    #finance .card.stock-dashboard,
+    #finance .card.time-range,
+    #finance .card.chart-container {
+        grid-column: span 1; /* Full width on smaller screens */
+    }
+}
+
+@media (max-width: 768px) {
+    #finance .cards-container {
+        grid-template-columns: 1fr; /* Single column on mobile */
+    }
+    
+    #finance .card {
+        grid-column: span 1;
+        min-width: auto;
+    }
+}
+
+/* Cookie Notification Banner */
+.cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--primary-bg);
+    border-top: 2px solid var(--accent-color);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    padding: 16px 0;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+
+.cookie-banner.show {
+    transform: translateY(0);
+}
+
+.cookie-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.cookie-text h6 {
+    margin: 0 0 8px 0;
+    color: var(--primary-text);
+    font-weight: 600;
+}
+
+.cookie-text p {
+    margin: 0;
+    color: var(--secondary-text);
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.cookie-actions {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.cookie-actions .btn-small {
+    font-size: 12px;
+    padding: 0 16px;
+    height: 32px;
+    line-height: 32px;
+}
+
+/* Updated Footer Styling */
+.footer-content {
+    padding: 20px 0;
+}
+
+.footer-links {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.footer-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.footer-separator {
+    color: var(--secondary-text);
+    font-weight: bold;
+}
+
+.footer-disclaimer {
+    font-size: 0.85em;
+    color: var(--secondary-text);
+    max-width: 800px;
+    margin: 15px auto 0;
+    line-height: 1.5;
+}
+
+/* Light theme adjustments */
+body:not(.dark-theme) .cookie-banner {
+    background: #f5f5f5;
+    border-top-color: #2196f3;
+}
+
+body:not(.dark-theme) .footer-link {
+    color: #1976d2;
+}
+
+body:not(.dark-theme) .footer-link:hover {
+    color: #1565c0;
+}
+
+/* Responsive design for cookie banner */
+@media (max-width: 768px) {
+    .cookie-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .cookie-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .footer-links {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .footer-separator {
+        display: none;
+    }
+}
+
+/* Simplified Trends Styling */
+.buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.topic-button {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.topic-button:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.topic-button:active {
+    transform: translateY(0);
+}
+
+/* Light theme adjustments for trend buttons */
+body:not(.dark-theme) .topic-button {
+    background: #1976d2;
+    color: white;
+}
+
+body:not(.dark-theme) .topic-button:hover {
+    background: #1565c0;
+}
+
+/* Section Controls */
+.section-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-controls .btn-small {
+    font-size: 12px;
+    padding: 0 12px;
+    height: 28px;
+    line-height: 28px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.section-controls .btn-small i {
+    font-size: 14px;
+}
+
+/* Finance card reset animation */
+@keyframes resetCardPosition {
+    0% {
+        transform: translate3d(var(--current-x, 0px), var(--current-y, 0px), 0);
+    }
+    100% {
+        transform: translate3d(0px, 0px, 0);
+    }
+}
+
+.card.resetting {
+    animation: resetCardPosition 0.5s ease-out forwards;
+}
+
+/* Time Range Button Styling */
+.time-range-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.time-range-buttons button {
+    margin: 1px;
+    font-size: 0.7em;
+    padding: 4px 8px;
+    height: 24px;
+    line-height: 16px;
+    min-width: 50px;
+}
+
+.chart-module-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.chart-module-container .time-range-buttons {
+    justify-content: flex-start;
+}
+
+.chart-module-container .chart-container {
+    width: 100%;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+#finance .card.timeframe-controls {
+    width: 50%;
+    margin: 0 auto 20px auto;
+    float: none;
+}
+
+#finance .card.timeframe-controls .time-range-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+#finance .card.timeframe-controls .time-range-buttons button {
+    margin: 2px;
+    font-size: 0.8em;
+}
+
+#finance .card.chart-container {
+    grid-column: span 2; /* Takes 2 columns (50% width) */
+    position: relative;
+    min-height: 400px;
+}
+
+#finance .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 8px 8px 0 0;
+    cursor: move;
+    user-select: none;
+    font-weight: 600;
+    color: var(--primary-text);
+}
+
+#finance .chart-header:hover {
+    background-color: var(--hover-bg);
+}
+
+#finance .chart-header .card-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#finance .chart-header .drag-handle {
+    cursor: move;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    font-size: 14px;
+    color: var(--secondary-text);
+}
+
+#finance .chart-header .drag-handle:hover {
+    background-color: var(--hover-bg);
+    color: var(--primary-text);
+}
+
+#finance .chart-header .resize-handle {
+    cursor: nw-resize;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    font-size: 14px;
+    color: var(--secondary-text);
+}
+
+#finance .chart-header .resize-handle:hover {
+    background-color: var(--hover-bg);
+    color: var(--primary-text);
+}
+
+#finance .card.stock-info,
+#finance .card.watchlist {
+    grid-column: span 1; /* Takes 1 column (33% width) */
 }
