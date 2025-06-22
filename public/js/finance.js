@@ -146,6 +146,51 @@ export function setupAutocomplete() {
         }
     });
 
+    // Handle Enter key for manual input
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const symbol = this.value.trim().toUpperCase();
+            if (symbol) {
+                // Validate the symbol exists in our database
+                if (stockSymbols[symbol]) {
+                    autocompleteList.style.display = 'none';
+                    updateFinanceData(symbol);
+                    fetchStockInfo(symbol);
+                    
+                    // Show success notification
+                    if (window.showNotification) {
+                        window.showNotification(`Loading data for ${symbol}...`, 2000);
+                    }
+                } else {
+                    // Show error for invalid symbol
+                    if (window.showNotification) {
+                        window.showNotification(`Symbol "${symbol}" not found. Please check the spelling or try a different symbol.`, 4000);
+                    } else {
+                        alert(`Symbol "${symbol}" not found. Please check the spelling or try a different symbol.`);
+                    }
+                }
+            }
+        }
+    });
+
+    // Add a visual indicator for valid symbols
+    input.addEventListener('input', function() {
+        const symbol = this.value.trim().toUpperCase();
+        const isValidSymbol = stockSymbols[symbol];
+        
+        // Add/remove visual feedback
+        if (symbol && isValidSymbol) {
+            this.style.borderColor = '#4CAF50'; // Green for valid
+            this.title = `Valid symbol: ${symbol}`;
+        } else if (symbol && !isValidSymbol) {
+            this.style.borderColor = '#f44336'; // Red for invalid
+            this.title = `Invalid symbol: ${symbol}`;
+        } else {
+            this.style.borderColor = ''; // Default
+            this.title = 'Enter a stock symbol';
+        }
+    });
+
     // Hide autocomplete when clicking outside
     document.addEventListener('click', function(e) {
         if (!input.contains(e.target) && !autocompleteList.contains(e.target)) {
@@ -702,9 +747,15 @@ document.getElementById('stockSymbolInput').addEventListener('change', (event) =
     
     // Get the currently active time range button
     const activeButton = document.querySelector('.time-range-button.active') || document.getElementById('realtimeButton');
-    const [timeRange, interval] = activeButton.getAttribute('onclick')
-        .match(/updateFinanceData\('([^']*)', '([^']*)'\)/i)
-        .slice(1);
+    
+    // Use data attributes instead of parsing onclick
+    let timeRange = '1d';
+    let interval = '1m';
+    
+    if (activeButton) {
+        timeRange = activeButton.getAttribute('data-time-range') || '1d';
+        interval = activeButton.getAttribute('data-interval') || '1m';
+    }
     
     // Check if auto-refresh is already running
     if (updateInterval) {
@@ -729,8 +780,15 @@ export function togglePauseFinance() {
     
     // Get the currently active time range button
     const activeButton = document.querySelector('.time-range-button.active') || document.getElementById('realtimeButton');
-    const timeRange = activeButton.getAttribute('onclick').match(/updateFinanceData\('([^']*)',/)[1];
-    const interval = activeButton.getAttribute('onclick').match(/, '([^']*)'\)/)[1];
+    
+    // Use data attributes instead of parsing onclick
+    let timeRange = '1d';
+    let interval = '1m';
+    
+    if (activeButton) {
+        timeRange = activeButton.getAttribute('data-time-range') || '1d';
+        interval = activeButton.getAttribute('data-interval') || '1m';
+    }
     
     if (isPaused && interval === '1m') {
         // Resume updates only for minute intervals
@@ -1620,6 +1678,55 @@ export function stopStockDashboard() {
         stockDashboardInterval = null;
     }
 }
+
+// Function to add current symbol to watchlist
+export function addCurrentSymbolToWatchlist() {
+    const input = document.getElementById('stockSymbolInput');
+    if (!input) return;
+    
+    const symbol = input.value.trim().toUpperCase();
+    if (!symbol) {
+        if (window.showNotification) {
+            window.showNotification('Please enter a stock symbol first', 3000);
+        }
+        return;
+    }
+    
+    if (!stockSymbols[symbol]) {
+        if (window.showNotification) {
+            window.showNotification(`Symbol "${symbol}" not found. Please check the spelling.`, 4000);
+        }
+        return;
+    }
+    
+    // Check if already in watchlist
+    const currentWatchlist = userPrefs.getFinanceWatchlist();
+    if (currentWatchlist.includes(symbol)) {
+        if (window.showNotification) {
+            window.showNotification(`${symbol} is already in your watchlist`, 3000);
+        }
+        return;
+    }
+    
+    // Add to watchlist
+    addToWatchlist(symbol);
+    
+    if (window.showNotification) {
+        window.showNotification(`${symbol} added to watchlist!`, 3000);
+    }
+}
+
+// Make functions available globally for HTML onclick handlers
+window.addToWatchlist = addToWatchlist;
+window.removeFromWatchlist = removeFromWatchlist;
+window.clearWatchlist = clearWatchlist;
+window.addCurrentSymbolToWatchlist = addCurrentSymbolToWatchlist;
+window.startStockDashboard = startStockDashboard;
+window.stopStockDashboard = stopStockDashboard;
+window.selectStock = selectStock;
+window.resetChartZoom = resetChartZoom;
+window.resetFinanceCardPositions = resetFinanceCardPositions;
+window.togglePauseFinance = togglePauseFinance;
 
 
 
