@@ -119,8 +119,8 @@ async function saveDailySummary(summaryData, date) {
         // Update global variables if it's for today
         const today = new Date().toISOString().split('T')[0];
         if (date === today) {
-            dailySummary = summaryData;
-            lastSummaryDate = today;
+        dailySummary = summaryData;
+        lastSummaryDate = today;
         }
         
         console.log(`Daily summary saved for ${date}`);
@@ -219,18 +219,18 @@ app.get('/api/news', async (req, res) => {
         if (fileCache[cacheKey] && !isCacheStale(fileCache[cacheKey].timestamp)) {
             console.log(`Using cached news data for: ${cacheKey}`);
             return res.json(fileCache[cacheKey].data);
-        }
+    }
 
         // If cache is stale or doesn't exist, fetch fresh data
         console.log(`Fetching fresh news data for: ${cacheKey}`);
-        
-        // Build API URL based on parameters
-        let newsUrl;
-        if (category) {
-            newsUrl = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&language=${language}&apiKey=${newsApiKey}`;
-        } else {
-            newsUrl = `https://newsapi.org/v2/everything?q=${query}&language=${language}&sortBy=popularity${from ? `&from=${from}` : ''}&apiKey=${newsApiKey}`;
-        }
+
+    // Build API URL based on parameters
+    let newsUrl;
+    if (category) {
+        newsUrl = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&language=${language}&apiKey=${newsApiKey}`;
+    } else {
+        newsUrl = `https://newsapi.org/v2/everything?q=${query}&language=${language}&sortBy=popularity${from ? `&from=${from}` : ''}&apiKey=${newsApiKey}`;
+    }
 
         const response = await axios.get(newsUrl);
         

@@ -701,10 +701,36 @@ body.dark-theme .chart-container canvas {
 
 .stock-change .percentage.green {
     color: #4caf50;
+    font-weight: bold;
+    text-shadow: 0 0 1px rgba(76, 175, 80, 0.3);
 }
 
 .stock-change .percentage.red {
     color: #f44336;
+    font-weight: bold;
+    text-shadow: 0 0 1px rgba(244, 67, 54, 0.3);
+}
+
+/* Dark theme enhancements for better visibility */
+body.dark-theme .stock-change .percentage.green {
+    color: #66bb6a;
+    text-shadow: 0 0 2px rgba(102, 187, 106, 0.5);
+}
+
+body.dark-theme .stock-change .percentage.red {
+    color: #ef5350;
+    text-shadow: 0 0 2px rgba(239, 83, 80, 0.5);
+}
+
+/* Override inline styles for dark theme */
+body.dark-theme .stock-change .percentage[style*="color: #4caf50"] {
+    color: #66bb6a !important;
+    text-shadow: 0 0 2px rgba(102, 187, 106, 0.5) !important;
+}
+
+body.dark-theme .stock-change .percentage[style*="color: #f44336"] {
+    color: #ef5350 !important;
+    text-shadow: 0 0 2px rgba(239, 83, 80, 0.5) !important;
 }
 
 .change-label {
@@ -804,9 +830,176 @@ body.dark-theme .chart-container canvas {
     margin-top: 15px;
 }
 
+/* Zoom Controls Styling */
+.zoom-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 6px;
+    padding: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.dark-theme .zoom-controls {
+    background: rgba(30, 30, 30, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.zoom-button, .fullscreenButton {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 4px;
+    background: var(--card-bg);
+    color: var(--primary-text);
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.zoom-button:hover, .fullscreenButton:hover {
+    background: var(--accent-color);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.zoom-button:active, .fullscreenButton:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Chart Slider Styling */
 .chart-slider {
-    width: 100%;
-    margin: 10px 0;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.1);
+    outline: none;
+    z-index: 10;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+body.dark-theme .chart-slider {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.chart-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.chart-slider::-webkit-slider-thumb:hover {
+    background: var(--accent-color);
+    transform: scale(1.1);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.chart-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.chart-slider::-moz-range-thumb:hover {
+    background: var(--accent-color);
+    transform: scale(1.1);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.chart-slider::-webkit-slider-track {
+    background: transparent;
+}
+
+.chart-slider::-moz-range-track {
+    background: transparent;
+    border: none;
+}
+
+/* Chart Resize Handles */
+.chart-resize-handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: var(--accent-color);
+    border: 2px solid var(--card-bg);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 15;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.chart-resize-handle:hover {
+    background: var(--accent-color);
+    transform: scale(1.2);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.chart-resize-handle-se {
+    bottom: 5px;
+    right: 5px;
+    cursor: se-resize;
+}
+
+.chart-resize-handle-sw {
+    bottom: 5px;
+    left: 5px;
+    cursor: sw-resize;
+}
+
+.chart-resize-handle-ne {
+    top: 5px;
+    right: 5px;
+    cursor: ne-resize;
+}
+
+.chart-resize-handle-nw {
+    top: 5px;
+    left: 5px;
+    cursor: nw-resize;
+}
+
+/* Chart container resizing state */
+.chart-container.resizing {
+    user-select: none;
+    pointer-events: none;
+}
+
+.chart-container.resizing .chart-resize-handle {
+    pointer-events: auto;
+}
+
+/* Dark theme adjustments for resize handles */
+body.dark-theme .chart-resize-handle {
+    background: var(--accent-color);
+    border-color: var(--card-bg);
 }
 
 /* Dashboard Controls */

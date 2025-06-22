@@ -16,17 +16,43 @@ class UserPreferences {
         this.preferences = this.loadPreferences();
     }
 
+    // Helper function to set a cookie
+    setCookie(name, value, days = 365) {
+        const expires = new Date();
+        expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+        document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; samesite=Lax`;
+    }
+
+    // Helper function to get a cookie
+    getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) {
+                return decodeURIComponent(c.substring(nameEQ.length, c.length));
+            }
+        }
+        return null;
+    }
+
+    // Helper function to delete a cookie
+    deleteCookie(name) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    }
+
     // Check if cookies are accepted
     isCookiesAccepted() {
-        return localStorage.getItem('cookiesAccepted') === 'true';
+        return this.getCookie('cookiesAccepted') === 'true';
     }
 
     // Check if cookies are declined
     isCookiesDeclined() {
-        return localStorage.getItem('cookiesDeclined') === 'true';
+        return this.getCookie('cookiesDeclined') === 'true';
     }
 
-    // Load preferences from localStorage
+    // Load preferences from cookies
     loadPreferences() {
         // Don't load preferences if cookies are declined
         if (this.isCookiesDeclined()) {
@@ -34,7 +60,7 @@ class UserPreferences {
         }
 
         try {
-            const stored = localStorage.getItem(this.storageKey);
+            const stored = this.getCookie(this.storageKey);
             if (stored) {
                 const parsed = JSON.parse(stored);
                 return { ...this.defaultPreferences, ...parsed };
@@ -45,7 +71,7 @@ class UserPreferences {
         return { ...this.defaultPreferences };
     }
 
-    // Save preferences to localStorage
+    // Save preferences to cookies
     savePreferences() {
         // Don't save preferences if cookies are declined
         if (this.isCookiesDeclined()) {
@@ -54,7 +80,7 @@ class UserPreferences {
         }
 
         try {
-            localStorage.setItem(this.storageKey, JSON.stringify(this.preferences));
+            this.setCookie(this.storageKey, JSON.stringify(this.preferences));
         } catch (error) {
             console.error('Error saving preferences:', error);
         }
@@ -86,9 +112,9 @@ class UserPreferences {
     // Weather location methods
     setWeatherLocation(location) {
         this.set('weatherLocation', location);
-        // Only save to localStorage if cookies are accepted
+        // Only save to cookie if cookies are accepted
         if (this.isCookiesAccepted()) {
-            localStorage.setItem('userWeatherLocation', location); // Keep for backward compatibility
+            this.setCookie('userWeatherLocation', location); // Keep for backward compatibility
         }
     }
 
@@ -96,15 +122,15 @@ class UserPreferences {
         if (this.isCookiesDeclined()) {
             return '';
         }
-        return this.get('weatherLocation') || localStorage.getItem('userWeatherLocation') || '';
+        return this.get('weatherLocation') || this.getCookie('userWeatherLocation') || '';
     }
 
     // Finance watchlist methods
     setFinanceWatchlist(watchlist) {
         this.set('financeWatchlist', watchlist);
-        // Only save to localStorage if cookies are accepted
+        // Only save to cookie if cookies are accepted
         if (this.isCookiesAccepted()) {
-            localStorage.setItem('financeWatchlist', JSON.stringify(watchlist)); // Keep for backward compatibility
+            this.setCookie('financeWatchlist', JSON.stringify(watchlist)); // Keep for backward compatibility
         }
     }
 
@@ -119,7 +145,7 @@ class UserPreferences {
         }
         // Fallback to old storage method
         try {
-            const oldStored = localStorage.getItem('financeWatchlist');
+            const oldStored = this.getCookie('financeWatchlist');
             if (oldStored) {
                 const parsed = JSON.parse(oldStored);
                 this.setFinanceWatchlist(parsed);

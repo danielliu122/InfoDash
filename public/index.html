@@ -38,7 +38,7 @@
             <div class="col s12">
                 <section id="summary-section" class="section">
                     <div class="section-header">
-                        <h3>📊 Daily Summary</h3>
+                        <h4>📊 Daily Summary</h4>
                         <div class="right">
                             <div class="section-controls">
                                 <button class="btn-small waves-effect waves-light" onclick="resetCookieConsent()">🍪 Reset Cookies</button>
@@ -156,7 +156,7 @@
                 <div class="col s12 m6">
                     <section id="news" class="section">
                         <div class="section-header">
-                            <h3>Featured Highlights</h3>
+                            <h4>Featured Highlights</h4>
                             <div class="section-toggle" onclick="toggleSection('news-content')" title="Show/Hide Section">
                                 <span class="toggle-icon">−</span>
                             </div>
@@ -310,7 +310,7 @@
                 <div class="col s12 m6">
                     <section id="trends" class="section">
                         <div class="section-header">
-                            <h3>Trending</h3>
+                            <h4>Trending</h4>
                             <div class="section-toggle" onclick="toggleSection('trends-content')" title="Show/Hide Section">
                                 <span class="toggle-icon">−</span>
                             </div>
@@ -386,7 +386,7 @@
             <div class="col s12">
                 <section id="finance" class="section col s12">
                     <div class="section-header">
-                        <h3>Finance Data</h3>
+                        <h4>Finance Data</h4>
                         <div class="section-controls">
                             <button class="btn-small waves-effect waves-light" onclick="resetFinanceCardPositions()" title="Reset card positions">
                                 <i class="material-icons">grid_on</i> Reset Layout
@@ -494,7 +494,7 @@
                 <div class="col s12 m6">
                     <section id="traffic" class="section">
                         <div class="section-header">
-                            <h3>Google Maps Traffic</h3>
+                            <h4>Google Maps Traffic</h4>
                             <div class="section-toggle" onclick="toggleSection('traffic-content')" title="Show/Hide Section">
                                 <span class="toggle-icon">−</span>
                             </div>
@@ -508,7 +508,7 @@
                 <div class="col s12 m6">
                     <section id="reddit" class="section">
                         <div class="section-header">
-                            <h3>Reddit Top Posts</h3>
+                            <h4>Reddit Top Posts</h4>
                             <div class="section-toggle" onclick="toggleSection('reddit-content')" title="Show/Hide Section">
                                 <span class="toggle-icon">−</span>
                             </div>
@@ -530,7 +530,7 @@
             <div class="col s12">
                 <section id="chat" class="section">
                     <div class="section-header">
-                        <h3>Chat</h3>
+                        <h4>Chat</h4>
                     </div>
                     <div id="chat-content" class="section-content">
                         <div class="chat-container">
@@ -557,7 +557,7 @@
             <div class="col s12">
                 <section id="preferences" class="section">
                     <div class="section-header">
-                        <h3>⚙️ User Preferences</h3>
+                        <h4>⚙️ User Preferences</h4>
                         <div class="section-toggle" onclick="toggleSection('preferences-content')" title="Show/Hide Section">
                             <span class="toggle-icon">−</span>
                         </div>
@@ -614,9 +614,9 @@
                         <div class="row">
                             <div class="col s12">
                                 <div class="preference-group">
-                                    <h5>🗑️ Data Management</h5>
-                                    <button class="btn waves-effect waves-light red" onclick="clearAllPreferences()">Clear All Preferences</button>
-                                    <p class="preference-info">This will reset all your saved preferences to default values.</p>
+                                    <h5>Data Management</h5>
+                                    <button class="btn waves-effect waves-light red" onclick="clearAllPreferences()">Reset All Settings</button>
+                                    <p class="preference-info">This will clear all your saved preferences including location, watchlist, theme, and other settings. This action cannot be undone.</p>
                                 </div>
                             </div>
                         </div>
@@ -630,8 +630,8 @@
     <div id="cookie-notification" class="cookie-banner" style="display: none;">
         <div class="cookie-content">
             <div class="cookie-text">
-                <h6>🍪 Privacy & Data Usage</h6>
-                <p>This website uses browser storage to remember your preferences (location, watchlist, theme, etc.) and improve your experience. No personal data is collected or shared with third parties.</p>
+                <h6>Privacy & Cookie Usage</h6>
+                <p>This website uses cookies to remember your preferences (location, watchlist, theme, etc.) and improve your experience. No personal data is collected or shared with third parties. By continuing to use this site, you consent to our use of cookies for these purposes.</p>
             </div>
             <div class="cookie-actions">
                 <button class="btn-small waves-effect waves-light" onclick="acceptCookies()">Accept</button>
@@ -649,7 +649,7 @@
                 <span class="footer-separator">•</span>
                 <a href="privacy-policy.html" target="_blank" class="footer-link">Privacy Policy</a>
             </div>
-            <p class="footer-disclaimer">The content provided on this website is for informational and entertainment purposes only and does not constitute financial, investment, or other professional advice. While we aim to provide accurate and up-to-date information, we make no guarantees about the completeness, reliability, or suitability of the content.</p>
+            <p class="footer-disclaimer">The content provided on this website is for informational purposes only and does not constitute financial, investment, legal, or other professional advice. While we strive to provide accurate and up-to-date information, we make no guarantees about the completeness, reliability, or suitability of the content for any specific purpose.</p>
         </div>
     </footer>
     <script type="module" src="js/userPreferences.js"></script>
@@ -674,8 +674,9 @@
         }
 
         function acceptCookies() {
-            localStorage.setItem('cookiesAccepted', 'true');
-            localStorage.setItem('cookiesDeclined', 'false');
+            // Set cookie consent using actual cookies
+            document.cookie = 'cookiesAccepted=true; expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString() + '; path=/; samesite=Lax';
+            document.cookie = 'cookiesDeclined=false; expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString() + '; path=/; samesite=Lax';
             hideCookieBanner();
             
             // Show notification
@@ -685,17 +686,20 @@
         }
 
         function declineCookies() {
-            localStorage.setItem('cookiesAccepted', 'false');
-            localStorage.setItem('cookiesDeclined', 'true');
+            // Set cookie consent using actual cookies
+            document.cookie = 'cookiesAccepted=false; expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString() + '; path=/; samesite=Lax';
+            document.cookie = 'cookiesDeclined=true; expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString() + '; path=/; samesite=Lax';
             
-            // Clear any existing preferences
-            localStorage.removeItem('userWeatherLocation');
-            localStorage.removeItem('userTheme');
-            localStorage.removeItem('userNewsCountry');
-            localStorage.removeItem('userNewsLanguage');
-            localStorage.removeItem('userTrendsCountry');
-            localStorage.removeItem('userTrendsLanguage');
-            localStorage.removeItem('userWatchlist');
+            // Clear any existing cookies
+            document.cookie = 'userWeatherLocation=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'userTheme=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'userNewsCountry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'userNewsLanguage=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'userTrendsCountry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'userTrendsLanguage=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'userWatchlist=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'infoDash_preferences=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'financeWatchlist=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
             
             hideCookieBanner();
             
@@ -715,10 +719,24 @@
             }
         }
 
+        // Helper function to get cookie value
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) {
+                    return decodeURIComponent(c.substring(nameEQ.length, c.length));
+                }
+            }
+            return null;
+        }
+
         // Check if cookie banner should be shown on page load
         function checkCookieConsent() {
-            const cookiesAccepted = localStorage.getItem('cookiesAccepted');
-            const cookiesDeclined = localStorage.getItem('cookiesDeclined');
+            const cookiesAccepted = getCookie('cookiesAccepted');
+            const cookiesDeclined = getCookie('cookiesDeclined');
             
             // Show banner if user hasn't made a choice yet
             if (!cookiesAccepted && !cookiesDeclined) {
@@ -1258,8 +1276,8 @@
         // Function to reset cookie consent
         function resetCookieConsent() {
             // Clear cookie consent flags
-            localStorage.removeItem('cookiesAccepted');
-            localStorage.removeItem('cookiesDeclined');
+            document.cookie = 'cookiesAccepted=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'cookiesDeclined=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
             
             // Show the cookie banner again
             showCookieBanner();

@@ -350,6 +350,10 @@ export function updateFinance(data) {
             </div>
             <canvas id="financeChart"></canvas>
             <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
+            <div class="chart-resize-handle chart-resize-handle-se" title="Drag to resize"></div>
+            <div class="chart-resize-handle chart-resize-handle-sw" title="Drag to resize"></div>
+            <div class="chart-resize-handle chart-resize-handle-ne" title="Drag to resize"></div>
+            <div class="chart-resize-handle chart-resize-handle-nw" title="Drag to resize"></div>
         </div>
     `;
 
@@ -423,6 +427,90 @@ export function updateFinance(data) {
     if (slider) {
         slider.value = 0;
     }
+
+    // Add chart resize functionality
+    setupChartResize(chartContainer);
+}
+
+// Function to setup chart resize functionality
+function setupChartResize(chartContainer) {
+    const resizeHandles = chartContainer.querySelectorAll('.chart-resize-handle');
+    
+    resizeHandles.forEach(handle => {
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight;
+        
+        function startResize(e) {
+            e.preventDefault();
+            isResizing = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startWidth = chartContainer.offsetWidth;
+            startHeight = chartContainer.offsetHeight;
+            
+            chartContainer.classList.add('resizing');
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('mouseup', stopResize);
+        }
+        
+        function resize(e) {
+            if (!isResizing) return;
+            
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+            
+            let newWidth = startWidth;
+            let newHeight = startHeight;
+            
+            // Determine resize direction based on handle class
+            if (handle.classList.contains('chart-resize-handle-se')) {
+                newWidth = startWidth + deltaX;
+                newHeight = startHeight + deltaY;
+            } else if (handle.classList.contains('chart-resize-handle-sw')) {
+                newWidth = startWidth - deltaX;
+                newHeight = startHeight + deltaY;
+            } else if (handle.classList.contains('chart-resize-handle-ne')) {
+                newWidth = startWidth + deltaX;
+                newHeight = startHeight - deltaY;
+            } else if (handle.classList.contains('chart-resize-handle-nw')) {
+                newWidth = startWidth - deltaX;
+                newHeight = startHeight - deltaY;
+            }
+            
+            // Apply minimum size constraints
+            const minWidth = 300;
+            const minHeight = 200;
+            newWidth = Math.max(newWidth, minWidth);
+            newHeight = Math.max(newHeight, minHeight);
+            
+            // Apply maximum size constraints (80% of viewport)
+            const maxWidth = window.innerWidth * 0.8;
+            const maxHeight = window.innerHeight * 0.8;
+            newWidth = Math.min(newWidth, maxWidth);
+            newHeight = Math.min(newHeight, maxHeight);
+            
+            // Update chart container size
+            chartContainer.style.width = newWidth + 'px';
+            chartContainer.style.height = newHeight + 'px';
+            
+            // Update canvas size
+            const canvas = document.getElementById('financeChart');
+            if (canvas && window.financeChart) {
+                canvas.width = newWidth;
+                canvas.height = newHeight - 30; // Account for slider
+                window.financeChart.resize();
+            }
+        }
+        
+        function stopResize() {
+            isResizing = false;
+            chartContainer.classList.remove('resizing');
+            document.removeEventListener('mousemove', resize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+        
+        handle.addEventListener('mousedown', startResize);
+    });
 }
 
 // Modify the refreshRealTimeFinanceData function
@@ -1283,14 +1371,28 @@ export async function fetchTopStocks() {
             try {
                 console.log(`Fetching ${symbol}...`);
                 const isCrypto = symbol.endsWith('-USD');
+                
                 if (isCrypto) {
-                    const data = await fetchRealTimeYahooFinanceData(symbol);
-                    if (data.error) {
-                        console.warn(`Failed to fetch ${symbol}: ${data.error}`);
+                    // For crypto, fetch both real-time and historical data to get proper change values
+                    const [currentData, historicalData] = await Promise.all([
+                        fetchRealTimeYahooFinanceData(symbol),
+                        fetchStockHistoricalData(symbol)
+                    ]);
+                    
+                    if (currentData.error) {
+                        console.warn(`Failed to fetch current data for ${symbol}: ${currentData.error}`);
                         return null;
                     }
-                    console.log(`Successfully fetched crypto ${symbol}: $${data.price}`);
-                    return data;
+                    
+                    // Use historical data for change values if available, otherwise fall back to real-time data
+                    const combinedData = {
+                        ...currentData,
+                        change: historicalData ? historicalData.change : (currentData.change || 0),
+                        changePercent: historicalData ? historicalData.changePercent : (currentData.changePercent || 0)
+                    };
+                    
+                    console.log(`Successfully fetched crypto ${symbol}: $${currentData.price} (Change: ${combinedData.changePercent.toFixed(2)}%)`);
+                    return combinedData;
                 } else {
                     const historicalData = await fetchStockHistoricalData(symbol);
                     if (!historicalData) {
@@ -1325,6 +1427,46 @@ export async function fetchTopStocks() {
     } catch (error) {
         console.error('Error fetching top stocks:', error);
     }
+}
+
+// Helper function to format price with commas and determine font size
+function formatPriceWithCommas(price) {
+    if (price === null || price === undefined || price === 'N/A') {
+        return { formatted: 'N/A', fontSize: '1.2em' };
+    }
+    
+    const numPrice = parseFloat(price);
+    if (isNaN(numPrice)) {
+        return { formatted: 'N/A', fontSize: '1.2em' };
+    }
+    
+    // Format with commas
+    const formatted = numPrice.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+    
+    // Determine font size based on number length
+    let fontSize = '1.2em'; // Default size
+    const priceStr = formatted.replace(/[^0-9]/g, ''); // Remove non-digits
+    
+    if (priceStr.length >= 7) { // 1,000,000+
+        fontSize = '0.9em';
+    } else if (priceStr.length >= 5) { // 10,000+
+        fontSize = '1.0em';
+    } else if (priceStr.length >= 3) { // 100+
+        fontSize = '1.1em';
+    }
+    
+    return { formatted, fontSize };
+}
+
+// Helper function to format change values
+function formatChangeValue(value) {
+    if (value === null || value === undefined) {
+        return '0.00';
+    }
+    return parseFloat(value).toFixed(2);
 }
 
 // Update stock dashboard with animations
@@ -1375,12 +1517,12 @@ function updateStockDashboard() {
             // For crypto, use regular change percentage
             priceChange = stock.change || 0;
             priceChangePercent = stock.changePercent || 0;
-            changeLabel = 'Change';
+            changeLabel = '1h';
         } else {
             // For stocks, use open-to-close percentage
             priceChange = stock.openToCloseChange || 0;
             priceChangePercent = stock.openToCloseChangePercent || 0;
-            changeLabel = 'Open→Close';
+            changeLabel = 'Daily';
         }
         
         // Determine animation class based on price change
@@ -1397,9 +1539,15 @@ function updateStockDashboard() {
 
         const changeColor = priceChange >= 0 ? 'green' : 'red';
         const changeIcon = priceChange >= 0 ? '↗' : '↘';
-        const price = stock.price ? stock.price.toFixed(2) : 'N/A';
-        const change = priceChange.toFixed(2);
-        const changePercent = priceChangePercent.toFixed(2);
+        
+        // Format price with commas and dynamic font size
+        const priceFormat = formatPriceWithCommas(stock.price);
+        const change = formatChangeValue(priceChange);
+        const changePercent = formatChangeValue(priceChangePercent);
+
+        // Define actual colors for inline styles
+        const percentageColor = priceChange >= 0 ? '#4caf50' : '#f44336';
+        const darkThemePercentageColor = priceChange >= 0 ? '#66bb6a' : '#ef5350';
 
         html += `
             <div class="stock-card ${animationClass}" onclick="selectStock('${stock.symbol}')">
@@ -1407,9 +1555,9 @@ function updateStockDashboard() {
                     <span class="stock-symbol">${stock.symbol}</span>
                     <span class="stock-name">${stockSymbols[stock.symbol] || stock.symbol}</span>
                 </div>
-                <div class="stock-price" style="color: ${changeColor};">$${price}</div>
+                <div class="stock-price" style="color: ${changeColor}; font-size: ${priceFormat.fontSize};">$${priceFormat.formatted}</div>
                 <div class="stock-change">
-                    ${changeIcon} $${change} <span class="percentage ${changeColor}">(${changePercent}%)</span>
+                    ${changeIcon} <span class="percentage" style="color: ${percentageColor}; font-weight: bold; text-shadow: 0 0 1px ${percentageColor}40;">${changePercent}%</span>
                     <div class="change-label">${changeLabel}</div>
                 </div>
             </div>

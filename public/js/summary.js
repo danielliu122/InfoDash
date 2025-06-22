@@ -513,7 +513,7 @@ async function displayCurrentWeather() {
     if (!location) {
         if (weatherSummaryContainer) {
             // Check if cookies are declined
-            const cookiesDeclined = localStorage.getItem('cookiesDeclined') === 'true';
+            const cookiesDeclined = getCookie('cookiesDeclined') === 'true';
             
             if (cookiesDeclined) {
                 weatherSummaryContainer.innerHTML = `
@@ -1264,4 +1264,18 @@ function updateRefreshButtonStatus() {
 }
 
 // Make functions globally available
-window.resetDailySummaryLimit = resetDailySummaryLimit; 
+window.resetDailySummaryLimit = resetDailySummaryLimit;
+
+// Helper function to get cookie value
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) {
+            return decodeURIComponent(c.substring(nameEQ.length, c.length));
+        }
+    }
+    return null;
+} 
