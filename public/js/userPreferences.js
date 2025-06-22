@@ -75,7 +75,7 @@ class UserPreferences {
     savePreferences() {
         // Don't save preferences if cookies are declined
         if (this.isCookiesDeclined()) {
-            console.log('Preferences not saved: cookies declined');
+            // console.log('Preferences not saved: cookies declined');
             return;
         }
 
@@ -261,7 +261,7 @@ class UserPreferences {
             document.body.classList.add(`${theme}-theme`);
         }
 
-        console.log('User preferences applied:', this.preferences);
+        // console.log('User preferences applied:', this.preferences);
     }
 
     // Save current UI state to preferences
@@ -292,7 +292,7 @@ class UserPreferences {
         const isDarkTheme = document.body.classList.contains('dark-theme');
         this.setTheme(isDarkTheme ? 'dark' : 'light');
 
-        console.log('Current state saved to preferences');
+        // console.log('Current state saved to preferences');
     }
 }
 

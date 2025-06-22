@@ -9,6 +9,7 @@ import {
     isMarketOpen,
     initializeFinance,
     clearWatchlist,
+    resetToDefaultWatchlist,
     resetChartZoom,
     updateChartTheme,
     startStockDashboard,
@@ -95,6 +96,9 @@ window.togglePauseFinance = togglePauseFinance;
 
 // Make resetFinanceCardPositions globally available
 window.resetFinanceCardPositions = resetFinanceCardPositions;
+
+// Make resetToDefaultWatchlist globally available
+window.resetToDefaultWatchlist = resetToDefaultWatchlist;
 
 // Export refreshNews function
 export async function refreshNews() {
@@ -253,7 +257,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (isMarketOpen()) {
             startAutoRefresh('^IXIC', '5m', '1m');
         } else {
-            console.log('Market is closed. Auto-refresh will not start.');
+            // console.log('Market is closed. Auto-refresh will not start.');
             // Update the chart once even if the market is closed
             handleFinanceUpdate('1d', '1m');
         }
@@ -266,7 +270,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error('Error during initial data fetch:', error);
     }
-    console.log("DOM fully loaded")
+    // console.log("DOM fully loaded")
 
     // Add event listeners for pagination controls
     const paginationButtons = document.querySelectorAll('.pagination-controls button');

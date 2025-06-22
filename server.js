@@ -29,7 +29,7 @@ async function loadNewsCache() {
         const data = await fs.readFile(NEWS_CACHE_FILE, 'utf8');
         return JSON.parse(data);
     } catch (error) {
-        console.log('No existing news cache found, starting fresh');
+        // console.log('No existing news cache found, starting fresh');
         return {};
     }
 }
@@ -46,7 +46,7 @@ async function saveNewsCache(cacheData) {
         }
         
         await fs.writeFile(NEWS_CACHE_FILE, JSON.stringify(cacheData, null, 2));
-        console.log('News cache saved to file');
+        // console.log('News cache saved to file');
     } catch (error) {
         console.error('Error saving news cache:', error);
     }
@@ -123,7 +123,7 @@ async function saveDailySummary(summaryData, date) {
         lastSummaryDate = today;
         }
         
-        console.log(`Daily summary saved for ${date}`);
+        // console.log(`Daily summary saved for ${date}`);
         return true;
     } catch (error) {
         console.error('Error saving daily summary:', error);
@@ -155,9 +155,9 @@ async function initializeDailySummary() {
     if (savedSummary) {
         dailySummary = savedSummary;
         lastSummaryDate = today;
-        console.log(`Loaded existing daily summary for ${today}`);
+        // console.log(`Loaded existing daily summary for ${today}`);
     } else {
-        console.log('No existing daily summary found');
+        // console.log('No existing daily summary found');
     }
 }
 
@@ -217,12 +217,12 @@ app.get('/api/news', async (req, res) => {
         
         // Check if we have cached data for this request
         if (fileCache[cacheKey] && !isCacheStale(fileCache[cacheKey].timestamp)) {
-            console.log(`Using cached news data for: ${cacheKey}`);
+            // console.log(`Using cached news data for: ${cacheKey}`);
             return res.json(fileCache[cacheKey].data);
     }
 
         // If cache is stale or doesn't exist, fetch fresh data
-        console.log(`Fetching fresh news data for: ${cacheKey}`);
+        // console.log(`Fetching fresh news data for: ${cacheKey}`);
 
     // Build API URL based on parameters
     let newsUrl;
@@ -244,7 +244,7 @@ app.get('/api/news', async (req, res) => {
             // Save updated cache to file
             await saveNewsCache(fileCache);
             
-            console.log(`Fresh news data cached for: ${cacheKey}`);
+            // console.log(`Fresh news data cached for: ${cacheKey}`);
             res.json(response.data);
         } else {
             res.status(response.status).json({ error: 'Error fetching news data' });
@@ -255,12 +255,12 @@ app.get('/api/news', async (req, res) => {
         
         // Check if it's a rate limit error
         if (error.response && error.response.status === 429) {
-            console.log('News API rate limit reached, checking for cached data...');
+            // console.log('News API rate limit reached, checking for cached data...');
             
             // Try to load any cached data, even if stale
             const fileCache = await loadNewsCache();
             if (fileCache[cacheKey]) {
-                console.log(`Using stale cached data for: ${cacheKey}`);
+                // console.log(`Using stale cached data for: ${cacheKey}`);
                 return res.json({
                     ...fileCache[cacheKey].data,
                     _cached: true,
@@ -277,11 +277,11 @@ app.get('/api/news', async (req, res) => {
         
         // Check if it's an API key error
         if (error.response && error.response.status === 401) {
-            console.log('News API key error, checking for cached data...');
+            // console.log('News API key error, checking for cached data...');
             
             const fileCache = await loadNewsCache();
             if (fileCache[cacheKey]) {
-                console.log(`Using cached data due to API key error for: ${cacheKey}`);
+                // console.log(`Using cached data due to API key error for: ${cacheKey}`);
                 return res.json({
                     ...fileCache[cacheKey].data,
                     _cached: true,
@@ -411,25 +411,25 @@ app.get('/api/googlemaps/script', (req, res) => {
 
 app.post('/api/chat', async (req, res) => {
     try {
-        console.log('Chat API: Received request');
+        // console.log('Chat API: Received request');
         const { messages, model = 'deepseek/deepseek-r1:free' } = req.body;
         
-        console.log('Chat API: Request body parsed, model:', model);
-        console.log('Chat API: Messages count:', messages?.length || 0);
+        // console.log('Chat API: Request body parsed, model:', model);
+        // console.log('Chat API: Messages count:', messages?.length || 0);
         
         if (!messages || messages.length === 0) {
-            console.log('Chat API: No messages provided');
+            // console.log('Chat API: No messages provided');
             return res.status(400).json({ error: 'Messages are required' });
         }
 
-        console.log('Chat API: Making OpenAI API call...');
+        // console.log('Chat API: Making OpenAI API call...');
         const response = await openai.chat.completions.create({
             model,
             messages,
             max_tokens: 3333,
         });
 
-        console.log('Chat API: OpenAI response received');
+        // console.log('Chat API: OpenAI response received');
 
         // Validate API response structure
         if (!response || !response.choices || !response.choices[0] || !response.choices[0].message) {
@@ -441,7 +441,7 @@ app.post('/api/chat', async (req, res) => {
         }
 
         const reply = response.choices[0].message.content;
-        console.log('Chat API: Sending response, length:', reply.length);
+        // console.log('Chat API: Sending response, length:', reply.length);
         res.json({ reply });
     } catch (error) {
         console.error('Chat API: Error communicating with OpenRouter:', error);
@@ -640,8 +640,8 @@ app.post('/api/enhanced-lookup', async (req, res) => {
 // Daily Summary API endpoints
 app.post('/api/summary/save', async (req, res) => {
     try {
-        console.log('Received summary save request');
-        console.log('Request body:', req.body);
+        // console.log('Received summary save request');
+        // console.log('Request body:', req.body);
         
         const { news, trends, finance, overall, date } = req.body;
         
@@ -649,12 +649,12 @@ app.post('/api/summary/save', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Date is required' });
         }
 
-        console.log('Provided date:', date);
+        // console.log('Provided date:', date);
         
         // Check if we already have a summary for the given date
         const existingSummary = await loadDailySummary(date);
         if (existingSummary) {
-            console.log(`Daily summary already exists for ${date}`);
+            // console.log(`Daily summary already exists for ${date}`);
             return res.json({ 
                 success: false, 
                 message: `Daily summary already exists for ${date}`,
@@ -662,10 +662,10 @@ app.post('/api/summary/save', async (req, res) => {
             });
         }
         
-        console.log('Extracted summary data:', { news: !!news, trends: !!trends, finance: !!finance, overall: !!overall });
+        // console.log('Extracted summary data:', { news: !!news, trends: !!trends, finance: !!finance, overall: !!overall });
         
         if (!news && !trends && !finance && !overall) {
-            console.log('No summary data provided');
+            // console.log('No summary data provided');
             return res.status(400).json({ 
                 success: false, 
                 message: 'No summary data provided' 
@@ -680,18 +680,18 @@ app.post('/api/summary/save', async (req, res) => {
             generatedAt: new Date().toISOString()
         };
         
-        console.log('Saving summary data...');
+        // console.log('Saving summary data...');
         const saved = await saveDailySummary(summaryData, date);
         
         if (saved) {
-            console.log(`Summary saved successfully for ${date}`);
+            // console.log(`Summary saved successfully for ${date}`);
             res.json({ 
                 success: true, 
                 message: 'Daily summary saved successfully',
                 summary: summaryData
             });
         } else {
-            console.log('Failed to save summary');
+            // console.log('Failed to save summary');
             res.status(500).json({ 
                 success: false, 
                 message: 'Failed to save daily summary' 
@@ -775,7 +775,7 @@ app.get('/api/summary/history', async (req, res) => {
 app.post('/api/news/clear-cache', async (req, res) => {
     try {
         await saveNewsCache({});
-        console.log('News cache cleared');
+        // console.log('News cache cleared');
         res.json({ success: true, message: 'News cache cleared successfully' });
     } catch (error) {
         console.error('Error clearing news cache:', error);
@@ -806,11 +806,49 @@ app.get('/api/news/cache-status', async (req, res) => {
     }
 });
 
+// --- NEW ROBUST BULK FINANCE ENDPOINT ---
+app.post('/api/finance/bulk-real-time', async (req, res) => {
+    const { symbols } = req.body;
+
+    if (!symbols || !Array.isArray(symbols)) {
+        return res.status(400).json({ error: 'Symbols must be an array' });
+    }
+
+    try {
+        const results = {};
+        const promises = symbols.map(async (symbol) => {
+            try {
+                const quote = await yahooFinance.quote(symbol);
+                if (quote) {
+                    results[symbol] = {
+                        price: quote.regularMarketPrice,
+                        change: quote.regularMarketChange,
+                        changePercent: quote.regularMarketChangePercent,
+                        symbol: quote.symbol,
+                        name: quote.shortName || quote.longName || symbol,
+                    };
+                } else {
+                    results[symbol] = { error: 'No data available' };
+                }
+            } catch (error) {
+                console.error(`Error fetching bulk data for symbol: ${symbol}`, error.message);
+                results[symbol] = { error: 'Failed to fetch' };
+            }
+        });
+
+        await Promise.all(promises);
+        res.json(results);
+    } catch (error) {
+        console.error('Error fetching bulk real-time data:', error);
+        res.status(500).json({ error: 'Failed to fetch bulk real-time financial data' });
+    }
+});
+
 // Catch-all route for undefined routes
 app.use((req, res) => {
     res.status(404).send('404 Not Found');
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    // console.log(`Server is running on port ${port}`);
 });

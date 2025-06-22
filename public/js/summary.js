@@ -439,7 +439,7 @@ function createAnalysisPrompt(sectionData) {
     let prompt = 'Please analyze the following current data and provide a comprehensive summary:\n\n';
     const selectedDate = new Date(getSelectedDate() + 'T00:00:00'); // Use selected date to check for weekend
     const isWeekend = selectedDate.getDay() === 0 || selectedDate.getDay() === 6;
-
+    
     if (sectionData.news && sectionData.news.length > 0) {
         prompt += '📰 TOP HEADLINES:\n';
         sectionData.news.forEach((item, index) => {
@@ -853,7 +853,7 @@ export async function saveCurrentSummary() {
         } else {
             const errorData = await response.json();
             showNotification(`Error saving summary: ${errorData.error}`, 5000);
-        }
+            }
     } catch (error) {
         console.error('Error saving summary:', error);
         showNotification('Error saving summary. Please try again.', 5000);
@@ -870,7 +870,7 @@ async function loadDailySummary(date = null) {
         if (result.success) {
             return result.summary;
         } else {
-            console.log('No daily summary found:', result.message);
+            // console.log('No daily summary found:', result.message);
             return null;
         }
     } catch (error) {
@@ -1026,8 +1026,8 @@ function updateSummaryDisplayFromData(summaryData) {
     
     // Fetch and display current weather separately
     displayCurrentWeather();
-}
-
+    }
+    
 // This function will now orchestrate the entire summary section's initial state
 async function loadOrGenerateTodaySummary() {
     const today = getLocalDateString();
@@ -1040,7 +1040,7 @@ async function loadOrGenerateTodaySummary() {
     
     if (summary) {
         // A summary for today already exists, just display it
-        console.log('Found existing summary for today, displaying without API calls');
+        // console.log('Found existing summary for today, displaying without API calls');
         updateSummaryDisplayFromData(summary);
         
         // Mark that a summary was generated today (since one exists)
@@ -1048,51 +1048,51 @@ async function loadOrGenerateTodaySummary() {
     } else {
         // No summary for today, check if user has already generated one today
         if (hasGeneratedToday()) {
-            console.log('User has already generated a summary today, showing notification');
+            // console.log('User has already generated a summary today, showing notification');
             showNotification('You have already generated a summary today. You can refresh the current summary or view past summaries.');
             hideSummaryLoading();
             setControlsDisabled(false);
             updateRefreshButtonStatus();
-            return;
-        }
-        
+        return;
+    }
+
         // No summary exists and user hasn't generated one today, so generate a new one
         setSummaryLoadingText(`No summary found for today. Generating a new one...`);
-        
-        const timeoutPromise = new Promise((_, reject) => {
+    
+    const timeoutPromise = new Promise((_, reject) => {
             setTimeout(() => reject(new Error('Summary generation timed out after 90 seconds')), 90000);
-        });
-        
-        try {
-            const summaryPromise = (async () => {
-                const sectionData = await collectSectionData();
-                const summaryText = await generateSummary(sectionData);
-                
+    });
+    
+    try {
+        const summaryPromise = (async () => {
+            const sectionData = await collectSectionData();
+            const summaryText = await generateSummary(sectionData);
+            
                 // Only save if the summary was successfully generated (not an error message)
                 if (summaryText && !summaryText.includes('Error:') && !summaryText.includes('Unable to generate')) {
-                    updateSummaryDisplay(summaryText);
-                    
+            updateSummaryDisplay(summaryText);
+            
                     // Mark that a summary was generated today
                     markGeneratedToday();
                     
                     // Automatically save the newly generated summary
-                    await saveCurrentSummary();
+            await saveCurrentSummary();
                     await updateSavedSummariesList(); // Refresh the archive list
                 } else {
                     // If generation failed, just display the error without saving
                     updateSummaryDisplay(summaryText);
                 }
-            })();
-            
-            await Promise.race([summaryPromise, timeoutPromise]);
-            
-        } catch (error) {
+        })();
+        
+        await Promise.race([summaryPromise, timeoutPromise]);
+        
+    } catch (error) {
             console.error('Error auto-generating summary:', error);
-            if (error.message.includes('timed out')) {
+        if (error.message.includes('timed out')) {
                 updateSummaryDisplay('Error: Summary generation timed out. Please try refreshing the page.');
-            } else {
+        } else {
                 updateSummaryDisplay('Error: Unable to automatically generate the daily summary.');
-            }
+        }
         }
     }
     
@@ -1103,7 +1103,7 @@ async function loadOrGenerateTodaySummary() {
 
 // Function to initialize the entire summary feature
 async function initializeSummarySection() {
-    console.log('Initializing summary section...');
+    // console.log('Initializing summary section...');
     
     // Set up event listeners
     document.getElementById('summaryDate').addEventListener('change', loadSummaryForDate);
@@ -1124,7 +1124,7 @@ async function initializeSummarySection() {
     // Update refresh button status
     updateRefreshButtonStatus();
     
-    console.log('Summary section initialized');
+    // console.log('Summary section initialized');
 }
 
 // Function to refresh summary (generates new one but doesn't save to server)
@@ -1149,10 +1149,10 @@ export async function refreshSummary() {
     
     try {
         const summaryPromise = (async () => {
-            const sectionData = await collectSectionData();
-            const summaryText = await generateSummary(sectionData);
-            updateSummaryDisplay(summaryText);
-            
+        const sectionData = await collectSectionData();
+        const summaryText = await generateSummary(sectionData);
+        updateSummaryDisplay(summaryText);
+        
             // Mark that a summary was generated today
             markGeneratedToday();
             
@@ -1170,7 +1170,7 @@ export async function refreshSummary() {
         if (error.message.includes('timed out')) {
             updateSummaryDisplay('Error: Summary generation timed out. Please try again.');
         } else {
-            updateSummaryDisplay('Error: Unable to refresh summary. Please try again later.');
+        updateSummaryDisplay('Error: Unable to refresh summary. Please try again later.');
         }
     } finally {
         hideSummaryLoading();
@@ -1193,7 +1193,7 @@ function toggleSection(sectionId) {
 // Make functions available globally for HTML onclick handlers
 window.saveCurrentSummary = saveCurrentSummary;
 window.loadSummaryForDate = loadSummaryForDate;
-window.deleteSelectedSummary = deleteSelectedSummary;
+window.deleteSelectedSummary = deleteSelectedSummary; 
 window.refreshSummary = refreshSummary;
 window.toggleSection = toggleSection;
 
@@ -1240,7 +1240,7 @@ window.setWeatherLocation = function() {
 // Function to reset daily summary generation limit (for testing or admin use)
 export function resetDailySummaryLimit() {
     localStorage.removeItem('lastSummaryGeneratedDate');
-    console.log('Daily summary generation limit reset');
+    // console.log('Daily summary generation limit reset');
     showNotification('Daily summary limit reset. You can now generate a new summary.');
     updateRefreshButtonStatus();
 }

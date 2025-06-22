@@ -420,6 +420,7 @@
                             <div class="card watchlist">
                                 <div class="card-header">
                                     <span class="card-title">Watchlist</span>
+                                    <button class="btn-small waves-effect waves-light" onclick="resetToDefaultWatchlist()" title="Reset to default watchlist">Reset to Default</button>
                                 </div>
                                 <div class="card-content">
                                     <div id="watchlist-container" class="watchlist-container">
@@ -433,8 +434,7 @@
                                 <div class="card-header">
                                     <span class="card-title">Live Stock Dashboard</span>
                                     <div class="dashboard-controls">
-                                        <button id="startDashboard" class="btn-small waves-effect waves-light green" onclick="startStockDashboard()">Start Live</button>
-                                        <button id="stopDashboard" class="btn-small waves-effect waves-light red" onclick="stopStockDashboard()" style="display: none;">Stop Live</button>
+                                        <button id="dashboardToggle" class="btn-small waves-effect waves-light green" onclick="toggleStockDashboard()">Pause</button>
                                     </div>
                                 </div>
                                 <div class="card-content">
@@ -480,10 +480,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Real-time Data Display -->
-                        <div class="real-time-data-container"></div>
-                        
                         <div class="data-container"></div>
                     </div>
                 </section>
@@ -807,29 +803,12 @@
             }
         }
 
-        async function startStockDashboard() {
+        async function toggleStockDashboard() {
             try {
-                const { startStockDashboard: startStockDashboardFn } = await import('./js/finance.js');
-                startStockDashboardFn();
-                
-                // Update button states
-                document.getElementById('startDashboard').style.display = 'none';
-                document.getElementById('stopDashboard').style.display = 'inline-block';
+                const { toggleStockDashboard: toggleStockDashboardFn } = await import('./js/finance.js');
+                toggleStockDashboardFn();
             } catch (error) {
-                console.error('Error starting stock dashboard:', error);
-            }
-        }
-
-        async function stopStockDashboard() {
-            try {
-                const { stopStockDashboard: stopStockDashboardFn } = await import('./js/finance.js');
-                stopStockDashboardFn();
-                
-                // Update button states
-                document.getElementById('startDashboard').style.display = 'inline-block';
-                document.getElementById('stopDashboard').style.display = 'none';
-            } catch (error) {
-                console.error('Error stopping stock dashboard:', error);
+                console.error('Error toggling stock dashboard:', error);
             }
         }
 
@@ -970,20 +949,20 @@
             }
 
             // Debug: Log the weather data structure
-            console.log('Weather data received:', weatherData);
-            console.log('Weather data keys:', Object.keys(weatherData));
+            // console.log('Weather data received:', weatherData);
+            // console.log('Weather data keys:', Object.keys(weatherData));
 
             // Handle different API response structures
             let location, current;
             
             if (weatherData.location && weatherData.current) {
                 // Standard structure (weather-js format)
-                console.log('Using weather-js structure');
+                // console.log('Using weather-js structure');
                 location = weatherData.location;
                 current = weatherData.current;
             } else if (weatherData.name && weatherData.main) {
                 // Alternative structure (OpenWeatherMap style)
-                console.log('Using OpenWeatherMap structure');
+                // console.log('Using OpenWeatherMap structure');
                 location = { name: weatherData.name, country: weatherData.sys?.country || '' };
                 current = {
                     temperature: weatherData.main.temp,
@@ -997,7 +976,7 @@
                 };
             } else if (weatherData.city && weatherData.temperature) {
                 // Another possible structure
-                console.log('Using city/temperature structure');
+                // console.log('Using city/temperature structure');
                 location = { name: weatherData.city, country: weatherData.country || '' };
                 current = {
                     temperature: weatherData.temperature,
@@ -1011,7 +990,7 @@
                 };
             } else {
                 // Fallback: try to extract data from any structure
-                console.log('Using fallback structure extraction');
+                // console.log('Using fallback structure extraction');
                 location = { 
                     name: weatherData.name || weatherData.city || weatherData.location || 'Unknown Location', 
                     country: weatherData.country || weatherData.sys?.country || '' 
@@ -1028,8 +1007,8 @@
                 };
             }
             
-            console.log('Extracted location:', location);
-            console.log('Extracted current:', current);
+            // console.log('Extracted location:', location);
+            // console.log('Extracted current:', current);
             
             // Ensure all required properties exist with fallbacks
             const temp = current.temperature !== undefined && current.temperature !== 'N/A' ? Math.round(current.temperature) : 'N/A';
@@ -1071,19 +1050,19 @@
                 ? `${locationName}, ${locationCountry}` 
                 : locationName;
             
-            console.log('Final display values:', {
-                locationDisplay,
-                locationName,
-                locationCountry,
-                temp,
-                tempUnit,
-                condition,
-                feelsLike,
-                humidity,
-                wind,
-                windUnit,
-                timestamp
-            });
+            // console.log('Final display values:', {
+            //     locationDisplay,
+            //     locationName,
+            //     locationCountry,
+            //     temp,
+            //     tempUnit,
+            //     condition,
+            //     feelsLike,
+            //     humidity,
+            //     wind,
+            //     windUnit,
+            //     timestamp
+            // });
             
             weatherContainer.innerHTML = `
                 <div class="weather-display" style="background: var(--card-bg); padding: 15px; border-radius: 8px; margin-top: 10px;">
@@ -1292,6 +1271,15 @@
 
         // Make reset function globally available
         window.resetCookieConsent = resetCookieConsent;
+
+        // Function to reset watchlist to default
+        function resetToDefaultWatchlist() {
+            if (window.financeModule && window.financeModule.resetToDefaultWatchlist) {
+                window.financeModule.resetToDefaultWatchlist();
+            } else {
+                console.error('Finance module not available');
+            }
+        }
     </script>
     <button id="scrollToTopBtn" class="scroll-to-top" style="display: none;">↑</button>
 

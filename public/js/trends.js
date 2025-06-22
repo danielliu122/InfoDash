@@ -130,14 +130,35 @@ export const updateTrends = (data, category) => {
             topicButton.title = `Traffic: ${topic.formattedTraffic}`;
         }
         
+        // Add click handler for better UX
+        topicButton.addEventListener('click', () => {
+            // Visual feedback
+            topicButton.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                topicButton.style.transform = '';
+            }, 150);
+            
+            // You can add search functionality here later
+            console.log('Trending topic clicked:', topicButton.textContent);
+        });
+        
         buttonsContainer.appendChild(topicButton);
     });
 
     trendsSection.appendChild(buttonsContainer);
 
-    // Add a simple info message about the simplified display
+    // Add a styled info message about the simplified display
     const infoMessage = document.createElement('div');
-    infoMessage.style.cssText = 'text-align: center; padding: 15px; color: var(--secondary-text); font-style: italic;';
+    infoMessage.style.cssText = `
+        text-align: center; 
+        padding: 20px; 
+        color: var(--secondary-text); 
+        font-style: italic;
+        background: var(--card-bg);
+        border-radius: 8px;
+        margin-top: 16px;
+        border: 1px solid var(--border-color);
+    `;
     infoMessage.innerHTML = '<p>📊 Showing trending topics for the selected country. Click on topics to see more details (when available).</p>';
     trendsSection.appendChild(infoMessage);
 };

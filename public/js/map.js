@@ -248,7 +248,7 @@ async function initMap() {
 
         places.forEach((place) => {
             if (!place.geometry || !place.geometry.location) {
-                console.log("Returned place contains no geometry");
+                // console.log("Returned place contains no geometry");
                 return;
             }
 
@@ -270,7 +270,7 @@ async function initMap() {
     trafficLayer.setMap(map);
 
     isMapInitialized = true;
-    console.log('Map initialized');
+    // console.log('Map initialized');
 
     // Add event listener for map interaction to request location
     map.addListener('click', requestLocation);
@@ -312,7 +312,7 @@ const updateTrafficInfo = async (location) => {
         console.error('Invalid location provided to updateTrafficInfo');
         return;
     }
-    //console.log('Updating traffic info for location:', location);
+    // console.log('Updating traffic info for location:', location);
 }
 
 // New function to request location
@@ -329,7 +329,7 @@ function requestLocation() {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 };
-                console.log('User location obtained:', pos);
+                // console.log('User location obtained:', pos);
                 map.setCenter(pos);
                 map.setZoom(12);
                 updateTrafficInfo(pos);

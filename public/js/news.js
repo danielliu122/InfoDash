@@ -14,13 +14,13 @@ export const fetchNewsData = async (query = 'world', country = 'us', language = 
 
     // Check if cache exists and remove expired data
     if (newsCache[cacheKey] && (Date.now() - newsCache[cacheKey].timestamp >= newsCache[cacheKey].ttl)) {
-        console.log(`Cache expired for ${cacheKey}, clearing it...`);
+        // console.log(`Cache expired for ${cacheKey}, clearing it...`);
         delete newsCache[cacheKey];
     }
 
     // Check if cached data is available and still valid
     if (newsCache[cacheKey]?.data?.length > 0 && (Date.now() - newsCache[cacheKey].timestamp < TTL_MS)) {
-        console.log(`Using cached news data for: ${cacheKey}`);
+        // console.log(`Using cached news data for: ${cacheKey}`);
         return newsCache[cacheKey].data;
     }
 
