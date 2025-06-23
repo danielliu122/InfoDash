@@ -104,7 +104,7 @@ section, .section, .summary-card, #finance, #finance .card, .news-item, .trend-c
     border-radius: 8px;
   margin-bottom: 20px;
   box-sizing: border-box;
-  max-height: 480px;
+  max-height: 240px;
   overflow-y: auto;
 }
 section, .section, .summary-card, .trend-card, .news-item, .chart-container {
@@ -376,7 +376,7 @@ body.dark-theme .card.chart-container {
 }
 
 .card.timeframe-controls {
-  max-height: 200px;
+  max-height: 100px;
   padding: 8px 16px !important;
   display: flex;
   flex-direction: column;
@@ -797,12 +797,12 @@ body.dark-theme .time-range-button.active {
 /* === Finance Section Card Height Limits === */
 #finance .card.timeframe-controls,
 #finance .card.stock-info {
-  max-height: 500px !important;
+  max-height: 250px !important;
   overflow-y: auto !important;
 }
 
 #finance .card.chart-container {
-  max-height: 500px !important;
+  max-height: 250px !important;
   overflow: hidden !important;
 }
 
@@ -838,7 +838,7 @@ body.dark-theme .time-range-button.active {
   position: absolute;
   top: 10px;
   right: 10px;
-  display: flex;
+    display: flex;
   flex-direction: row;
   gap: 4px;
   z-index: 10;

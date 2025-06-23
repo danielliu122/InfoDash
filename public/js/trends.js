@@ -1,5 +1,3 @@
-// trends.js
-
 import { userPrefs } from './userPreferences.js';
 
 // Function to decode HTML entities
@@ -138,8 +136,10 @@ export const updateTrends = (data, category) => {
                 topicButton.style.transform = '';
             }, 150);
             
-            // You can add search functionality here later
-            console.log('Trending topic clicked:', topicButton.textContent);
+            // Open Google News search in new tab
+            const searchTerm = encodeURIComponent(topicButton.textContent);
+            const googleNewsUrl = `https://news.google.com/search?for=${searchTerm}&hl=en-US&gl=US&ceid=US%3Aen`;
+            window.open(googleNewsUrl, '_blank');
         });
         
         buttonsContainer.appendChild(topicButton);
@@ -159,7 +159,7 @@ export const updateTrends = (data, category) => {
         margin-top: 16px;
         border: 1px solid var(--border-color);
     `;
-    infoMessage.innerHTML = '<p>📊 Showing trending topics for the selected country. Click on topics to see more details (when available).</p>';
+    infoMessage.innerHTML = '<p>📊 Showing trending topics for the selected country. Click on topics to search Google News in a new tab.</p>';
     trendsSection.appendChild(infoMessage);
 };
 
@@ -288,4 +288,4 @@ const validLanguageCountryMap = {
     'BR': ['pt', 'en'],
     'ES': ['es', 'en'],
     // Add more countries and their valid languages as needed
-};
+}; 
