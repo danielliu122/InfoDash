@@ -2,33 +2,189 @@
   "world-us-en-general-all": {
     "data": {
       "status": "ok",
-      "totalResults": 35,
+      "totalResults": 34,
       "articles": [
         {
           "source": {
             "id": null,
-            "name": "Yahoo Entertainment"
+            "name": "Understandingwar.org"
           },
-          "author": "Yahoo Sports Staff",
-          "title": "College World Series 2025 score: LSU's Kade Anderson makes argument for No. 1 pick with shutout win in Game 1 - Yahoo Sports",
-          "description": "The southpaw hit 130 pitches to give LSU a 1-0 lead in the Men's College World Series.",
-          "url": "https://sports.yahoo.com/college-sports/live/college-world-series-2025-score-lsus-kade-anderson-makes-argument-for-no-1-pick-with-shutout-win-in-game-1-220034362.html",
-          "urlToImage": "https://s.yimg.com/ny/api/res/1.2/lV_NF5vQv9Xg470DYf3l3g--/YXBwaWQ9aGlnaGxhbmRlcjt3PTEyMDA7aD04MDA7Y2Y9d2VicA--/https://s.yimg.com/os/creatr-uploaded-images/2025-06/998c75d0-4f07-11f0-9bdd-a0297017de06",
-          "publishedAt": "2025-06-22T01:44:00Z",
-          "content": "If LSU southpaw Kade Anderson is the No. 1 pick of the 2025 MLB Draft, Game 1 of the Men's College World Series will be a reason why.\r\nThe All-American sophomore dominated Coastal Carolina with a shu… [+1471 chars]"
+          "author": null,
+          "title": "Iran Update Special Report, June 22, 2025, Morning Edition - Institute for the Study of War",
+          "description": "The United States conducted strikes against three Iranian nuclear sites, including the Fordow Fuel Enrichment Plant (FEEP) in Qom Province.",
+          "url": "https://www.understandingwar.org/backgrounder/iran-update-special-report-june-22-2025-morning-edition",
+          "urlToImage": "",
+          "publishedAt": "2025-06-22T18:19:02Z",
+          "content": "Ria Reddy, Andie Parry, and Brian Carter\r\nInformation Cutoff: 5:00 AM ET \r\nThe Critical Threats Project (CTP) at the American Enterprise Institute and the Institute for the Study of War (ISW) are pub… [+12516 chars]"
+        },
+        {
+          "source": {
+            "id": "axios",
+            "name": "Axios"
+          },
+          "author": "Barak Ravid",
+          "title": "At Trump's request, Israel cleared way for U.S. bombers in Iran - Axios",
+          "description": "The operation marked the culmination of months of intense U.S.-Israeli coordination.",
+          "url": "https://www.axios.com/2025/06/22/trump-israel-iran-strikes-air-defenses",
+          "urlToImage": "https://images.axios.com/tKTOgUiRIwBluWUYDFber8BINOg=/0x0:5513x3101/1366x768/2025/06/22/1750613716088.jpg",
+          "publishedAt": "2025-06-22T17:44:45Z",
+          "content": "<ul><li>That partnership peaked in the final hours before the strike, when Israel played a direct role in enabling the U.S. military operation.</li><li>\"I want to thank and congratulate Prime Ministe… [+2801 chars]"
+        },
+        {
+          "source": {
+            "id": "abc-news",
+            "name": "ABC News"
+          },
+          "author": "The Associated Press",
+          "title": "Police: Suspect shot and killed by a security guard after a shooting at a church in Michigan - ABC News - Breaking News, Latest News and Videos",
+          "description": "One person was shot in the leg, church member ran shooter over with his truck.",
+          "url": "https://abcnews.go.com/US/wireStory/police-suspect-shot-killed-security-guard-after-shooting-123099075",
+          "urlToImage": "https://s.abcnews.com/images/US/abc_news_default_2000x2000_update_16x9_992.jpg",
+          "publishedAt": "2025-06-22T17:20:42Z",
+          "content": "WAYNE, Mich. -- A gunman opened fire during a service at a suburban Detroit church on Sunday, wounding at least one person before a security guard killed him, police said.\r\nThe incident happened at C… [+664 chars]"
+        },
+        {
+          "source": {
+            "id": "cnn",
+            "name": "CNN"
+          },
+          "author": "Allegra Goodwin, Gianluca Mezzofiore, Christian Edwards, Thomas Bordeaux, Jessie Yeung",
+          "title": "How badly have US strikes damaged Iran’s nuclear facilities? Here’s what to know - CNN",
+          "description": "After initially favoring diplomacy, US President Donald Trump resorted to an extraordinary use of force against Iran on Saturday night, striking three of the regime’s key nuclear sites.",
+          "url": "https://www.cnn.com/2025/06/21/middleeast/nuclear-sites-iran-us-bombs-wwk-intl",
+          "urlToImage": "https://media.cnn.com/api/v1/images/stellar/prod/fordow-marked2-1.png?c=16x9&q=w_800,c_fill",
+          "publishedAt": "2025-06-22T17:20:00Z",
+          "content": "Warplanes. Submarines. Cruise missiles. Bombs that weigh 30,000 pounds.\r\nAfter initially favoring diplomacy, US President Donald Trump resorted to an extraordinary use of force against Iran on Saturd… [+6319 chars]"
+        },
+        {
+          "source": {
+            "id": "the-wall-street-journal",
+            "name": "The Wall Street Journal"
+          },
+          "author": "WSJ",
+          "title": "Exclusive | Bank of New York Mellon Approached Northern Trust to Discuss Potential Merger - WSJ",
+          "description": null,
+          "url": "https://www.wsj.com/finance/banking/bank-of-new-york-mellon-approached-northern-trust-to-discuss-potential-merger-7017f4eb",
+          "urlToImage": null,
+          "publishedAt": "2025-06-22T17:03:00Z",
+          "content": null
+        },
+        {
+          "source": {
+            "id": "nbc-news",
+            "name": "NBC News"
+          },
+          "author": "Rohan Nadkarni",
+          "title": "Houston Rockets acquire Kevin Durant from Phoenix Suns, reports say - NBC News",
+          "description": "One of the NBA’s most accomplished scorers is on the move yet again",
+          "url": "https://www.nbcnews.com/sports/nba/houston-rockets-kevin-durant-phoenix-suns-rcna213253",
+          "urlToImage": "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2025-06/250622-kevin-durant-vl-1257p-d872ea.jpg",
+          "publishedAt": "2025-06-22T17:02:31Z",
+          "content": "One of the NBAs most accomplished scorers is on the move yet again.\r\nThe Phoenix Suns are trading forward Kevin Durant to the Houston Rockets, according to multiple reports. The Suns will receive Jal… [+2081 chars]"
         },
         {
           "source": {
             "id": null,
-            "name": "Albuquerque Journal"
+            "name": "DW (English)"
           },
-          "author": "Geoff Grammer / Journal Staff Writer",
-          "title": "UFC champ Jon Jones retires, hit with another criminal charge in Albuquerque - Albuquerque Journal",
-          "description": "Jon Jones, the oft-embattled Albuquerque resident considered by many to be the greatest mixed martial artist of all time, shocked the combat sports world Saturday when UFC President Dana White",
-          "url": "https://www.abqjournal.com/sports/article_2bd78914-e533-4711-b153-0169eb9a3500.html",
-          "urlToImage": "https://bloximages.chicago2.vip.townnews.com/abqjournal.com/content/tncms/assets/v3/editorial/8/e3/8e353bf4-a543-11ef-8c29-df2bce9582b1/673a89a27b503.image.jpg?crop=1760%2C924%2C0%2C33&resize=1200%2C630&order=crop%2Cresize",
-          "publishedAt": "2025-06-22T01:22:00Z",
-          "content": "Exclusive Business Outlook Newsletter, delivered every Monday. Designed for paid subscribers, it provides narrative coverage of local trends, industry news, and key economic updates, going beyond the… [+31 chars]"
+          "author": "Kalika Mehta",
+          "title": "Syria: Blast hits church in Damascus, witnesses say - dw.com",
+          "description": "At least 20 people were killed and 52 injured in an explosion by an apparent \"Islamic State\" suicide bomber at a church in the Syrian capital.",
+          "url": "https://www.dw.com/en/syria-deadly-blast-hits-church-in-damascus/a-73000565",
+          "urlToImage": "https://static.dw.com/image/73000797_6.jpg",
+          "publishedAt": "2025-06-22T16:41:15Z",
+          "content": "A blast rocked the Mar Elias Church in the Dweila neighborhood of Syria's capital, Damascus, on Sunday, according to witnesses.\r\nOne witness told Reuters news agency that a suicide bomber detonated h… [+3098 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "NPR"
+          },
+          "author": "The Associated Press",
+          "title": "As Israel recovers the bodies of three more hostages, how many are still in Gaza? - NPR",
+          "description": "Israel said Sunday that it has recovered the bodies of three more hostages taken in Hamas' Oct. 7 attack that ignited the ongoing 20-month war in the Gaza Strip.",
+          "url": "https://www.npr.org/2025/06/22/nx-s1-5441735/as-israel-recovers-the-bodies-of-three-more-hostages-how-many-are-still-in-gaza",
+          "urlToImage": "https://npr.brightspotcdn.com/dims3/default/strip/false/crop/5616x3159+0+46/resize/1400/quality/100/format/jpeg/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2Fcb%2F71%2F41669df74b47ae8622ef008a5b77%2Fap25172628688620.jpg",
+          "publishedAt": "2025-06-22T16:29:31Z",
+          "content": "Israel said Sunday that it has recovered the bodies of three more hostages taken in Hamas' Oct. 7 attack that ignited the ongoing 20-month war in the Gaza Strip.\r\nThe Israeli military identified them… [+1454 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "Variety"
+          },
+          "author": "Rebecca Rubin",
+          "title": "Global Box Office: Pixar’s ‘Elio’ Craters With $35 Million, ‘28 Years Later’ Awakens to $60 Million - Variety",
+          "description": "Disney and Pixar's animated adventure \"Elio\" crash-landed in its box office debut, earning a dismal $14 million overseas and $35 million globally.",
+          "url": "https://variety.com/2025/film/news/elio-craters-box-office-global-28-years-later-opening-weekend-1236437602/",
+          "urlToImage": "https://variety.com/wp-content/uploads/2025/06/28-Years-Later-4.jpg?w=1000&h=563&crop=1",
+          "publishedAt": "2025-06-22T16:02:00Z",
+          "content": "Disney and Pixar‘s animated adventure “Elio” crash-landed in its box office debut, earning a dismal $14 million overseas and $35 million globally. \r\nThose ticket sales rank as the worst-ever for Pixa… [+2913 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "New York Post"
+          },
+          "author": "Andrew Crane",
+          "title": "Jon Jones hit with new criminal charge amid UFC retirement news - New York Post",
+          "description": "The revelation came after the UFC superstar announced his retirement on Saturday.",
+          "url": "https://nypost.com/2025/06/22/sports/jon-jones-hit-with-new-criminal-charge-amid-ufc-retirement-news/",
+          "urlToImage": "https://nypost.com/wp-content/uploads/sites/2/2025/06/jon-jones-charge.jpg?quality=75&strip=all&1750590883&w=1024",
+          "publishedAt": "2025-06-22T15:16:00Z",
+          "content": "UFC star Jon Jones, who confirmed his shocking retirement Saturday, was accused of leaving the scene of an accident a misdemeanor charge in February and has a bond arraignment hearing scheduled for J… [+3057 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "MMA Fighting"
+          },
+          "author": "Alexander K. Lee",
+          "title": "Khalil Rountree responds to fans walking out of UFC Baku main event, Magomed Ankalaev trolling - MMA Fighting",
+          "description": "Khalil Rountree doesn’t care if everyone wasn’t thrilled by his UFC Baku main event win.",
+          "url": "https://www.mmafighting.com/2025/6/22/24453471/khalil-rountree-responds-to-fans-walking-out-of-ufc-baku-main-event-magomed-ankalaev-trolling",
+          "urlToImage": "https://cdn.vox-cdn.com/thumbor/K-9Oc7GPSrihiZIFl3a9A5iAja8=/0x99:4199x2297/fit-in/1200x630/cdn.vox-cdn.com/uploads/chorus_asset/file/26034236/2221387443.jpg",
+          "publishedAt": "2025-06-22T15:00:00Z",
+          "content": "Khalil Rountree couldnt care less if a handful of fans and the UFC light heavyweight champion didnt appreciate his latest performance.\r\nSaturdays UFC Baku main event saw Rountree cleanly out-strikeJa… [+2087 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "MarketWatch"
+          },
+          "author": "Christine Idzelis",
+          "title": "S&P 500 may be up in June, but Iran attacks and tariff fears are good reasons to rethink risk - MarketWatch",
+          "description": "‘We’re entering the greater-fool phase,’ cautions Wells Fargo’s Sameer Samana",
+          "url": "https://www.marketwatch.com/story/s-p-500-is-up-in-june-but-are-stocks-worth-the-risk-amid-iran-attacks-and-tariff-fears-4008325d",
+          "urlToImage": "https://images.mktw.net/im-80037030/social",
+          "publishedAt": "2025-06-22T14:27:00Z",
+          "content": "Tariffs and the widening Middle East conflict are casting clouds over the stock markets June gains, with a potentially turbulent summer ahead after the S&amp;P 500s recent push toward its record high… [+391 chars]"
+        },
+        {
+          "source": {
+            "id": "axios",
+            "name": "Axios"
+          },
+          "author": "Ben Geman",
+          "title": "Iran parliament reportedly backs closure of oil transit channel - Axios",
+          "description": "Impeding the strait would likely bring a massive spike in oil prices that would flow through to U.S. consumers.",
+          "url": "https://www.axios.com/2025/06/22/iran-closure-strait-of-hormuz",
+          "urlToImage": "https://images.axios.com/1DLRVeRIyx3jONOS2Ezi9uc0kSY=/0x0:5536x3114/1366x768/2025/06/22/1750601249024.jpg",
+          "publishedAt": "2025-06-22T14:17:44Z",
+          "content": "<ul><li>The narrow channel between Iran and Oman is the chokepoint for a quarter of the world's seaborne oil trade and around one-fifth of all oil movements.</li><li>Without diplomatic concessions fr… [+1925 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Andru Marino, Barbara Krasnoff",
+          "title": "Weird-shaped notebooks make me want to write again - The Verge",
+          "description": "Producer Andru Marino writes about the weird but useful Triangle and Sidekick notebooks.",
+          "url": "https://www.theverge.com/tech/690335/notebook-triangle-sidekick-favorite",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/Sidekick-notebook_AMarino.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
+          "publishedAt": "2025-06-22T14:00:00Z",
+          "content": "Different shapes inspire different doodles, as the Triangle and Sidekick notebooks prove.\r\nAndru Marino is an audio and video producer at The Verge. I make videos on our YouTube / TikTok / Instagram … [+2886 chars]"
         },
         {
           "source": {
@@ -36,211 +192,29 @@
             "name": "Associated Press"
           },
           "author": null,
-          "title": "Trump’s move against Iran may draw more criticism from MAGA’s anti-interventionists - AP News",
-          "description": "President Donald Trump’s decision to strike three nuclear sites in Iran could deepen a divide among some of the Republican’s supporters. That includes high-profile backers who had said any such move would run counter to the anti-interventionism he'd promised …",
-          "url": "https://apnews.com/article/trump-iran-israel-maga-republicans-airstrikes-eea687ca0fd051643528272d4f5043b7",
-          "urlToImage": "https://dims.apnews.com/dims4/default/eabf1ec/2147483647/strip/true/crop/2923x1644+0+152/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2F85%2F93%2Fe03c2cdbc387dc29ae30b3a5c109%2Ff1912a372bf942c4b888ef092324fce9",
-          "publishedAt": "2025-06-22T00:54:00Z",
-          "content": "President Donald Trumps decision to strike three nuclear sites in Iran could deepen a divide among some of the Republicans supporters, including high-profile backers who had said any such move would … [+6317 chars]"
-        },
-        {
-          "source": {
-            "id": "the-washington-post",
-            "name": "The Washington Post"
-          },
-          "author": "Frances Vinall, Victoria Bisset, Dan Lamothe, Mariana Alfaro, Mustafa Salim, Marianna Sotomayor, Dylan Moriarty, Niha Masih, Lior Soroka, Alon Rom, Alex Horton, Mikhail Klimentov, Evan Hill, Claire Parker, Sara Sorcher, Gaya Gupta, Daniel Wu, Susannah George, Ellen Francis, Adam Taylor, Angie Orellana Hernandez, Hannah Natanson, Kelsey Ables, Lior Sokora, Natalie Allison",
-          "title": "Israel-Iran live updates: U.S. warplanes carry out 'successful' strikes on three nuclear sites in Iran, Trump says - The Washington Post",
-          "description": "The B-2 is the only U.S. aircraft able to carry the bunker-busting bombs thought to be capable of penetrating Iran’s Fordow nuclear enrichment facility.",
-          "url": "https://www.washingtonpost.com/world/2025/06/21/israel-iran-live-updates-us-trump/",
-          "urlToImage": "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/FGOMPQJFDYZNGWDJ4QZHZLTPO4_size-normalized.JPG&w=1440",
-          "publishedAt": "2025-06-22T00:36:08Z",
-          "content": "The International Atomic Energy Agency, the United Nations nuclear watchdog, said Saturday that Israels strike on Irans Isfahan nuclear site posed no risk to the broader populace with regard to dange… [+375 chars]"
+          "title": "Game 7: After a back-and-forth NBA Finals, it's time for the Thunder and Pacers to decide the title - AP News",
+          "description": "Oklahoma City Thunder coach Mark Daigneault knows exactly why the NBA Finals are coming down to a Game 7. He says it's a contest of wills. He's not wrong. Back and forth they have gone, the Thunder and the Indiana Pacers. Indiana led the series, then Oklahoma…",
+          "url": "https://apnews.com/article/nba-finals-pacers-thunder-game-7-2489e4d37b7b25dfd3a5f28c9e0fd001",
+          "urlToImage": "https://dims.apnews.com/dims4/default/db79c45/2147483647/strip/true/crop/5373x3022+0+280/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2Fc9%2F59%2Fa1473db713aedfea1ec5a089e1cd%2Fa51c8a1bdffa46358919c7f364d0f1bc",
+          "publishedAt": "2025-06-22T13:25:00Z",
+          "content": "OKLAHOMA CITY (AP) Oklahoma City Thunder coach Mark Daigneault knows exactly why the NBA Finals are coming down to a Game 7.\r\nIts a contest of wills, he said.\r\nAnd to this point, neither side has los… [+2347 chars]"
         },
         {
           "source": {
             "id": null,
-            "name": "BBC News"
+            "name": "NPR"
           },
-          "author": null,
-          "title": "Stress hormones: Why quick fixes won't lower our cortisol levels - BBC",
-          "description": "Social media is awash with claims it can help us destress and lower cortisol levels – but experts warn against these \"quick fixes\".",
-          "url": "https://www.bbc.com/news/articles/cg5z6l19rv6o",
-          "urlToImage": "https://ichef.bbci.co.uk/news/1024/branded_news/555e/live/a951cd60-4de7-11f0-8c47-237c2e4015f5.jpg",
-          "publishedAt": "2025-06-21T23:30:41Z",
-          "content": "Ruth CleggHealth and wellbeing reporter\r\nIt could apparently change the shape of my face, add pounds to my midriff, and even make my hair fall out. \r\nI feel like warnings about cortisol - a stress ho… [+8433 chars]"
-        },
-        {
-          "source": {
-            "id": "cbs-news",
-            "name": "CBS News"
-          },
-          "author": null,
-          "title": "Former Texas Rep. Blake Farenthold, who left Congress amid sexual harassment allegations, dies at 63 - CBS News",
-          "description": "Farenthold was elected in 2010, upsetting long-serving Democratic Rep. Solomon Ortiz. Seven years later, Farenthold announced that he wouldn't seek reelection.",
-          "url": "https://www.cbsnews.com/news/blake-farenthold-former-texas-rep-dies/",
-          "urlToImage": "https://assets2.cbsnewsstatic.com/hub/i/r/2025/06/21/a4cc9047-1905-441a-bf61-6fd2b23c2282/thumbnail/1200x630/a5df504fe53386941c63d3961a150e61/gettyimages-490538204.jpg?v=64f55bb7ef9382fe7916b907da543f1f",
-          "publishedAt": "2025-06-21T23:26:08Z",
-          "content": "Former Rep. Blake Farenthold, who left Congress amid sexual harassment allegations, has died. He was 63.\r\nSteve Ray, Farenthold's former longtime political consultant, told CBS News in an email Satur… [+1107 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "Sky.com"
-          },
-          "author": null,
-          "title": "Belarus opposition leader Siarhei Tsikhanouski freed from jail after rare visit by top US envoy - Sky News",
-          "description": "",
-          "url": "https://news.sky.com/story/belarus-opposition-leader-siarhei-tsikhanouski-freed-from-jail-after-rare-visit-by-top-us-envoy-13386817",
-          "urlToImage": "https://e3.365dm.com/25/06/1600x900/skynews-siarhei-tsikhanouski_6947571.jpg?20250621191348",
-          "publishedAt": "2025-06-21T23:03:45Z",
-          "content": "A jailed opposition leader in Belarus has been freed and is now in Lithuania.\r\nSiarhei Tsikhanouski was released along with 13 other political prisoners following talks between Belarusian President A… [+3826 chars]"
-        },
-        {
-          "source": {
-            "id": "bloomberg",
-            "name": "Bloomberg"
-          },
-          "author": "Alex Longley, Yongchang Chin",
-          "title": "Trump’s Twists and Turns Over Iran Leave Oil Traders Hanging - Bloomberg.com",
-          "description": "The oil market has been wrestling for days with Donald Trump’s next act in an escalating Middle East conflict. Now American jets have struck Iran’s three main nuclear sites, a move that leaves traders preparing for a price surge — but still guessing where the…",
-          "url": "https://www.bloomberg.com/news/articles/2025-06-21/trump-s-twists-and-turns-over-iran-leave-oil-traders-hanging",
-          "urlToImage": "https://assets.bwbx.io/images/users/iqjWHBFdfxIU/i6qvKPSDl1Cg/v1/1200x800.jpg",
-          "publishedAt": "2025-06-21T23:00:01Z",
-          "content": "The oil market has been wrestling for days with Donald Trumps next act in an escalating Middle East conflict. Now American jets have struck Irans three main nuclear sites, a move that leaves traders … [+427 chars]"
-        },
-        {
-          "source": {
-            "id": "the-wall-street-journal",
-            "name": "The Wall Street Journal"
-          },
-          "author": "Michael M. Phillips",
-          "title": "Oil Workers, Snagged in a Dispute Over a Dictator’s Son’s Yacht, Are Freed After Two Years - WSJ",
-          "description": "The men, imprisoned in apparent retaliation for a legal dispute involving the ruling family’s yacht and villas in Cape Town, arrived home in South Africa Saturday",
-          "url": "https://www.wsj.com/world/africa/oil-workers-snagged-in-a-dispute-over-a-dictators-sons-yacht-are-freed-after-two-years-aa0c9461",
-          "urlToImage": "https://images.wsj.net/im-83713817/social",
-          "publishedAt": "2025-06-21T21:53:00Z",
-          "content": "Equatorial Guineas dictator freed two South African oil workers that his regime had imprisoned for years in apparent retaliation for an unrelated legal dispute involving the ruling familys superyacht… [+404 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "Page Six"
-          },
-          "author": "Hannah Southwick",
-          "title": "How to watch the Kids’ Choice Awards for free: Time, livestream, host - Page Six",
-          "description": "It’s time for some slime.",
-          "url": "https://pagesix.com/2025/06/21/entertainment/how-to-watch-the-kids-choice-awards-for-free-time-host/",
-          "urlToImage": "https://pagesix.com/wp-content/uploads/sites/3/2025/06/106828985.jpg?quality=75&strip=all&w=1024",
-          "publishedAt": "2025-06-21T21:00:00Z",
-          "content": "Page Six may be compensated and/or receive an affiliate commission if you click or buy through our links. Featured pricing is subject to change.\r\nIt’s time for some slime.\r\nNickelodeon’s annual fan-v… [+2634 chars]"
-        },
-        {
-          "source": {
-            "id": "techcrunch",
-            "name": "TechCrunch"
-          },
-          "author": "Anthony Ha",
-          "title": "European leaders worry they’re too reliant on U.S. tech - TechCrunch",
-          "description": "European governments may be reconsidering their use of American technology and services, according to a new report in The New York Times.",
-          "url": "https://techcrunch.com/2025/06/21/european-leaders-worry-theyre-too-reliant-on-u-s-tech/",
-          "urlToImage": "https://techcrunch.com/wp-content/uploads/2019/11/GettyImages-1146371917.jpg?w=1024",
-          "publishedAt": "2025-06-21T20:16:09Z",
-          "content": "European governments may be reconsidering their use of American technology and services, according to a new report in The New York Times.\r\nThe flashpoint seems to come after President Donald Trump sa… [+1077 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "TMZ"
-          },
-          "author": "TMZ Staff",
-          "title": "'Melrose Place' Star Courtney Thorne-Smith Files for Divorce - TMZ",
-          "description": "Courtney Thorne-Smith has filed for divorce from her husband, Roger Fishman, nearly four years after she says they separated ... TMZ has learned.",
-          "url": "https://www.tmz.com/2025/06/21/melrose-place-star-courtney-thorne-smith-files-for-divorce/",
-          "urlToImage": "https://imagez.tmz.com/image/ae/16by9/2025/06/21/aed350d898dc4f4290cc9033c4316e52_xl.jpg",
-          "publishedAt": "2025-06-21T19:32:56Z",
-          "content": "Courtney Thorne-Smith has filed for divorce from her husband, Roger Fishman, nearly four years after she says they separated ... TMZ has learned.\r\nThe veteran actress filed the docs without a lawyer … [+1117 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "Daily Beast"
-          },
-          "author": "Emell Derra Adolphus",
-          "title": "Trump Lists Reasons He Deserves Nobel Prize in Epic Meltdown - The Daily Beast",
-          "description": "“The people know, and that’s all that matters to me!” the president claimed.",
-          "url": "https://www.thedailybeast.com/trump-lists-reasons-he-deserves-nobel-prize-in-epic-meltdown/",
-          "urlToImage": "https://www.thedailybeast.com/resizer/v2/J5SQOPX4FBGW3FOZT2PI64GDLM.JPG?smart=true&auth=34011c4e753b1bf2f7257e6563a11414e15a83c4444e7848b891e258c122234c&width=1200&height=630",
-          "publishedAt": "2025-06-21T19:11:00Z",
-          "content": "President Donald Trump posted a laundry list of reasons why he believes that he should get a Nobel Peace Prize.\r\nIn a Truth Social post, the president celebrated that he was very happy to report on a… [+3284 chars]"
-        },
-        {
-          "source": {
-            "id": "cnn",
-            "name": "CNN"
-          },
-          "author": "Tyler Ory",
-          "title": "A potent heat dome is building over the US, sending temperatures into the triple digits - Yahoo",
-          "description": "Dangerous, record-breaking heat will impact millions next week.",
-          "url": "https://www.cnn.com/2025/06/21/weather/heat-dome-climate",
-          "urlToImage": "https://media.cnn.com/api/v1/images/stellar/prod/cnnd-heat-dome-2025.png?c=16x9&q=w_800,c_fill",
-          "publishedAt": "2025-06-21T18:59:58Z",
-          "content": "The hottest temperatures of the year so far will soon reach the eastern half of the United States as a brutal heat dome starts to build over the weekend. Dangerous, record-breaking heat will impact m… [+3024 chars]"
-        },
-        {
-          "source": {
-            "id": "ars-technica",
-            "name": "Ars Technica"
-          },
-          "author": "Stephen Clark",
-          "title": "Psyche keeps its date with an asteroid, but now it’s running in backup mode - Ars Technica",
-          "description": "Engineers switched to a backup fuel line less than a quarter of the way through Psyche’s mission.",
-          "url": "https://arstechnica.com/space/2025/06/psyche-keeps-its-date-with-an-asteroid-but-now-its-running-in-backup-mode/",
-          "urlToImage": "https://cdn.arstechnica.net/wp-content/uploads/2024/05/1-pia24834-1152x648.jpg",
-          "publishedAt": "2025-06-21T18:10:03Z",
-          "content": null
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "Newsnationnow.com"
-          },
-          "author": "MARIA CHENG, Associated Press",
-          "title": "You probably don’t need foods with added protein, nutritionists say - NewsNation",
-          "description": "Protein is a macronutrient, or a basic kind of food like fat or carbohydrates that your body needs to function.",
-          "url": "https://www.newsnationnow.com/health/ap-you-probably-dont-need-foods-with-added-protein-nutritionists-say/",
-          "urlToImage": "https://www.newsnationnow.com/wp-content/uploads/sites/108/2025/06/6856ae6c5f2b89.78438263.jpeg?w=1280",
-          "publishedAt": "2025-06-21T17:44:24Z",
-          "content": "The human body needs protein. Proteins carry out countless functions inside cells and they are vital for the growth, repair and maintenance of muscles, bones and skin. And with food companies rolling… [+4043 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "The Official Website of the Ultimate Fighting Championship"
-          },
-          "author": null,
-          "title": "Main Card Results | UFC Baku - ufc.com",
-          "description": "See The Fight Results, Watch Post-Fight Interviews With The Main Card Winners And More From UFC Fight Night: Hill vs Rountree Jr., Live From Baku Crystal Hall in Baku on June 21",
-          "url": "https://www.ufc.com/news/main-card-results-highlights-winner-interviews-ufc-fight-night-hill-vs-rountree-jr-baku",
-          "urlToImage": "https://ufc.com/images/styles/card/s3/2025-05/062125-ufc-fight-night-hill-vs-rountree-jr-EVENT-ART.jpg?itok=L4mFgKoR",
-          "publishedAt": "2025-06-21T17:37:30Z",
-          "content": "Blaydes wasted no time taking Kuniev to the canvas, and while the Russian rose quickly, Blaydes kept him locked up against the fence. Once separated, the two traded on the feet, Kuniev getting in som… [+388 chars]"
-        },
-        {
-          "source": {
-            "id": "fortune",
-            "name": "Fortune"
-          },
-          "author": "Jason Ma",
-          "title": "Top economist who previously sounded the alarm on tariffs sees a possible scenario where Trump 'outsmarted all of us' - Fortune",
-          "description": "\"This would seem like a victory for the world and yet would produce $400 billion of annual revenue for US taxpayers.\"",
-          "url": "https://fortune.com/2025/06/21/trump-tariffs-outsmarted-us-all-10-percent-federal-revenue-economy/",
-          "urlToImage": "https://fortune.com/img-assets/wp-content/uploads/2025/06/GettyImages-2220475391-e1750521440372.jpg?resize=1200,600",
-          "publishedAt": "2025-06-21T17:06:00Z",
-          "content": "Businesses and consumers remain in limbo over what will happen next with President Donald Trumps tariffs, but a top economist sees a way to leave them in place and still deliver a victory for the wor… [+3323 chars]"
+          "author": "The Associated Press",
+          "title": "FedEx founder Fred Smith, who revolutionized package delivery, dies at 80 - NPR",
+          "description": "Smith once said he came up with the name Federal Express because he wanted the company to sound big and important when in fact it was a start-up operation with a future far from assured.",
+          "url": "https://www.npr.org/2025/06/22/nx-s1-5441684/fedex-founder-fred-smith-who-revolutionized-package-delivery-dies-at-80",
+          "urlToImage": "https://npr.brightspotcdn.com/dims3/default/strip/false/crop/5442x3061+0+283/resize/1400/quality/100/format/jpeg/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2F45%2F47%2Fc843b1f54a8793797cd83fb50e8b%2Fap25173319706592.jpg",
+          "publishedAt": "2025-06-22T13:13:25Z",
+          "content": "MEMPHIS, Tenn. Fred Smith, the FedEx Corp. founder who revolutionized the express delivery industry, has died, the company said. He was 80.\r\nFedEx started operating in 1973, delivering small parcels … [+3677 chars]"
         }
       ]
     },
-    "timestamp": 1750653515542
+    "timestamp": 1750703404818
   },
   "world-ca-en-general-all": {
     "data": {
@@ -248,7 +222,7 @@
       "totalResults": 0,
       "articles": []
     },
-    "timestamp": 1750653515622
+    "timestamp": 1750703404940
   },
   "world-gb-en-general-all": {
     "data": {
@@ -256,7 +230,7 @@
       "totalResults": 0,
       "articles": []
     },
-    "timestamp": 1750653515710
+    "timestamp": 1750703405374
   },
   "world-FR-en-general-all": {
     "data": {

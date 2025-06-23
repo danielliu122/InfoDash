@@ -6,7 +6,7 @@ export const fetchRedditData = async (timePeriod = 'day') => {
         throw new Error('Invalid time period specified');
     }
 
-    const redditUrl = `https://www.reddit.com/top.json?sort=top&t=${timePeriod}`;
+    const redditUrl = `/api/reddit?t=${timePeriod}`;
 
     try {
         const response = await fetch(redditUrl);
