@@ -211,6 +211,33 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
     box-sizing: border-box !important;
     display: block !important;
   }
+  .card.chart-container:fullscreen,
+  .card.chart-container:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    background: var(--card-bg, #232323);
+    z-index: 9999;
+    box-shadow: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+  }
+  .card.chart-container:fullscreen canvas,
+  .card.chart-container:-webkit-full-screen canvas {
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    display: block;
+  }
 }
 
 /* === Add more component-specific and utility rules below as needed === */

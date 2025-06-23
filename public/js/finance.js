@@ -1427,6 +1427,47 @@ export function selectStock(symbol) {
     handleFinanceUpdate('1d', '1m');
 }
 
+// Utility: Detect if device is mobile
+function isMobileDevice() {
+  return /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+}
+
+// Listen for fullscreen changes on the chart
+if (typeof document !== 'undefined') {
+  document.addEventListener('fullscreenchange', async function () {
+    const chartContainer = document.querySelector('.card.chart-container');
+    if (!chartContainer) return;
+
+    if (document.fullscreenElement === chartContainer && isMobileDevice()) {
+      // Try to lock orientation to landscape (if supported)
+      if (screen.orientation && screen.orientation.lock) {
+        try {
+          await screen.orientation.lock('landscape');
+        } catch (e) {
+          if (window.showNotification) {
+            window.showNotification('For best experience, rotate your device to landscape.', 4000);
+          } else {
+            alert('For best experience, rotate your device to landscape.');
+          }
+        }
+      } else {
+        if (window.showNotification) {
+          window.showNotification('For best experience, rotate your device to landscape.', 4000);
+        } else {
+          alert('For best experience, rotate your device to landscape.');
+        }
+      }
+    } else if (!document.fullscreenElement && isMobileDevice()) {
+      // Optionally unlock orientation when exiting fullscreen
+      if (screen.orientation && screen.orientation.unlock) {
+        try {
+          screen.orientation.unlock();
+        } catch (e) {}
+      }
+    }
+  });
+}
+
 
 
 
