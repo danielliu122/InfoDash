@@ -534,7 +534,7 @@ body.dark-theme .stock-dashboard-grid::-webkit-scrollbar-corner {
 }
 
 #finance .cards-container .card.stock-dashboard {
-  flex: 1 1 calc(100% - 8px);
+  flex: 1 1 calc(49% - 8px);
   min-width: 300px;
   margin: 0 0 0 5px !important;
 }
