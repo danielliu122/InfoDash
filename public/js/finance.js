@@ -1137,6 +1137,9 @@ export function initializeFinance() {
 
 // Clear entire watchlist
 export function clearWatchlist() {
+    if (!window.confirm('Are you sure you want to clear your entire watchlist? This action cannot be undone.')) {
+        return;
+    }
     watchlist = [];
     userPrefs.setFinanceWatchlist(watchlist);
     updateWatchlistUI();

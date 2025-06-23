@@ -1012,3 +1012,12 @@ body.dark-theme .fullscreenButton:hover {
   outline: none;
   transform: scale(1.08);
 }
+
+.time-range-buttons .btn-small {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  min-width: 0;
+  height: 22px;
+  line-height: 1.1;
+  border-radius: 4px;
+}

@@ -363,6 +363,9 @@ export function declineCookies() {
 }
 
 export function resetCookieConsent() {
+    if (!window.confirm('Are you sure you want to reset your cookie consent? You will be prompted again to accept or decline cookies.')) {
+        return;
+    }
     document.cookie = 'cookiesAccepted=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     document.cookie = 'cookiesDeclined=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     showCookieBanner();
@@ -385,24 +388,25 @@ export function checkCookieConsent() {
 
 // Preference management helpers
 export function clearAllPreferences() {
-    if (confirm('Are you sure you want to clear all your preferences? This will reset your location, watchlist, and other settings.')) {
-        if (window.userPrefs) {
-            window.userPrefs.clear();
-            // Reset UI elements
-            const locationInput = document.getElementById('weatherLocationInput');
-            if (locationInput) locationInput.value = '';
-            const locationBtn = document.getElementById('set-location-btn');
-            if (locationBtn) locationBtn.textContent = '📍 Set Location';
-            // Clear weather display
-            const weatherContainer = document.getElementById('preferences-weather');
-            if (weatherContainer) {
-                weatherContainer.innerHTML = '';
-            }
-            // Refresh the page to apply all changes
-            location.reload();
-        } else {
-            alert('Preferences system not available');
+    if (!window.confirm('Are you sure you want to clear all your preferences? This will reset your location, watchlist, and other settings. This action cannot be undone.')) {
+        return;
+    }
+    if (window.userPrefs) {
+        window.userPrefs.clear();
+        // Reset UI elements
+        const locationInput = document.getElementById('weatherLocationInput');
+        if (locationInput) locationInput.value = '';
+        const locationBtn = document.getElementById('set-location-btn');
+        if (locationBtn) locationBtn.textContent = '📍 Set Location';
+        // Clear weather display
+        const weatherContainer = document.getElementById('preferences-weather');
+        if (weatherContainer) {
+            weatherContainer.innerHTML = '';
         }
+        // Refresh the page to apply all changes
+        location.reload();
+    } else {
+        alert('Preferences system not available');
     }
 }
 
