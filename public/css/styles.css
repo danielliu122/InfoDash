@@ -256,16 +256,16 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   }
 }
 
-/* === Add more component-specific and utility rules below as needed === */
-
-/* === REVERT: Stock Dashboard Sizing === */
 .stock-dashboard,
 .stock-dashboard-grid,
 .card.chart-container {
-  width: 100% !important;
+        width: 100% !important;
   max-width: 100% !important;
   min-width: 0;
   box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 1%;
 }
 .stock-dashboard {
   margin-top: 15px;
@@ -283,7 +283,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   padding: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  text-align: center;
+        text-align: center;
   min-height: 90px;
   display: flex;
         flex-direction: column;
@@ -363,33 +363,34 @@ body.dark-theme .collapsible-header:hover {
 
 /* === DESKTOP: LIVE STOCK DASHBOARD MODULES HALF WIDTH === */
 @media (min-width: 1000px) {
-  #finance .card,
-  .stock-card {
-    width: 49%;
-    max-width: 49%;
-    min-width: 300px;
-    box-sizing: border-box;
-    margin-right: 1%;
-    margin-bottom: 20px;
-    display: inline-block;
-    vertical-align: top;
-  }
   #finance .cards-container {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
-    justify-content: flex-start;
   }
+
+  #finance .cards-container .card {
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Make specific cards span both columns if needed */
+  #finance .cards-container .card.chart-container,
+  #finance .cards-container .finance-bottom-row {
+    grid-column: span 2;
+  }
+
   .section {
     max-height: 600px;
   }
+
   .summary-card,
   .news-item,
   .trend-card,
-  #finance .card,
-  .card.chart-container {
+  #finance .card {
     padding: 16px !important;
-    margin-bottom: 16px !important;
+    margin-bottom: 0 !important; /* Let the gap handle spacing */
     border: 1px solid #333 !important;
     border-radius: 8px !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -568,9 +569,6 @@ body.dark-theme .stock-dashboard-grid::-webkit-scrollbar-corner {
 }
 
 #finance .cards-container .card {
-  flex: 1 1 calc(50% - 8px);
-  min-width: 300px;
-  margin: 0 0 0 5px !important;
   padding: 0;
   box-sizing: border-box;
   /* Only absolute when dragging */
@@ -583,37 +581,19 @@ body.dark-theme .stock-dashboard-grid::-webkit-scrollbar-corner {
 }
 
 #finance .cards-container .card.chart-container {
-  flex: 2 1 calc(100% - 8px);
+  flex: 1 1 100%;
   min-width: 600px;
-  margin: 0 0 0 5px !important;
 }
 
 #finance .cards-container .card.timeframe-controls {
-  flex: 1 1 calc(100% - 8px);
+  flex: 1 1 100%;
   min-width: 300px;
-  margin: 0 0 0 5px !important;
 }
 
-#finance .cards-container .card.stock-dashboard {
-  flex: 1 1 calc(49% - 8px);
-  min-width: 300px;
-  margin: 0 0 0 5px !important;
-}
-
-/* Ensure proper spacing for finance cards */
-#finance .cards-container .card:first-child {
-  margin: 0 0 0 0 !important;
-}
-
-#finance .cards-container .card:last-child {
-  margin: 0 0 0 5px !important;
-}
-
-/* Remove any conflicting margin/padding rules */
-#finance .cards-container .card.stock-info,
+#finance .cards-container .card.stock-dashboard,
 #finance .cards-container .card.watchlist {
-  margin: 0 0 0 5px !important;
-  padding: 0;
+  flex: 1 1 calc(50% - 8px);
+  min-width: 300px;
 }
 
 /* Ensure the finance section itself has proper layout */
@@ -680,7 +660,7 @@ body.dark-theme #reddit-content > .data-container {
   border: none;
   padding: 8px 16px;
   border-radius: 20px;
-  font-size: 14px;
+    font-size: 14px;
   font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1077,7 +1057,7 @@ body.dark-theme .fullscreenButton:hover {
   min-width: 0;
   height: 22px;
   line-height: 1.1;
-  border-radius: 4px;
+    border-radius: 4px;
 }
 
 @media (min-width: 1000px) {

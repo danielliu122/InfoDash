@@ -36,13 +36,23 @@ const DEFAULT_WATCHLIST = [
 
 // Helper function to get default symbol based on market status
 function getDefaultSymbol() {
-    const day = new Date().getDay();
+    const now = new Date();
+    const day = now.getDay();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    
+    // Check if it's a weekend
     const isWeekend = day === 0 || day === 6; // Sunday or Saturday
     
-    if (isWeekend) {
-        return 'BTC-USD'; // Default to Bitcoin on weekends
+    // Check if it's a weekday during market hours (9:30AM - 4:00PM)
+    const isMarketHours = !isWeekend && 
+                         (hours > 9 || (hours === 9 && minutes >= 30)) && 
+                         (hours < 16);
+    
+    if (isWeekend || !isMarketHours) {
+        return 'BTC-USD'; // Default to Bitcoin on weekends and outside market hours
     } else {
-        return '^IXIC'; // Default to NASDAQ on weekdays
+        return '^IXIC'; // Default to NASDAQ during market hours on weekdays
     }
 }
 
@@ -1259,7 +1269,7 @@ async function fetchStockHistoricalData(symbol) {
         }
         
         return null;
-    } catch (error) {
+            } catch (error) {
         console.error(`Error fetching historical data for ${symbol}:`, error);
         return null;
     }
@@ -1296,9 +1306,22 @@ export async function fetchTopStocks(symbolsOverride = null) {
 
         let fetchedStocks = Object.values(data).filter(stock => !stock.error);
 
-        // On weekends, sort crypto to the top
-        const day = new Date().getDay();
-        if (day === 0 || day === 6) { // Sunday or Saturday
+        // Sort stocks based on market hours
+        const now = new Date();
+        const day = now.getDay();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        
+        // Check if it's a weekend
+        const isWeekend = day === 0 || day === 6; // Sunday or Saturday
+        
+        // Check if it's a weekday during market hours (9:30AM - 4:00PM)
+        const isMarketHours = !isWeekend && 
+                            (hours > 9 || (hours === 9 && minutes >= 30)) && 
+                            (hours < 16);
+        
+        // If outside market hours, sort crypto to the top
+        if (!isMarketHours) {
             fetchedStocks.sort((a, b) => {
                 const aIsCrypto = a.symbol.endsWith('-USD');
                 const bIsCrypto = b.symbol.endsWith('-USD');
@@ -1446,7 +1469,7 @@ if (typeof document !== 'undefined') {
         } catch (e) {
           if (window.showNotification) {
             window.showNotification('For best experience, rotate your device to landscape.', 4000);
-          } else {
+        } else {
             alert('For best experience, rotate your device to landscape.');
           }
         }
