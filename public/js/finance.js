@@ -14,6 +14,7 @@ let stockDashboardInterval = null;
 let cryptoDashboardInterval = null; // Dedicated interval for crypto
 let previousStockData = {};
 let isDashboardPaused = false; // Track pause state
+const MAX_POINTS = 50;
 
 // Default watchlist with popular stocks and cryptocurrencies
 const DEFAULT_WATCHLIST = [
@@ -33,6 +34,10 @@ const DEFAULT_WATCHLIST = [
     '^DJI',    // Dow Jones Industrial Average
     '^GSPC'    // S&P 500 Index
 ];
+
+// Set default time range and interval
+const DEFAULT_TIME_RANGE = '12h';
+const DEFAULT_INTERVAL = '5m';
 
 // Helper function to get default symbol based on market status
 function getDefaultSymbol() {
@@ -113,27 +118,28 @@ function formatChangeValue(value) {
 }
 
 function addData(chart, label, newData) {
-    // Check if the data has actually changed
-    const lastDataPoint = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1];
-    const lastLabel = chart.data.labels[chart.data.labels.length - 1];
-    
-    // Only add data if the price has changed OR if it's a new timestamp
-    if (lastDataPoint !== newData || lastLabel !== label) {
-        // Keep only the last 200 points (adjust as needed)
-        if (chart.data.labels.length > 200) {
+    // Always use ISO string for comparison
+    const labelStr = (typeof label === 'string') ? label : label.toISOString();
+    // Convert all labels in chart to ISO strings for comparison
+    const labelsISO = chart.data.labels.map(l => (typeof l === 'string' ? l : l.toISOString()));
+    const lastLabel = labelsISO.length > 0 ? labelsISO[labelsISO.length - 1] : null;
+
+    if (lastLabel !== labelStr && !labelsISO.includes(labelStr)) {
+        if (chart.data.labels.length >= MAX_POINTS) {
             chart.data.labels.shift();
             chart.data.datasets[0].data.shift();
         }
-        
-        // Add new data point
-        chart.data.labels.push(label);
+        chart.data.labels.push(labelStr);
         chart.data.datasets[0].data.push(newData);
-        
-        // Update the chart
-        chart.update('none'); // Use 'none' mode for better performance
-        
-        // Update the last timestamp
-        lastTimestamp = label;
+        chart.update('none');
+        lastTimestamp = labelStr;
+    } else {
+        // Optionally update the last point if the price changed
+        const idx = labelsISO.lastIndexOf(labelStr);
+        if (idx !== -1 && chart.data.datasets[0].data[idx] !== newData) {
+            chart.data.datasets[0].data[idx] = newData;
+            chart.update('none');
+        }
     }
 }
 
@@ -779,7 +785,7 @@ function setupChartResize(chartContainer) {
 }
 
 // This function handles fetching data and deciding how to update the chart.
-export async function updateFinanceData(symbol, timeRange = '1d', interval = '1m', isRefresh = false) {
+export async function updateFinanceData(symbol, timeRange = '1d', interval = 'm', isRefresh = false) {
     try {
         currentSymbol = symbol; // Keep track of the current symbol
         
@@ -790,7 +796,7 @@ export async function updateFinanceData(symbol, timeRange = '1d', interval = '1m
         if (isRefresh && window.financeChart) {
             // For a live refresh, just add the new data point to the existing chart.
             if (realTimeData && realTimeData.price && realTimeData.timestamp) {
-                 addData(window.financeChart, realTimeData.timestamp, realTimeData.price);
+                 addData(window.financeChart, realTimeData.timestamp.toISOString(), realTimeData.price);
             }
         } else {
             // For a new symbol or initial load, fetch historical data and do a full redraw.
@@ -1010,7 +1016,7 @@ function initializeChart(ctx, data) {
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 fill: true,
                 pointRadius: 2,
-                pointHoverRadius: 10,
+                pointHoverRadius: 5,
                 spanGaps: true,
                 segment: {
                     borderColor: ctx => {
@@ -1094,8 +1100,8 @@ export function initializeFinance() {
         stockSymbolInput.value = currentSymbol;
     }
     
-    // Load initial data with the default symbol
-    handleFinanceUpdate('1d', '1m');
+    // Load initial data with the default symbol, time range, and interval
+    handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
     
     // Start the dashboard automatically
     startStockDashboard();
@@ -1116,7 +1122,7 @@ export function initializeFinance() {
         button.addEventListener('click', function() {
             const symbol = this.getAttribute('data-stock-symbol');
             document.getElementById('stockSymbolInput').value = symbol;
-            updateFinanceData(symbol);
+            updateFinanceData(symbol, DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
         });
     });
     
@@ -1137,10 +1143,10 @@ export function initializeFinance() {
         });
     });
     
-    // Set initial active state
-    const realtimeButton = document.getElementById('realtimeButton');
-    if (realtimeButton) {
-        realtimeButton.classList.add('active');
+    // Set initial active state for the default time range button
+    const defaultButton = Array.from(document.querySelectorAll('.time-range-button')).find(btn => btn.getAttribute('data-time-range') === DEFAULT_TIME_RANGE && btn.getAttribute('data-interval') === DEFAULT_INTERVAL);
+    if (defaultButton) {
+        defaultButton.classList.add('active');
     }
 }
 
@@ -1447,7 +1453,7 @@ window.togglePauseFinance = togglePauseFinance;
 // Select stock for detailed view
 export function selectStock(symbol) {
     document.getElementById('stockSymbolInput').value = symbol;
-    handleFinanceUpdate('1d', '1m');
+    handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
 }
 
 // Utility: Detect if device is mobile

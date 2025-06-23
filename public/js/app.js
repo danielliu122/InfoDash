@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (isMarketOpen()) {
             startAutoRefresh('^IXIC', '5m', '1m');
         } else {
-            // console.log('Market is closed. Auto-refresh will not start.');
+            console.log('Market is closed. Auto-refresh will not start.');
             // Update the chart once even if the market is closed
             handleFinanceUpdate('1d', '1m');
         }
