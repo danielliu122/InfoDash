@@ -1034,7 +1034,7 @@ function initializeChart(ctx, data) {
             },
             animation: true,
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             backgroundColor: backgroundColor,
             
             scales: {
@@ -1101,7 +1101,6 @@ export function initializeFinance() {
     
     setupAutocomplete();
     loadWatchlistFromPreferences();
-    setupDraggableCards();
     
     // Set up event listeners for stock symbol buttons
     document.querySelectorAll('[data-stock-symbol]').forEach(button => {
@@ -1134,149 +1133,6 @@ export function initializeFinance() {
     if (realtimeButton) {
         realtimeButton.classList.add('active');
     }
-}
-
-// Setup draggable cards functionality
-function setupDraggableCards() {
-    const cards = document.querySelectorAll('#finance .card');
-    const chartContainer = document.querySelector('#finance .chart-container');
-    const financeSection = document.getElementById('finance');
-    
-    if (!financeSection) return;
-    
-    // Combine cards and chart container for draggable functionality
-    const draggableElements = [...cards];
-    if (chartContainer) {
-        draggableElements.push(chartContainer);
-    }
-    
-    draggableElements.forEach(card => {
-        let isDragging = false;
-        let isResizing = false;
-        let currentX;
-        let currentY;
-        let initialX;
-        let initialY;
-        let xOffset = 0;
-        let yOffset = 0;
-        let initialWidth;
-        let initialHeight;
-        
-        // Add drag handle and resize button to card header (only for actual cards)
-        if (card.classList.contains('card')) {
-            const cardTitle = card.querySelector('.card-title');
-            if (cardTitle) {
-                cardTitle.innerHTML = `
-                    <span>${cardTitle.textContent}</span>
-                    <div class="card-controls">
-                        <span class="drag-handle">⋮⋮</span>
-                        <span class="resize-handle" title="Resize">⤡</span>
-                    </div>
-                `;
-            }
-        } else if (card === chartContainer) {
-            // Add drag handle to chart container
-            const chartHeader = document.createElement('div');
-            chartHeader.className = 'chart-header';
-            chartHeader.innerHTML = `
-                <span>Stock Chart</span>
-                <div class="card-controls">
-                    <span class="drag-handle">⋮⋮</span>
-                    <span class="resize-handle" title="Resize">⤡</span>
-                </div>
-            `;
-            chartContainer.insertBefore(chartHeader, chartContainer.firstChild);
-        }
-        
-        card.addEventListener('mousedown', dragStart);
-        card.addEventListener('mousemove', drag);
-        card.addEventListener('mouseup', dragEnd);
-        card.addEventListener('mouseleave', dragEnd);
-        
-        function dragStart(e) {
-            // Check if clicking on resize handle
-            if (e.target.closest('.resize-handle')) {
-                isResizing = true;
-                initialWidth = card.offsetWidth;
-                initialHeight = card.offsetHeight;
-                initialX = e.clientX;
-                initialY = e.clientY;
-                card.classList.add('resizing');
-                return;
-            }
-            
-            // Only start dragging if clicking on the header or drag handle
-            if (!e.target.closest('.card-header') && !e.target.closest('.chart-header') && !e.target.closest('.drag-handle')) {
-                return;
-            }
-            
-            initialX = e.clientX - xOffset;
-            initialY = e.clientY - yOffset;
-            
-            if (e.target === card || card.contains(e.target)) {
-                isDragging = true;
-                card.classList.add('dragging');
-            }
-        }
-        
-        function drag(e) {
-            if (isResizing) {
-                e.preventDefault();
-                const deltaX = e.clientX - initialX;
-                const deltaY = e.clientY - initialY;
-                
-                const newWidth = Math.max(300, initialWidth + deltaX); // Minimum 300px width
-                const newHeight = Math.max(200, initialHeight + deltaY); // Minimum 200px height
-                
-                card.style.width = newWidth + 'px';
-                card.style.height = newHeight + 'px';
-                return;
-            }
-            
-            if (isDragging) {
-                e.preventDefault();
-                
-                currentX = e.clientX - initialX;
-                currentY = e.clientY - initialY;
-                
-                // Get current finance section bounds
-                const currentFinanceBounds = financeSection.getBoundingClientRect();
-                const cardBounds = card.getBoundingClientRect();
-                
-                // Calculate boundaries to keep card within finance section
-                const maxX = currentFinanceBounds.width - cardBounds.width;
-                const maxY = currentFinanceBounds.height - cardBounds.height;
-                
-                // Constrain movement to finance section boundaries
-                currentX = Math.max(0, Math.min(currentX, maxX));
-                currentY = Math.max(0, Math.min(currentY, maxY));
-                
-                // Update offsets
-                xOffset = currentX;
-                yOffset = currentY;
-                
-                setTranslate(currentX, currentY, card);
-            }
-        }
-        
-        function dragEnd(e) {
-            if (isDragging) {
-                initialX = currentX;
-                initialY = currentY;
-                isDragging = false;
-                card.classList.remove('dragging');
-            }
-            
-            if (isResizing) {
-                isResizing = false;
-                card.classList.remove('resizing');
-            }
-        }
-        
-        function setTranslate(xPos, yPos, el) {
-            el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
-        }
-    });
 }
 
 // Clear entire watchlist

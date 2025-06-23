@@ -505,12 +505,8 @@ body.dark-theme .stock-dashboard-grid::-webkit-scrollbar-corner {
 }
 
 #finance .cards-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+  position: relative;
+  overflow: hidden;
 }
 
 #finance .cards-container .card {
@@ -519,6 +515,13 @@ body.dark-theme .stock-dashboard-grid::-webkit-scrollbar-corner {
   margin: 0 0 0 5px !important;
   padding: 0;
   box-sizing: border-box;
+  /* Only absolute when dragging */
+}
+
+#finance .cards-container .card.dragging {
+  position: absolute !important;
+  z-index: 1000;
+  pointer-events: auto;
 }
 
 #finance .cards-container .card.chart-container {
@@ -947,4 +950,65 @@ body.dark-theme .fullscreenButton:hover {
     height: 20px !important;
     font-size: 10px !important;
   }
+}
+
+.finance-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+.finance-bottom-row .card {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.scroll-to-top {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 1000;
+  background: var(--accent-color, #1976d2);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 2em;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+  transition: background 0.2s, opacity 0.2s, transform 0.2s;
+}
+.scroll-to-top:hover {
+  background: var(--primary-color, #1565c0);
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.theme-toggle {
+  background: var(--card-bg, #232323);
+  color: var(--accent-color, #1976d2);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 1.6em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  margin-left: 12px;
+}
+.theme-toggle:hover, .theme-toggle:focus {
+  background: var(--accent-color, #1976d2);
+  color: #fff;
+  outline: none;
+  transform: scale(1.08);
 }

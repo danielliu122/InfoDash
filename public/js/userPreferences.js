@@ -300,4 +300,156 @@ class UserPreferences {
 const userPrefs = new UserPreferences();
 
 // Export for use in other modules
-export { userPrefs, UserPreferences }; 
+export { userPrefs, UserPreferences };
+
+// Cookie consent and banner logic
+export function showCookieBanner() {
+    const banner = document.getElementById('cookie-notification');
+    if (banner) {
+        banner.style.display = 'block';
+        banner.classList.add('show');
+    }
+}
+
+export function hideCookieBanner() {
+    const banner = document.getElementById('cookie-notification');
+    if (banner) {
+        banner.classList.remove('show');
+        setTimeout(() => {
+            banner.style.display = 'none';
+        }, 300);
+    }
+}
+
+export function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) {
+            return decodeURIComponent(c.substring(nameEQ.length, c.length));
+        }
+    }
+    return null;
+}
+
+export function acceptCookies() {
+    document.cookie = 'cookiesAccepted=true; expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString() + '; path=/; samesite=Lax';
+    document.cookie = 'cookiesDeclined=false; expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString() + '; path=/; samesite=Lax';
+    hideCookieBanner();
+    if (window.showNotification) {
+        window.showNotification('Cookies accepted! Your preferences will be saved.', 3000);
+    }
+}
+
+export function declineCookies() {
+    document.cookie = 'cookiesAccepted=false; expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString() + '; path=/; samesite=Lax';
+    document.cookie = 'cookiesDeclined=true; expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString() + '; path=/; samesite=Lax';
+    // Clear any existing cookies
+    document.cookie = 'userWeatherLocation=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'userTheme=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'userNewsCountry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'userNewsLanguage=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'userTrendsCountry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'userTrendsLanguage=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'userWatchlist=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'infoDash_preferences=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'financeWatchlist=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    hideCookieBanner();
+    if (window.showNotification) {
+        window.showNotification('Cookies declined. No preferences will be saved.', 3000);
+    }
+}
+
+export function resetCookieConsent() {
+    document.cookie = 'cookiesAccepted=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'cookiesDeclined=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    showCookieBanner();
+    if (window.showNotification) {
+        window.showNotification('Cookie consent reset. Please accept cookies to save preferences.', 5000);
+    } else {
+        alert('Cookie consent reset. Please accept cookies to save preferences.');
+    }
+}
+
+export function checkCookieConsent() {
+    const cookiesAccepted = getCookie('cookiesAccepted');
+    const cookiesDeclined = getCookie('cookiesDeclined');
+    if (!cookiesAccepted && !cookiesDeclined) {
+        setTimeout(() => {
+            showCookieBanner();
+        }, 1000);
+    }
+}
+
+// Preference management helpers
+export function clearAllPreferences() {
+    if (confirm('Are you sure you want to clear all your preferences? This will reset your location, watchlist, and other settings.')) {
+        if (window.userPrefs) {
+            window.userPrefs.clear();
+            // Reset UI elements
+            const locationInput = document.getElementById('weatherLocationInput');
+            if (locationInput) locationInput.value = '';
+            const locationBtn = document.getElementById('set-location-btn');
+            if (locationBtn) locationBtn.textContent = '📍 Set Location';
+            // Clear weather display
+            const weatherContainer = document.getElementById('preferences-weather');
+            if (weatherContainer) {
+                weatherContainer.innerHTML = '';
+            }
+            // Refresh the page to apply all changes
+            location.reload();
+        } else {
+            alert('Preferences system not available');
+        }
+    }
+}
+
+export function updatePreferencesDisplay() {
+    if (!window.userPrefs) return;
+    // Update weather location display
+    const locationInput = document.getElementById('weatherLocationInput');
+    if (locationInput) {
+        const savedLocation = window.userPrefs.getWeatherLocation();
+        locationInput.value = savedLocation;
+        // Fetch and display weather data if location is saved
+        if (savedLocation && window.fetchAndDisplayWeatherInPreferences) {
+            window.fetchAndDisplayWeatherInPreferences(savedLocation);
+        }
+    }
+    // Update news settings display
+    const currentNewsCountry = document.getElementById('currentNewsCountry');
+    const currentNewsLanguage = document.getElementById('currentNewsLanguage');
+    if (currentNewsCountry) {
+        const country = window.userPrefs.getNewsCountry();
+        currentNewsCountry.textContent = country;
+    }
+    if (currentNewsLanguage) {
+        const language = window.userPrefs.getNewsLanguage();
+        const languageNames = {
+            'en': 'English', 'es': 'Español', 'fr': 'Français', 'de': 'Deutsch',
+            'ru': 'Русский', 'zh': '中文', 'ja': '日本語', 'ko': '한국어',
+            'pt': 'Português', 'ar': 'العربية', 'hi': 'हिन्दी', 'it': 'Italiano'
+        };
+        currentNewsLanguage.textContent = languageNames[language] || language;
+    }
+    // Update theme display
+    const currentTheme = document.getElementById('currentTheme');
+    if (currentTheme) {
+        const theme = window.userPrefs.getTheme();
+        currentTheme.textContent = theme.charAt(0).toUpperCase() + theme.slice(1);
+    }
+    // Update watchlist display
+    const preferencesWatchlist = document.getElementById('preferencesWatchlist');
+    if (preferencesWatchlist) {
+        const watchlist = window.userPrefs.getFinanceWatchlist();
+        if (watchlist && watchlist.length > 0) {
+            preferencesWatchlist.innerHTML = watchlist.map(symbol => 
+                `<span class="chip">${symbol}</span>`
+            ).join(' ');
+        } else {
+            preferencesWatchlist.innerHTML = '<p>No stocks in watchlist</p>';
+        }
+    }
+} 

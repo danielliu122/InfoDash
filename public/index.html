@@ -26,9 +26,9 @@
         data-ad-client="ca-pub-4393237786045277">
     </amp-auto-ads>
     <header class="container">
-        <h4 class="center-align">Info Dash</h4>
-        <div class="center-align">
-            <button id="themeToggleButton" class="btn waves-effect waves-light">Theme</button>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <h4 class="center-align" style="margin: 0;">Info Dash</h4>
+            <button class="theme-toggle" id="themeToggle">🌓</button>
         </div>
     </header>
     
@@ -398,24 +398,33 @@
                     </div>
                     <div id="finance-content" class="section-content">
                         <div class="cards-container">
-                            <!-- Stock Search -->
-                            <div class="card stock-info">
+                            <!-- Chart -->
+                            <div class="card chart-container">
                                 <div class="card-header">
-                                    <span class="card-title">Stock Search</span>
+                                    <span class="card-title">Price Chart</span>
                                 </div>
                                 <div class="card-content">
-                                    <div class="input-field">
-                                        <input type="text" id="stockSymbolInput" placeholder="Enter stock symbol or company name" autocomplete="off">
-                                <div id="autocomplete-list" class="autocomplete-items"></div>
+                                    <canvas id="financeChart"></canvas>
+                                    <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
+                                    <div class="chart-controls">
+                                        <button class="btn waves-effect waves-light pause-button" onclick="togglePauseFinance()">Pause</button>
+                                        <button class="btn-small waves-effect waves-light" onclick="resetChartZoom()">Reset Zoom</button>
+                                    </div>
+                                </div>
                             </div>
-                                    <div id="stock-info-card-container"></div>
-                                    <div class="quick-actions">
-                                        <button class="btn-small waves-effect waves-light" onclick="document.getElementById('stockSymbolInput').focus()">Search</button>
-                                        <button class="btn-small waves-effect waves-light" onclick="clearWatchlist()">Clear Watchlist</button>
+
+                            <!-- Live Stock Dashboard -->
+                            <div class="card stock-dashboard">
+                                <div class="card-header">
+                                    <span class="card-title">Live Stock Dashboard</span>
+                                </div>
+                                <div class="card-content">
+                                    <div id="stock-dashboard" class="stock-dashboard">
+                                        <!-- Dynamic stock cards will be populated here -->
+                                    </div>
+                                </div>
                             </div>
-                            </div>
-                        </div>
-                            
+
                             <!-- Watchlist -->
                             <div class="card watchlist">
                                 <div class="card-header">
@@ -429,53 +438,41 @@
                                 </div>
                             </div>
 
-                            <!-- Live Stock Dashboard -->
-                            <div class="card stock-dashboard">
-                                <div class="card-header">
-                                    <span class="card-title">Live Stock Dashboard</span>
-                                    <div class="dashboard-controls">
-                                        <button id="dashboardToggle" class="btn-small waves-effect waves-light green" onclick="toggleStockDashboard()">Pause</button>
+                            <div class="finance-bottom-row">
+                                <!-- Timeframe Controls -->
+                                <div class="card timeframe-controls">
+                                    <div class="card-header">
+                                        <span class="card-title">Chart Timeframe</span>
+                                    </div>
+                                    <div class="card-content">
+                                        <div class="time-range-buttons">
+                                            <button id="realtimeButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="5m" data-interval="1m">5 Min</button>
+                                            <button id="hourlyButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="2h" data-interval="1m">2 Hour</button>
+                                            <button id="openButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="1d" data-interval="5m">1 Day</button>
+                                            <button id="weeklyButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="1wk" data-interval="15m">1 Week</button>
+                                            <button id="monthlyButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="1mo" data-interval="1h">1 Month</button>
+                                            <button id="yearlyButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="1y" data-interval="1d">1 Year</button>
+                                            <button id="5yrButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="5y" data-interval="1mo">5 Years</button>
+                                            <button id="maxButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="max" data-interval="1mo">Max</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="card-content">
-                                    <div id="stock-dashboard" class="stock-dashboard">
-                                        <!-- Dynamic stock cards will be populated here -->
-                                    </div>
-                                </div>
-                            </div>
 
-                            <!-- Timeframe Controls -->
-                            <div class="card timeframe-controls">
-                                <div class="card-header">
-                                    <span class="card-title">Chart Timeframe</span>
-                                </div>
-                                <div class="card-content">
-                                    <div class="time-range-buttons">
-                                        <button id="realtimeButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="5m" data-interval="1m">5 Min</button>
-                                        <button id="hourlyButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="2h" data-interval="1m">2 Hour</button>
-                                        <button id="openButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="1d" data-interval="5m">1 Day</button>
-                                        <button id="weeklyButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="1wk" data-interval="15m">1 Week</button>
-                                        <button id="monthlyButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="1mo" data-interval="1h">1 Month</button>
-                                        <button id="yearlyButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="1y" data-interval="1d">1 Year</button>
-                                        <button id="5yrButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="5y" data-interval="1mo">5 Years</button>
-                                        <button id="maxButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="max" data-interval="1mo">Max</button>
+                                <!-- Stock Search -->
+                                <div class="card stock-info">
+                                    <div class="card-header">
+                                        <span class="card-title">Stock Search</span>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Chart -->
-                            <div class="card chart-container">
-                                <div class="card-header">
-                                    <span class="card-title">Price Chart</span>
-                                </div>
-                                <div class="card-content">
-                        <div class="chart-container">
-                            <canvas id="financeChart"></canvas>
-                            <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
-                        </div>
-                                    <div class="chart-controls">
-                        <button class="btn waves-effect waves-light pause-button" onclick="togglePauseFinance()">Pause</button>
-                                        <button class="btn-small waves-effect waves-light" onclick="resetChartZoom()">Reset Zoom</button>
+                                    <div class="card-content">
+                                        <div class="input-field">
+                                            <input type="text" id="stockSymbolInput" placeholder="Enter stock symbol or company name" autocomplete="off">
+                                            <div id="autocomplete-list" class="autocomplete-items"></div>
+                                        </div>
+                                        <div id="stock-info-card-container"></div>
+                                        <div class="quick-actions">
+                                            <button class="btn-small waves-effect waves-light" onclick="document.getElementById('stockSymbolInput').focus()">Search</button>
+                                            <button class="btn-small waves-effect waves-light" onclick="clearWatchlist()">Clear Watchlist</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -562,15 +559,7 @@
                         <div class="row">
                             <div class="col s12 m6">
                                 <div class="preference-group">
-                                    <h5>🌍 Location & Weather</h5>
-                                    <div class="input-field">
-                                        <input type="text" id="weatherLocationInput" placeholder="Enter your location (e.g., New York, NY)">
-                                        <label for="weatherLocationInput">Weather Location</label>
-                                    </div>
-                                    <button class="btn waves-effect waves-light" onclick="saveWeatherLocation()">Save Location</button>
-                                    <button class="btn-small waves-effect waves-light" onclick="refreshWeatherData()" style="margin-left: 10px;">🔄 Refresh</button>
                                     <div id="preferences-weather" style="margin-top:10px;"></div>
-                                    <p class="preference-info">This location will be used for weather data in summaries and weather features.</p>
                                 </div>
                             </div>
                             
@@ -580,7 +569,7 @@
                                     <p><strong>Current Settings:</strong></p>
                                     <p>Country: <span id="currentNewsCountry">US</span></p>
                                     <p>Language: <span id="currentNewsLanguage">English</span></p>
-                                    <p class="preference-info">These settings are automatically saved when you change them in the News and Trends sections.</p>
+                                    <p class="preference-info">These settings are automatically saved when you change them in the News section.</p>
                                 </div>
                             </div>
                         </div>
@@ -659,629 +648,25 @@
     <script type="module" src="js/weather.js"></script>
     <script type="module" src="js/map.js"></script>
 
-    <script>
-        // Cookie banner functionality
-        function showCookieBanner() {
-            const banner = document.getElementById('cookie-notification');
-            if (banner) {
-                banner.style.display = 'block';
-                banner.classList.add('show');
-            }
-        }
-
-        function acceptCookies() {
-            // Set cookie consent using actual cookies
-            document.cookie = 'cookiesAccepted=true; expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString() + '; path=/; samesite=Lax';
-            document.cookie = 'cookiesDeclined=false; expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString() + '; path=/; samesite=Lax';
-            hideCookieBanner();
-            
-            // Show notification
-            if (window.showNotification) {
-                window.showNotification('Cookies accepted! Your preferences will be saved.', 3000);
-            }
-        }
-
-        function declineCookies() {
-            // Set cookie consent using actual cookies
-            document.cookie = 'cookiesAccepted=false; expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString() + '; path=/; samesite=Lax';
-            document.cookie = 'cookiesDeclined=true; expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString() + '; path=/; samesite=Lax';
-            
-            // Clear any existing cookies
-            document.cookie = 'userWeatherLocation=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            document.cookie = 'userTheme=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            document.cookie = 'userNewsCountry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            document.cookie = 'userNewsLanguage=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            document.cookie = 'userTrendsCountry=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            document.cookie = 'userTrendsLanguage=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            document.cookie = 'userWatchlist=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            document.cookie = 'infoDash_preferences=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            document.cookie = 'financeWatchlist=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            
-            hideCookieBanner();
-            
-            // Show notification
-            if (window.showNotification) {
-                window.showNotification('Cookies declined. No preferences will be saved.', 3000);
-            }
-        }
-
-        function hideCookieBanner() {
-            const banner = document.getElementById('cookie-notification');
-            if (banner) {
-                banner.classList.remove('show');
-                setTimeout(() => {
-                    banner.style.display = 'none';
-                }, 300);
-            }
-        }
-
-        // Helper function to get cookie value
-        function getCookie(name) {
-            const nameEQ = name + "=";
-            const ca = document.cookie.split(';');
-            for (let i = 0; i < ca.length; i++) {
-                let c = ca[i];
-                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-                if (c.indexOf(nameEQ) === 0) {
-                    return decodeURIComponent(c.substring(nameEQ.length, c.length));
-                }
-            }
-            return null;
-        }
-
-        // Check if cookie banner should be shown on page load
-        function checkCookieConsent() {
-            const cookiesAccepted = getCookie('cookiesAccepted');
-            const cookiesDeclined = getCookie('cookiesDeclined');
-            
-            // Show banner if user hasn't made a choice yet
-            if (!cookiesAccepted && !cookiesDeclined) {
-                setTimeout(() => {
-                    showCookieBanner();
-                }, 1000); // Show after 1 second
-            }
-        }
-
-        // Initialize cookie banner check when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            checkCookieConsent();
-        });
-
-        // Function to test cookie banner (for debugging)
-        function testCookieBanner() {
-            // Clear any existing cookie consent
-            localStorage.removeItem('cookiesAccepted');
-            localStorage.removeItem('cookiesDeclined');
-            showCookieBanner();
-        }
-
-        function toggleSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            const toggleButton = event.target.closest('.section-toggle');
-            const toggleIcon = toggleButton ? toggleButton.querySelector('.toggle-icon') : null;
-            
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                if (toggleIcon) {
-                    toggleIcon.textContent = '−';
-                }
-            } else {
-                section.style.display = 'none';
-                if (toggleIcon) {
-                    toggleIcon.textContent = '+';
-                }
-            }
-        }
-
-        // Global function to refresh summary data
-        async function refreshSummaryData() {
-            try {
-                // Import the refresh function dynamically
-                const { refreshSummary } = await import('./js/summary.js');
-                await refreshSummary();
-            } catch (error) {
-                console.error('Error refreshing summary:', error);
-            }
-        }
-
-        // Global finance functions
-        async function clearWatchlist() {
-            try {
-                const { clearWatchlist: clearWatchlistFn } = await import('./js/finance.js');
-                clearWatchlistFn();
-            } catch (error) {
-                console.error('Error clearing watchlist:', error);
-            }
-        }
-
-        async function resetChartZoom() {
-            try {
-                const { resetChartZoom: resetChartZoomFn } = await import('./js/finance.js');
-                resetChartZoomFn();
-            } catch (error) {
-                console.error('Error resetting chart zoom:', error);
-            }
-        }
-
-        async function toggleStockDashboard() {
-            try {
-                const { toggleStockDashboard: toggleStockDashboardFn } = await import('./js/finance.js');
-                toggleStockDashboardFn();
-            } catch (error) {
-                console.error('Error toggling stock dashboard:', error);
-            }
-        }
-
-        async function selectStock(symbol) {
-            try {
-                const { selectStock: selectStockFn } = await import('./js/finance.js');
-                selectStockFn(symbol);
-            } catch (error) {
-                console.error('Error selecting stock:', error);
-            }
-        }
-
-        async function addToWatchlist(symbol) {
-            try {
-                const { addToWatchlist: addToWatchlistFn } = await import('./js/finance.js');
-                addToWatchlistFn(symbol);
-            } catch (error) {
-                console.error('Error adding to watchlist:', error);
-            }
-        }
-
-        async function removeFromWatchlist(symbol) {
-            try {
-                const { removeFromWatchlist: removeFromWatchlistFn } = await import('./js/finance.js');
-                removeFromWatchlistFn(symbol);
-            } catch (error) {
-                console.error('Error removing from watchlist:', error);
-            }
-        }
-
-        // Location modal functions - make them globally available
-        function showLocationModal() {
-            const modal = document.getElementById('locationModal');
-            const input = document.getElementById('weatherLocationInput');
-            
-            // Set current location if it exists
-            const currentLocation = localStorage.getItem('userWeatherLocation');
-            if (currentLocation) {
-                input.value = currentLocation;
-            }
-            
-            // Initialize modal if not already done
-            if (!modal.classList.contains('initialized')) {
-                M.Modal.init(modal);
-                modal.classList.add('initialized');
-            }
-            
-            // Open modal
-            const instance = M.Modal.getInstance(modal);
-            instance.open();
-            
-            // Focus on input
-            setTimeout(() => {
-                input.focus();
-            }, 300);
-        }
-
-        function setWeatherLocation() {
-            const input = document.getElementById('weatherLocationInput');
-            const location = input.value.trim();
-            
-            if (!location) {
-                if (window.showNotification) {
-                    window.showNotification('Please enter a location', 3000);
-                } else {
-                    alert('Please enter a location');
-                }
-                return;
-            }
-            
-            // Save to user preferences
-            if (window.userPrefs) {
-                window.userPrefs.setWeatherLocation(location);
-                
-                // Update the location button if it exists
-                const locationBtn = document.getElementById('set-location-btn');
-                if (locationBtn) {
-                    const cityName = location.split(',')[0];
-                    locationBtn.textContent = `📍 ${cityName}`;
-                }
-                
-                // Close modal
-                closeLocationModal();
-                
-                // Show notification
-                if (window.showNotification) {
-                    window.showNotification(`Weather location set to: ${location}`, 3000);
-                } else {
-                    alert(`Weather location set to: ${location}`);
-                }
-                
-                // Update weather display in both summary and preferences sections
-                if (window.displayCurrentWeather) {
-                    window.displayCurrentWeather();
-                }
-            } else {
-                alert('Preferences system not available');
-            }
-        }
-
-        function closeLocationModal() {
-            const modal = document.getElementById('locationModal');
-            const instance = M.Modal.getInstance(modal);
-            if (instance) {
-                instance.close();
-            }
-        }
-
-        async function fetchAndDisplayWeatherInPreferences(location) {
-            try {
-                const response = await fetch(`/api/weather?location=${encodeURIComponent(location)}`);
-                if (response.ok) {
-                    const weatherData = await response.json();
-                    displayWeatherInPreferences(weatherData);
-                } else {
-                    const errorData = await response.json().catch(() => ({}));
-                    console.error('Failed to fetch weather data:', errorData);
-                    displayWeatherInPreferences(null, errorData.error || 'Failed to fetch weather data');
-                }
-            } catch (error) {
-                console.error('Error fetching weather:', error);
-                displayWeatherInPreferences(null, 'Network error - please check your connection');
-            }
-        }
-
-        function displayWeatherInPreferences(weatherData, errorMessage = null) {
-            const weatherContainer = document.getElementById('preferences-weather');
-            if (!weatherContainer) return;
-
-            if (errorMessage) {
-                weatherContainer.innerHTML = `<p style="color: #f44336;">${errorMessage}</p>`;
-                return;
-            }
-
-            if (!weatherData) {
-                weatherContainer.innerHTML = '<p style="color: #f44336;">No weather data available</p>';
-                return;
-            }
-
-            // Debug: Log the weather data structure
-            // console.log('Weather data received:', weatherData);
-            // console.log('Weather data keys:', Object.keys(weatherData));
-
-            // Handle different API response structures
-            let location, current;
-            
-            if (weatherData.location && weatherData.current) {
-                // Standard structure (weather-js format)
-                // console.log('Using weather-js structure');
-                location = weatherData.location;
-                current = weatherData.current;
-            } else if (weatherData.name && weatherData.main) {
-                // Alternative structure (OpenWeatherMap style)
-                // console.log('Using OpenWeatherMap structure');
-                location = { name: weatherData.name, country: weatherData.sys?.country || '' };
-                current = {
-                    temperature: weatherData.main.temp,
-                    temperatureUnit: 'C',
-                    condition: weatherData.weather?.[0]?.description || 'Unknown',
-                    feelslike: weatherData.main.feels_like,
-                    humidity: weatherData.main.humidity,
-                    wind: weatherData.wind?.speed || 'N/A',
-                    windUnit: 'm/s',
-                    uv: 'N/A'
-                };
-            } else if (weatherData.city && weatherData.temperature) {
-                // Another possible structure
-                // console.log('Using city/temperature structure');
-                location = { name: weatherData.city, country: weatherData.country || '' };
-                current = {
-                    temperature: weatherData.temperature,
-                    temperatureUnit: weatherData.temperatureUnit || 'F',
-                    condition: weatherData.condition || 'Unknown',
-                    feelslike: weatherData.feelslike || weatherData.temperature,
-                    humidity: weatherData.humidity || 'N/A',
-                    wind: weatherData.wind || 'N/A',
-                    windUnit: weatherData.windUnit || '',
-                    uv: weatherData.uv || 'N/A'
-                };
-            } else {
-                // Fallback: try to extract data from any structure
-                // console.log('Using fallback structure extraction');
-                location = { 
-                    name: weatherData.name || weatherData.city || weatherData.location || 'Unknown Location', 
-                    country: weatherData.country || weatherData.sys?.country || '' 
-                };
-                current = {
-                    temperature: weatherData.temperature || weatherData.main?.temp || weatherData.current?.temperature || 'N/A',
-                    temperatureUnit: weatherData.temperatureUnit || 'F',
-                    condition: weatherData.condition || weatherData.weather?.[0]?.description || weatherData.current?.condition || 'Unknown',
-                    feelslike: weatherData.feelslike || weatherData.main?.feels_like || weatherData.current?.feelslike || 'N/A',
-                    humidity: weatherData.humidity || weatherData.main?.humidity || weatherData.current?.humidity || 'N/A',
-                    wind: weatherData.wind || weatherData.wind?.speed || weatherData.current?.wind || 'N/A',
-                    windUnit: weatherData.windUnit || 'mph',
-                    uv: weatherData.uv || weatherData.current?.uv || 'N/A'
-                };
-            }
-            
-            // console.log('Extracted location:', location);
-            // console.log('Extracted current:', current);
-            
-            // Ensure all required properties exist with fallbacks
-            const temp = current.temperature !== undefined && current.temperature !== 'N/A' ? Math.round(current.temperature) : 'N/A';
-            const tempUnit = current.temperatureUnit || '°';
-            const condition = current.condition || 'Unknown';
-            const feelsLike = current.feelslike !== undefined && current.feelslike !== 'N/A' ? Math.round(current.feelslike) : 'N/A';
-            const humidity = current.humidity || 'N/A';
-            
-            // Fix wind display - remove duplicate units and clean up the data
-            let wind = current.wind || 'N/A';
-            let windUnit = current.windUnit || '';
-            
-            // If wind already contains the unit, extract just the number
-            if (typeof wind === 'string' && wind.includes('mph')) {
-                wind = wind.replace(' mph', '').replace('mph', '').trim();
-                windUnit = 'mph';
-            } else if (typeof wind === 'string' && wind.includes('m/s')) {
-                wind = wind.replace(' m/s', '').replace('m/s', '').trim();
-                windUnit = 'm/s';
-            }
-            
-            const uv = current.uv || 'N/A';
-            
-            // Get current timestamp for when the request was made
-            const now = new Date();
-            const timestamp = now.toLocaleTimeString('en-US', { 
-                hour12: true, 
-                hour: 'numeric', 
-                minute: '2-digit', 
-                second: '2-digit' 
-            });
-            
-            // Clean up location display - handle undefined country properly
-            const locationName = location.name || 'Unknown Location';
-            const locationCountry = location.country;
-            
-            // Only show country if it exists and is not empty/undefined
-            const locationDisplay = locationCountry && locationCountry !== 'undefined' && locationCountry.trim() !== '' 
-                ? `${locationName}, ${locationCountry}` 
-                : locationName;
-            
-            // console.log('Final display values:', {
-            //     locationDisplay,
-            //     locationName,
-            //     locationCountry,
-            //     temp,
-            //     tempUnit,
-            //     condition,
-            //     feelsLike,
-            //     humidity,
-            //     wind,
-            //     windUnit,
-            //     timestamp
-            // });
-            
-            weatherContainer.innerHTML = `
-                <div class="weather-display" style="background: var(--card-bg); padding: 15px; border-radius: 8px; margin-top: 10px;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                        <h6 style="margin: 0; color: var(--text-color);">📍 ${locationDisplay}</h6>
-                        <div style="font-size: 0.8em; color: var(--text-secondary); text-align: right;">
-                            <div>🕐 Updated: ${timestamp}</div>
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="text-align: center;">
-                            <div style="font-size: 2em; font-weight: bold; color: var(--accent-color);">${temp}${tempUnit}</div>
-                            <div style="color: var(--text-secondary); font-size: 0.9em;">${condition}</div>
-                        </div>
-                        <div style="flex: 1;">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.9em;">
-                                <div><strong>Feels like:</strong> ${feelsLike}${tempUnit}</div>
-                                <div><strong>Humidity:</strong> ${humidity}%</div>
-                                <div><strong>Wind:</strong> ${wind} ${windUnit}</div>
-                                <div><strong>UV Index:</strong> ${uv}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function refreshWeatherData() {
-            const locationInput = document.getElementById('weatherLocationInput');
-            const location = locationInput.value.trim();
-            
-            if (!location) {
-                if (window.showNotification) {
-                    window.showNotification('Please enter a location first', 3000);
-                } else {
-                    alert('Please enter a location first');
-                }
-                return;
-            }
-            
-            // Show loading state
-            const weatherContainer = document.getElementById('preferences-weather');
-            if (weatherContainer) {
-                weatherContainer.innerHTML = '<p style="color: var(--text-secondary);">🔄 Loading weather data...</p>';
-            }
-            
-            // Fetch fresh weather data
-            fetchAndDisplayWeatherInPreferences(location);
-            
-            if (window.showNotification) {
-                window.showNotification('Weather data refreshed!', 2000);
-            }
-        }
-
-        function clearAllPreferences() {
-            if (confirm('Are you sure you want to clear all your preferences? This will reset your location, watchlist, and other settings.')) {
-                if (window.userPrefs) {
-                    window.userPrefs.clear();
-                    
-                    // Reset UI elements
-                    const locationInput = document.getElementById('weatherLocationInput');
-                    if (locationInput) locationInput.value = '';
-                    
-                    const locationBtn = document.getElementById('set-location-btn');
-                    if (locationBtn) locationBtn.textContent = '📍 Set Location';
-                    
-                    // Clear weather display
-                    const weatherContainer = document.getElementById('preferences-weather');
-                    if (weatherContainer) {
-                        weatherContainer.innerHTML = '';
-                    }
-                    
-                    // Refresh the page to apply all changes
-                    location.reload();
-                } else {
-                    alert('Preferences system not available');
-                }
-            }
-        }
-
-        function updatePreferencesDisplay() {
-            if (!window.userPrefs) return;
-            
-            // Update weather location display
-            const locationInput = document.getElementById('weatherLocationInput');
-            if (locationInput) {
-                const savedLocation = window.userPrefs.getWeatherLocation();
-                locationInput.value = savedLocation;
-                
-                // Fetch and display weather data if location is saved
-                if (savedLocation) {
-                    fetchAndDisplayWeatherInPreferences(savedLocation);
-                }
-            }
-            
-            // Update news settings display
-            const currentNewsCountry = document.getElementById('currentNewsCountry');
-            const currentNewsLanguage = document.getElementById('currentNewsLanguage');
-            
-            if (currentNewsCountry) {
-                const country = window.userPrefs.getNewsCountry();
-                currentNewsCountry.textContent = country;
-            }
-            
-            if (currentNewsLanguage) {
-                const language = window.userPrefs.getNewsLanguage();
-                const languageNames = {
-                    'en': 'English', 'es': 'EspaÃ±ol', 'fr': 'FranÃ§ais', 'de': 'Deutsch',
-                    'ru': 'Ð ÑƒÑÑÐºÐ¸Ð¹', 'zh': 'ä¸­æ–‡', 'ja': 'æ—¥æœ¬èªž', 'ko': 'í•œêµ­ì–´',
-                    'pt': 'PortuguÃªs', 'ar': 'Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©', 'hi': 'à¤¹à¤¿à¤¨à¥à¤¦à¥€', 'it': 'Italiano'
-                };
-                currentNewsLanguage.textContent = languageNames[language] || language;
-            }
-            
-            // Update theme display
-            const currentTheme = document.getElementById('currentTheme');
-            if (currentTheme) {
-                const theme = window.userPrefs.getTheme();
-                currentTheme.textContent = theme.charAt(0).toUpperCase() + theme.slice(1);
-            }
-            
-            // Update watchlist display
-            const preferencesWatchlist = document.getElementById('preferencesWatchlist');
-            if (preferencesWatchlist) {
-                const watchlist = window.userPrefs.getFinanceWatchlist();
-                if (watchlist && watchlist.length > 0) {
-                    preferencesWatchlist.innerHTML = watchlist.map(symbol => 
-                        `<span class="chip">${symbol}</span>`
-                    ).join(' ');
-                } else {
-                    preferencesWatchlist.innerHTML = '<p>No stocks in watchlist</p>';
-                }
-            }
-        }
-
-        // Make functions globally available
-        window.saveWeatherLocation = setWeatherLocation;
+    <script type="module">
+        import { showNotification, toggleSection, showLocationModal, closeLocationModal } from './js/uiUtils.js';
+        import { acceptCookies, declineCookies, resetCookieConsent, checkCookieConsent, showCookieBanner, hideCookieBanner, clearAllPreferences, updatePreferencesDisplay } from './js/userPreferences.js';
+        
+        window.showNotification = showNotification;
+        window.toggleSection = toggleSection;
+        window.showLocationModal = showLocationModal;
+        window.closeLocationModal = closeLocationModal;
+        window.acceptCookies = acceptCookies;
+        window.declineCookies = declineCookies;
+        window.resetCookieConsent = resetCookieConsent;
+        window.checkCookieConsent = checkCookieConsent;
+        window.showCookieBanner = showCookieBanner;
+        window.hideCookieBanner = hideCookieBanner;
         window.clearAllPreferences = clearAllPreferences;
         window.updatePreferencesDisplay = updatePreferencesDisplay;
-        window.fetchAndDisplayWeatherInPreferences = fetchAndDisplayWeatherInPreferences;
-        window.displayWeatherInPreferences = displayWeatherInPreferences;
-        window.refreshWeatherData = refreshWeatherData;
-
-        // Notification function for user feedback
-        function showNotification(message, duration = 3000) {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: var(--accent-color);
-                color: white;
-                padding: 12px 20px;
-                border-radius: 4px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                z-index: 10000;
-                transform: translateX(100%);
-                transition: transform 0.3s ease;
-                max-width: 300px;
-                word-wrap: break-word;
-            `;
-            notification.textContent = message;
-            
-            // Add to page
-            document.body.appendChild(notification);
-            
-            // Animate in
-            setTimeout(() => {
-                notification.style.transform = 'translateX(0)';
-            }, 100);
-            
-            // Remove after duration
-            setTimeout(() => {
-                notification.style.transform = 'translateX(100%)';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, duration);
-        }
-        
-        // Make notification function globally available
-        window.showNotification = showNotification;
-        
-        // Note: CORS errors from Google AdSense are expected in development
-        // These will not appear in production when served from a proper domain
-
-        // Function to reset cookie consent
-        function resetCookieConsent() {
-            // Clear cookie consent flags
-            document.cookie = 'cookiesAccepted=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            document.cookie = 'cookiesDeclined=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            
-            // Show the cookie banner again
-            showCookieBanner();
-            
-            // Show notification
-            if (window.showNotification) {
-                window.showNotification('Cookie consent reset. Please accept cookies to save preferences.', 5000);
-            } else {
-                alert('Cookie consent reset. Please accept cookies to save preferences.');
-            }
-        }
-
-        // Make reset function globally available
-        window.resetCookieConsent = resetCookieConsent;
-
-        // Function to reset watchlist to default
-        function resetToDefaultWatchlist() {
-            if (window.financeModule && window.financeModule.resetToDefaultWatchlist) {
-                window.financeModule.resetToDefaultWatchlist();
-            } else {
-                console.error('Finance module not available');
-            }
-        }
+        // Remove all inline definitions of these functions
     </script>
-    <button id="scrollToTopBtn" class="scroll-to-top" style="display: none;">↑</button>
+    <button id="scrollToTopBtn" class="scroll-to-top">↑</button>
 
     <!-- Notification Bar -->
     <div id="notification-bar"></div>

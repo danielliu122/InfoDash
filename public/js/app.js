@@ -145,10 +145,10 @@ function toggleTheme() {
     // Save the theme preference
     userPrefs.setTheme(newTheme);
 
-    // Update the theme toggle button text
-    const themeToggleButton = document.getElementById('themeToggleButton');
+    // Update the theme toggle button icon
+    const themeToggleButton = document.getElementById('themeToggle');
     if (themeToggleButton) {
-        themeToggleButton.textContent = `${currentTheme}`;
+        themeToggleButton.textContent = newTheme === 'light' ? '🌞' : '🌙';
     }
     
     // Update chart theme
@@ -162,10 +162,9 @@ window.toggleTheme = toggleTheme;
 function initializeTheme() {
     const savedTheme = userPrefs.getTheme();
     document.body.classList.add(`${savedTheme}-theme`);
-
-    const themeToggleButton = document.getElementById('themeToggleButton');
+    const themeToggleButton = document.getElementById('themeToggle');
     if (themeToggleButton) {
-        themeToggleButton.textContent = `${savedTheme === 'light' ? 'dark' : 'light'}`;
+        themeToggleButton.textContent = savedTheme === 'light' ? '🌞' : '🌙';
     }
 }
 
@@ -263,7 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Theme toggle functionality
-        const themeToggleButton = document.getElementById('themeToggleButton');
+        const themeToggleButton = document.getElementById('themeToggle');
         if (themeToggleButton) {
             themeToggleButton.addEventListener('click', toggleTheme);
         }

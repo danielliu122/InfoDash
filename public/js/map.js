@@ -293,11 +293,14 @@ async function initMap() {
     startPeriodicTrafficUpdates();
 
     // Add event listener for the theme toggle button
-    document.getElementById('themeToggleButton').addEventListener('click', async () => {
-        // Toggle between DARK and LIGHT
-        currentColorScheme = currentColorScheme === ColorScheme.DARK ? ColorScheme.LIGHT : ColorScheme.DARK;
-        map.setOptions({ colorScheme: currentColorScheme });
-    });
+    const themeToggleBtn = document.getElementById('themeToggle');
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', async () => {
+            // Toggle between DARK and LIGHT
+            currentColorScheme = currentColorScheme === ColorScheme.DARK ? ColorScheme.LIGHT : ColorScheme.DARK;
+            map.setOptions({ colorScheme: currentColorScheme });
+        });
+    }
 }
 
 function startPeriodicTrafficUpdates() {
