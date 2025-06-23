@@ -410,8 +410,11 @@
                         <div class="cards-container">
                             <!-- Chart -->
                             <div class="card chart-container">
-                                <div class="card-header">
+                                <div class="card-header" style="display: flex; align-items: center; justify-content: space-between;">
                                     <span class="card-title">Price Chart</span>
+                                    <button id="chartFullscreenBtn" class="btn-small waves-effect waves-light" title="Fullscreen" style="margin-left: 8px;">
+                                        <i class="material-icons">fullscreen</i>
+                                    </button>
                                 </div>
                                 <div class="card-content">
                                     <canvas id="financeChart"></canvas>
@@ -661,5 +664,44 @@
 
     <!-- Notification Bar -->
     <div id="notification-bar"></div>
+
+    <script type="module">
+        // Add fullscreen logic for chart
+        function isMobileDevice() {
+            return /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+        }
+        const chartFullscreenBtn = document.getElementById('chartFullscreenBtn');
+        if (chartFullscreenBtn) {
+            chartFullscreenBtn.addEventListener('click', async function () {
+                const chartContainer = document.querySelector('.card.chart-container');
+                if (!chartContainer) return;
+                // Request fullscreen
+                if (chartContainer.requestFullscreen) {
+                    await chartContainer.requestFullscreen();
+                } else if (chartContainer.webkitRequestFullscreen) {
+                    await chartContainer.webkitRequestFullscreen();
+                }
+                // Try to lock orientation to landscape (must be in this gesture)
+                if (isMobileDevice() && screen.orientation && screen.orientation.lock) {
+                    try {
+                        await screen.orientation.lock('landscape');
+                    } catch (e) {
+                        if (window.showNotification) {
+                            window.showNotification('For best experience, rotate your device to landscape.', 4000);
+                        } else {
+                            alert('For best experience, rotate your device to landscape.');
+                        }
+                    }
+                }
+            });
+        }
+        document.addEventListener('fullscreenchange', function () {
+            if (!document.fullscreenElement && isMobileDevice() && screen.orientation && screen.orientation.unlock) {
+                try {
+                    screen.orientation.unlock();
+                } catch (e) {}
+            }
+        });
+    </script>
 </body>
 </html>
