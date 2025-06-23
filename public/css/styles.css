@@ -1078,3 +1078,23 @@ body.dark-theme .fullscreenButton:hover {
     display: block;
   }
 }
+
+/* Hide scrollbar for Stock Search card */
+.card.stock-info {
+  overflow: auto;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+.card.stock-info::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Trending card */
+#trends .card {
+  overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+#trends .card::-webkit-scrollbar {
+  display: none;
+}
