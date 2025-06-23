@@ -238,6 +238,22 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
     max-height: 100vh !important;
     display: block;
   }
+
+  /* Limit section height on mobile */
+  section, .section {
+    max-height: 800px !important;
+    overflow-y: auto; /* Ensure scrolling is enabled */
+  }
+
+  /* Custom minimum section heights for mobile */
+  #news .data-container,
+  #trends .data-container {
+      min-height: 450px !important;
+  }
+
+  #preferences .section-content {
+      min-height: 350px !important;
+  }
 }
 
 /* === Add more component-specific and utility rules below as needed === */
