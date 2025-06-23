@@ -1034,9 +1034,8 @@ function initializeChart(ctx, data) {
             },
             animation: true,
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
             backgroundColor: backgroundColor,
-            
             scales: {
                 y: {
                     ticks: {
