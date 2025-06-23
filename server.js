@@ -851,10 +851,10 @@ app.get('/api/reddit', async (req, res) => {
     const timePeriod = req.query.t || 'day';
     const redditUrl = `https://www.reddit.com/top.json?sort=top&t=${timePeriod}`;
     try {
-        const response = await fetch(redditUrl);
-        const data = await response.json();
-        res.json(data);
+        const response = await axios.get(redditUrl);
+        res.json(response.data);
     } catch (error) {
+        console.error('Error fetching Reddit data:', error);
         res.status(500).json({ error: 'Failed to fetch from Reddit' });
     }
 });
