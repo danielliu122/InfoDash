@@ -17,7 +17,6 @@ import {
 } from './finance.js';
 import { fetchNewsData, updateNews } from './news.js';
 import { fetchTrendsData, updateTrends } from './trends.js'; // Import from trends.js
-import { fetchRedditData, updateReddit } from './reddit.js'; // Import from reddit.js
 import { refreshSummary, initializeSummarySection } from './summary.js'; // Import summary functionality
 import { userPrefs } from './userPreferences.js'; // Import user preferences
 
@@ -45,9 +44,6 @@ window.handleButtonClick = async function(type, category, subCategory = 'all') {
             // Fetch news data with the specified category
             data = await fetchNewsData(category, country, language);
             updateNews(data);
-        } else if (type === 'reddit') {
-            data = await fetchRedditData(category);
-            updateReddit(data);
         } else if (type === 'trends') {
             data = await fetchTrendsData(category, subCategory, language, country);
             updateTrends(data, category);
@@ -236,7 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         userPrefs.saveCurrentState();
     });
 
-    // Fetch and display world news and top Reddit posts of the day by default
+    // Fetch and display world news 
     try {
         const country = countrySelect.value;
         const language = languageSelect.value;
@@ -244,10 +240,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Fetch prioritized news data
         const newsData = await fetchNewsData('world', country, language, false, 'top-headlines');
         updateNews(newsData);
-
-        // Fetch other default data
-        const redditData = await fetchRedditData('day');
-        updateReddit(redditData);
 
         const trendsData = await fetchTrendsData('daily', 'all', trendsLanguageSelect.value, trendsCountrySelect.value);
         updateTrends(trendsData, 'daily');
