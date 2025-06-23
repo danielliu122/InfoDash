@@ -649,17 +649,20 @@ app.post('/api/summary/save', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Date is required' });
         }
 
-        // console.log('Provided date:', date);
+        // Determine if the date is today
+        const today = new Date().toISOString().split('T')[0];
         
-        // Check if we already have a summary for the given date
-        const existingSummary = await loadDailySummary(date);
-        if (existingSummary) {
-            // console.log(`Daily summary already exists for ${date}`);
-            return res.json({ 
-                success: false, 
-                message: `Daily summary already exists for ${date}`,
-                summary: existingSummary 
-            });
+        // Only block overwriting for past dates
+        if (date !== today) {
+            const existingSummary = await loadDailySummary(date);
+            if (existingSummary) {
+                // console.log(`Daily summary already exists for ${date}`);
+                return res.json({ 
+                    success: false, 
+                    message: `Daily summary already exists for ${date}`,
+                    summary: existingSummary 
+                });
+            }
         }
         
         // console.log('Extracted summary data:', { news: !!news, trends: !!trends, finance: !!finance, overall: !!overall });
