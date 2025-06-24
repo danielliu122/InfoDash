@@ -216,7 +216,8 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   .card.chart-container:-webkit-full-screen {
     width: 100vw !important;
     height: 100vh !important;
-    min-height: 100vh !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
     max-width: 100vw !important;
     max-height: 100vh !important;
     background: var(--card-bg, #232323);
@@ -234,7 +235,8 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   .card.chart-container:-webkit-full-screen canvas {
     width: 100vw !important;
     height: 100vh !important;
-    min-height: 100vh !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
     max-width: 100vw !important;
     max-height: 100vh !important;
     display: block;
