@@ -1,0 +1,36 @@
+{
+    "name": "InfoDash - Real-Time News & Finance Dashboard",
+    "short_name": "InfoDash",
+    "description": "Get real-time news headlines, stock market data, trending topics, weather updates, and AI-powered daily summaries",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#2196F3",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "en",
+    "categories": ["finance", "news", "productivity", "utilities"],
+    "icons": [
+        {
+            "src": "/favicon.ico",
+            "sizes": "16x16 32x32",
+            "type": "image/x-icon"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/static/screenshot-desktop.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "InfoDash Desktop Dashboard"
+        },
+        {
+            "src": "/static/screenshot-mobile.png",
+            "sizes": "390x844",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "InfoDash Mobile Dashboard"
+        }
+    ]
+} 

@@ -3,22 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Info Dash</title>
+    
+    <!-- Primary Meta Tags -->
+    <title>InfoDash - Real-Time News, Finance, Trends & AI Summary Dashboard</title>
+    <meta name="title" content="InfoDash - Real-Time News, Finance, Trends & AI Summary Dashboard">
+    <meta name="description" content="Get real-time news headlines, stock market data, trending topics, weather updates, and AI-powered daily summaries. Your comprehensive information dashboard for staying informed.">
+    <meta name="keywords" content="news dashboard, real-time news, stock market, finance data, trending topics, weather, AI summary, market analysis, financial dashboard, news aggregator, stock tracker, crypto prices, market trends, daily summary, information dashboard">
+    <meta name="author" content="InfoDash">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://infodash.app/">
+    <meta property="og:title" content="InfoDash - Real-Time News, Finance, Trends & AI Summary Dashboard">
+    <meta property="og:description" content="Get real-time news headlines, stock market data, trending topics, weather updates, and AI-powered daily summaries. Your comprehensive information dashboard for staying informed.">
+    <meta property="og:site_name" content="InfoDash">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://infodash.app/">
+    <meta property="twitter:title" content="InfoDash - Real-Time News, Finance, Trends & AI Summary Dashboard">
+    <meta property="twitter:description" content="Get real-time news headlines, stock market data, trending topics, weather updates, and AI-powered daily summaries. Your comprehensive information dashboard for staying informed.">
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#2196F3">
+    <meta name="msapplication-TileColor" content="#2196F3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="InfoDash">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://infodash.app/">
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16x16.png">
+    <link rel="manifest" href="static/site.webmanifest">
+    
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    
+    <!-- Fonts and Stylesheets -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script src="https://cdn.jsdelivr.net/npm/yahoo-finance2@2.0.0/dist/yahooFinance.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+    <!-- Google AdSense -->
     <meta name="google-adsense-account" content="ca-pub-4393237786045277">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4393237786045277" crossorigin="anonymous"></script>
-    <script async custom-element="amp-auto-ads"
-        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "InfoDash",
+        "description": "Real-time news, finance data, trending topics, and AI-powered daily summaries dashboard",
+        "url": "https://infodash.app/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Real-time news headlines",
+            "Stock market data and charts",
+            "Cryptocurrency prices",
+            "Trending topics",
+            "Weather updates",
+            "AI-powered daily summaries",
+            "Interactive charts",
+            "Customizable watchlists"
+        ],
+        "author": {
+            "@type": "Organization",
+            "name": "InfoDash"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "InfoDash"
+        }
+    }
+    </script>
+    
+    <!-- Additional Structured Data for News -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "NewsMediaOrganization",
+        "name": "InfoDash",
+        "url": "https://infodash.app/",
+        "sameAs": [
+            "https://twitter.com/infodash",
+            "https://facebook.com/infodash"
+        ]
+    }
     </script>
 </head>
 <body class="dark-theme">
