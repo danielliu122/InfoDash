@@ -36,8 +36,8 @@ const DEFAULT_WATCHLIST = [
 ];
 
 // Set default time range and interval
-const DEFAULT_TIME_RANGE = '6h';
-const DEFAULT_INTERVAL = '5m';
+export const DEFAULT_TIME_RANGE = '2h';
+export const DEFAULT_INTERVAL = '1m';
 
 // Helper function to get default symbol based on market status
 function getDefaultSymbol() {
@@ -708,6 +708,12 @@ export function updateFinance(data) {
     const canvas = document.getElementById('financeChart');
     if (!canvas) return;
 
+    // --- Synchronize canvas drawing buffer size with displayed size ---
+    const parent = canvas.parentElement;
+    canvas.width = parent.clientWidth;
+    canvas.height = parent.clientHeight;
+    // ---------------------------------------------------------------
+
     // Destroy existing chart if it exists
     if (window.financeChart && typeof window.financeChart.destroy === 'function') {
         window.financeChart.destroy();
@@ -1017,7 +1023,7 @@ function initializeChart(ctx, data) {
                 borderColor: 'rgba(75, 192, 192, 1)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 fill: true,
-                pointRadius: 2,
+                pointRadius: 3,
                 pointHoverRadius: 5,
                 spanGaps: true,
                 segment: {

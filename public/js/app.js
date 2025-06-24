@@ -13,7 +13,9 @@ import {
     resetChartZoom,
     updateChartTheme,
     startStockDashboard,
-    resetFinanceCardPositions
+    resetFinanceCardPositions,
+    DEFAULT_TIME_RANGE,
+    DEFAULT_INTERVAL
 } from './finance.js';
 import { fetchNewsData, updateNews } from './news.js';
 import { fetchTrendsData, updateTrends } from './trends.js'; // Import from trends.js
@@ -250,7 +252,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             console.log('Market is closed. Auto-refresh will not start.');
             // Update the chart once even if the market is closed
-            handleFinanceUpdate('1d', '1m');
+            handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
         }
 
         // Theme toggle functionality

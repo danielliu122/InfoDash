@@ -210,6 +210,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
     min-width: 0 !important;
     box-sizing: border-box !important;
     display: block !important;
+    min-height: 500px !important;
   }
   .card.chart-container:fullscreen,
   .card.chart-container:-webkit-full-screen {
@@ -503,7 +504,7 @@ body.dark-theme #autocomplete-list .autocomplete-suggestion:hover {
   overflow: auto;
   min-width: 320px;
   min-height: 240px;
-  max-width: 100%;
+  max-width: 1200px !important;
   max-height: 90vh;
     position: relative;
 }
@@ -1062,15 +1063,17 @@ body.dark-theme .fullscreenButton:hover {
 
 @media (min-width: 1000px) {
   .card.chart-container {
-    max-width: 900px !important;
-    min-height: 420px !important;
+    max-width: 1200px !important;
+    min-height: 500px !important;
     margin-left: auto;
     margin-right: auto;
   }
   .card.chart-container canvas,
   #financeChart {
-    min-height: 400px !important;
     width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    max-height: 100%;
     display: block;
   }
 }
