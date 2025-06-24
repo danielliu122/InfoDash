@@ -85,5 +85,5 @@ Thumbs.db
 !.elasticbeanstalk/*.global.yml
 
 # Local data file
-daily-summaries.json
-news-cache.json
+data/daily-summaries.json
+data/news-cache.json
