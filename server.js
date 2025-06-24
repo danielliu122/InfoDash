@@ -86,6 +86,7 @@ function isMarketClosed() {
 // Function to save daily summary to file
 async function saveDailySummary(summaryData, date) {
     try {
+        console.log(`saveDailySummary: Saving summary for date: ${date}`);
         const summaryFile = path.join(__dirname, 'data', 'daily-summaries.json');
         
         // Ensure data directory exists
@@ -101,8 +102,10 @@ async function saveDailySummary(summaryData, date) {
         try {
             const existingData = await fs.readFile(summaryFile, 'utf8');
             summaries = JSON.parse(existingData);
+            console.log(`saveDailySummary: Loaded existing summaries for ${Object.keys(summaries).length} dates`);
         } catch (error) {
             // File doesn't exist or is invalid, start fresh
+            console.log('saveDailySummary: No existing summaries file found, starting fresh');
             summaries = {};
         }
         
@@ -115,18 +118,19 @@ async function saveDailySummary(summaryData, date) {
         
         // Save to file
         await fs.writeFile(summaryFile, JSON.stringify(summaries, null, 2));
+        console.log(`saveDailySummary: Successfully saved summary for ${date}`);
         
         // Update global variables if it's for today
         const today = new Date().toISOString().split('T')[0];
         if (date === today) {
-        dailySummary = summaryData;
-        lastSummaryDate = today;
+            dailySummary = summaryData;
+            lastSummaryDate = today;
+            console.log('saveDailySummary: Updated global variables for today');
         }
         
-        // console.log(`Daily summary saved for ${date}`);
         return true;
     } catch (error) {
-        console.error('Error saving daily summary:', error);
+        console.error('saveDailySummary: Error saving daily summary:', error);
         return false;
     }
 }
@@ -135,14 +139,18 @@ async function saveDailySummary(summaryData, date) {
 async function loadDailySummary(date = null) {
     try {
         const targetDate = date || new Date().toISOString().split('T')[0];
+        console.log(`loadDailySummary: Loading summary for date: ${targetDate}`);
         const summaryFile = path.join(__dirname, 'data', 'daily-summaries.json');
         
         const data = await fs.readFile(summaryFile, 'utf8');
         const summaries = JSON.parse(data);
+        console.log(`loadDailySummary: Found summaries for dates: ${Object.keys(summaries).join(', ')}`);
         
-        return summaries[targetDate] || null;
+        const summary = summaries[targetDate] || null;
+        console.log(`loadDailySummary: Summary found for ${targetDate}:`, !!summary);
+        return summary;
     } catch (error) {
-        console.error('Error loading daily summary:', error);
+        console.error('loadDailySummary: Error loading daily summary:', error);
         return null;
     }
 }
