@@ -36,7 +36,7 @@ const DEFAULT_WATCHLIST = [
 ];
 
 // Set default time range and interval
-const DEFAULT_TIME_RANGE = '12h';
+const DEFAULT_TIME_RANGE = '6h';
 const DEFAULT_INTERVAL = '5m';
 
 // Helper function to get default symbol based on market status
@@ -785,7 +785,7 @@ function setupChartResize(chartContainer) {
 }
 
 // This function handles fetching data and deciding how to update the chart.
-export async function updateFinanceData(symbol, timeRange = '1d', interval = 'm', isRefresh = false) {
+export async function updateFinanceData(symbol, timeRange = DEFAULT_TIME_RANGE, interval = DEFAULT_INTERVAL, isRefresh = false) {
     try {
         currentSymbol = symbol; // Keep track of the current symbol
         
@@ -847,12 +847,12 @@ document.getElementById('stockSymbolInput').addEventListener('change', (event) =
     const activeButton = document.querySelector('.time-range-button.active') || document.getElementById('realtimeButton');
     
     // Use data attributes instead of parsing onclick
-    let timeRange = '1d';
-    let interval = '1m';
+    let timeRange = DEFAULT_TIME_RANGE;
+    let interval = DEFAULT_INTERVAL;
     
     if (activeButton) {
-        timeRange = activeButton.getAttribute('data-time-range') || '1d';
-        interval = activeButton.getAttribute('data-interval') || '1m';
+        timeRange = activeButton.getAttribute('data-time-range') || DEFAULT_TIME_RANGE;
+        interval = activeButton.getAttribute('data-interval') || DEFAULT_INTERVAL;
     }
     
     // Check if auto-refresh is already running
