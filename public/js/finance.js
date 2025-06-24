@@ -1050,9 +1050,9 @@ function initializeChart(ctx, data) {
                   }
                 }
             },
-            animation: !isMobile,
-            responsive: !isMobile,
-            maintainAspectRatio: false,
+            animation: false,
+            responsive: false,
+            maintainAspectRatio: true,
             backgroundColor: backgroundColor,
             scales: {
                 y: {

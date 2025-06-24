@@ -2,33 +2,150 @@
   "world-us-en-general-all": {
     "data": {
       "status": "ok",
-      "totalResults": 34,
+      "totalResults": 32,
       "articles": [
         {
           "source": {
-            "id": "bloomberg",
-            "name": "Bloomberg"
+            "id": null,
+            "name": "CNBC"
           },
-          "author": "Richard Henderson",
-          "title": "Oil Surges, US Futures Drop After Strikes on Iran: Markets Wrap - Bloomberg",
-          "description": "US equity futures dropped and oil advanced in Asia on Monday after Washington struck Iran’s nuclear sites over the weekend.",
-          "url": "https://www.bloomberg.com/news/articles/2025-06-22/oil-surges-us-futures-drop-after-strikes-on-iran-markets-wrap",
-          "urlToImage": "https://assets.bwbx.io/images/users/iqjWHBFdfxIU/ipoCwfJIqk5c/v0/1200x675.png",
-          "publishedAt": "2025-06-23T01:35:00Z",
-          "content": "US equity futures dropped and oil advanced in Asia on Monday after Washington struck Irans nuclear sites over the weekend. \r\nContracts for the S&amp;P 500 declined around 0.3% and a gauge of Asian eq… [+204 chars]"
+          "author": "Diana Olick",
+          "title": "May home sales increase very slightly, but prices hit another record high - CNBC",
+          "description": "Sales of existing homes rose very slightly in May from April but were still weaker than they were a year ago. Prices rose, hitting a record high for May.",
+          "url": "https://www.cnbc.com/2025/06/23/may-home-sales-prices.html",
+          "urlToImage": "https://image.cnbcfm.com/api/v1/image/108136378-1745524139472-gettyimages-2211809885-bb2_8032_ixihhfjy.jpeg?v=1745524288&w=1920&h=1080",
+          "publishedAt": "2025-06-23T14:00:07Z",
+          "content": "Sales of previously owned homes rose very slightly in May, up 0.8% from April, to a seasonally adjusted, annualized rate of 4.03 million units, according to the National Association of Realtors. \r\nHo… [+2393 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Antonio G. Di Benedetto",
+          "title": "Chromebook Plus laptops like Lenovo’s sleek, new 14-incher are getting free Gemini AI features - The Verge",
+          "description": "Google adds new Gemini features like select to search to Chromebook Plus laptops. Lenovo’s Chromebook Plus 14 also debuts with a new processor for on-device AI.",
+          "url": "https://www.theverge.com/news/690885/google-chromeos-gemini-ai-select-to-search-lenovo-chromebook-plus-14",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/257814_Lenovo_Chromebook_Plus_14_laptop_ADiBenedetto_0007.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
+          "publishedAt": "2025-06-23T13:00:00Z",
+          "content": "Features include select-to-search images and on-screen text, smart grouping of tabs and documents, and automated image editing.\r\nGoogle announced a handful of new Gemini AI features for Chromebook Pl… [+2478 chars]"
         },
         {
           "source": {
             "id": null,
-            "name": "Israel Hayom"
+            "name": "BBC News"
           },
-          "author": "ErezL",
-          "title": "The untold story of the Iran war: How Israel did the unthinkable - www.israelhayom.com",
-          "description": "In early January, after meetings at the Prime Minister's Office's 8th floor and then then at the Kirya in Tel Aviv, it was clear: Israel had crossed the",
-          "url": "https://www.israelhayom.com/2025/06/22/the-untold-story-of-the-iran-war-how-israel-did-the-unthinkable/",
-          "urlToImage": "https://www.israelhayom.com/wp-content/uploads/2025/06/a972cbc3-a15f-4c9e-9d2b-cdd45f4929e4.jpg",
-          "publishedAt": "2025-06-23T01:24:21Z",
-          "content": "In early January, an Israeli official met with Minister of Strategic Affairs Ron Dermer on the eighth floor of the Prime Minister's Office in Jerusalem. A week later, the same official met with then-… [+24688 chars]"
+          "author": null,
+          "title": "Let non-doms pay £250,000 and avoid some UK tax - Nigel Farage - BBC",
+          "description": "The Reform UK leader says money raised from the policy would go to the lowest-paid 10% of full-time workers.",
+          "url": "https://www.bbc.com/news/articles/c14e03dvydno",
+          "urlToImage": "https://ichef.bbci.co.uk/news/1024/branded_news/c388/live/5252ce70-5011-11f0-8c0a-5b816c079050.jpg",
+          "publishedAt": "2025-06-23T12:56:03Z",
+          "content": "Kate Whannel\r\nJoe Pike\r\nReform UK has announced it would give non-doms the chance to avoid some UK taxes by paying a £250,000 fee, with the proceeds going to people on the lowest incomes.\r\nNon-domici… [+3992 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "PhoneArena"
+          },
+          "author": "Adrian Diaconescu",
+          "title": "Behold the upcoming Galaxy Watch 8, Watch 8 Classic, and Watch Ultra (2025) in beautiful new leaks! - PhoneArena",
+          "description": "You may or may not like their designs, but Samsung's three fast-approaching smartwatches hold no more cosmetic secrets after this huge new leak.",
+          "url": "https://www.phonearena.com/news/samsung-galaxy-watch-8-watch-8-classic-watch-ultra-2025-beautiful-new-pictures_id171600",
+          "urlToImage": "https://m-cdn.phonearena.com/images/article/171600-wide-two_1200/Behold-the-upcoming-Galaxy-Watch-8-Watch-8-Classic-and-Watch-Ultra-2025-in-beautiful-new-leaks.jpg",
+          "publishedAt": "2025-06-23T12:50:48Z",
+          "content": "A discussion is a place, where people can voice their opinion, no matter if it\r\n is positive, neutral or negative. However, when posting, one must stay true to the topic, and not just share some\r\n ra… [+1082 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "SB Nation"
+          },
+          "author": "Ricky O'Donnell",
+          "title": "NBA mock draft 2025: Updated projection with NBA Finals now over - SBNation.com",
+          "description": "Here’s our latest 2025 NBA mock draft with the season now over.",
+          "url": "https://www.sbnation.com/nba/2025/6/23/24451800/nba-mock-draft-2025-updated-projection-with-nba-finals-now-over",
+          "urlToImage": "https://cdn.vox-cdn.com/thumbor/tLrIIWHEQ6rremFudnVw0Wv2Dxk=/0x17:3440x1818/fit-in/1200x630/cdn.vox-cdn.com/uploads/chorus_asset/file/26032518/2214887127.jpg",
+          "publishedAt": "2025-06-23T12:00:00Z",
+          "content": "The 2025 NBA Draft class has spent the last year under the microscope. Cooper Flagg going No. 1 overall has been a forgone conclusion from the moment he reclassified to accelerate his pro timeline, a… [+13471 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "BBC News"
+          },
+          "author": null,
+          "title": "Israel says it struck Tehran's Evin prison and Fordo access routes - BBC",
+          "description": "Iran's judiciary says the attack damaged parts of Evin, a notorious facility which holds many political prisoners.",
+          "url": "https://www.bbc.com/news/articles/cp8621gnknjo",
+          "urlToImage": "https://ichef.bbci.co.uk/news/1024/branded_news/62b3/live/f242d090-5031-11f0-8c47-237c2e4015f5.jpg",
+          "publishedAt": "2025-06-23T11:59:50Z",
+          "content": "The Israeli military has struck Tehran's notorious Evin prison and damaged parts of the facility, which holds many political detainees, Iran's judiciary says.\r\nThe judiciary's Mizan news agency repor… [+1256 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "Barron's"
+          },
+          "author": "Barron's",
+          "title": "These Stocks Are Moving the Most Today: Northrop Grumman, Exxon, Tesla, Northern Trust, Fiserv, and More - Barron's",
+          "description": null,
+          "url": "https://www.barrons.com/articles/stock-movers-0b3ff026",
+          "urlToImage": null,
+          "publishedAt": "2025-06-23T11:46:00Z",
+          "content": null
+        },
+        {
+          "source": {
+            "id": "the-washington-post",
+            "name": "The Washington Post"
+          },
+          "author": "Kevin Loria",
+          "title": "The truth about using cannabis for health problems - The Washington Post",
+          "description": "People are using cannabis for everything from pain to insomnia. Here’s when it might help and when it won’t. And don’t smoke or vape it.",
+          "url": "https://www.washingtonpost.com/wellness/2025/06/23/cannabis-health-insomnia-pain-paranoia/",
+          "urlToImage": "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/BR26PFFV2NEHZBF6KK6H4AARB4.jpg&w=1440",
+          "publishedAt": "2025-06-23T11:31:53Z",
+          "content": "Consumer Reports has no financial relationship with any advertisers on this site.\r\nMany U.S. states have legalized cannabis, and there has been a significant increase in the number of older adults us… [+4228 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "Rudebaguette.com"
+          },
+          "author": "Rosemary Potter",
+          "title": "Nintendo Switch 2 Divides the Community as Doubts Rise Over Whether the New Console Truly Delivers on Expectations - Rude Baguette",
+          "description": "IN A NUTSHELL 🎮 The Nintendo Switch 2 has launched, selling over 3.5 million units in just four days, setting a new record for console releases. 💰 Priced at around $500, the console offers a 7.9-inch LCD screen with Full HD resolution, but its high cost is …",
+          "url": "https://www.rudebaguette.com/en/2025/06/nintendo-switch-2-divides-the-community-as-doubts-rise-over-whether-the-new-console-truly-delivers-on-expectations/",
+          "urlToImage": "https://www.rudebaguette.com/wp-content/uploads/2025/06/this-controversial-device-has-gamers-torn-nintendo-switch-2-sparks-debate-as-critics-question-this-new-consoles-worth-and-impact.jpg",
+          "publishedAt": "2025-06-23T11:01:28Z",
+          "content": "<table><tr><td>IN A NUTSHELL</td></tr><tr><td><ul><li> The Nintendo Switch 2 has launched, selling over 3.5 million units in just four days, setting a new record for console releases.</li><li> Priced… [+5611 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "Bloody Elbow"
+          },
+          "author": null,
+          "title": "Demetrious Johnson reacts to Jon Jones’ UFC retirement… ‘I don’t understand why’ - Bloody Elbow",
+          "description": "Demetrious Johnson still wants some clarity.",
+          "url": "https://bloodyelbow.com/2025/06/23/demetrious-johnson-reacts-to-jon-jones-ufc-retirement-i-dont-understand-why/",
+          "urlToImage": "https://bloodyelbow.com/wp-content/uploads/1/2025/06/generated-image-281.jpg",
+          "publishedAt": "2025-06-23T10:45:00Z",
+          "content": "The majority of the UFC fanbase is happy that Jon Jones has finally retired from the sport but it has left some people confused.\r\nAfter several months of delaying a potential UFC heavyweight title un… [+2625 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "KHOU.com"
+          },
+          "author": "Deevon Rahming",
+          "title": "Abbott vetoes THC ban, calls Texas lawmakers back to Austin for special session - KHOU",
+          "description": "Texas lawmakers are heading back for a special session after Gov. Abbott vetoed Senate Bill 3. Here is what he’s proposing instead.",
+          "url": "https://www.khou.com/article/news/local/texas/thc-ban-texas-update-veto-special-session/285-52709030-71a3-4a16-adb1-060953dddb72",
+          "urlToImage": "https://media.khou.com/assets/KHOU/images/73862da2-a043-47b6-a82c-e59a93fc4e42/20250623T110939/73862da2-a043-47b6-a82c-e59a93fc4e42_1140x641.jpg",
+          "publishedAt": "2025-06-23T10:25:00Z",
+          "content": "AUSTIN, Texas Tensions are rising at the Texas Capitol after Gov. Greg Abbott vetoed Senate Bill 3, a measure that would have banned consumable hemp products containing THC. Instead of signing the bi… [+3976 chars]"
         },
         {
           "source": {
@@ -36,116 +153,12 @@
             "name": "The Washington Post"
           },
           "author": "Meg Kelly, Joyce Sohyun Lee, Nilo Tabrizy, Evan Hill, Dylan Moriarty",
-          "title": "What satellite images show of damage to Iran’s nuclear sites - The Washington Post",
-          "description": "A Washington Post examination of visuals, expert analysis and official statements shows damage to Iran’s Fordow nuclear site after U.S. strikes.",
+          "title": "What satellite images reveal about damage to Iran’s nuclear sites - The Washington Post",
+          "description": "Visuals, expert analysis and official statements shed light on Iran’s nuclear sites after U.S. strikes.",
           "url": "https://www.washingtonpost.com/investigations/2025/06/22/iran-strikes-nuclear-site-damage-visuals/",
-          "urlToImage": "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/MOG6RO3XIFTJPQ6ECEK726W5O4.JPG&w=1440",
-          "publishedAt": "2025-06-23T01:21:40Z",
-          "content": "Satellite imagery taken Sunday morning shows at least six apparent bomb entry points at Irans key Fordow uranium enrichment facility, according to a Washington Post visual analysis and multiple exper… [+4426 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "Farmingdale-observer.com"
-          },
-          "author": null,
-          "title": "A hidden swarm of 'city-killer' asteroids around Venus could one day collide with Earth, simulations suggest. - Farmingdale Observer",
-          "description": "Recent astronomical simulations have uncovered a concerning revelation: Venus may harbor numerous hidden asteroids capable of devastating Earth upon impact. These \"city killer\" space rocks orbit the sun alongside Venus but remain largely undetected due to the…",
-          "url": "https://farmingdale-observer.com/2025/06/22/a-hidden-swarm-of-city-killer-asteroids-around-venus-could-one-day-collide-with-earth-simulations-suggest/",
-          "urlToImage": null,
-          "publishedAt": "2025-06-23T01:15:00Z",
-          "content": "Recent astronomical simulations have uncovered a concerning revelation: Venus may harbor numerous hidden asteroids capable of devastating Earth upon impact. These “city killer” space rocks orbit the … [+3866 chars]"
-        },
-        {
-          "source": {
-            "id": "nbc-news",
-            "name": "NBC News"
-          },
-          "author": "Rohan Nadkarni",
-          "title": "Pacers star Tyrese Haliburton left Game 7 of the NBA Finals with injury - NBC News",
-          "description": "Indiana Pacers guard Tyrese Haliburton left Game 7 of the NBA Finals in the first quarter with a right leg injury",
-          "url": "https://www.nbcnews.com/sports/nba/tyrese-haliburton-injury-game-7-rcna214415",
-          "urlToImage": "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2025-06/250622-NBA-832-e47990.jpg",
-          "publishedAt": "2025-06-23T00:35:00Z",
-          "content": "Indiana Pacers guard Tyrese Haliburton left Game 7 of the NBA Finals in the first quarter with a right leg injury.\r\nThe Pacers announced during the second quarter that Haliburton would not return wit… [+2016 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "CBS Sports"
-          },
-          "author": "Jack Maloney",
-          "title": "Thunder vs. Pacers score: NBA Finals Game 7 live updates as OKC, Indy battle for 2025 championship - CBS Sports",
-          "description": "Can SGA and the Thunder win at home? Or will the Pacers get their first NBA title with another upset?",
-          "url": "https://www.cbssports.com/nba/news/thunder-vs-pacers-score-nba-finals-game-7-live-updates-as-okc-indy-battle-for-2025-championship/live/",
-          "urlToImage": "https://sportshub.cbsistatic.com/i/r/2025/06/22/d14dd366-7e1e-4ea6-a3fa-5e00c1f7d084/thumbnail/1200x675/f0363c6985a3593c071ff28ed76fd89e/siakam-sga-imagn.png",
-          "publishedAt": "2025-06-23T00:28:45Z",
-          "content": "Tyrese Haliburton collapsed to the floor in the middle of the first quarter after attempting to drive to the basket, and immediately slapped the ground and screamed out in distress. Haliburton was pl… [+1688 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
-          "author": "Andrew J. Hawkins",
-          "title": "Tesla’s robotaxi is live: here are some of the first reactions. - The Verge",
-          "description": "Tesla launched a limited robotaxi service with safety monitors in the passenger seat in a small area in Austin, Texas.",
-          "url": "https://www.theverge.com/news/690846/tesla-robotaxi-first-reaction-austin",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/gettyimages-2220744156.jpg?quality=90&strip=all&crop=0%2C10.785131724411%2C100%2C78.429736551177&w=1200",
-          "publishedAt": "2025-06-22T23:58:26Z",
-          "content": "Elon Musk promised an unsupervised robotaxi service would launch in June. I guess that depends on your definition of unsupervised.\r\nTesla finally did the damn thing. The company launched its hotly an… [+6198 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "State.gov"
-          },
-          "author": null,
-          "title": "Worldwide Caution - U.S. Department of State (.gov)",
-          "description": "On June 22, 2025, the Department of State issued a Worldwide Caution Security Alert advising U.S. citizens overseas to exercise increased caution.  The full text of the updated Worldwide Caution Security Alert is as follows: Event: The conflict between Israel…",
-          "url": "https://www.state.gov/releases/office-of-the-spokesperson/2025/06/worldwide-caution/",
-          "urlToImage": "https://www.state.gov/wp-content/uploads/2025/01/Tarawera_social_template.png",
-          "publishedAt": "2025-06-22T23:46:49Z",
-          "content": "On June 22, 2025, the Department of State issued a Worldwide Caution Security Alert advising U.S. citizens overseas to exercise increased caution. \r\nThe full text of the updated Worldwide Caution Sec… [+578 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "The Detroit News"
-          },
-          "author": "Summer Ballentine, Carol Thompson",
-          "title": "Police credit staffers for stopping gunman at Wayne Co. church: They 'prevented a mass shooting' - The Detroit News",
-          "description": "Congregants were gathered Sunday for a special vacation Bible school service at CrossPointe Community Church when the shooting happened. A security guard killed gunman.",
-          "url": "https://www.detroitnews.com/story/news/local/wayne-county/2025/06/22/security-guard-kills-active-shooter-at-crosspointe-church-wayne-police-say/84307435007/",
-          "urlToImage": "https://www.detroitnews.com/gcdn/authoring/authoring-images/2025/06/22/PDTN/84307789007-img-7367.jpeg?crop=2345,1317,x0,y0&width=2345&height=1317&format=pjpg&auto=webp",
-          "publishedAt": "2025-06-22T23:46:19Z",
-          "content": "Wayne  A gunman wearing a tactical vest and carrying two guns targeted a suburban Detroit church Sunday morning, firing shots into the building's exterior during a special vacation Bible School servi… [+4396 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "BBC News"
-          },
-          "author": null,
-          "title": "How China made electric vehicles mainstream - BBC",
-          "description": "The world's second largest economy is both the biggest producer and buyer of EVs.",
-          "url": "https://www.bbc.com/news/articles/c2d5ld8y8pwo",
-          "urlToImage": "https://ichef.bbci.co.uk/news/1024/branded_news/5275/live/906fc590-3a0f-11f0-a4ca-c350ccf42b30.jpg",
-          "publishedAt": "2025-06-22T23:17:26Z",
-          "content": "Annabelle Liang &amp; Nick MarshBusiness reporter &amp; Transport correspondent\r\nAlmost half of all cars sold in China last year were electric\r\n\"I drive an electric vehicle because I am poor,\" says L… [+9719 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "NBCSports.com"
-          },
-          "author": "Mike Florio",
-          "title": "Travis Hunter gets his full $30.57 million signing bonus up front - NBC Sports",
-          "description": "When it comes to rookie contracts, there's not much to negotiate.",
-          "url": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/travis-hunter-gets-his-full-30-57-million-signing-bonus-up-front",
-          "urlToImage": "https://nbcsports.brightspotcdn.com/dims4/default/5ba2ced/2147483647/strip/true/crop/4000x2250+0+0/resize/1440x810!/quality/90/?url=https%3A%2F%2Fnbc-sports-production-nbc-sports.s3.us-east-1.amazonaws.com%2Fbrightspot%2Fb1%2F97%2F9aba72c544e28e9c2f9554b4dbf9%2Fhttps-delivery-gettyimages.com%2Fdownloads%2F2219147778",
-          "publishedAt": "2025-06-22T23:06:26Z",
-          "content": "When it comes to rookie contracts, theres not much to negotiate. On one of the few negotiable items, Jaguars receiver/defensive back Travis Hunter did very well.\r\nAdam Schefter of ESPN.com reports th… [+1961 chars]"
+          "urlToImage": "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/V2WEBPR22BGQ3O2BVIYPGFMDXI_size-normalized.png&w=1440",
+          "publishedAt": "2025-06-23T10:24:23Z",
+          "content": "Satellite images provide the first glimpses of the aftermath of U.S. strikes on three sites said to be central to Irans nuclear program, revealing severe damage at aboveground facilities as well as t… [+8593 chars]"
         },
         {
           "source": {
@@ -153,120 +166,107 @@
             "name": "Associated Press"
           },
           "author": null,
-          "title": "Judge orders Kilmar Abrego Garcia’s release from jail before trial, but ICE plans to detain him - AP News",
-          "description": "A Tennessee judge plans to order Kilmar Abrego Garcia’s release from jail while he awaits a federal trial on human smuggling charges, but he is not expected to be allowed to go free. Prosecutors at his June 13 detention hearing said that U.S. Immigration and …",
-          "url": "https://apnews.com/article/abrego-garcia-deportation-error-c0a515baffdf54baba412edf4cdbd310",
-          "urlToImage": "https://dims.apnews.com/dims4/default/ce094d6/2147483647/strip/true/crop/8640x4860+0+450/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2F86%2F91%2F3a42c7bc218f1671f9d507572dad%2F765194c548064b02a902573c8cc38826",
-          "publishedAt": "2025-06-22T22:59:00Z",
-          "content": "NASHVILLE, Tenn. (AP) A federal judge in Tennessee plans to order the release of Kilmar Abrego Garcia, whose mistaken deportation to El Salvador has become a flashpoint in President Donald Trumps imm… [+3900 chars]"
+          "title": "The number of abortions kept rising in 2024 because of telehealth prescriptions, report finds - AP News",
+          "description": "A new report finds that the number of abortions in the U.S. grew in 2024 as more women obtained pills through telehealth. The latest WeCount project for the Society of Family Planning finds that 1 in 4 abortions uses medications prescribed by a provider who d…",
+          "url": "https://apnews.com/article/abortion-data-wecount-pills-telehealth-anniversary-7d42e427bc1e26d2ea7b48b8f20a042e",
+          "urlToImage": "https://dims.apnews.com/dims4/default/16a12f1/2147483647/strip/true/crop/4500x2531+0+234/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2Fa5%2F06%2F73291d06ac822ff712a752309d35%2F33c5ffe4ca7940c38f4ddcc6b0c2a4bc",
+          "publishedAt": "2025-06-23T10:02:00Z",
+          "content": "The number of abortions in the U.S. rose again in 2024, with women continuing to find ways to get them despite bans and restrictions in many states, according to a report out Monday.\r\nThe latest repo… [+3574 chars]"
         },
         {
           "source": {
             "id": null,
-            "name": "PEOPLE"
+            "name": "CNBC"
           },
-          "author": "https://www.facebook.com/peoplemag",
-          "title": "Elizabeth Hurley and Billy Ray Cyrus Support Miley Cyrus at Singer’s “Something Beautiful ”Premiere Event in London - AOL.com",
-          "description": "Billy Ray Cyrus and his girlfriend Elizabeth Hurley supported Miley Cyrus at the London premiere of her visual album 'Something Beautiful' on June 21, shortly after Miley revealed that she and her dad are back on good terms. Elizabeth's son, Damian Hurley, al…",
-          "url": "https://people.com/elizabeth-hurley-billy-ray-cyrus-support-miley-cyrus-at-london-premiere-event-11759027",
-          "urlToImage": "https://people.com/thmb/X7ZNbNoXSR8J9e6_RW33JIg19xw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(756x340:758x342)/miley-cyrus-Lost-City-Immersive-Event-billy-ray-cyrus-elizabeth-hurley-062225-0a2208bfd70846f4b6a9994d84fb9783.jpg",
-          "publishedAt": "2025-06-22T22:20:24Z",
-          "content": "<ul><li>Billy Ray Cyrus and Elizabeth Hurley supported Miley Cyrus at the London premiere of her visual album Something Beautiful on Saturday, June 21</li><li>The couple, who went public in April, ha… [+3571 chars]"
+          "author": "Michael Wayland",
+          "title": "New Stellantis CEO faces slew of challenges, vows to avoid 'mediocrity' - CNBC",
+          "description": "Antonio Filosa, a 51-year-old Italian native, is taking over as CEO as the automaker deals with fractured relationships, regulatory uncertainty and more.",
+          "url": "https://www.cnbc.com/2025/06/23/stellantis-ceo-antonio-filosa.html",
+          "urlToImage": "https://image.cnbcfm.com/api/v1/image/108159072-1749821781726-CA_BU025_001EV.jpg?v=1749824850&w=1920&h=1080",
+          "publishedAt": "2025-06-23T10:00:01Z",
+          "content": "Incoming Stellantis CEO Antonio Filosa, head of the company's Americas operations, greets a Windsor Assembly Plant employee during an event celebrating Chryslers 100th anniversary on June 6, 2025.\r\nD… [+10909 chars]"
         },
         {
           "source": {
-            "id": null,
-            "name": "Eonline.com"
+            "id": "cnn",
+            "name": "CNN"
           },
-          "author": null,
-          "title": "Anna Camp Defends Her and Girlfriend Jade Whipkey’s 18-Year Age Gap - Yahoo",
-          "description": "Pitch Perfect’s Anna Camp defended the 18-year age gap between her and girlfriend Jade Whipkey, two days after the couple made their red carpet debut at the Los Angeles premiere of Bride Hard.",
-          "url": "https://www.eonline.com/news/1419008/anna-camp-defends-her-jade-whipkeys-18-year-age-gap",
-          "urlToImage": "https://akns-images.eonline.com/eol_images/Entire_Site/20250513/90c645ee-cbd0-4d81-b039-7f5ca46f3d33_1747141652.jpg?fit=around%7C1080:1080&output-quality=90&crop=1080:1080;center,top",
-          "publishedAt": "2025-06-22T21:43:00Z",
-          "content": "One thing thats not unwritten? The way Kristin felt about her 13-year age gap with ex-boyfriend Mark Estes. \r\nMe dating a 24-year-old is not something that I was searching out, The Hills alum said on… [+1266 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "Space.com"
-          },
-          "author": "Stefanie Waldek",
-          "title": "Scientists to unveil 1st images from the Vera C. Rubin Observatory on June 23: Watch the big moment live - Space",
-          "description": "Armed with the world's largest digital camera, this observatory's first light is bound to be one for the textbooks.",
-          "url": "https://www.space.com/astronomy/scientists-to-unveil-1st-images-from-the-vera-c-rubin-observatory-on-june-23-watch-the-big-moment-live",
-          "urlToImage": "https://cdn.mos.cms.futurecdn.net/6i7ZHAJTMV96iYWVqxgeV4.jpg",
-          "publishedAt": "2025-06-22T21:33:46Z",
-          "content": "A new window into the universe is about to open. On Monday (June 23), the Vera C. Rubin Observatory — a joint project between the U.S. National Science Foundation and the U.S. Department of Energy — … [+2830 chars]"
+          "author": "Kara Scannell",
+          "title": "Inside Sean ‘Diddy’ Combs’ all-star defense team - CNN",
+          "description": "Sean “Diddy” Combs has recruited an all-star defense team. Here’s what we know about Marc Agnifilo, Teny Geragos, and the six other lawyers representing Combs.",
+          "url": "https://www.cnn.com/2025/06/23/entertainment/sean-diddy-combs-defense-team",
+          "urlToImage": "https://media.cnn.com/api/v1/images/stellar/prod/puff-week5-thur3-20250622022859034.jpg?c=16x9&q=w_800,c_fill",
+          "publishedAt": "2025-06-23T10:00:00Z",
+          "content": "Nine attorneys five men and four women fill two tables in the courtroom for Sean Diddy Combs.\r\nSome are confrontational cross examiners, others take a softer approach to witnesses and a handful are f… [+9216 chars]"
         },
         {
           "source": {
             "id": null,
             "name": "BBC News"
           },
-          "author": null,
-          "title": "Met Police chief 'shocked' by planned Palestine Action protest in London - BBC",
-          "description": "The force says it cannot legally stop Monday's protest in support of the pro-Palestine group.",
-          "url": "https://www.bbc.com/news/articles/c79q1jv8p24o",
-          "urlToImage": "https://ichef.bbci.co.uk/news/1024/branded_news/b3c0/live/23e9f2c0-4fa8-11f0-8831-bd01b6af6b69.jpg",
-          "publishedAt": "2025-06-22T21:16:35Z",
-          "content": "Jacqueline Howard\r\nThe Metropolitan Police chief has said he is \"shocked and frustrated\" at a planned protest in support of Palestine Action in London on Monday.\r\nCommissioner Sir Mark Rowley said wh… [+3311 chars]"
+          "author": "Jessica Bradley",
+          "title": "Is an apple a day really good for your health? - BBC",
+          "description": "We're told an apple a day keeps the doctor away, but does this humble fruit really have an outsized positive effect on our health?",
+          "url": "https://www.bbc.com/future/article/20250620-is-an-apple-a-day-really-good-for-your-health",
+          "urlToImage": "https://ychef.files.bbci.co.uk/624x351/p0lkj9kr.jpg",
+          "publishedAt": "2025-06-23T09:01:47Z",
+          "content": "We're told an apple a day keeps the doctor away, but does this humble fruit really have an outsized positive effect on our health?\r\nThe world loves apples. Every year, almost 100 million tonnes of ap… [+9553 chars]"
         },
         {
           "source": {
             "id": null,
-            "name": "Variety"
+            "name": "CNBC"
           },
-          "author": "Alex Ritman",
-          "title": "28 Years Later Alpha Zombie Actor on Prosthetic Penis and Train Injury - Variety",
-          "description": "Chi Lewis-Parry discusses playing 28 Years Later's main Alpha infected Samson, ripping out spines and lobbying to the be the next Bond villain",
-          "url": "https://variety.com/2025/film/global/28-years-later-alpha-zombie-actor-prosthetic-penis-1236436227/",
-          "urlToImage": "https://variety.com/wp-content/uploads/2025/06/GettyImages-2220797506.jpg?w=1000&h=563&crop=1",
-          "publishedAt": "2025-06-22T20:43:00Z",
-          "content": "Danny Boyle‘s terrifying zombies — sorry, the infected — are back, and with them, a truly enormous and terrifying specimen.\r\n“28 Years Later” has proved a critical triumph for the director and co-wri… [+9547 chars]"
+          "author": "Annika Kim Constantino",
+          "title": "Major U.S. health insurers say they will streamline controversial process for approving care - CNBC",
+          "description": "Insurers such as CVS and UnitedHealthcare will implement the changes across commercial, Medicare and Medicaid plans, benefiting 257 million Americans.",
+          "url": "https://www.cnbc.com/2025/06/23/prior-authorizations-us-insurers-to-change-approval-process.html",
+          "urlToImage": "https://image.cnbcfm.com/api/v1/image/107387028-1710350423351-gettyimages-1543156724-AFP_33PH3NQ.jpeg?v=1747268664&w=1920&h=1080",
+          "publishedAt": "2025-06-23T09:00:01Z",
+          "content": "Health plans under major U.S. insurers said Monday they have voluntarily agreed to speed up and reduce prior authorizations a process that is often a major pain point for patients and providers when … [+2000 chars]"
         },
         {
           "source": {
             "id": null,
-            "name": "POLITICO.eu"
+            "name": "STAT"
           },
-          "author": "Jan Cienski",
-          "title": "NATO allies agree to 5 percent defense spending goal - politico.eu",
-          "description": "Spain threw up a last-minute roadblock to the new spending target, but gave way after being granted flexibility.",
-          "url": "https://www.politico.eu/article/nato-allies-defense-spending-goal-spain-gdp/",
-          "urlToImage": "https://www.politico.eu/cdn-cgi/image/width=1200,height=630,fit=crop,quality=80,onerror=redirect/wp-content/uploads/2025/06/22/13141711-scaled.jpg",
-          "publishedAt": "2025-06-22T20:19:00Z",
-          "content": "In order to bring Madrid on board, the new language that leaders will approve on Wednesday was changed from \"we commit\" to \"allies commit\" to spend 5 percent on defense, a NATO official said. That wo… [+1351 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "Nintendo Life"
-          },
-          "author": "Damien McFerran",
-          "title": "Digital Foundry Is \"Happy\" With Switch 2 But Feels The Screen Is \"Problematic\" - Nintendo Life",
-          "description": "Display has \"blurring characteristics that are easily worse than the 2017 Switch’s display\"",
-          "url": "https://www.nintendolife.com/news/2025/06/digital-foundry-is-happy-with-switch-2-but-feels-the-screen-is-problematic",
-          "urlToImage": "https://images.nintendolife.com/20b1277270269/large.jpg",
-          "publishedAt": "2025-06-22T20:00:00Z",
-          "content": "Image: Damien McFerran / Nintendo Life\r\nThe tech boffins over at Digital Foundry have delivered their final verdict on Switch 2, and it's mostly positivebut the console's LCD screen has been found wa… [+2388 chars]"
+          "author": "William Pao",
+          "title": "The decades-long journey to Gilead’s twice-a-year HIV prevention drug lenacapavir - STAT",
+          "description": "Gilead’s twice-a-year HIV prevention drug lenacapavir is 30 years in the making. Here’s the story behind it.",
+          "url": "https://www.statnews.com/2025/06/23/fda-approval-lenacapavir-yeztugo-gilead-history-development-breakthrough-william-pao/",
+          "urlToImage": "https://www.statnews.com/wp-content/uploads/2025/06/AP24205636401239-1024x576.jpg",
+          "publishedAt": "2025-06-23T08:33:12Z",
+          "content": "On Thursday, the FDA approved lenacapavir, to be sold as Yeztugo, for the prevention of HIV in the U.S. The below essay, adapted from Breakthrough: The Quest for Life-Changing Medicine by William Pao… [+37025 chars]"
         },
         {
           "source": {
             "id": "axios",
             "name": "Axios"
           },
-          "author": "Barak Ravid",
-          "title": "At Trump's request, Israel cleared way for U.S. bombers in Iran - Axios",
-          "description": "The operation marked the culmination of months of intense U.S.-Israeli coordination.",
-          "url": "https://www.axios.com/2025/06/22/trump-israel-iran-strikes-air-defenses",
-          "urlToImage": "https://images.axios.com/tKTOgUiRIwBluWUYDFber8BINOg=/0x0:5513x3101/1366x768/2025/06/22/1750613716088.jpg",
-          "publishedAt": "2025-06-22T17:44:45Z",
-          "content": "<ul><li>That partnership peaked in the final hours before the strike, when Israel played a direct role in enabling the U.S. military operation.</li><li>\"I want to thank and congratulate Prime Ministe… [+2801 chars]"
+          "author": "Ina Fried",
+          "title": "Apple's AI software delays put pressure on hardware - Axios",
+          "description": "The company needs to deliver compelling hardware upgrades as consumers hold on to their phones longer.",
+          "url": "https://www.axios.com/2025/06/23/iphone-16-apple-ai-hardware",
+          "urlToImage": "https://images.axios.com/913x50CnGaWC0FUPnKOGLD4uS2Y=/0x0:1920x1080/1366x768/2025/06/23/1750639190090.jpg",
+          "publishedAt": "2025-06-23T08:18:14Z",
+          "content": "Driving the news: Apple previewed iOS 26, the software that will power the next iPhone at its June developer conference.\r\n<ul><li>The signature features will be mostly cosmetic and unlikely to drive … [+1985 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "SpaceNews"
+          },
+          "author": "Jeff Foust",
+          "title": "Isaacman interested in privately funded science missions - SpaceNews",
+          "description": "Former NASA administrator nominee Jared Isaacman says he is interested in pursuing some of the goals he had for the agency from outside it.",
+          "url": "http://spacenews.com/isaacman-interested-in-privately-funded-science-missions/",
+          "urlToImage": "https://spacenews.com/wp-content/uploads/2025/06/issacman2-isdc25.jpeg",
+          "publishedAt": "2025-06-23T07:47:22Z",
+          "content": "ORLANDO, Fla. Former NASA administrator nominee Jared Isaacman says he is interested in pursuing some of the goals he had for the agency from outside it.\r\nIsaacman received the National Space Society… [+4435 chars]"
         }
       ]
     },
-    "timestamp": 1750728269211
+    "timestamp": 1750778401250
   },
   "world-ca-en-general-all": {
     "data": {
@@ -274,7 +274,7 @@
       "totalResults": 0,
       "articles": []
     },
-    "timestamp": 1750728269343
+    "timestamp": 1750778401331
   },
   "world-gb-en-general-all": {
     "data": {
@@ -282,7 +282,7 @@
       "totalResults": 0,
       "articles": []
     },
-    "timestamp": 1750728269427
+    "timestamp": 1750778401408
   },
   "world-FR-en-general-all": {
     "data": {
