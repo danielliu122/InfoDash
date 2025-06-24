@@ -417,6 +417,21 @@ app.get('/api/googlemaps/script', (req, res) => {
     res.redirect(scriptUrl);
 });
 
+// Helper function for retrying OpenRouter API calls with delay
+async function callOpenRouterWithRetry(options, retries = 2) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+            return await openai.chat.completions.create(options);
+        } catch (error) {
+            if (attempt === retries) throw error;
+            // Only retry on network errors
+            if (error.code !== 'ERR_STREAM_PREMATURE_CLOSE') throw error;
+            // Wait with exponential backoff
+            await new Promise(res => setTimeout(res, 1000 * (attempt + 1)));
+        }
+    }
+}
+
 app.post('/api/chat', async (req, res) => {
     try {
         // console.log('Chat API: Received request');
@@ -430,8 +445,8 @@ app.post('/api/chat', async (req, res) => {
             return res.status(400).json({ error: 'Messages are required' });
         }
 
-        // console.log('Chat API: Making OpenAI API call...');
-        const response = await openai.chat.completions.create({
+        // Use retry logic for OpenRouter API call
+        const response = await callOpenRouterWithRetry({
             model,
             messages,
             max_tokens: 3333,
