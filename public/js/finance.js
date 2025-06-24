@@ -697,7 +697,7 @@ export function updateFinance(data) {
                 <button class="zoom-button" id="zoomIn">+</button>
                 <button class="zoom-button" id="zoomOut">-</button>
                 <button class="zoom-button" id="resetZoom">↺</button>
-                <button class="fullscreenButton" id="fullscreenButton">⤢</button>
+                <button class="fullscreenButton" id="fullscreenButton" disabled>⤢</button>
             </div>
             <canvas id="financeChart"></canvas>
             <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
@@ -935,56 +935,6 @@ export async function handleFinanceUpdate(timeRange, interval) {
         logger.error('Error in handleFinanceUpdate:', error);
     }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    function handleFullscreen(event) {
-        const fullscreenButton = event.target.closest('#fullscreenButton');
-        if (!fullscreenButton) return;
-    
-        const chartContainer = fullscreenButton.closest('.chart-container');
-        if (!chartContainer) return;
-    
-        const canvas = chartContainer.querySelector('canvas');
-        if (!canvas) return;
-    
-        const existingData = window.financeChart?.data || {};
-        const ctx = canvas.getContext('2d');
-    
-        if (!document.fullscreenElement) {
-            chartContainer.requestFullscreen().then(() => {
-                setTimeout(() => {
-                    if (window.financeChart) window.financeChart.destroy();
-                    
-                    canvas.width = chartContainer.clientWidth;
-                    canvas.height = chartContainer.clientHeight;
-                    
-                    window.financeChart = initializeChart(ctx, {
-                        dates: existingData.labels || [],
-                        prices: existingData.datasets?.[0]?.data || [],
-                        symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
-                    });
-                }, 100); // second delay after entering fullscreen
-            });
-        } else {
-            document.exitFullscreen().then(() => {
-                setTimeout(() => {
-                    if (window.financeChart) window.financeChart.destroy();
-                    
-                    canvas.width = chartContainer.clientWidth;
-                    canvas.height = 400;
-                    
-                    window.financeChart = initializeChart(ctx, {
-                        dates: existingData.labels || [],
-                        prices: existingData.datasets?.[0]?.data || [],
-                        symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
-                    });
-                }, 100); // second delay after exiting fullscreen
-            });
-        }
-    }
-
-    document.body.addEventListener('click', handleFullscreen);
-});
 
 function initializeChart(ctx, data) {
     const isMobile = isMobileDevice();
