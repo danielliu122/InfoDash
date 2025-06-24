@@ -792,12 +792,13 @@ function showNotification(message, duration = 3000) {
 }
 
 // Function to enable/disable summary controls
-function setControlsDisabled(disabled) {
+async function setControlsDisabled(disabled) {
     const dateInput = document.getElementById('summaryDate');
     const refreshBtn = document.getElementById('summary-refresh-btn');
     
     if (dateInput) dateInput.disabled = disabled;
     if (refreshBtn) {
+        await new Promise(resolve => setTimeout(resolve, 500));
         refreshBtn.disabled = disabled || hasGeneratedToday();
         // Add visual indication when refresh is disabled due to daily limit
         if (hasGeneratedToday()) {
@@ -1136,7 +1137,8 @@ async function initializeSummarySection() {
     const today = getLocalDateString();
     document.getElementById('summaryDate').value = today;
     
-    // Load or generate today's summary
+    // Add a slight delay before loading or generating today's summary
+    await new Promise(resolve => setTimeout(resolve, 500));
     await loadOrGenerateTodaySummary();
     
     // Update saved summaries list
