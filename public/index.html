@@ -140,7 +140,7 @@
                         <h4>📊 Daily Summary</h4>
                         <div class="right">
                             <div class="section-controls">
-                                <button class="btn-small waves-effect waves-light" onclick="resetCookieConsent()">🍪 Reset Cookies</button>
+                                <button id="summary-refresh-btn" class="btn-small waves-effect waves-light" onclick="refreshSummary()">🔄 Refresh</button>
                         </div>
                             <button id="summary-refresh-btn" class="btn-small waves-effect waves-light" onclick="refreshSummary()">🔄 Refresh</button>
                     </div>
@@ -698,6 +698,7 @@
                                 <div class="preference-group">
                                     <h5>Data Management</h5>
                                     <button class="btn waves-effect waves-light red" onclick="clearAllPreferences()">Reset All Settings</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="resetCookieConsent()" style="margin-left: 10px;">🍪 Reset Cookies</button>
                                     <p class="preference-info">This will clear all your saved preferences including location, watchlist, theme, and other settings. This action cannot be undone.</p>
                                 </div>
                             </div>
