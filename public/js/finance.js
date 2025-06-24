@@ -981,6 +981,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initializeChart(ctx, data) {
+    const isMobile = isMobileDevice();
+
     // Check if it's a crypto symbol
     const isCrypto = data.symbol.endsWith('-USD');
     
@@ -1048,8 +1050,8 @@ function initializeChart(ctx, data) {
                   }
                 }
             },
-            animation: true,
-            responsive: true,
+            animation: !isMobile,
+            responsive: !isMobile,
             maintainAspectRatio: false,
             backgroundColor: backgroundColor,
             scales: {
