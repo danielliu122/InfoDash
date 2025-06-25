@@ -1131,11 +1131,13 @@ async function initializeSummarySection() {
     // console.log('Initializing summary section...');
     
     // Set up event listeners
-    document.getElementById('summaryDate').addEventListener('change', loadSummaryForDate);
-    
-    // Initialize the date picker with today's date
-    const today = getLocalDateString();
-    document.getElementById('summaryDate').value = today;
+    const dateInput = document.getElementById('summaryDate');
+    if (dateInput) {
+        dateInput.addEventListener('change', loadSummaryForDate);
+        // Initialize the date picker with today's date
+        const today = getLocalDateString();
+        dateInput.value = today;
+    }
     
     // Add a slight delay before loading or generating today's summary
     await new Promise(resolve => setTimeout(resolve, 500));
