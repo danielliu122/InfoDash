@@ -42,14 +42,15 @@ export const DEFAULT_INTERVAL = '1m';
 // Helper function to get default symbol based on market status
 function getDefaultSymbol() {
     const now = new Date();
-    const day = now.getDay();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
+    const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    const day = etNow.getDay();
+    const hours = etNow.getHours();
+    const minutes = etNow.getMinutes();
     
     // Check if it's a weekend
     const isWeekend = day === 0 || day === 6; // Sunday or Saturday
     
-    // Check if it's a weekday during market hours (9:30AM - 4:00PM)
+    // Check if it's a weekday during market hours (9:30AM - 4:00PM ET)
     const isMarketHours = !isWeekend && 
                          (hours > 9 || (hours === 9 && minutes >= 30)) && 
                          (hours < 16);
@@ -557,7 +558,7 @@ export function isMarketOpen() {
         return true; // Crypto markets are always open
     }
 
-    // Existing stock market hour checks
+    // Use Eastern Time for market hours check
     const now = new Date();
     const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
     const day = etNow.getDay();
@@ -829,8 +830,22 @@ export function startAutoRefresh() {
     // Only auto-refresh if the market is open OR if it's a cryptocurrency.
     if (isMarketOpen() || isCrypto) {
         updateInterval = setInterval(() => {
-            // Pass `true` for the `isRefresh` flag to prevent full chart recreation
-            updateFinanceData(currentSymbol, undefined, undefined, true);
+            // Check if market status has changed and we need to switch symbols
+            const shouldSwitchToCrypto = !isMarketOpen() && !currentSymbol.endsWith('-USD');
+            
+            if (shouldSwitchToCrypto) {
+                // Market just closed, switch to BTC-USD
+                currentSymbol = 'BTC-USD';
+                const stockSymbolInput = document.getElementById('stockSymbolInput');
+                if (stockSymbolInput) {
+                    stockSymbolInput.value = currentSymbol;
+                }
+                // Update the chart with the new symbol
+                updateFinanceData(currentSymbol, undefined, undefined, false);
+            } else {
+                // Normal refresh - Pass `true` for the `isRefresh` flag to prevent full chart recreation
+                updateFinanceData(currentSymbol, undefined, undefined, true);
+            }
         }, 5000); // Refresh every 5 seconds
     } else {
         logger.warn(`Market is closed for ${currentSymbol}. Auto-refresh will not start.`);
@@ -1272,14 +1287,15 @@ export async function fetchTopStocks(symbolsOverride = null) {
 
         // Sort stocks based on market hours
         const now = new Date();
-        const day = now.getDay();
-        const hours = now.getHours();
-        const minutes = now.getMinutes();
+        const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+        const day = etNow.getDay();
+        const hours = etNow.getHours();
+        const minutes = etNow.getMinutes();
         
         // Check if it's a weekend
         const isWeekend = day === 0 || day === 6; // Sunday or Saturday
         
-        // Check if it's a weekday during market hours (9:30AM - 4:00PM)
+        // Check if it's a weekday during market hours (9:30AM - 4:00PM ET)
         const isMarketHours = !isWeekend && 
                             (hours > 9 || (hours === 9 && minutes >= 30)) && 
                             (hours < 16);
@@ -1297,6 +1313,9 @@ export async function fetchTopStocks(symbolsOverride = null) {
 
         topStocks = fetchedStocks;
         updateStockDashboard();
+        
+        // Check for market close transition during dashboard updates
+        handleMarketCloseTransition();
     } catch (error) {
         logger.error("Error fetching top stocks:", error);
     }
@@ -1407,6 +1426,7 @@ window.selectStock = selectStock;
 window.resetChartZoom = resetChartZoom;
 window.resetFinanceCardPositions = resetFinanceCardPositions;
 window.togglePauseFinance = togglePauseFinance;
+window.handleMarketCloseTransition = handleMarketCloseTransition;
 
 // Select stock for detailed view
 export function selectStock(symbol) {
@@ -1453,6 +1473,29 @@ if (typeof document !== 'undefined') {
       }
     }
   });
+}
+
+// Function to handle market close transition
+export function handleMarketCloseTransition() {
+    const currentSymbol = document.getElementById('stockSymbolInput')?.value.toUpperCase();
+    
+    // If we're currently showing a stock (not crypto) and market just closed
+    if (currentSymbol && !currentSymbol.endsWith('-USD') && !isMarketOpen()) {
+        // Switch to BTC-USD
+        const newSymbol = 'BTC-USD';
+        document.getElementById('stockSymbolInput').value = newSymbol;
+        
+        // Update the chart with the new symbol
+        updateFinanceData(newSymbol, DEFAULT_TIME_RANGE, DEFAULT_INTERVAL, false);
+        
+        // Restart auto-refresh with the new symbol
+        if (updateInterval) {
+            stopAutoRefresh();
+            startAutoRefresh();
+        }
+        
+        logger.info(`Market closed, switched from ${currentSymbol} to ${newSymbol}`);
+    }
 }
 
 
