@@ -19,6 +19,7 @@ import {
 } from './finance.js';
 import { fetchNewsData, updateNews } from './news.js';
 import { fetchTrendsData, updateTrends } from './trends.js'; // Import from trends.js
+import { fetchRedditData, updateReddit } from './reddit.js'; // Import from reddit.js
 import { refreshSummary, initializeSummarySection } from './summary.js'; // Import summary functionality
 import { userPrefs } from './userPreferences.js'; // Import user preferences
 
@@ -49,6 +50,9 @@ window.handleButtonClick = async function(type, category, subCategory = 'all') {
         } else if (type === 'trends') {
             data = await fetchTrendsData(category, subCategory, language, country);
             updateTrends(data, category);
+        } else if (type === 'reddit') {
+            data = await fetchRedditData(category);
+            updateReddit(data);
         }
     } catch (error) {
         console.error(`Error handling ${type} request:`, error);
@@ -243,6 +247,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const newsData = await fetchNewsData('world', country, language, false, 'top-headlines');
         updateNews(newsData);
 
+        // Fetch other default data
+        const redditData = await fetchRedditData('day');
+        updateReddit(redditData);
+        
         const trendsData = await fetchTrendsData('daily', 'all', trendsLanguageSelect.value, trendsCountrySelect.value);
         updateTrends(trendsData, 'daily');
 
