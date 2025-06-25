@@ -883,14 +883,10 @@ app.get('/api/reddit', async (req, res) => {
     const timePeriod = req.query.t || 'day';
     const redditUrl = `https://www.reddit.com/top.json?sort=top&t=${timePeriod}`;
     try {
-        const response = await axios.get(redditUrl, {
-            headers: {
-                'User-Agent': 'InfoDashBot/1.0 (by /u/your_reddit_username)'
-            }
-        });
+        const response = await axios.get(redditUrl);
         res.json(response.data);
     } catch (error) {
-        console.error('Error fetching Reddit data:', error?.response?.data || error.message);
+        console.error('Error fetching Reddit data:', error);
         res.status(500).json({ error: 'Failed to fetch from Reddit' });
     }
 });
