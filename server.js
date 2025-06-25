@@ -879,22 +879,6 @@ app.post('/api/finance/bulk-real-time', async (req, res) => {
     }
 });
 
-app.get('/api/reddit', async (req, res) => {
-    const timePeriod = req.query.t || 'day';
-    const redditUrl = `https://www.reddit.com/top.json?sort=top&t=${timePeriod}`;
-    try {
-        const response = await axios.get(redditUrl, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (compatible; InfoDashBot/1.0; +https://yourwebsite.com/bot)'
-            }
-        });
-        res.json(response.data);
-    } catch (error) {
-        console.error('Error fetching Reddit data:', error?.response?.data || error.message);
-        res.status(500).json({ error: 'Failed to fetch from Reddit' });
-    }
-});
-
 // Catch-all route for undefined routes
 app.use((req, res) => {
     res.status(404).send('404 Not Found');
