@@ -2892,7 +2892,7 @@
   "world-US-en-general-all": {
     "data": {
       "status": "ok",
-      "totalResults": 115479,
+      "totalResults": 113618,
       "articles": [
         {
           "source": {
@@ -2938,26 +2938,13 @@
             "id": "wired",
             "name": "Wired"
           },
-          "author": "Molly Taft",
-          "title": "Trump Cuts Are Killing a Tiny Office That Keeps Measurements of the World Accurate",
-          "description": "A tiny but crucial agency that maintains physical coordinates like latitude and longitude in the US is struggling as the Trump administration forces out federal employees.",
-          "url": "https://www.wired.com/story/trump-cuts-are-killing-a-tiny-office-that-keeps-our-measurements-of-the-world-accurate/",
-          "urlToImage": "https://media.wired.com/photos/6827affd820db7d753adbb1c/191:100/w_1280,c_limit/GettyImages-1337105596.jpg",
-          "publishedAt": "2025-05-21T17:00:00Z",
-          "content": "The remaining staff are in an all hands on deck situation with the rollout, says Brett Howe, the former geodetic services division chief at NGS, who opted to retire at the end of April. Despite a ded… [+3750 chars]"
-        },
-        {
-          "source": {
-            "id": "wired",
-            "name": "Wired"
-          },
-          "author": "Amit Katwala",
-          "title": "The Enhanced Games Has A Date, A Host City and a Drug-Fuelled World Record",
-          "description": "The Enhanced Games, where athletes are allowed to take performance-enhancing drugs, will host its first event in May. One \"enhanced\" former Olympic swimmer has already broken the 50m freestyle record.",
-          "url": "https://www.wired.com/story/the-enhanced-games-has-a-date-a-host-city-and-a-drug-fuelled-world-record/",
-          "urlToImage": "https://media.wired.com/photos/682cfbd29f36acb81c1e4fc7/191:100/w_1280,c_limit/Science_EnhancedGames_Press.jpg",
-          "publishedAt": "2025-05-21T20:00:00Z",
-          "content": "The Enhanced Gamesa kind of Olympics for athletes who are dopingtoday announced the date and venue for its first competition: May 21-24, 2026, at Resorts World Las Vegas.\r\nAthletes competing in the e… [+1754 chars]"
+          "author": "Zack Savitsky",
+          "title": "How the Universe and Its Mirrored Version Are Different",
+          "description": "From living matter to molecules to elementary particles, the world is made of “chiral” objects that differ from their reflected forms.",
+          "url": "https://www.wired.com/story/how-the-universe-differs-from-its-mirror-image/",
+          "urlToImage": "https://media.wired.com/photos/6852baee416aa69fa1193ad6/191:100/w_1280,c_limit/Chirality-byCelsius-Pictor-Lede-scaled.jpeg",
+          "publishedAt": "2025-06-22T11:00:00Z",
+          "content": "Kitty couldnt have digested looking-glass milk. Worse, if it had contained any bacteria with the opposite handedness, her immune system and antibiotics would have been ill suited to put up a fight. A… [+3048 chars]"
         },
         {
           "source": {
@@ -2971,19 +2958,6 @@
           "urlToImage": "https://media.wired.com/photos/683ec14f857e010441818bd2/191:100/w_1280,c_limit/IoVolcanism-cr.NASA-Lede.V2-scaled.jpeg",
           "publishedAt": "2025-06-15T11:00:00Z",
           "content": "Crucially, unlike Ios odd magnetic field, which seemed to indicate that it concealed an oceans worth of fluid, Europas own Galileo-era magnetic signal remains robust. Its a pretty clean result at Eur… [+3050 chars]"
-        },
-        {
-          "source": {
-            "id": "wired",
-            "name": "Wired"
-          },
-          "author": "Andy Greenberg",
-          "title": "Feds Charge 16 Russians Allegedly Tied to Botnets Used in Ransomware, Cyberattacks, and Spying",
-          "description": "A new US indictment against a group of Russian nationals offers a clear example of how, authorities say, a single malware operation can enable both criminal and state-sponsored hacking.",
-          "url": "https://www.wired.com/story/us-charges-16-russians-danabot-malware/",
-          "urlToImage": "https://media.wired.com/photos/682e4ba3cb28ab32eb87f1cc/191:100/w_1280,c_limit/Russians-Charged-Spy-Malware-Security.jpg",
-          "publishedAt": "2025-05-22T19:56:44Z",
-          "content": "The hacker ecosystem in Russia, more than perhaps anywhere else in the world, has long blurred the lines between cybercrime, state-sponsored cyberwarfare, and espionage. Now an indictment of a group … [+3301 chars]"
         },
         {
           "source": {
@@ -3094,19 +3068,6 @@
             "id": "wired",
             "name": "Wired"
           },
-          "author": "Chris Haslam",
-          "title": "Anker Nebula X1 Home Projector Review: Gorgeous Anywhere",
-          "description": "This next-generation laser projector pairs with surround-sound speakers and microphones for a cinematic karaoke party.",
-          "url": "https://www.wired.com/review/anker-nebula-x1-home-projector/",
-          "urlToImage": "https://media.wired.com/photos/6830d47b3b9a7444dc45d582/191:100/w_1280,c_limit/NEBULA%20X1%20_%20Source%20Nebula.png",
-          "publishedAt": "2025-05-24T14:03:00Z",
-          "content": "Combined with the X1's four speakers, you've got 200 watts of lossless audio power through one cable, and with Dolby Audio support (although no Dolby Atmos) and 25 ms latency on screen there's no syn… [+2640 chars]"
-        },
-        {
-          "source": {
-            "id": "wired",
-            "name": "Wired"
-          },
           "author": "Steven Levy",
           "title": "Google DeepMind’s CEO Thinks AI Will Make Humans Less Selfish",
           "description": "Demis Hassabis says that systems as smart as humans are almost here, and we’ll need to radically change how we think and behave.",
@@ -3127,6 +3088,32 @@
           "urlToImage": "https://media.wired.com/photos/6851b5c97f1196d5f5a32700/191:100/w_1280,c_limit/Uncanny-Valley-Meta-AI-Business-2194136055.jpg",
           "publishedAt": "2025-06-20T19:22:03Z",
           "content": "Michael Calore: Yeah.\r\nKatie Drummond: We need to do more reporting on this. I think that the compensation of people in Silicon Valley is fascinating.\r\nLauren Goode: Well, if anyone would like to wei… [+2648 chars]"
+        },
+        {
+          "source": {
+            "id": "wired",
+            "name": "Wired"
+          },
+          "author": "Molly Taft",
+          "title": "International Nuclear Watchdog Issues Stark Warning In Wake of US Iran Strikes",
+          "description": "“Violence and destruction could reach unimaginable levels” if diplomacy is not pursued, said the head of the International Atomic Energy Agency.",
+          "url": "https://www.wired.com/story/international-nuclear-watchdog-warning-iran-strikes/",
+          "urlToImage": "https://media.wired.com/photos/685957ba6c488232375ee467/191:100/w_1280,c_limit/trump-war-pol-2220648319-2.jpg",
+          "publishedAt": "2025-06-23T15:08:54Z",
+          "content": "The idea of attacking facilities working to develop nuclear power might immediately bring to mind the worst images of disasters like Chernobyl and Fukushima. But experts say that even if the strikes … [+3422 chars]"
+        },
+        {
+          "source": {
+            "id": "wired",
+            "name": "Wired"
+          },
+          "author": "Boone Ashworth",
+          "title": "Google Wants to Get Better at Spotting Wildfires From Space",
+          "description": "A partnership with the nonprofit Earth Fire Alliance and satellite manufacturer Muon Space is giving Google a better shot at tracking wildfires—and using AI to process all the data being collected.",
+          "url": "https://www.wired.com/story/google-earth-fire-alliance-spotting-wildfires-from-space/",
+          "urlToImage": "https://media.wired.com/photos/685063d9806539b4180fa570/191:100/w_1280,c_limit/Transporter%2013%20Manifest%20SpaceX.jpg",
+          "publishedAt": "2025-06-24T09:30:00Z",
+          "content": "With fire in particular, times are compressed so much that you have to apply technology to make a decision within the timeframe that you can impact the outcome of what's happening, Collins says.\r\nKry… [+3010 chars]"
         },
         {
           "source": {
@@ -3198,32 +3185,6 @@
             "id": "wired",
             "name": "Wired"
           },
-          "author": "Lauren Goode",
-          "title": "OpenAI's Big Bet That Jony Ive Can Make AI Hardware Work",
-          "description": "Io, a firm Ive and Sam Altman cocreated, will now merge with OpenAI.",
-          "url": "https://www.wired.com/story/jony-ive-open-ai-hardware-io/",
-          "urlToImage": "https://media.wired.com/photos/682e0aa2e697c0df119ce200/191:100/w_1280,c_limit/Jony-Ive-Business-1191537321.jpg",
-          "publishedAt": "2025-05-21T18:33:39Z",
-          "content": "OpenAI has fully acquired Io, a joint venture it cocreated last year with Jony Ive, the famed British designer behind the sleek industrial aesthetic that defined the iPhone and more than two decades … [+3382 chars]"
-        },
-        {
-          "source": {
-            "id": "wired",
-            "name": "Wired"
-          },
-          "author": "Julian Chokkattu",
-          "title": "Google’s Android Chief Hopes Its ‘New Era’ Will Get People to Ditch Their iPhones",
-          "description": "Android is getting a design refresh, launching a mixed reality platform for smart glasses, and Gemini is expanding to cars and watches. Can it entice the overwhelmingly dominant iPhone-owning youth?",
-          "url": "https://www.wired.com/story/googles-android-chief-hopes-its-new-era-will-get-people-to-ditch-their-iphones/",
-          "urlToImage": "https://media.wired.com/photos/682dfa68f2ad41d2691ffa8d/191:100/w_1280,c_limit/DSC_4023.jpg",
-          "publishedAt": "2025-05-21T18:30:07Z",
-          "content": "And that brings us to the third focus for Android, which is the connecting line between all the Android ecosystem productsartificial intelligence. Almost the entirety of Google's keynote was spent on… [+3074 chars]"
-        },
-        {
-          "source": {
-            "id": "wired",
-            "name": "Wired"
-          },
           "author": "Will Knight, Lauren Goode, Kate Knibbs, Louise Matsakis",
           "title": "Trump's Crackdown on Foreign Student Visas Could Derail Critical AI Research",
           "description": "The US says it will \"aggressively revoke\" Chinese student visas and has paused interviews for all student visa applicants. Experts warn the moves could weaken American leadership in STEM.",
@@ -3231,19 +3192,6 @@
           "urlToImage": "https://media.wired.com/photos/68362ed67854ee198fdf8bcb/191:100/w_1280,c_limit/Trump-STEM-Visas-Business-2217166890.jpg",
           "publishedAt": "2025-05-29T19:42:30Z",
           "content": "At some US colleges, international students make up the majority of doctoral students in departments like computer science. At the University of Chicago, for example, foreign nationals accounted for … [+3684 chars]"
-        },
-        {
-          "source": {
-            "id": "wired",
-            "name": "Wired"
-          },
-          "author": "Molly Taft",
-          "title": "The EPA Wants to Roll Back Emissions Controls on Power Plants",
-          "description": "\"The EPA is trying to get out of the climate change business,” says one expert.",
-          "url": "https://www.wired.com/story/the-epa-is-trying-to-roll-back-emissions-controls-on-power-plants/",
-          "urlToImage": "https://media.wired.com/photos/68495fddf966af23d5c7150b/191:100/w_1280,c_limit/GettyImages-1360241786.jpg",
-          "publishedAt": "2025-06-11T20:36:25Z",
-          "content": "The US Environmental Protection Agency (EPA) moved to roll back emissions standards for power plants, the second-largest source of CO2 emissions in the country, on Wednesday, claiming that the Americ… [+3006 chars]"
         },
         {
           "source": {
@@ -3276,6 +3224,19 @@
             "id": "wired",
             "name": "Wired"
           },
+          "author": "Molly Taft",
+          "title": "The EPA Wants to Roll Back Emissions Controls on Power Plants",
+          "description": "\"The EPA is trying to get out of the climate change business,” says one expert.",
+          "url": "https://www.wired.com/story/the-epa-is-trying-to-roll-back-emissions-controls-on-power-plants/",
+          "urlToImage": "https://media.wired.com/photos/68495fddf966af23d5c7150b/191:100/w_1280,c_limit/GettyImages-1360241786.jpg",
+          "publishedAt": "2025-06-11T20:36:25Z",
+          "content": "The US Environmental Protection Agency (EPA) moved to roll back emissions standards for power plants, the second-largest source of CO2 emissions in the country, on Wednesday, claiming that the Americ… [+3006 chars]"
+        },
+        {
+          "source": {
+            "id": "wired",
+            "name": "Wired"
+          },
           "author": "Christopher Null",
           "title": "Concha Sol Hearing Aids Review: Feeling Dated",
           "description": "With a lethargic app and replaceable batteries, these hearing aids are a hard sell despite solid sound quality.",
@@ -3296,6 +3257,19 @@
           "urlToImage": "https://media.wired.com/photos/6852c26292e37fb3775b48af/191:100/w_1280,c_limit/iran-internet-sec-2201457744.jpg",
           "publishedAt": "2025-06-18T18:17:52Z",
           "content": "Alimardani says that it appears mobile data services are patchy, and for many people virtual private networks, which can be used to avoid censorship, have stopped working. This means it has been diff… [+4357 chars]"
+        },
+        {
+          "source": {
+            "id": "wired",
+            "name": "Wired"
+          },
+          "author": "Arielle Pardes",
+          "title": "The Methaphone Is a Phone (That’s Not a Phone) to Help You Stop Using Your Phone",
+          "description": "The Methaphone—a clear slab of smartphone-shaped acrylic—is part cheeky art project, part helpful tool for those looking to curb their phone addiction.",
+          "url": "https://www.wired.com/story/methaphone-smartphone-addiction/",
+          "urlToImage": "https://media.wired.com/photos/6859a1d0423268e68f311bed/191:100/w_1280,c_limit/methaphone%201%20angle%20right.jpg",
+          "publishedAt": "2025-06-24T10:00:00Z",
+          "content": "Earlier this year, Eric Antonow was in a coffee shop with his family when he felt the familiar, twitchy urge to reach for his phone. He patted his pockets for reliefthe cool, thin slab was still ther… [+3952 chars]"
         },
         {
           "source": {
@@ -3328,13 +3302,13 @@
             "id": "wired",
             "name": "Wired"
           },
-          "author": "Andy Greenberg, Dell Cameron, Andrew Couts",
-          "title": "The US Is Building a One-Stop Shop for Buying Your Data",
-          "description": "Plus: A mysterious hacking group’s secret client is exposed, Signal takes a swipe at Microsoft Recall, Russian hackers target security cameras to spy on aid to Ukraine, and more.",
-          "url": "https://www.wired.com/story/us-spies-one-stop-shop-private-data/",
-          "urlToImage": "https://media.wired.com/photos/6830988616b6b462fae2add8/191:100/w_1280,c_limit/4th-amendment-roundup-sec-924396088.jpg",
-          "publishedAt": "2025-05-24T10:30:00Z",
-          "content": "This week, WIRED launched our Rogues issuewhich included going a bit rough ourselves. WIRED senior correspondent Andy Greenberg flew to Louisiana to see how easy it would be to recreate the 3D-printe… [+7148 chars]"
+          "author": "Alden Wicker",
+          "title": "Recycled Polyester Saved This American Factory. Environmentalists Hate It",
+          "description": "Unifi survived competition from China by helping fashion brands meet sustainability goals. But not everyone agrees that its polyester made from recycled plastic bottles should be produced in the US.",
+          "url": "https://www.wired.com/story/repreve-recycled-polyester-saved-unifi-factory-environmentalists-hate-it/",
+          "urlToImage": "https://media.wired.com/photos/6851be63a51f49b437932ffe/191:100/w_1280,c_limit/22030_Repreve-04806.jpg",
+          "publishedAt": "2025-06-23T11:00:00Z",
+          "content": "In the bottle processing plant in Reidsville, North Carolina, drifts of plastic particles, like snow banks, are piled in every nook of the machinery that chops the bottles into flake. When I ask our … [+3802 chars]"
         },
         {
           "source": {
@@ -3374,32 +3348,6 @@
           "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/NintendoSwitch2_MarioKartWorld_Character_SCRN_25.png?quality=90&strip=all&crop=0%2C3.4613147178592%2C100%2C93.077370564282&w=1200",
           "publishedAt": "2025-06-02T19:06:56Z",
           "content": "Producer Kosuke Yabuki talks about what went into building the Nintendo Switch 2 launch title.\r\nFrom the very beginning, the goal for Mario Kart World was ambitious. A follow-up to the Switchs (and W… [+6943 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
-          "author": "Jay Castello",
-          "title": "Real-world map data is helping make better games about farms and transportation",
-          "description": "I'm feeling a strange sense of pressure as I set up my first bus route in City Bus Manager. I want to get things right for the public transportation users of this city, probably because it's the city I actually live in. City Bus Manager uses OpenStreetMap (OS…",
-          "url": "https://www.theverge.com/games/672035/openstreetmap-data-games",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/ss_283fc893933a77e80eb12a73fee872b9ba62b556.jpg?quality=90&strip=all&crop=0%2C3.4613147178592%2C100%2C93.077370564282&w=1200",
-          "publishedAt": "2025-05-23T18:20:20Z",
-          "content": "Titles like City Bus Manager and Global Farmer are benefiting from OpenStreetMap.\r\nIm feeling a strange sense of pressure as I set up my first bus route in City Bus Manager. I want to get things righ… [+6036 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
-          "author": "John Voelcker",
-          "title": "What if Tesla made a Slate-like EV instead of the Cybertruck?",
-          "description": "At last month's rapturously received Slate debut, it took an executive's quip that \"Slate\" and \"Tesla\" use the same 5 letters to shift my brain into high gear. I've covered the EV world for 15-plus years, and I virtually never spend time on counterfactuals. T…",
-          "url": "https://www.theverge.com/tesla/672120/slate-truck-tesla-cybertruck-what-if",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/257762_Tesla_slate_not_cybertruck_CVirginia.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
-          "publishedAt": "2025-05-22T01:18:50Z",
-          "content": "Tesla had all the right ingredients to make a small, affordable electric truck. Why didnt it?\r\nTesla had all the right ingredients to make a small, affordable electric truck. Why didnt it?\r\nAt last m… [+10762 chars]"
         },
         {
           "source": {
@@ -3484,32 +3432,6 @@
             "id": "the-verge",
             "name": "The Verge"
           },
-          "author": "David Pierce",
-          "title": "Summer blockbuster season is here",
-          "description": "Hi, friends! Welcome to Installer No. 84, your guide to the best and Verge-iest stuff in the world. (If you're new here, welcome, so psyched you found us, and also you can read all the old editions at the Installer homepage.) This week, I've been reading abou…",
-          "url": "https://www.theverge.com/installer-newsletter/673547/mission-impossible-fortnite-stream-deck-installer",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/Installer-84.png?quality=90&strip=all&crop=0%2C10.705075966465%2C100%2C78.589848067069&w=1200",
-          "publishedAt": "2025-05-23T16:14:09Z",
-          "content": "Plus, in this weeks Installer: a cheap set-top box worth a try, a clever twist on the Stream Deck, where to go post-Pocket, and more.\r\nPlus, in this weeks Installer: a cheap set-top box worth a try, … [+10672 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
-          "author": "Lauren Feiner",
-          "title": "Meta’s antitrust defense wraps with one big claim: WhatsApp and Instagram couldn’t be better",
-          "description": "For five weeks, the Federal Trade Commission asked a federal judge to imagine a world where Instagram and WhatsApp flourished outside Meta's control instead of being acquired by the tech giant. In the sixth and final week of trial, Meta asked Judge James Boas…",
-          "url": "https://www.theverge.com/antitrust/673923/meta-case-ftc-antitrust-trial",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/04/STKS507_FTCxMETA_ANTITRUST_CVIRGINIA_4_D.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
-          "publishedAt": "2025-05-23T21:26:51Z",
-          "content": "It also addressed the elephant in the room: TikTok.\r\nIt also addressed the elephant in the room: TikTok.\r\nFor five weeks, the Federal Trade Commission asked a federal judge to imagine a world where I… [+5507 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
           "author": "Andrew J. Hawkins",
           "title": "Republicans are determined to make you pay more for gas",
           "description": "Things are getting nutty in the world of vehicle fuel economy standards. Last week, Transportation Secretary (and ex-reality TV contestant) Sean Duffy declared that he was resetting the Corporate Average Fuel Economy (CAFE) standards that govern vehicle fuel …",
@@ -3536,19 +3458,6 @@
             "id": "the-verge",
             "name": "The Verge"
           },
-          "author": "Andrew Liszewski",
-          "title": "Tamagotchi Paradise has you caring for an entire planet of virtual pets",
-          "description": "There are still plenty of Tamagotchi devices that have you focusing on raising just a single digital character, but the new Tamagotchi Paradise puts you in charge of a planet full of needy dependents. To make it a little easier to navigate its digital world, …",
-          "url": "https://www.theverge.com/news/672451/tamagotchi-paradise-virtual-pet",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/tamagotchiparadise1.jpg?quality=90&strip=all&crop=0%2C10.771594928107%2C100%2C78.456810143786&w=1200",
-          "publishedAt": "2025-05-22T14:03:02Z",
-          "content": "YouTube\" data-portal-copyright=\"Screenshot: YouTube\" data-has-syndication-rights=\"1\" src=\"https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/tamagotchiparadise1.jpg?quality=90&strip=all… [+2125 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
           "author": "Verge Staff",
           "title": "The Verge’s favorite summer gear for 2025",
           "description": "Two years ago, we published a list of our favorite summer gear — and it’s time to do it again! Things can get a little tense out there in the world, so sometimes you have to pause and take a breath. We’re looking forward to taking some time for ourselves by h…",
@@ -3562,19 +3471,6 @@
             "id": "the-verge",
             "name": "The Verge"
           },
-          "author": "Lauren Feiner",
-          "title": "Did WhatsApp really need Meta?",
-          "description": "In its antitrust case against Meta, the US Federal Trade Commission is asking a judge to consider an alternate reality. In that world, the company never bought Instagram and WhatsApp. The two apps remained competitive with Facebook, developing features that c…",
-          "url": "https://www.theverge.com/antitrust/671831/meta-whatsapp-founder-brian-acton-testimony-antitrust-trial-ftc",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/04/STKS507_FTCxMETA_ANTITRUST_CVIRGINIA_2_A.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
-          "publishedAt": "2025-05-21T18:41:02Z",
-          "content": "Cofounder Brian Acton butted heads with Meta before his departure, but took the stand as part of its defense.\r\nCofounder Brian Acton butted heads with Meta before his departure, but took the stand as… [+5307 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
           "author": "Jay Peters",
           "title": "You can now try interactive AI worlds backed by Pixar’s cofounder",
           "description": "AI companies have recently been experimenting with interactive, AI-generated worlds. There's an AI-generated version of Quake. An AI-generated Minecraft. Google DeepMind is also building a team to develop models that \"simulate the world.\" Now, an AI startup b…",
@@ -3582,6 +3478,19 @@
           "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/Screenshot-2025-05-27-at-7.27.50%E2%80%AFPM.png?quality=90&strip=all&crop=0%2C3.3574337239259%2C100%2C93.285132552148&w=1200",
           "publishedAt": "2025-05-28T15:54:26Z",
           "content": "Odysseys interactive video is like a blurry video game.\r\nOdysseys interactive video is like a blurry video game.\r\nAI companies have recently been experimenting with interactive, AI-generated worlds. … [+3692 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Brandt Ranj",
+          "title": "Eero’s speedy Pro 6E mesh system is on sale with a gift card for $200 off",
+          "description": "Sluggish Wi-Fi is one of my least favorite tech problems to deal with because it messes with everything: my work, my smart lightbulbs, my online sessions of Mario Kart World. There are many reasons your Wi-Fi may be wonky, but the good news is that you can so…",
+          "url": "https://www.theverge.com/tech/689687/eero-6e-router-system-anker-six-port-desktop-charger-deal-sale",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/Amazon-eero-Pro-6E-System-Deal-Image.png?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
+          "publishedAt": "2025-06-19T15:50:19Z",
+          "content": "You can also save on a 4K projector and pick up a 17-port docking hub for an all-time low.\r\nYou can also save on a 4K projector and pick up a 17-port docking hub for an all-time low.\r\nSluggish Wi-Fi … [+3464 chars]"
         },
         {
           "source": {
@@ -3614,13 +3523,26 @@
             "id": "the-verge",
             "name": "The Verge"
           },
-          "author": "Brandt Ranj",
-          "title": "Eero’s speedy Pro 6E mesh system is on sale with a gift card for $200 off",
-          "description": "Sluggish Wi-Fi is one of my least favorite tech problems to deal with because it messes with everything: my work, my smart lightbulbs, my online sessions of Mario Kart World. There are many reasons your Wi-Fi may be wonky, but the good news is that you can so…",
-          "url": "https://www.theverge.com/tech/689687/eero-6e-router-system-anker-six-port-desktop-charger-deal-sale",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/Amazon-eero-Pro-6E-System-Deal-Image.png?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
-          "publishedAt": "2025-06-19T15:50:19Z",
-          "content": "You can also save on a 4K projector and pick up a 17-port docking hub for an all-time low.\r\nYou can also save on a 4K projector and pick up a 17-port docking hub for an all-time low.\r\nSluggish Wi-Fi … [+3464 chars]"
+          "author": "Andrew Webster",
+          "title": "Death Stranding 2 is much more approachable, if you’re prepared",
+          "description": "It took me a long time to appreciate Death Stranding. I'm not even sure I fully got it after my initial playthrough, which was equal parts mesmerizing and dull. The game, in which you play as a postapocalyptic delivery man in a world ravaged by a breach with …",
+          "url": "https://www.theverge.com/games-review/690468/death-stranding-2-review-ps5",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/01_Characters.jpg?quality=90&strip=all&crop=0%2C3.4613147178592%2C100%2C93.077370564282&w=1200",
+          "publishedAt": "2025-06-20T19:55:05Z",
+          "content": "Death Stranding 2 is much more approachable, if youre prepared\r\nHideo Kojimas series remains demanding and inscrutable, but the original game sets up the sequel perfectly.\r\nDeath Stranding 2 is much … [+5919 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Khee Hoon Chan",
+          "title": "Hideo Kojima sees Death Stranding 2 as a cautionary tale",
+          "description": "For once, the unflappable Hideo Kojima was overwhelmed. Even close to four decades of game-making experience didn't prepare him for his biggest tribulation so far: developing Death Stranding 2: On the Beach during the covid-19 pandemic. \"I thought I can't pul…",
+          "url": "https://www.theverge.com/games/691570/hideo-kojima-death-stranding-2",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/25.06.13-SFF-Hideo-Kojima-George-Miller-by-Tim-Levy-1002.jpg?quality=90&strip=all&crop=0%2C10.76363770124%2C100%2C78.472724597521&w=1200",
+          "publishedAt": "2025-06-24T17:31:54Z",
+          "content": "Hideo Kojima sees Death Stranding 2 as a cautionary tale\r\nThe creator talks about the challenges of crafting a sequel to his singular delivery game.\r\nHideo Kojima sees Death Stranding 2 as a cautiona… [+6493 chars]"
         },
         {
           "source": {
@@ -3647,6 +3569,19 @@
           "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/gettyimages-2212249714.jpg?quality=90&strip=all&crop=0%2C10.7294090391%2C100%2C78.541181921799&w=1200",
           "publishedAt": "2025-06-16T22:43:52Z",
           "content": "Eric will reportedly take a role at the new company, which will be called Tron Inc.\r\nLast year, Justin Sun was facing a federal investigation into his crypto empire, to the point that he avoided ente… [+1698 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Brandon Russell",
+          "title": "Nintendo’s GameCube controller for the Switch 2 is available once again",
+          "description": "If you missed the chance to pick up Nintendo’s new GameCube Controller for the Switch 2, your time has come. It’s back in stock for $64.99 at the My Nintendo Store. To add one to your collection, you’ll need to have a Nintendo Switch Online subscription, whic…",
+          "url": "https://www.theverge.com/tech/691562/nintendo-wireless-gamecube-controller-switch-2-restock",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/nintendo-switch-2-game-controller-stub.png?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
+          "publishedAt": "2025-06-23T22:51:31Z",
+          "content": "The wireless controller is perfect for playing classic titles like Wind Waker and Soulcalibur 2.\r\nThe wireless controller is perfect for playing classic titles like Wind Waker and Soulcalibur 2.\r\nIf … [+1638 chars]"
         },
         {
           "source": {
@@ -3699,19 +3634,6 @@
           "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/NintendoSwitch2_DonkeyKongBananza_SCRN_12.png?quality=90&strip=all&crop=0%2C3.4613147178592%2C100%2C93.077370564282&w=1200",
           "publishedAt": "2025-06-18T13:35:39Z",
           "content": "Theres a lot going on in the latest DK adventure.\r\nTheres a lot going on in the latest DK adventure.\r\nSwitch 2 owners will soon have another big Nintendo game to play. During its latest Direct presen… [+1984 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
-          "author": "Andrew Webster",
-          "title": "Nintendo’s bold new era is full of safe bets",
-          "description": "Nintendo is entering a new era. While most everyone associates the company with video games, for the last few years the brand behind Mario has been steadily expanding itself into something much larger. \"I think people view Nintendo as a gaming company, but we…",
-          "url": "https://www.theverge.com/nintendo/671949/nintendo-switch-2-era-risks",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/257766_Nintendo_package__CVirginia_SAFE-BETS.jpg?quality=90&strip=all&crop=0%2C9.9676601489831%2C100%2C80.064679702034&w=1200",
-          "publishedAt": "2025-05-23T14:23:04Z",
-          "content": "Nintendos bold new era is full of safe bets\r\nA new console, theme parks, movies, and even a museum as the company expands, its less interested in taking risks.\r\nNintendos bold new era is full of safe… [+6797 chars]"
         },
         {
           "source": {
@@ -3790,6 +3712,32 @@
           "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/257769_Switch_2_AKrales_0392.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
           "publishedAt": "2025-06-11T13:59:59Z",
           "content": "Some Verge staff joined a GameChat to test out the new feature, as well as play a little Mario Kart during the work day.\r\nSome Verge staff joined a GameChat to test out the new feature, as well as pl… [+2840 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Cameron Faulkner",
+          "title": "I skipped every Death Stranding cutscene and I’ll do it again",
+          "description": "I beat the original Death Stranding, but please don't ask me what happened in it. There was a cataclysm - not quite a Gommage - that made the US more divided than ever, and you play as a babysitter-meets-delivery-guy who has special awareness of invisible, ho…",
+          "url": "https://www.theverge.com/games/690231/death-stranding-cutscenes-skip",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/samporterbridgeschilling.jpg?quality=90&strip=all&crop=0,10.790308403715,100,78.419383192571",
+          "publishedAt": "2025-06-23T16:34:00Z",
+          "content": "With fewer cutscenes, the game becomes funnier, and just more fun.\r\nI beat the original Death Stranding, but please dont ask me what happened in it. There was a cataclysm not quite a Gommage that mad… [+2976 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Jay Peters",
+          "title": "Death Stranding 2 is bigger and more ambitious — and that includes its music",
+          "description": "Death Stranding 2: On the Beach is an expansive, captivating sequel filled with huge environments to explore and a big story from Hideo Kojima to try and wrap your head around. But one of my favorite additions is a small one: an in-game music player that basi…",
+          "url": "https://www.theverge.com/games/691316/death-stranding-2-woodkid-kojima-music-player",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/07_World_b01b8b.jpg?quality=90&strip=all&crop=0%2C5.8777892344809%2C100%2C88.244421531038&w=1200",
+          "publishedAt": "2025-06-24T17:16:20Z",
+          "content": "You even have your own music player.\r\nDeath Stranding 2: On the Beach is an expansive, captivating sequel filled with huge environments to explore and a big story from Hideo Kojima to try and wrap yo… [+2881 chars]"
         },
         {
           "source": {
@@ -3887,19 +3835,6 @@
             "id": "the-verge",
             "name": "The Verge"
           },
-          "author": "Jess Weatherbed",
-          "title": "Anthropic’s Claude 4 AI models are better at coding and reasoning",
-          "description": "Anthropic has introduced Claude Opus 4 and Claude Sonnet 4, its latest generation of hybrid-reasoning AI models optimized for coding tasks and solving complex problems.  Claude Opus 4 is Anthropic’s most powerful AI model to date, according to the company’s a…",
-          "url": "https://www.theverge.com/news/672705/anthropic-claude-4-ai-ous-sonnet-availability",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/Claude-4-Model-selector.png?quality=90&strip=all&crop=0,18.834359977232,100,62.331280045537",
-          "publishedAt": "2025-05-22T16:38:05Z",
-          "content": "Anthropic says Claude 4 worked autonomously for seven hours in customer tests.\r\nAnthropic says Claude 4 worked autonomously for seven hours in customer tests.\r\nAnthropic has introduced Claude Opus 4 … [+2148 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
           "author": "Elizabeth Lopatto",
           "title": "Let’s all do a dramatic reading of Trump and Musk’s mean posts",
           "description": "Donald Trump and Elon Musk, two of the most media-addled personalities of our time, are publicly torching their relationship by posting on the public social media networks they each respectively own. I have seen theories that this is kayfabe, and I don't buy …",
@@ -3920,19 +3855,6 @@
           "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/257796_Nintendo_Switch_2_size_comparison_ADiBenedetto_0043.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
           "publishedAt": "2025-06-20T23:37:32Z",
           "content": "New features like GameShare and virtual game cards make the console ideal for families.\r\nI wouldnt have preordered a Nintendo Switch 2 just for myself. The price is high, theres no new Smash Bros. or… [+5418 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
-          "author": "Emma Roth",
-          "title": "Now you can watch the Internet Archive preserve documents in real time",
-          "description": "If you’ve ever wondered how the Internet Archive uploads all the physical documents on its site, now you can get a behind-the-scenes look at the process. The Internet Archive launched a new YouTube livestream that shows the digitization of microfiche in real …",
-          "url": "https://www.theverge.com/news/672682/internet-archive-microfiche-lo-fi-beats-channel",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/microfiche-scanning.png?quality=90&strip=all&crop=0%2C0.76132321567303%2C100%2C94.005823138489&w=1200",
-          "publishedAt": "2025-05-22T16:10:46Z",
-          "content": "The feed offers a close-up look of how microfiche the sheets of films that store multiple documents are digitized and uploaded to the Archive.\r\nThe feed offers a close-up look of how microfiche the s… [+1926 chars]"
         },
         {
           "source": {
@@ -3978,19 +3900,6 @@
             "id": "the-verge",
             "name": "The Verge"
           },
-          "author": "Ash Parrish",
-          "title": "Last Defense Academy makes confusion part of the fun",
-          "description": "The Hundred Line: Last Defense Academy starts off by asking a simple question: what happens when you pluck a handful of colorful teenagers from their homes, plop them in a state-of-the-art school filled with every convenience, then force them to fight for the…",
-          "url": "https://www.theverge.com/games-review/673768/hundred-line-last-defense-academy-review-danganronpa",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/ss_13baa96c1d9bb764498a1c80f452945d84d47372.jpg?quality=90&strip=all&crop=0%2C3.4613147178592%2C100%2C93.077370564282&w=1200",
-          "publishedAt": "2025-05-23T20:49:35Z",
-          "content": "Last Defense Academy makes confusion part of the fun\r\nDespite similar art styles and narrative elements, this aint ya mamas Danganronpa.\r\nLast Defense Academy makes confusion part of the fun\r\nDespite… [+6771 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
           "author": "Geoffrey Bunting",
           "title": "Answering the Nintendo Switch 2’s lingering accessibility questions",
           "description": "One of the biggest surprises of the Nintendo Switch 2's reveal was its proposed accessibility. For years, Nintendo has been known for accidentally stumbling on accessibility solutions while stubbornly refusing to engage with the broader subject. Yet, in the S…",
@@ -4017,6 +3926,19 @@
             "id": "the-verge",
             "name": "The Verge"
           },
+          "author": "Tom Warren",
+          "title": "A week in Xbox VR with Microsoft and Meta’s new $399 headset",
+          "description": "Microsoft and Meta announced an Xbox-branded Quest VR headset last year, and it's going on sale today for $399.99. The Meta Quest 3S Xbox Edition is a custom colorway VR headset that comes bundled with an Xbox wireless controller, matching Touch Plus controll…",
+          "url": "https://www.theverge.com/hands-on/690978/meta-quest-3s-xbox-edition-vr-headset-release-date-pricing",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/xboxmetaquest3s_twarren_01.jpg?quality=90&strip=all&crop=0%2C10.486021930258%2C100%2C79.027956139484&w=1200",
+          "publishedAt": "2025-06-24T13:02:05Z",
+          "content": "The Quest 3S Xbox Edition is a custom colorway VR headset bundled with an Xbox controller.\r\nMicrosoft and Meta announced an Xbox-branded Quest VR headset last year, and its going on sale today for $3… [+2789 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
           "author": "Andrew Webster",
           "title": "8 games from the Wholesome Direct 2025 that you can play right now",
           "description": "The Wholesome Direct is always full of cute and charming games to keep an eye on for the future. But it's also a great place to find things to play now - and that's especially true this year. The 2025 edition of the livestream showcase included a number of ga…",
@@ -4037,6 +3959,19 @@
           "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/lcimg-d70a06ea-da2e-4d1a-8598-b850e161dee5.jpeg?quality=90&strip=all&crop=0%2C10.597538331207%2C100%2C78.804923337586&w=1200",
           "publishedAt": "2025-06-09T20:50:37Z",
           "content": "From a huge redesign to handy phone call features, heres whats coming next to iOS.\r\nFrom a huge redesign to handy phone call features, heres whats coming next to iOS.\r\nApple just announced the next m… [+3310 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Lauren Feiner",
+          "title": "Trump’s FTC will approve an ad merger — with a gift to Elon Musk’s X",
+          "description": "The all-Republican Federal Trade Commission agreed to approve a $13.5 billion ad merger if it includes a ban on steering ad dollars away from platforms or publishers based on “political or ideological viewpoints.” The order, which was reported by The New York…",
+          "url": "https://www.theverge.com/policy/691520/ftc-omnicom-interpublic-group-merger-advertiser-boycott-political-ideology",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/03/STKS500_FTC_B.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
+          "publishedAt": "2025-06-23T20:48:09Z",
+          "content": "A proposed consent decree would ban directing ad dollars based on ideological viewpoints.\r\nThe all-Republican Federal Trade Commission agreed to approve a $13.5 billion ad merger if it includes a ban… [+3627 chars]"
         },
         {
           "source": {
@@ -4108,19 +4043,6 @@
             "id": "the-verge",
             "name": "The Verge"
           },
-          "author": "Nathan Edwards",
-          "title": "Norbauer Seneca review: a $3,600 luxury keyboard for the keyboard obsessed",
-          "description": "Some people can tell great wine from okay wine. They go on wine tastings, take wine tours. They tend to spend more money on wine than most. I am not one of those people. I can tell wine from vinegar if you show me the bottle. I am just a little bit obsessed w…",
-          "url": "https://www.theverge.com/reviews/659125/norbauer-seneca-review-luxury-capacitive-keyboard",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/03/Verge_Seneca-53QP.jpg?quality=90&strip=all&crop=0%2C10.75385989963%2C100%2C78.49228020074&w=1200",
-          "publishedAt": "2025-06-15T03:57:33Z",
-          "content": "Some people can tell great wine from okay wine. They go on wine tastings, take wine tours. They tend to spend more money on wine than most. \r\nI am not one of those people. I can tell wine from vinega… [+10003 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
           "author": "Lauren Feiner",
           "title": "Inside the courthouse reshaping the future of the internet",
           "description": "The future of the internet will be determined in one building in Washington, DC - and for six weeks, I watched it unfold. For much of this spring, the E. Barrett Prettyman Courthouse in downtown Washington, DC, was buzzing with lawyers, reporters, and interes…",
@@ -4134,6 +4056,19 @@
             "id": "the-verge",
             "name": "The Verge"
           },
+          "author": "Nathan Edwards",
+          "title": "Norbauer Seneca review: a $3,600 luxury keyboard for the keyboard obsessed",
+          "description": "Some people can tell great wine from okay wine. They go on wine tastings, take wine tours. They tend to spend more money on wine than most. I am not one of those people. I can tell wine from vinegar if you show me the bottle. I am just a little bit obsessed w…",
+          "url": "https://www.theverge.com/reviews/659125/norbauer-seneca-review-luxury-capacitive-keyboard",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/03/Verge_Seneca-53QP.jpg?quality=90&strip=all&crop=0%2C10.75385989963%2C100%2C78.49228020074&w=1200",
+          "publishedAt": "2025-06-15T03:57:33Z",
+          "content": "Some people can tell great wine from okay wine. They go on wine tastings, take wine tours. They tend to spend more money on wine than most. \r\nI am not one of those people. I can tell wine from vinega… [+10003 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
           "author": "Ash Parrish",
           "title": "Ninja Gaiden 4’s gory combat hides a goofy center",
           "description": "Ninja Gaiden 4 was one of several games that Xbox showed off in its games showcase over the weekend. And during its Summer Game Fest-adjacent in-person preview event, I got the chance to play it for myself. I've never played Ninja Gaiden before and was skepti…",
@@ -4141,19 +4076,6 @@
           "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/Ninja-Gaiden-4_Evergreen_KeyArt_Horizontal_9600x5400_RGB-2.jpg?quality=90&strip=all&crop=0%2C3.4613147178592%2C100%2C93.077370564282&w=1200",
           "publishedAt": "2025-06-10T18:16:35Z",
           "content": "PlatinumGames put a little of Bayonettas camp in Team Ninjas edgy ninja series, and it works.\r\nNinja Gaiden 4 was one of several games that Xbox showed off in its games showcase over the weekend. And… [+3886 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
-          "author": "Vjeran Pavic",
-          "title": "Fujifilm X Half hands-on: whimsical, refreshing, and simply fun",
-          "description": "The first thing I noticed about the Fujifilm X Half is just how small and light it is. The camera is designed to give you no excuses - you should be able to bring it with you everywhere. And after spending a few hours walking around LA with the camera, I'm st…",
-          "url": "https://www.theverge.com/tech/673538/fujifilm-x-half-camera-hands-on",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/1vpavic_20250522__0019.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
-          "publishedAt": "2025-05-23T17:04:46Z",
-          "content": "A reminder that photography isnt always picture-perfect.\r\nA reminder that photography isnt always picture-perfect.\r\nThe first thing I noticed about the Fujifilm X Half is just how small and light it … [+4652 chars]"
         },
         {
           "source": {
@@ -4193,10 +4115,88 @@
           "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/gettyimages-2219478146.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
           "publishedAt": "2025-06-15T01:36:29Z",
           "content": "Of all the jarring things Ive witnessed on the National Mall, nothing will beat the image of the first thing I saw after I cleared security at the Army festival: a child, sitting at the controls of a… [+5134 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Jay Peters",
+          "title": "With the Switch, technology finally caught up to Nintendo",
+          "description": "The Nintendo Switch is on the cusp of becoming Nintendo's bestselling hardware ever. In retrospect, it's easy to see why: it's a device that seamlessly transitions from a home console to a handheld, erasing the distinction between the two. It's been so succes…",
+          "url": "https://www.theverge.com/games/671323/nintendo-switch-2-wii-u-technology-games",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/257766_Nintendo_package__CVirginia_TECH.jpg?quality=90&strip=all&crop=0%2C9.9676601489831%2C100%2C80.064679702034&w=1200",
+          "publishedAt": "2025-05-27T12:05:37Z",
+          "content": "The Wii U was a flop, but many of its ideas and games were ahead of their time.\r\nThe Wii U was a flop, but many of its ideas and games were ahead of their time.\r\nThe Nintendo Switch is on the cusp of… [+4014 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Jay Peters",
+          "title": "Breath of the Wild’s Switch 2 enhancements have me exploring Hyrule all over again",
+          "description": "Last night, I stayed up way too late playing through the Great Plateau section of The Legend of Zelda: Breath of the Wild - Nintendo Switch 2 Edition, and I'm falling in love with the game all over again. The opening moments of Breath of the Wild are iconic. …",
+          "url": "https://www.theverge.com/nintendo/681361/nintendo-switch-2-zelda-breath-of-the-wild-edition",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/NintendoSwitch2_ZeldaBotWNintendoSwitch2Edition_SCRN_10.png?quality=90&strip=all&crop=0%2C3.4613147178592%2C100%2C93.077370564282&w=1200",
+          "publishedAt": "2025-06-06T16:35:15Z",
+          "content": "The upgrade brings faster load times and a handy companion app.\r\nThe upgrade brings faster load times and a handy companion app.\r\nLast night, I stayed up way too late playing through the Great Platea… [+3416 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Jack Buehrer",
+          "title": "The music industry is building the tech to hunt down AI songs",
+          "description": "The music industry's nightmare came true in 2023, and it sounded a lot like Drake. \"Heart on My Sleeve,\" a convincingly fake duet between Drake and The Weeknd, racked up millions of streams before anyone could explain who made it or where it came from. The tr…",
+          "url": "https://www.theverge.com/ai-artificial-intelligence/686767/music-industry-ai-song-detection-tracking-licensing",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/257666_futureproofing_jgibbs-music.jpg?quality=90&strip=all&crop=0%2C10.704090241901%2C100%2C78.591819516198&w=1200",
+          "publishedAt": "2025-06-18T21:18:47Z",
+          "content": "With no way to stop the onslaught of AI music, the industry is taking a different approach: figuring out how to make money off of it.\r\nThe music industrys nightmare came true in 2023, and it sounded … [+5636 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Alex Heath",
+          "title": "Meta held talks to buy Thinking Machines, Perplexity, and Safe Superintelligence",
+          "description": "At this point, it's becoming easier to say which AI startups Mark Zuckerberg hasn't looked at acquiring. In addition to Ilya Sutskever's Safe Superintelligence (SSI), sources tell me the Meta CEO recently discussed buying ex-OpenAI CTO Mira Murati's Thinking …",
+          "url": "https://www.theverge.com/command-line-newsletter/690720/meta-buy-thinking-machines-perplexity-safe-superintelligence",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/02/STK043_VRG_Illo_N_Barclay_2_Meta.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
+          "publishedAt": "2025-06-20T22:53:47Z",
+          "content": "Mark Zuckerberg has been playing the field as he looks to reboot his AI strategy.\r\nAt this point, its becoming easier to say which AI startups Mark Zuckerberghasnt looked at acquiring.\r\nIn addition t… [+10152 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Tim Stevens",
+          "title": "Slate Auto FAQ: your questions answered",
+          "description": "Alright, we get it. Y'all are excited about Slate. We thought the little Slate Truck was cool, but based on the number of clicks and comments on our Slate Auto articles so far, you'd like to know more. Many of you wrote in with questions and more than a few p…",
+          "url": "https://www.theverge.com/electric-cars/676036/slate-auto-faq-truck-ev-specs-price-tariff",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/05/257777_Slate_truck_CVirginia.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
+          "publishedAt": "2025-05-29T19:08:16Z",
+          "content": "Wondering about data privacy, preconditioning, or even 3D-printing? Weve got answers.\r\nWondering about data privacy, preconditioning, or even 3D-printing? Weve got answers.\r\nAlright, we get it. Yall … [+7227 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Ash Parrish",
+          "title": "The whiplash of covering Summer Game Fest 2025 in LA",
+          "description": "I love going to Summer Game Fest. It's a rare opportunity to connect with my colleagues and friends in person, as well as listen to developers talk about why they make their games. In some ways, this year's SGF gave me everything I love about the event. But w…",
+          "url": "https://www.theverge.com/games/688568/summer-game-fest-2025-los-angeles-ice-arrests",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/chorus/uploads/chorus_asset/file/23644103/PlayDays_June10_2022_1920x1280_00022.JPG?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
+          "publishedAt": "2025-06-18T14:42:21Z",
+          "content": "The event lacked big-name titles and had an atmosphere marred by political unrest.\r\nI love going to Summer Game Fest. Its a rare opportunity to connect with my colleagues and friends in person, as we… [+5772 chars]"
         }
       ]
     },
-    "timestamp": 1750647924067
+    "timestamp": 1750881044228
   },
   "technology-US-en-general-all": {
     "data": {
