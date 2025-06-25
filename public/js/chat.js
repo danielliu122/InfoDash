@@ -71,12 +71,12 @@ function appendMessage(message, isAI = false) {
     chatLog.scrollTop = chatLog.scrollHeight; // Scroll to the bottom
 }
 
-async function fetchAIResponse(history) {
+async function fetchAIResponse(history, attempt = 0) {
+    const maxRetries = 5;
+    const retryDelay = 5000; // 5 seconds
     try {
         const selectedModel = document.getElementById('model-select').value;
         const lastMessage = history[history.length - 1];
-        
-        // Prepare conversation context with system prompt
         const messages = [
             {
                 role: 'system',
@@ -89,13 +89,9 @@ async function fetchAIResponse(history) {
                 content: message
             }))
         ];
-
-        // Check if it's a simple factual question
         if (isSimpleQuery(lastMessage)) {
             return await handleSimpleQuery(lastMessage, messages, selectedModel);
         }
-
-        // Regular chat response
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: {
@@ -106,6 +102,15 @@ async function fetchAIResponse(history) {
                 model: selectedModel 
             }),
         });
+        if (response.status === 503) {
+            if (attempt < maxRetries) {
+                appendMessage("AI: The AI is starting up, please wait... (retrying)");
+                await new Promise(res => setTimeout(res, retryDelay));
+                return fetchAIResponse(history, attempt + 1);
+            } else {
+                return "AI: The AI is still unavailable after several attempts. Please try again later.";
+            }
+        }
         const data = await response.json();
         return data.reply || 'Sorry, I did not understand that.';
     } catch (error) {

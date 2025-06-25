@@ -433,6 +433,15 @@ async function callOpenRouterWithRetry(options, retries = 2) {
 }
 
 app.post('/api/chat', async (req, res) => {
+    // LLM readiness check (customize as needed)
+    if (!process.env.DEEPSEEK_API_KEY) {
+        return res.status(503).json({
+            type: "https://infodash.app/errors/llm-not-ready",
+            title: "LLM Not Ready",
+            status: 503,
+            detail: "The language model is still starting up or not configured. Please try again in a moment."
+        });
+    }
     try {
         // console.log('Chat API: Received request');
         const { messages, model = 'deepseek/deepseek-r1:free' } = req.body;
