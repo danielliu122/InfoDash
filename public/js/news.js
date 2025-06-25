@@ -140,13 +140,18 @@ export function updateNews(data) {
             img.alt = 'Thumbnail';
             img.classList.add('news-thumbnail');
 
-            const title = document.createElement('h3');
+            const title = document.createElement('h5');
             title.classList.add('article-title');
             title.textContent = article.title;
 
             const description = document.createElement('p');
             description.classList.add('article-text');
             description.textContent = article.description;
+
+            const space1 = document.createElement('br');
+            description.appendChild(space1);
+            const space2 = document.createElement('br');
+            description.appendChild(space2);
 
             const authorDate = document.createElement('p');
             authorDate.classList.add('article-descriptor');

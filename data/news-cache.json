@@ -2,163 +2,33 @@
   "world-us-en-general-all": {
     "data": {
       "status": "ok",
-      "totalResults": 32,
+      "totalResults": 38,
       "articles": [
         {
           "source": {
-            "id": null,
-            "name": "CNBC"
-          },
-          "author": "Diana Olick",
-          "title": "May home sales increase very slightly, but prices hit another record high - CNBC",
-          "description": "Sales of existing homes rose very slightly in May from April but were still weaker than they were a year ago. Prices rose, hitting a record high for May.",
-          "url": "https://www.cnbc.com/2025/06/23/may-home-sales-prices.html",
-          "urlToImage": "https://image.cnbcfm.com/api/v1/image/108136378-1745524139472-gettyimages-2211809885-bb2_8032_ixihhfjy.jpeg?v=1745524288&w=1920&h=1080",
-          "publishedAt": "2025-06-23T14:00:07Z",
-          "content": "Sales of previously owned homes rose very slightly in May, up 0.8% from April, to a seasonally adjusted, annualized rate of 4.03 million units, according to the National Association of Realtors. \r\nHo… [+2393 chars]"
-        },
-        {
-          "source": {
-            "id": "the-verge",
-            "name": "The Verge"
-          },
-          "author": "Antonio G. Di Benedetto",
-          "title": "Chromebook Plus laptops like Lenovo’s sleek, new 14-incher are getting free Gemini AI features - The Verge",
-          "description": "Google adds new Gemini features like select to search to Chromebook Plus laptops. Lenovo’s Chromebook Plus 14 also debuts with a new processor for on-device AI.",
-          "url": "https://www.theverge.com/news/690885/google-chromeos-gemini-ai-select-to-search-lenovo-chromebook-plus-14",
-          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/257814_Lenovo_Chromebook_Plus_14_laptop_ADiBenedetto_0007.jpg?quality=90&strip=all&crop=0%2C10.732984293194%2C100%2C78.534031413613&w=1200",
-          "publishedAt": "2025-06-23T13:00:00Z",
-          "content": "Features include select-to-search images and on-screen text, smart grouping of tabs and documents, and automated image editing.\r\nGoogle announced a handful of new Gemini AI features for Chromebook Pl… [+2478 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "BBC News"
+            "id": "associated-press",
+            "name": "Associated Press"
           },
           "author": null,
-          "title": "Let non-doms pay £250,000 and avoid some UK tax - Nigel Farage - BBC",
-          "description": "The Reform UK leader says money raised from the policy would go to the lowest-paid 10% of full-time workers.",
-          "url": "https://www.bbc.com/news/articles/c14e03dvydno",
-          "urlToImage": "https://ichef.bbci.co.uk/news/1024/branded_news/c388/live/5252ce70-5011-11f0-8c0a-5b816c079050.jpg",
-          "publishedAt": "2025-06-23T12:56:03Z",
-          "content": "Kate Whannel\r\nJoe Pike\r\nReform UK has announced it would give non-doms the chance to avoid some UK taxes by paying a £250,000 fee, with the proceeds going to people on the lowest incomes.\r\nNon-domici… [+3992 chars]"
+          "title": "Powell says Fed rate cut is on hold even as Trump demands cuts - AP News",
+          "description": "The Federal Reserve will continue to wait and see how the economy evolves before deciding whether to reduce its key interest rate, Chair Jerome Powell says, a stance directly at odds with President Donald Trump’s calls for immediate cuts. Powell said Tuesday …",
+          "url": "https://apnews.com/article/interest-rates-federal-reserve-trump-inflation-df5b9ac09f0cd283797c6c294a98da9c",
+          "urlToImage": "https://dims.apnews.com/dims4/default/8947793/2147483647/strip/true/crop/8419x4736+0+439/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2F07%2F71%2F4bc2554937a4f38ee537154270ab%2Ffeeff1b6b8564837bd42b119e45d90a4",
+          "publishedAt": "2025-06-24T18:34:00Z",
+          "content": "WASHINGTON (AP) The Federal Reserve will continue to wait and see how the economy evolves before deciding whether to reduce its key interest rate, Chair Jerome Powell said Tuesday, a stance directly … [+5660 chars]"
         },
         {
           "source": {
-            "id": null,
-            "name": "PhoneArena"
+            "id": "abc-news",
+            "name": "ABC News"
           },
-          "author": "Adrian Diaconescu",
-          "title": "Behold the upcoming Galaxy Watch 8, Watch 8 Classic, and Watch Ultra (2025) in beautiful new leaks! - PhoneArena",
-          "description": "You may or may not like their designs, but Samsung's three fast-approaching smartwatches hold no more cosmetic secrets after this huge new leak.",
-          "url": "https://www.phonearena.com/news/samsung-galaxy-watch-8-watch-8-classic-watch-ultra-2025-beautiful-new-pictures_id171600",
-          "urlToImage": "https://m-cdn.phonearena.com/images/article/171600-wide-two_1200/Behold-the-upcoming-Galaxy-Watch-8-Watch-8-Classic-and-Watch-Ultra-2025-in-beautiful-new-leaks.jpg",
-          "publishedAt": "2025-06-23T12:50:48Z",
-          "content": "A discussion is a place, where people can voice their opinion, no matter if it\r\n is positive, neutral or negative. However, when posting, one must stay true to the topic, and not just share some\r\n ra… [+1082 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "SB Nation"
-          },
-          "author": "Ricky O'Donnell",
-          "title": "NBA mock draft 2025: Updated projection with NBA Finals now over - SBNation.com",
-          "description": "Here’s our latest 2025 NBA mock draft with the season now over.",
-          "url": "https://www.sbnation.com/nba/2025/6/23/24451800/nba-mock-draft-2025-updated-projection-with-nba-finals-now-over",
-          "urlToImage": "https://cdn.vox-cdn.com/thumbor/tLrIIWHEQ6rremFudnVw0Wv2Dxk=/0x17:3440x1818/fit-in/1200x630/cdn.vox-cdn.com/uploads/chorus_asset/file/26032518/2214887127.jpg",
-          "publishedAt": "2025-06-23T12:00:00Z",
-          "content": "The 2025 NBA Draft class has spent the last year under the microscope. Cooper Flagg going No. 1 overall has been a forgone conclusion from the moment he reclassified to accelerate his pro timeline, a… [+13471 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "BBC News"
-          },
-          "author": null,
-          "title": "Israel says it struck Tehran's Evin prison and Fordo access routes - BBC",
-          "description": "Iran's judiciary says the attack damaged parts of Evin, a notorious facility which holds many political prisoners.",
-          "url": "https://www.bbc.com/news/articles/cp8621gnknjo",
-          "urlToImage": "https://ichef.bbci.co.uk/news/1024/branded_news/62b3/live/f242d090-5031-11f0-8c47-237c2e4015f5.jpg",
-          "publishedAt": "2025-06-23T11:59:50Z",
-          "content": "The Israeli military has struck Tehran's notorious Evin prison and damaged parts of the facility, which holds many political detainees, Iran's judiciary says.\r\nThe judiciary's Mizan news agency repor… [+1256 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "Barron's"
-          },
-          "author": "Barron's",
-          "title": "These Stocks Are Moving the Most Today: Northrop Grumman, Exxon, Tesla, Northern Trust, Fiserv, and More - Barron's",
+          "author": "ABC News - Breaking News, Latest News and Videos",
+          "title": "Israel and Iran agree to ceasefire to bring end to '12 DAY WAR,' Trump says - ABC News - Breaking News, Latest News and Videos",
           "description": null,
-          "url": "https://www.barrons.com/articles/stock-movers-0b3ff026",
+          "url": "https://abcnews.go.com/International/israel-iran-agree-ceasefire-bring-end-12-day/story?id\\\\u003d123137697",
           "urlToImage": null,
-          "publishedAt": "2025-06-23T11:46:00Z",
+          "publishedAt": "2025-06-24T18:05:03Z",
           "content": null
-        },
-        {
-          "source": {
-            "id": "the-washington-post",
-            "name": "The Washington Post"
-          },
-          "author": "Kevin Loria",
-          "title": "The truth about using cannabis for health problems - The Washington Post",
-          "description": "People are using cannabis for everything from pain to insomnia. Here’s when it might help and when it won’t. And don’t smoke or vape it.",
-          "url": "https://www.washingtonpost.com/wellness/2025/06/23/cannabis-health-insomnia-pain-paranoia/",
-          "urlToImage": "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/BR26PFFV2NEHZBF6KK6H4AARB4.jpg&w=1440",
-          "publishedAt": "2025-06-23T11:31:53Z",
-          "content": "Consumer Reports has no financial relationship with any advertisers on this site.\r\nMany U.S. states have legalized cannabis, and there has been a significant increase in the number of older adults us… [+4228 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "Rudebaguette.com"
-          },
-          "author": "Rosemary Potter",
-          "title": "Nintendo Switch 2 Divides the Community as Doubts Rise Over Whether the New Console Truly Delivers on Expectations - Rude Baguette",
-          "description": "IN A NUTSHELL 🎮 The Nintendo Switch 2 has launched, selling over 3.5 million units in just four days, setting a new record for console releases. 💰 Priced at around $500, the console offers a 7.9-inch LCD screen with Full HD resolution, but its high cost is …",
-          "url": "https://www.rudebaguette.com/en/2025/06/nintendo-switch-2-divides-the-community-as-doubts-rise-over-whether-the-new-console-truly-delivers-on-expectations/",
-          "urlToImage": "https://www.rudebaguette.com/wp-content/uploads/2025/06/this-controversial-device-has-gamers-torn-nintendo-switch-2-sparks-debate-as-critics-question-this-new-consoles-worth-and-impact.jpg",
-          "publishedAt": "2025-06-23T11:01:28Z",
-          "content": "<table><tr><td>IN A NUTSHELL</td></tr><tr><td><ul><li> The Nintendo Switch 2 has launched, selling over 3.5 million units in just four days, setting a new record for console releases.</li><li> Priced… [+5611 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "Bloody Elbow"
-          },
-          "author": null,
-          "title": "Demetrious Johnson reacts to Jon Jones’ UFC retirement… ‘I don’t understand why’ - Bloody Elbow",
-          "description": "Demetrious Johnson still wants some clarity.",
-          "url": "https://bloodyelbow.com/2025/06/23/demetrious-johnson-reacts-to-jon-jones-ufc-retirement-i-dont-understand-why/",
-          "urlToImage": "https://bloodyelbow.com/wp-content/uploads/1/2025/06/generated-image-281.jpg",
-          "publishedAt": "2025-06-23T10:45:00Z",
-          "content": "The majority of the UFC fanbase is happy that Jon Jones has finally retired from the sport but it has left some people confused.\r\nAfter several months of delaying a potential UFC heavyweight title un… [+2625 chars]"
-        },
-        {
-          "source": {
-            "id": null,
-            "name": "KHOU.com"
-          },
-          "author": "Deevon Rahming",
-          "title": "Abbott vetoes THC ban, calls Texas lawmakers back to Austin for special session - KHOU",
-          "description": "Texas lawmakers are heading back for a special session after Gov. Abbott vetoed Senate Bill 3. Here is what he’s proposing instead.",
-          "url": "https://www.khou.com/article/news/local/texas/thc-ban-texas-update-veto-special-session/285-52709030-71a3-4a16-adb1-060953dddb72",
-          "urlToImage": "https://media.khou.com/assets/KHOU/images/73862da2-a043-47b6-a82c-e59a93fc4e42/20250623T110939/73862da2-a043-47b6-a82c-e59a93fc4e42_1140x641.jpg",
-          "publishedAt": "2025-06-23T10:25:00Z",
-          "content": "AUSTIN, Texas Tensions are rising at the Texas Capitol after Gov. Greg Abbott vetoed Senate Bill 3, a measure that would have banned consumable hemp products containing THC. Instead of signing the bi… [+3976 chars]"
-        },
-        {
-          "source": {
-            "id": "the-washington-post",
-            "name": "The Washington Post"
-          },
-          "author": "Meg Kelly, Joyce Sohyun Lee, Nilo Tabrizy, Evan Hill, Dylan Moriarty",
-          "title": "What satellite images reveal about damage to Iran’s nuclear sites - The Washington Post",
-          "description": "Visuals, expert analysis and official statements shed light on Iran’s nuclear sites after U.S. strikes.",
-          "url": "https://www.washingtonpost.com/investigations/2025/06/22/iran-strikes-nuclear-site-damage-visuals/",
-          "urlToImage": "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/V2WEBPR22BGQ3O2BVIYPGFMDXI_size-normalized.png&w=1440",
-          "publishedAt": "2025-06-23T10:24:23Z",
-          "content": "Satellite images provide the first glimpses of the aftermath of U.S. strikes on three sites said to be central to Irans nuclear program, revealing severe damage at aboveground facilities as well as t… [+8593 chars]"
         },
         {
           "source": {
@@ -166,107 +36,224 @@
             "name": "Associated Press"
           },
           "author": null,
-          "title": "The number of abortions kept rising in 2024 because of telehealth prescriptions, report finds - AP News",
-          "description": "A new report finds that the number of abortions in the U.S. grew in 2024 as more women obtained pills through telehealth. The latest WeCount project for the Society of Family Planning finds that 1 in 4 abortions uses medications prescribed by a provider who d…",
-          "url": "https://apnews.com/article/abortion-data-wecount-pills-telehealth-anniversary-7d42e427bc1e26d2ea7b48b8f20a042e",
-          "urlToImage": "https://dims.apnews.com/dims4/default/16a12f1/2147483647/strip/true/crop/4500x2531+0+234/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2Fa5%2F06%2F73291d06ac822ff712a752309d35%2F33c5ffe4ca7940c38f4ddcc6b0c2a4bc",
-          "publishedAt": "2025-06-23T10:02:00Z",
-          "content": "The number of abortions in the U.S. rose again in 2024, with women continuing to find ways to get them despite bans and restrictions in many states, according to a report out Monday.\r\nThe latest repo… [+3574 chars]"
+          "title": "Bobby Sherman, teen idol in the 1960s and ‘70s, and later a CPR teacher, dies at 81 - AP News",
+          "description": "Former teen idol Bobby Sherman has died at 81. His winsome smile and fashionable shaggy mop top helped make him into a star in the 1960s and ’70s with bubblegum pop like “Little Woman” and “Julie, Do Ya Love Me.” His wife, Brigitte Poublon, announced the deat…",
+          "url": "https://apnews.com/article/bobby-sherman-dies-d4cbbcc4bac0697754e82dde6afe155a",
+          "urlToImage": "https://dims.apnews.com/dims4/default/c723b20/2147483647/strip/true/crop/2000x1125+0+104/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2F9a%2F76%2F30e39db37a7a837af8952b864e05%2Fbf2082f69c1a4a6682006b7adee83c15",
+          "publishedAt": "2025-06-24T17:49:00Z",
+          "content": "Bobby Sherman, whose winsome smile and fashionable shaggy mop top helped make him into a teen idol in the 1960s and 70s with bubblegum pop hits like Little Woman and Julie, Do Ya Love Me, has died. H… [+6825 chars]"
+        },
+        {
+          "source": {
+            "id": "associated-press",
+            "name": "Associated Press"
+          },
+          "author": null,
+          "title": "GOP plan to sell more than 2 million acres of federal lands is found to violate Senate rules - AP News",
+          "description": "A plan to sell more than 3,200 square miles of federal lands has been ruled out of Republicans’ big tax and spending cut bill after the Senate parliamentarian determined the proposal by Senate Energy Chairman Mike Lee would violate the chamber’s rules. The Ut…",
+          "url": "https://apnews.com/article/public-land-sales-senate-mike-lee-bf4c3a046a107efc7d4ffe005fdb9d2d",
+          "urlToImage": "https://dims.apnews.com/dims4/default/dba7901/2147483647/strip/true/crop/6000x3375+0+312/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2Fcd%2Fbc%2F5560203f82efe44b939c5fa2902e%2Fb6c7879b15eb40a1b2bb26023be05bfb",
+          "publishedAt": "2025-06-24T17:15:00Z",
+          "content": "WASHINGTON (AP) A plan to sell more than 3,200 square miles (8,300 square kilometers) of federal lands has been ruled out of Republicans big tax and spending cut bill after the Senate parliamentarian… [+4340 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Andrew J. Hawkins",
+          "title": "Tesla’s robotaxis are operating in a regulatory vacuum - The Verge",
+          "description": "Tesla is facing few regulatory roadblocks in deploying its driverless robotaxi service. NHTSA has struggled to keep up, even before DOGE started laying off its safety regulators.",
+          "url": "https://www.theverge.com/tesla/691975/tesla-robotaxi-mistake-nhtsa-regulatory-weak",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/gettyimages-2220743970.jpg?quality=90&strip=all&crop=0%2C10.785131724411%2C100%2C78.429736551177&w=1200",
+          "publishedAt": "2025-06-24T17:12:21Z",
+          "content": "The federal government has effectively given up on regulating driverless vehicles. Thats good news for Elon Musk.\r\nThis week, Tesla launched its long-promised robotaxi service in Austin, and almost i… [+5773 chars]"
         },
         {
           "source": {
             "id": null,
-            "name": "CNBC"
+            "name": "ZDNet"
           },
-          "author": "Michael Wayland",
-          "title": "New Stellantis CEO faces slew of challenges, vows to avoid 'mediocrity' - CNBC",
-          "description": "Antonio Filosa, a 51-year-old Italian native, is taking over as CEO as the automaker deals with fractured relationships, regulatory uncertainty and more.",
-          "url": "https://www.cnbc.com/2025/06/23/stellantis-ceo-antonio-filosa.html",
-          "urlToImage": "https://image.cnbcfm.com/api/v1/image/108159072-1749821781726-CA_BU025_001EV.jpg?v=1749824850&w=1920&h=1080",
-          "publishedAt": "2025-06-23T10:00:01Z",
-          "content": "Incoming Stellantis CEO Antonio Filosa, head of the company's Americas operations, greets a Windsor Assembly Plant employee during an event celebrating Chryslers 100th anniversary on June 6, 2025.\r\nD… [+10909 chars]"
+          "author": "Kerry Wan",
+          "title": "Samsung offers $1,000 off preorder deal for new Galaxy foldable phones ahead of Unpacked - ZDNET",
+          "description": "Samsung has officially set the date and location for its next Unpacked event, where the Galaxy Z Fold 7, Z Flip 7, and more are expected to debut.",
+          "url": "https://www.zdnet.com/article/samsung-offers-1000-off-preorder-deal-for-new-galaxy-foldable-phones-ahead-of-unpacked/",
+          "urlToImage": "https://www.zdnet.com/a/img/resize/fb6b4b43271f3a23113317979432421eca0bb486/2024/07/08/ad0c4ff5-75be-4bab-a1ab-43d7d565020d/dsc01140.jpg?auto=webp&fit=crop&height=675&width=1200",
+          "publishedAt": "2025-06-24T17:07:00Z",
+          "content": "Kerry Wan/ZDNET\r\nAt this point in time, three things are certain when July comes along: backyard barbecues, fireworks past midnight, and Samsung Unpacked. \r\nAlso: The best Samsung phones to buy in 20… [+1831 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "New York Post"
+          },
+          "author": "Zach Braziller",
+          "title": "Final 2025 NBA mock draft: Predicting all 30 first-round selections - New York Post",
+          "description": "The Post’s Zach Braziller breaks down the eagerly anticipated first round with his mock draft.",
+          "url": "https://nypost.com/2025/06/24/sports/final-2025-nba-mock-draft-predicting-all-32-first-round-selections/",
+          "urlToImage": "https://nypost.com/wp-content/uploads/sites/2/2025/06/newspress-collage-7ufzpktw8-1750780934144.jpg?quality=75&strip=all&1750766633&w=1024",
+          "publishedAt": "2025-06-24T17:06:00Z",
+          "content": "The fireworks started Sunday and continued a day later.\r\nThe Suns moved future Hall of Famer Kevin Durant in a blockbuster trade with the Rockets, and the Celtics sent Jrue Holiday to the Trail Blaze… [+12243 chars]"
         },
         {
           "source": {
             "id": "cnn",
             "name": "CNN"
           },
-          "author": "Kara Scannell",
-          "title": "Inside Sean ‘Diddy’ Combs’ all-star defense team - CNN",
-          "description": "Sean “Diddy” Combs has recruited an all-star defense team. Here’s what we know about Marc Agnifilo, Teny Geragos, and the six other lawyers representing Combs.",
-          "url": "https://www.cnn.com/2025/06/23/entertainment/sean-diddy-combs-defense-team",
-          "urlToImage": "https://media.cnn.com/api/v1/images/stellar/prod/puff-week5-thur3-20250622022859034.jpg?c=16x9&q=w_800,c_fill",
-          "publishedAt": "2025-06-23T10:00:00Z",
-          "content": "Nine attorneys five men and four women fill two tables in the courtroom for Sean Diddy Combs.\r\nSome are confrontational cross examiners, others take a softer approach to witnesses and a handful are f… [+9216 chars]"
+          "author": "Ivana Kottasová, Daria Tarasova-Markina, James Frater",
+          "title": "Russian attacks kill dozens of Ukrainians as Kyiv’s allies gather for a key NATO summit - CNN",
+          "description": "Russia killed dozens of Ukrainian civilians in less than 48 hours on Monday and Tuesday, according to Ukrainian officials, two of the deadliest days in many months.",
+          "url": "https://www.cnn.com/2025/06/24/europe/russian-attacks-ukraine-nato-summit-latam-intl",
+          "urlToImage": "https://media.cnn.com/api/v1/images/stellar/prod/c-2025-06-24t130357z-384679607-rc209fai6doi-rtrmadp-3-ukraine-crisis-attack-dnipro.jpg?c=16x9&q=w_800,c_fill",
+          "publishedAt": "2025-06-24T16:55:00Z",
+          "content": "Russia killed dozens of Ukrainian civilians in less than 48 hours on Monday and Tuesday, according to Ukrainian officials, two of the deadliest days in many months.\r\nA five-year-old boy and an 11-yea… [+4906 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "NBCSports.com"
+          },
+          "author": "Myles Simmons",
+          "title": "Aaron Rodgers: I’m pretty sure this is it - NBC Sports",
+          "description": "Rodgers said in a Tuesday interview on the Pat McAfee show that his career will likely come to an end after the 2025 season.",
+          "url": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/aaron-rodgers-im-pretty-sure-this-is-it",
+          "urlToImage": "https://nbcsports.brightspotcdn.com/dims4/default/dee6e1e/2147483647/strip/true/crop/3000x1688+0+0/resize/1440x810!/quality/90/?url=https%3A%2F%2Fnbc-sports-production-nbc-sports.s3.us-east-1.amazonaws.com%2Fbrightspot%2Fa4%2F29%2F9c3bcf684d2fb6c2f9ecf9e1c629%2Fhttps-delivery-gettyimages.com%2Fdownloads%2F2219834984",
+          "publishedAt": "2025-06-24T16:49:56Z",
+          "content": "Its going to be one last ride for Aaron Rodgers in 2025. \r\nIn a Tuesday interview with the Pat McAfee show, Rodgers revealed that hes likely to retire after spending the coming season with the Steele… [+1219 chars]"
+        },
+        {
+          "source": {
+            "id": "al-jazeera-english",
+            "name": "Al Jazeera English"
+          },
+          "author": "Al Jazeera Staff",
+          "title": "Iran’s Pezeshkian expresses ‘regret’ to the emir of Qatar - Al Jazeera",
+          "description": "Iranian president says neither Qatar nor its people were targets of attack on US base in the gas-rich Gulf nation.",
+          "url": "https://www.aljazeera.com/news/2025/6/24/irans-pezeshkian-expresses-regret-to-the-emir-of-qatar",
+          "urlToImage": "https://www.aljazeera.com/wp-content/uploads/2025/02/AFP__20250219__36Y474X__v1__HighRes__IranQatarPoliticsDiplomacy-1739977403.jpg?resize=1920%2C1440",
+          "publishedAt": "2025-06-24T16:46:43Z",
+          "content": "Iranian President Masoud Pezeshkian has expressed his regret to Qatars Emir Sheikh Tamim bin Hamad Al Thani over Tehrans missile attack on a US base on Monday.\r\nIn a phone call on Tuesday with the em… [+2949 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "KGO-TV"
+          },
+          "author": null,
+          "title": "Bay Area family among 8 victims identified in deadly Lake Tahoe capsizing during storm - ABC7 San Francisco",
+          "description": "San Francisco DoorDash executive Josh Pickles and his parents from Redwood City have been identified as three of eight people killed in a tragic boating accident on Lake Tahoe. All other victims have been identified.",
+          "url": "https://abc7news.com/post/deadly-lake-tahoe-boating-accident-bay-area-family-other-victims-identified-boat-killed-during-storm/16831434/",
+          "urlToImage": "https://cdn.abcotvs.com/dip/images/16831158_062325-kgo-tahoe-capsize-2-img.jpg?w=1600",
+          "publishedAt": "2025-06-24T16:30:00Z",
+          "content": "SAN FRANCISCO (KGO) -- A Bay Area family was among the eight killed in the Lake Tahoe boating accident, the El Dorado County Sheriff's Office Coroner's Division confirmed as they identified all victi… [+2427 chars]"
+        },
+        {
+          "source": {
+            "id": "the-verge",
+            "name": "The Verge"
+          },
+          "author": "Antonio G. Di Benedetto",
+          "title": "Nvidia’s RTX 5050 GPU starts at $249 with last-gen GDDR6 VRAM - The Verge",
+          "description": "Nvidia announced its GeForce RTX 5050 GPUs for desktops and laptops. The desktop cards start at $249 with 8GB of older GDDR6 VRAM, while laptops get newer GDDR7.",
+          "url": "https://www.theverge.com/news/692045/nvidia-geforce-rtx-5050-desktop-laptop-gpu-gddr6-gddr7",
+          "urlToImage": "https://platform.theverge.com/wp-content/uploads/sites/2/2025/06/geforce-rtx-5050-desktop-and-laptop.jpg?quality=90&strip=all&crop=0%2C0.13712291199202%2C100%2C99.725754176016&w=1200",
+          "publishedAt": "2025-06-24T15:45:49Z",
+          "content": "Laptops with RTX 5050 cards are also coming with 8GB of GDDR7.\r\nNvidia has announced GeForce RTX 5050 GPUs for both desktops and laptops with support for ray tracing and DLSS 4 with Multi Frame Gener… [+1976 chars]"
         },
         {
           "source": {
             "id": null,
             "name": "BBC News"
           },
-          "author": "Jessica Bradley",
-          "title": "Is an apple a day really good for your health? - BBC",
-          "description": "We're told an apple a day keeps the doctor away, but does this humble fruit really have an outsized positive effect on our health?",
-          "url": "https://www.bbc.com/future/article/20250620-is-an-apple-a-day-really-good-for-your-health",
-          "urlToImage": "https://ychef.files.bbci.co.uk/624x351/p0lkj9kr.jpg",
-          "publishedAt": "2025-06-23T09:01:47Z",
-          "content": "We're told an apple a day keeps the doctor away, but does this humble fruit really have an outsized positive effect on our health?\r\nThe world loves apples. Every year, almost 100 million tonnes of ap… [+9553 chars]"
+          "author": null,
+          "title": "Juliana Marins: Brazilian tourist who fell off Indonesian volcano found dead - BBC",
+          "description": "Juliana Marins survived the initial fall during an early morning hike along a trail on Mount Rinjani.",
+          "url": "https://www.bbc.com/news/articles/c939q6k1ewwo",
+          "urlToImage": "https://ichef.bbci.co.uk/news/1024/branded_news/986d/live/da9bd6a0-502a-11f0-bdf6-9d43c4322174.jpg",
+          "publishedAt": "2025-06-24T15:39:07Z",
+          "content": "Flora Drury &amp; Rachel Hagan\r\nA Brazilian tourist who fell while hiking near the crater of an active volcano in Indonesia has been found dead, her family and rescuers said.\r\nJuliana Marins survived… [+2602 chars]"
         },
         {
           "source": {
             "id": null,
-            "name": "CNBC"
+            "name": "Financial Times"
           },
-          "author": "Annika Kim Constantino",
-          "title": "Major U.S. health insurers say they will streamline controversial process for approving care - CNBC",
-          "description": "Insurers such as CVS and UnitedHealthcare will implement the changes across commercial, Medicare and Medicaid plans, benefiting 257 million Americans.",
-          "url": "https://www.cnbc.com/2025/06/23/prior-authorizations-us-insurers-to-change-approval-process.html",
-          "urlToImage": "https://image.cnbcfm.com/api/v1/image/107387028-1710350423351-gettyimages-1543156724-AFP_33PH3NQ.jpeg?v=1747268664&w=1920&h=1080",
-          "publishedAt": "2025-06-23T09:00:01Z",
-          "content": "Health plans under major U.S. insurers said Monday they have voluntarily agreed to speed up and reduce prior authorizations a process that is often a major pain point for patients and providers when … [+2000 chars]"
+          "author": "Myles McCormick, Demetri Sevastopulo",
+          "title": "Trump signals sanctions relief for China to buy Iran’s oil - Financial Times",
+          "description": "Potential policy U-turn comes hours after president declared peace in Middle East war",
+          "url": "https://www.ft.com/content/d86aa6fa-08d1-4a07-8184-92c8c6c53293",
+          "urlToImage": "https://www.ft.com/__origami/service/image/v2/images/raw/https%3A%2F%2Fd1e00ek4ebabms.cloudfront.net%2Fproduction%2F329c2edf-5237-44be-b3a2-1fd715b73a04.jpg?source=next-barrier-page",
+          "publishedAt": "2025-06-24T15:37:55Z",
+          "content": "Complete digital access to quality analysis and expert insights, complemented with our award-winning Weekend Print edition.\r\n<ul><li></li>Everything in Print<li></li>Weekday Print Edition<li></li>FT … [+202 chars]"
+        },
+        {
+          "source": {
+            "id": "nbc-news",
+            "name": "NBC News"
+          },
+          "author": "Minyvonne Burke, Austin Mullen",
+          "title": "'Cobra Kai' actor Martin Kove accused of biting costar Alicia Hannah-Kim, nearly drawing blood - NBC News",
+          "description": "“Cobra Kai” actor Martin Kove allegedly bit his co-star Alicia Hannah-Kim on the arm so hard he nearly drew blood, according to a police report.",
+          "url": "https://www.nbcnews.com/pop-culture/pop-culture-news/cobra-kai-actor-martin-kove-accused-biting-costar-alicia-hannah-kim-ne-rcna214731",
+          "urlToImage": "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2025-06/250624-martin-kove-alicia-hannah-kim-mn-1120-624ba6.jpg",
+          "publishedAt": "2025-06-24T15:37:11Z",
+          "content": "Cobra Kai actor Martin Kove allegedly bit his co-star Alicia Hannah-Kim on the arm so hard he nearly drew blood, according to a police report. \r\nHannah-Kim said they were at a VIP meet-and-greet Sund… [+1707 chars]"
         },
         {
           "source": {
             "id": null,
-            "name": "STAT"
+            "name": "MacRumors"
           },
-          "author": "William Pao",
-          "title": "The decades-long journey to Gilead’s twice-a-year HIV prevention drug lenacapavir - STAT",
-          "description": "Gilead’s twice-a-year HIV prevention drug lenacapavir is 30 years in the making. Here’s the story behind it.",
-          "url": "https://www.statnews.com/2025/06/23/fda-approval-lenacapavir-yeztugo-gilead-history-development-breakthrough-william-pao/",
-          "urlToImage": "https://www.statnews.com/wp-content/uploads/2025/06/AP24205636401239-1024x576.jpg",
-          "publishedAt": "2025-06-23T08:33:12Z",
-          "content": "On Thursday, the FDA approved lenacapavir, to be sold as Yeztugo, for the prevention of HIV in the U.S. The below essay, adapted from Breakthrough: The Quest for Life-Changing Medicine by William Pao… [+37025 chars]"
+          "author": "Joe Rossignol",
+          "title": "Here's Everything New in macOS Tahoe Beta 2 - MacRumors",
+          "description": "The second developer beta of macOS Tahoe is now available for testing, and it includes a handful of smaller new features and changes on the Mac.  ...",
+          "url": "https://www.macrumors.com/2025/06/24/macos-tahoe-beta-2-new-features-changes/",
+          "urlToImage": "https://images.macrumors.com/t/i2UaxYd6Fxox9ao16W5WNas3REY=/1600x/article-new/2025/06/macos-tahoe.jpg",
+          "publishedAt": "2025-06-24T15:35:17Z",
+          "content": "The second developer beta of macOS Tahoe is now available for testing, and it includes a handful of smaller new features and changes on the Mac.\r\nBelow, we recap everything new that has been found in… [+2201 chars]"
         },
         {
           "source": {
-            "id": "axios",
-            "name": "Axios"
+            "id": "nbc-news",
+            "name": "NBC News"
           },
-          "author": "Ina Fried",
-          "title": "Apple's AI software delays put pressure on hardware - Axios",
-          "description": "The company needs to deliver compelling hardware upgrades as consumers hold on to their phones longer.",
-          "url": "https://www.axios.com/2025/06/23/iphone-16-apple-ai-hardware",
-          "urlToImage": "https://images.axios.com/913x50CnGaWC0FUPnKOGLD4uS2Y=/0x0:1920x1080/1366x768/2025/06/23/1750639190090.jpg",
-          "publishedAt": "2025-06-23T08:18:14Z",
-          "content": "Driving the news: Apple previewed iOS 26, the software that will power the next iPhone at its June developer conference.\r\n<ul><li>The signature features will be mostly cosmetic and unlikely to drive … [+1985 chars]"
+          "author": "Lawrence Hurley, Gary Grumbach",
+          "title": "Trump administration accuses judge of 'unprecedented defiance' of Supreme Court in immigration dispute - NBC News",
+          "description": "A fight over the fate of six migrants the Trump administration wants to deport to South Sudan flared up again as the Justice Department accused a federal judge of \"unprecedented defiance\" of a Supreme Court decision the previous day.",
+          "url": "https://www.nbcnews.com/politics/supreme-court/trump-administration-accuses-judge-unprecedented-defiance-supreme-cour-rcna214735",
+          "urlToImage": "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2025-06/250624-trump-mb-1535-0a0453.jpg",
+          "publishedAt": "2025-06-24T15:05:50Z",
+          "content": "WASHINGTON A fight over the fate of a group of migrants the Trump administration wants to deport to South Sudan flared up again on Tuesday as the Justice Department accused a federal judge of \"unprec… [+2981 chars]"
         },
         {
           "source": {
             "id": null,
-            "name": "SpaceNews"
+            "name": "MassLive.com"
           },
-          "author": "Jeff Foust",
-          "title": "Isaacman interested in privately funded science missions - SpaceNews",
-          "description": "Former NASA administrator nominee Jared Isaacman says he is interested in pursuing some of the goals he had for the agency from outside it.",
-          "url": "http://spacenews.com/isaacman-interested-in-privately-funded-science-missions/",
-          "urlToImage": "https://spacenews.com/wp-content/uploads/2025/06/issacman2-isdc25.jpeg",
-          "publishedAt": "2025-06-23T07:47:22Z",
-          "content": "ORLANDO, Fla. Former NASA administrator nominee Jared Isaacman says he is interested in pursuing some of the goals he had for the agency from outside it.\r\nIsaacman received the National Space Society… [+4435 chars]"
+          "author": "Brian Robb | brobb@masslive.com",
+          "title": "Brad Stevens savvy tactic pays dividends with Anfernee Simons trade | Brian Robb - MassLive",
+          "description": "Brad Stevens made a big bet a year ago and it started to pay off for the Celtics on Monday night.",
+          "url": "https://www.masslive.com/celtics/2025/06/brad-stevens-savvy-tactic-pays-dividends-with-anfernee-simons-trade-brian-robb.html",
+          "urlToImage": "https://www.masslive.com/resizer/v2/JANPX4EPJBETNIUCVWR5UBDFUQ.jpg?auth=1762a4768c376f04eb9d1e3098db368b2aef67bf6470c92980b88eb2cde6cd6a&width=1280&quality=90",
+          "publishedAt": "2025-06-24T14:57:00Z",
+          "content": "This summer was always going to be an offseason of change for the Boston Celtics. Brad Stevens and Bostons front office made a strategic push for a title for the last two years, netting the franchise… [+3119 chars]"
+        },
+        {
+          "source": {
+            "id": null,
+            "name": "Gizmodo.com"
+          },
+          "author": "Ed Cara",
+          "title": "Ozempic Might Be a Dementia Buster, Too - Gizmodo",
+          "description": "Research out today is the latest to suggest that semaglutide can significantly lower people's risk of dementia.",
+          "url": "https://gizmodo.com/ozempic-might-be-a-dementia-buster-too-2000619463",
+          "urlToImage": "https://gizmodo.com/app/uploads/2025/06/Ozempic-1200x675.jpg",
+          "publishedAt": "2025-06-24T14:55:59Z",
+          "content": "Semaglutide, the active ingredient in popular weight loss drugs Ozempic and Wegovy, might also double as a brain booster. Research out today describes a link between semaglutide use and a reduced ris… [+3336 chars]"
         }
       ]
     },
-    "timestamp": 1750778401250
+    "timestamp": 1750879390231
   },
   "world-ca-en-general-all": {
     "data": {
@@ -274,7 +261,7 @@
       "totalResults": 0,
       "articles": []
     },
-    "timestamp": 1750778401331
+    "timestamp": 1750879390322
   },
   "world-gb-en-general-all": {
     "data": {
@@ -282,7 +269,7 @@
       "totalResults": 0,
       "articles": []
     },
-    "timestamp": 1750778401408
+    "timestamp": 1750879390416
   },
   "world-FR-en-general-all": {
     "data": {
