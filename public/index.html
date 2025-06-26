@@ -65,6 +65,17 @@
     <script src="https://cdn.jsdelivr.net/npm/yahoo-finance2@2.0.0/dist/yahooFinance.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     
+    <!-- Application Scripts -->
+    <script type="module" src="js/userPreferences.js"></script>
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/chat.js"></script>
+    <script type="module" src="js/finance.js"></script>
+    <script type="module" src="js/news.js"></script>
+    <script type="module" src="js/trends.js"></script>
+    <script type="module" src="js/reddit.js"></script>
+    <script type="module" src="js/summary.js"></script>
+    <script type="module" src="js/map.js"></script>
+    
     <!-- Google AdSense -->
     <meta name="google-adsense-account" content="ca-pub-4393237786045277">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4393237786045277" crossorigin="anonymous"></script>
@@ -725,16 +736,6 @@
             <p class="footer-disclaimer">The content provided on this website is for informational purposes only and does not constitute financial, investment, legal, or other professional advice. While we strive to provide accurate and up-to-date information, we make no guarantees about the completeness, reliability, or suitability of the content for any specific purpose.</p>
         </div>
     </footer>
-    <script type="module" src="js/userPreferences.js"></script>
-    <script type="module" src="js/app.js"></script>
-    <script type="module" src="js/chat.js"></script>
-    <script type="module" src="js/finance.js"></script>
-    <script type="module" src="js/news.js"></script>
-    <script type="module" src="js/trends.js"></script>
-    <script type="module" src="js/reddit.js"></script>
-    <script type="module" src="js/summary.js"></script>
-    <script type="module" src="js/map.js"></script>
-
     <script type="module">
         import { showNotification, toggleSection, showLocationModal, closeLocationModal } from './js/uiUtils.js';
         import { acceptCookies, declineCookies, resetCookieConsent, checkCookieConsent, showCookieBanner, hideCookieBanner, clearAllPreferences, updatePreferencesDisplay } from './js/userPreferences.js';
@@ -781,10 +782,10 @@
                     } catch (e) {
                         if (window.showNotification) {
                             window.showNotification('For best experience, rotate your device to landscape.', 4000);
-            } else {
+                        } else {
                             alert('For best experience, rotate your device to landscape.');
-            }
-        }
+                        }
+                    }
                 }
             });
         }
