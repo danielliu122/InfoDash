@@ -144,17 +144,52 @@ async function loadDailySummary(date = null) {
         const targetDate = date || new Date().toISOString().split('T')[0];
         console.log(`loadDailySummary: Loading summary for date: ${targetDate}`);
         console.log(`loadDailySummary: Using file path: ${SUMMARY_FILE}`);
+        console.log(`loadDailySummary: Current working directory: ${process.cwd()}`);
+        console.log(`loadDailySummary: __dirname: ${__dirname}`);
+        
+        // Check if file exists first
+        try {
+            await fs.access(SUMMARY_FILE);
+            console.log(`loadDailySummary: File exists at ${SUMMARY_FILE}`);
+        } catch (error) {
+            console.log(`loadDailySummary: File does not exist at ${SUMMARY_FILE}`);
+            console.log(`loadDailySummary: Error accessing file: ${error.message}`);
+            return null;
+        }
+        
+        // Check if data directory exists
+        const dataDir = path.join(__dirname, 'data');
+        try {
+            await fs.access(dataDir);
+            console.log(`loadDailySummary: Data directory exists at ${dataDir}`);
+            
+            // List files in data directory
+            const files = await fs.readdir(dataDir);
+            console.log(`loadDailySummary: Files in data directory: ${files.join(', ')}`);
+        } catch (error) {
+            console.log(`loadDailySummary: Data directory does not exist at ${dataDir}`);
+            console.log(`loadDailySummary: Error accessing data directory: ${error.message}`);
+        }
         
         const data = await fs.readFile(SUMMARY_FILE, 'utf8');
+        console.log(`loadDailySummary: File read successfully, size: ${data.length} characters`);
+        
         const summaries = JSON.parse(data);
+        console.log(`loadDailySummary: JSON parsed successfully`);
         console.log(`loadDailySummary: Found summaries for dates: ${Object.keys(summaries).join(', ')}`);
         
         const summary = summaries[targetDate] || null;
         console.log(`loadDailySummary: Summary found for ${targetDate}:`, !!summary);
+        
+        if (summary) {
+            console.log(`loadDailySummary: Summary data keys: ${Object.keys(summary).join(', ')}`);
+        }
+        
         return summary;
     } catch (error) {
         console.error('loadDailySummary: Error loading daily summary:', error);
         console.error('loadDailySummary: Error details:', error.message);
+        console.error('loadDailySummary: Error stack:', error.stack);
         return null;
     }
 }
@@ -750,15 +785,22 @@ app.get('/api/summary/daily', async (req, res) => {
         const { date } = req.query;
         const targetDate = date || new Date().toISOString().split('T')[0];
         
+        console.log(`/api/summary/daily: Request received for date: ${targetDate}`);
+        console.log(`/api/summary/daily: Query parameters:`, req.query);
+        
         const summary = await loadDailySummary(targetDate);
         
+        console.log(`/api/summary/daily: loadDailySummary returned:`, !!summary);
+        
         if (summary) {
+            console.log(`/api/summary/daily: Sending success response with summary data`);
             res.json({ 
                 success: true, 
                 summary,
                 date: targetDate
             });
         } else {
+            console.log(`/api/summary/daily: Sending failure response - no summary found`);
             res.json({ 
                 success: false, 
                 message: 'No summary found for the specified date',
@@ -766,7 +808,8 @@ app.get('/api/summary/daily', async (req, res) => {
             });
         }
     } catch (error) {
-        console.error('Error retrieving daily summary:', error);
+        console.error('/api/summary/daily: Error retrieving daily summary:', error);
+        console.error('/api/summary/daily: Error stack:', error.stack);
         res.status(500).json({ 
             success: false, 
             message: 'Server error while retrieving summary' 
