@@ -23,6 +23,9 @@ const fs = require('fs').promises;
 // News cache file path
 const NEWS_CACHE_FILE = path.join(__dirname, 'data', 'news-cache.json');
 
+// Summary file path
+const SUMMARY_FILE = path.join(__dirname, 'data', 'daily-summaries.json');
+
 // Function to load news cache from file
 async function loadNewsCache() {
     try {
@@ -87,7 +90,7 @@ function isMarketClosed() {
 async function saveDailySummary(summaryData, date) {
     try {
         console.log(`saveDailySummary: Saving summary for date: ${date}`);
-        const summaryFile = path.join(__dirname, 'data', 'daily-summaries.json');
+        console.log(`saveDailySummary: Using file path: ${SUMMARY_FILE}`);
         
         // Ensure data directory exists
         const dataDir = path.join(__dirname, 'data');
@@ -100,7 +103,7 @@ async function saveDailySummary(summaryData, date) {
         // Read existing summaries
         let summaries = {};
         try {
-            const existingData = await fs.readFile(summaryFile, 'utf8');
+            const existingData = await fs.readFile(SUMMARY_FILE, 'utf8');
             summaries = JSON.parse(existingData);
             console.log(`saveDailySummary: Loaded existing summaries for ${Object.keys(summaries).length} dates`);
         } catch (error) {
@@ -117,7 +120,7 @@ async function saveDailySummary(summaryData, date) {
         };
         
         // Save to file
-        await fs.writeFile(summaryFile, JSON.stringify(summaries, null, 2));
+        await fs.writeFile(SUMMARY_FILE, JSON.stringify(summaries, null, 2));
         console.log(`saveDailySummary: Successfully saved summary for ${date}`);
         
         // Update global variables if it's for today
@@ -140,9 +143,9 @@ async function loadDailySummary(date = null) {
     try {
         const targetDate = date || new Date().toISOString().split('T')[0];
         console.log(`loadDailySummary: Loading summary for date: ${targetDate}`);
-        const summaryFile = path.join(__dirname, 'data', 'daily-summaries.json');
+        console.log(`loadDailySummary: Using file path: ${SUMMARY_FILE}`);
         
-        const data = await fs.readFile(summaryFile, 'utf8');
+        const data = await fs.readFile(SUMMARY_FILE, 'utf8');
         const summaries = JSON.parse(data);
         console.log(`loadDailySummary: Found summaries for dates: ${Object.keys(summaries).join(', ')}`);
         
@@ -151,6 +154,7 @@ async function loadDailySummary(date = null) {
         return summary;
     } catch (error) {
         console.error('loadDailySummary: Error loading daily summary:', error);
+        console.error('loadDailySummary: Error details:', error.message);
         return null;
     }
 }
@@ -772,10 +776,10 @@ app.get('/api/summary/daily', async (req, res) => {
 
 app.get('/api/summary/history', async (req, res) => {
     try {
-        const summaryFile = path.join(__dirname, 'data', 'daily-summaries.json');
+        console.log(`summary/history: Using file path: ${SUMMARY_FILE}`);
         
         try {
-            const data = await fs.readFile(summaryFile, 'utf8');
+            const data = await fs.readFile(SUMMARY_FILE, 'utf8');
             const summaries = JSON.parse(data);
             
             // Convert to array format for easier frontend consumption
@@ -792,6 +796,7 @@ app.get('/api/summary/history', async (req, res) => {
             });
         } catch (error) {
             // File doesn't exist
+            console.log('summary/history: No summary file found, returning empty array');
             res.json({ 
                 success: true, 
                 summaries: []
