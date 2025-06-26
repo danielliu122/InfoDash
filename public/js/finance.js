@@ -698,7 +698,7 @@ export function updateFinance(data) {
                 <button class="zoom-button" id="zoomIn">+</button>
                 <button class="zoom-button" id="zoomOut">-</button>
                 <button class="zoom-button" id="resetZoom">↺</button>
-                <button class="fullscreenButton" id="fullscreenButton" disabled>⤢</button>
+                <button class="fullscreenButton" id="fullscreenButton" >⤢</button>
             </div>
             <canvas id="financeChart"></canvas>
             <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
@@ -730,14 +730,87 @@ export function updateFinance(data) {
     document.getElementById('zoomIn').addEventListener('click', () => window.financeChart.zoom(1.1));
     document.getElementById('zoomOut').addEventListener('click', () => window.financeChart.zoom(0.9));
     document.getElementById('resetZoom').addEventListener('click', resetChartZoom);
-    document.getElementById('fullscreenButton').addEventListener('click', () => {
-        const chartElement = document.getElementById('financeChart').parentElement;
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-        } else {
-            chartElement.requestFullscreen();
+    
+    // Improved fullscreen functionality with proper chart resizing
+    function handleFullscreen(event) {
+        const fullscreenButton = event.target.closest('#fullscreenButton');
+        if (!fullscreenButton) return;
+    
+        const chartContainer = fullscreenButton.closest('.chart-container');
+        if (!chartContainer) return;
+    
+        const canvas = chartContainer.querySelector('canvas');
+        if (!canvas) return;
+    
+        const existingData = window.financeChart?.data || {};
+        const ctx = canvas.getContext('2d');
+        
+        // Store the current timeframe when entering fullscreen
+        let currentTimeRange = DEFAULT_TIME_RANGE;
+        let currentInterval = DEFAULT_INTERVAL;
+        const activeButton = document.querySelector('.time-range-button.active');
+        if (activeButton) {
+            currentTimeRange = activeButton.getAttribute('data-time-range') || DEFAULT_TIME_RANGE;
+            currentInterval = activeButton.getAttribute('data-interval') || DEFAULT_INTERVAL;
         }
-    });
+    
+        if (!document.fullscreenElement) {
+            // Entering fullscreen
+            chartContainer.requestFullscreen().then(() => {
+                // Wait for the fullscreen state to be fully established
+                const checkFullscreen = () => {
+                    if (document.fullscreenElement === chartContainer) {
+                        // DOM is ready, now manipulate the chart
+                        setTimeout(() => {
+                            if (window.financeChart) window.financeChart.destroy();
+                            
+                            canvas.width = chartContainer.clientWidth;
+                            canvas.height = chartContainer.clientHeight;
+                            
+                            window.financeChart = initializeChart(ctx, {
+                                dates: existingData.labels || [],
+                                prices: existingData.datasets?.[0]?.data || [],
+                                symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
+                            }, false); // Disable maintainAspectRatio when entering fullscreen
+                            
+                            // Ensure chart is properly sized and coordinate system is recalculated
+                            if (window.financeChart) {
+                                window.financeChart.resize();
+                                window.financeChart.update('none'); // Force coordinate recalculation
+                            }
+                        }, 100);
+                    } else {
+                        // Still waiting for fullscreen to be established
+                        requestAnimationFrame(checkFullscreen);
+                    }
+                };
+                checkFullscreen();
+            });
+        } else {
+            // Exiting fullscreen
+            document.exitFullscreen().then(() => {
+                // Wait for the fullscreen state to be fully cleared
+                const checkNormalMode = () => {
+                    if (!document.fullscreenElement) {
+                        // DOM is ready, now trigger the active timeframe button's onclick event
+                        setTimeout(() => {
+                            // Find the currently active timeframe button and trigger its click event
+                            const activeButton = document.querySelector('.time-range-button.active');
+                            if (activeButton) {
+                                activeButton.click();
+                            }
+                        }, 200); // Increased delay to ensure chart is fully settled
+                    } else {
+                        // Still waiting for fullscreen to be cleared
+                        requestAnimationFrame(checkNormalMode);
+                    }
+                };
+                checkNormalMode();
+            });
+        }
+    }
+
+    document.body.addEventListener('click', handleFullscreen);
 
     const slider = document.getElementById('chartSlider');
     slider.addEventListener('input', function(e) {
@@ -884,12 +957,10 @@ document.getElementById('stockSymbolInput').addEventListener('change', (event) =
     startAutoRefresh();
 });
 
-
 // Function to get the current theme
 function getCurrentTheme() {
     return document.body.classList.contains('dark-theme') ? 'dark' : 'light';
 }
-
 
 export function togglePauseFinance() {
     const header = document.querySelector('.finance-header .controls');
@@ -951,7 +1022,7 @@ export async function handleFinanceUpdate(timeRange, interval) {
     }
 }
 
-function initializeChart(ctx, data) {
+function initializeChart(ctx, data, maintainAspectRatio = true) {
     const isMobile = isMobileDevice();
 
     // Check if it's a crypto symbol
@@ -1023,7 +1094,7 @@ function initializeChart(ctx, data) {
             },
             animation: false,
             responsive: false,
-            maintainAspectRatio: true,
+            maintainAspectRatio: maintainAspectRatio,
             backgroundColor: backgroundColor,
             scales: {
                 y: {
@@ -1248,7 +1319,7 @@ async function fetchStockHistoricalData(symbol) {
         }
         
         return null;
-            } catch (error) {
+    } catch (error) {
         console.error(`Error fetching historical data for ${symbol}:`, error);
         return null;
     }
@@ -1497,9 +1568,4 @@ export function handleMarketCloseTransition() {
         logger.info(`Market closed, switched from ${currentSymbol} to ${newSymbol}`);
     }
 }
-
-
-
-
-
 

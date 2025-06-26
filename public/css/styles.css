@@ -1105,3 +1105,10 @@ body.dark-theme .fullscreenButton:hover {
 #trends .card::-webkit-scrollbar {
   display: none;
 }
+
+/* For fullscreen mode */
+#finance .chart-container:fullscreen {
+    height: 100vh !important;
+    width: 100vw !important;
+    background: var(--background-color);
+}
