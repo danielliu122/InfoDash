@@ -744,6 +744,7 @@ export function updateFinance(data) {
     
         const existingData = window.financeChart?.data || {};
         const ctx = canvas.getContext('2d');
+        const isMobile = isMobileDevice();
         
         // Store the current timeframe when entering fullscreen
         let currentTimeRange = DEFAULT_TIME_RANGE;
@@ -764,8 +765,17 @@ export function updateFinance(data) {
                         setTimeout(() => {
                             if (window.financeChart) window.financeChart.destroy();
                             
-                            canvas.width = chartContainer.clientWidth;
-                            canvas.height = chartContainer.clientHeight;
+                            // Use dynamic viewport units for mobile
+                            if (isMobile) {
+                                // For mobile, use dynamic viewport units
+                                const mobileWidth = window.innerWidth || document.documentElement.clientWidth;
+                                const mobileHeight = window.innerHeight || document.documentElement.clientHeight;
+                                canvas.width = mobileWidth;
+                                canvas.height = mobileHeight;
+                            } else {
+                                canvas.width = chartContainer.clientWidth;
+                                canvas.height = chartContainer.clientHeight;
+                            }
                             
                             window.financeChart = initializeChart(ctx, {
                                 dates: existingData.labels || [],
@@ -792,12 +802,18 @@ export function updateFinance(data) {
                 // Wait for the fullscreen state to be fully cleared
                 const checkNormalMode = () => {
                     if (!document.fullscreenElement) {
-                        // DOM is ready, now trigger the active timeframe button's onclick event
+                        // DOM is ready, now trigger the 2-hour timeframe button specifically
                         setTimeout(() => {
-                            // Find the currently active timeframe button and trigger its click event
-                            const activeButton = document.querySelector('.time-range-button.active');
-                            if (activeButton) {
-                                activeButton.click();
+                            // Find and trigger the 2-hour button specifically
+                            const twoHourButton = document.getElementById('hourlyButton');
+                            if (twoHourButton) {
+                                twoHourButton.click();
+                            } else {
+                                // Fallback to active button if 2-hour button not found
+                                const activeButton = document.querySelector('.time-range-button.active');
+                                if (activeButton) {
+                                    activeButton.click();
+                                }
                             }
                         }, 200); // Increased delay to ensure chart is fully settled
                     } else {
@@ -1535,12 +1551,47 @@ if (typeof document !== 'undefined') {
           alert('For best experience, rotate your device to landscape.');
         }
       }
+      
+      // Add resize listener for mobile fullscreen
+      const handleMobileResize = () => {
+        if (document.fullscreenElement === chartContainer && window.financeChart) {
+          const canvas = chartContainer.querySelector('canvas');
+          if (canvas) {
+            // Get actual viewport dimensions
+            const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+            
+            // Set canvas size to match viewport
+            canvas.width = viewportWidth;
+            canvas.height = viewportHeight;
+            
+            // Resize and update chart
+            window.financeChart.resize();
+            window.financeChart.update('none');
+          }
+        }
+      };
+      
+      // Listen for resize events
+      window.addEventListener('resize', handleMobileResize);
+      window.addEventListener('orientationchange', handleMobileResize);
+      
+      // Store the handler for cleanup
+      chartContainer._mobileResizeHandler = handleMobileResize;
+      
     } else if (!document.fullscreenElement && isMobileDevice()) {
       // Optionally unlock orientation when exiting fullscreen
       if (screen.orientation && screen.orientation.unlock) {
         try {
           screen.orientation.unlock();
         } catch (e) {}
+      }
+      
+      // Remove resize listeners
+      if (chartContainer._mobileResizeHandler) {
+        window.removeEventListener('resize', chartContainer._mobileResizeHandler);
+        window.removeEventListener('orientationchange', chartContainer._mobileResizeHandler);
+        delete chartContainer._mobileResizeHandler;
       }
     }
   });
