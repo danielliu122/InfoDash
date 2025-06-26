@@ -15,6 +15,7 @@ let cryptoDashboardInterval = null; // Dedicated interval for crypto
 let previousStockData = {};
 let isDashboardPaused = false; // Track pause state
 const MAX_POINTS = 50;
+let userSelectedSymbol = false; // Track if user manually selected a symbol
 
 // Default watchlist with popular stocks and cryptocurrencies
 const DEFAULT_WATCHLIST = [
@@ -699,6 +700,7 @@ export function updateFinance(data) {
                 <button class="zoom-button" id="zoomOut">-</button>
                 <button class="zoom-button" id="resetZoom">↺</button>
                 <button class="fullscreenButton" id="fullscreenButton" >⤢</button>
+                <button class="pause-button" id="pause-finance-button" onclick="togglePauseFinance()">⏸</button>
             </div>
             <canvas id="financeChart"></canvas>
             <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
@@ -909,27 +911,62 @@ export async function updateFinanceData(symbol, timeRange = DEFAULT_TIME_RANGE, 
     }
 }
 
-// The auto-refresh loop now correctly calls for a refresh.
+// Update the event listener for stock symbol input
+// Set userSelectedSymbol to true when user changes input
+const stockSymbolInput = document.getElementById('stockSymbolInput');
+if (stockSymbolInput) {
+    stockSymbolInput.addEventListener('change', (event) => {
+        userSelectedSymbol = true;
+        const symbol = event.target.value.toUpperCase();
+        // ... existing code ...
+        // Get the currently active time range button
+        const activeButton = document.querySelector('.time-range-button.active') || document.getElementById('realtimeButton');
+        let timeRange = DEFAULT_TIME_RANGE;
+        let interval = DEFAULT_INTERVAL;
+        if (activeButton) {
+            timeRange = activeButton.getAttribute('data-time-range') || DEFAULT_TIME_RANGE;
+            interval = activeButton.getAttribute('data-interval') || DEFAULT_INTERVAL;
+        }
+        if (updateInterval) {
+            stopAutoRefresh();
+        }
+        startAutoRefresh();
+    });
+}
+
+// Update selectStock to set userSelectedSymbol to true
+export function selectStock(symbol) {
+    userSelectedSymbol = true;
+    document.getElementById('stockSymbolInput').value = symbol;
+    handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
+}
+
+// Update autocomplete click handler (if any) to set userSelectedSymbol = true
+// If you have a function for autocomplete selection, add:
+// userSelectedSymbol = true;
+
+// Update startAutoRefresh to respect pause and user selection
 export function startAutoRefresh() {
     stopAutoRefresh(); 
     if (!currentSymbol) return;
-
     const isCrypto = currentSymbol.endsWith('-USD');
-    
+    const pauseButton = document.getElementById('pause-finance-button');
+    if (pauseButton && pauseButton.classList.contains('paused')) {
+        return; // Do not start if paused
+    }
     // Only auto-refresh if the market is open OR if it's a cryptocurrency.
     if (isMarketOpen() || isCrypto) {
         updateInterval = setInterval(() => {
             // Check if market status has changed and we need to switch symbols
             const shouldSwitchToCrypto = !isMarketOpen() && !currentSymbol.endsWith('-USD');
-            
-            if (shouldSwitchToCrypto) {
-                // Market just closed, switch to BTC-USD
+            if (shouldSwitchToCrypto && !userSelectedSymbol) {
+                // Market just closed, switch to BTC-USD only if user hasn't selected a symbol
                 currentSymbol = 'BTC-USD';
                 const stockSymbolInput = document.getElementById('stockSymbolInput');
                 if (stockSymbolInput) {
                     stockSymbolInput.value = currentSymbol;
                 }
-                // Update the chart with the new symbol
+                userSelectedSymbol = false; // App is now in auto mode
                 updateFinanceData(currentSymbol, undefined, undefined, false);
             } else {
                 // Normal refresh - Pass `true` for the `isRefresh` flag to prevent full chart recreation
@@ -941,37 +978,39 @@ export function startAutoRefresh() {
     }
 }
 
-// Stop function now only needs to clear the main interval
-export function stopAutoRefresh() {
-    if (updateInterval) {
-        clearInterval(updateInterval);
-        updateInterval = null;
+// Update handleMarketCloseTransition to respect userSelectedSymbol
+export function handleMarketCloseTransition() {
+    const currentSymbol = document.getElementById('stockSymbolInput')?.value.toUpperCase();
+    // If we're currently showing a stock (not crypto) and market just closed
+    if (currentSymbol && !currentSymbol.endsWith('-USD') && !isMarketOpen() && !userSelectedSymbol) {
+        // Switch to BTC-USD only if user hasn't selected a symbol
+        const newSymbol = 'BTC-USD';
+        document.getElementById('stockSymbolInput').value = newSymbol;
+        userSelectedSymbol = false; // App is now in auto mode
+        updateFinanceData(newSymbol, DEFAULT_TIME_RANGE, DEFAULT_INTERVAL, false);
+        if (updateInterval) {
+            stopAutoRefresh();
+            startAutoRefresh();
+        }
+        logger.info(`Market closed, switched from ${currentSymbol} to ${newSymbol}`);
     }
 }
 
-// Update the event listener for stock symbol input
-document.getElementById('stockSymbolInput').addEventListener('change', (event) => {
-    const symbol = event.target.value.toUpperCase();
-    
-    // Get the currently active time range button
-    const activeButton = document.querySelector('.time-range-button.active') || document.getElementById('realtimeButton');
-    
-    // Use data attributes instead of parsing onclick
-    let timeRange = DEFAULT_TIME_RANGE;
-    let interval = DEFAULT_INTERVAL;
-    
-    if (activeButton) {
-        timeRange = activeButton.getAttribute('data-time-range') || DEFAULT_TIME_RANGE;
-        interval = activeButton.getAttribute('data-interval') || DEFAULT_INTERVAL;
-    }
-    
-    // Check if auto-refresh is already running
-    if (updateInterval) {
+// In handleFinanceUpdate, only start auto-refresh if not paused
+export async function handleFinanceUpdate(timeRange, interval) {
+    const symbolInput = document.getElementById('stockSymbolInput');
+    const symbol = symbolInput.value.toUpperCase() || currentSymbol;
+    try {
         stopAutoRefresh();
+        await updateFinanceData(symbol, timeRange, interval);
+        const pauseButton = document.getElementById('pause-finance-button');
+        if (!pauseButton || !pauseButton.classList.contains('paused')) {
+            startAutoRefresh();
+        }
+    } catch (error) {
+        logger.error('Error in handleFinanceUpdate:', error);
     }
-    
-    startAutoRefresh();
-});
+}
 
 // Function to get the current theme
 function getCurrentTheme() {
@@ -979,22 +1018,14 @@ function getCurrentTheme() {
 }
 
 export function togglePauseFinance() {
-    const header = document.querySelector('.finance-header .controls');
     let button = document.getElementById('pause-finance-button');
-
-    if (!button) {
-        button = document.createElement('button');
-        button.id = 'pause-finance-button';
-        button.className = 'btn';
-        header.appendChild(button);
-    }
-
+    if (!button) return;
     const isPaused = button.classList.toggle('paused');
     if (isPaused) {
         button.textContent = 'Resume';
         stopAutoRefresh();
     } else {
-        button.textContent = 'Pause';
+        button.innerHTML = '⏸'; // Pause icon
         // When resuming, restart the auto-refresh loop
         startAutoRefresh();
     }
@@ -1015,28 +1046,6 @@ document.querySelectorAll('.time-range-button').forEach(button => {
         handleFinanceUpdate(timeRange, interval);
     });
 });
-
-export async function handleFinanceUpdate(timeRange, interval) {
-    const symbolInput = document.getElementById('stockSymbolInput');
-    const symbol = symbolInput.value.toUpperCase() || currentSymbol;
-
-    try {
-        // Stop any ongoing updates first
-        stopAutoRefresh();
-
-        // Use the correct, consolidated update function
-        await updateFinanceData(symbol, timeRange, interval);
-
-        // Resume auto-refresh if the feature is not paused
-        const pauseButton = document.getElementById('pause-finance-button');
-        if (!pauseButton || !pauseButton.classList.contains('paused')) {
-             startAutoRefresh();
-        }
-
-    } catch (error) {
-        logger.error('Error in handleFinanceUpdate:', error);
-    }
-}
 
 function initializeChart(ctx, data, maintainAspectRatio = true) {
     const isMobile = isMobileDevice();
@@ -1515,12 +1524,6 @@ window.resetFinanceCardPositions = resetFinanceCardPositions;
 window.togglePauseFinance = togglePauseFinance;
 window.handleMarketCloseTransition = handleMarketCloseTransition;
 
-// Select stock for detailed view
-export function selectStock(symbol) {
-    document.getElementById('stockSymbolInput').value = symbol;
-    handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
-}
-
 // Utility: Detect if device is mobile
 function isMobileDevice() {
   return /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
@@ -1597,26 +1600,10 @@ if (typeof document !== 'undefined') {
   });
 }
 
-// Function to handle market close transition
-export function handleMarketCloseTransition() {
-    const currentSymbol = document.getElementById('stockSymbolInput')?.value.toUpperCase();
-    
-    // If we're currently showing a stock (not crypto) and market just closed
-    if (currentSymbol && !currentSymbol.endsWith('-USD') && !isMarketOpen()) {
-        // Switch to BTC-USD
-        const newSymbol = 'BTC-USD';
-        document.getElementById('stockSymbolInput').value = newSymbol;
-        
-        // Update the chart with the new symbol
-        updateFinanceData(newSymbol, DEFAULT_TIME_RANGE, DEFAULT_INTERVAL, false);
-        
-        // Restart auto-refresh with the new symbol
-        if (updateInterval) {
-            stopAutoRefresh();
-            startAutoRefresh();
-        }
-        
-        logger.info(`Market closed, switched from ${currentSymbol} to ${newSymbol}`);
+export function stopAutoRefresh() {
+    if (updateInterval) {
+        clearInterval(updateInterval);
+        updateInterval = null;
     }
 }
 

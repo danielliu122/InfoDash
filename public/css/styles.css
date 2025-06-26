@@ -538,17 +538,6 @@ body.dark-theme #autocomplete-list .autocomplete-suggestion:hover {
   max-height: 90vh;
     position: relative;
 }
-.card.chart-container::after {
-    content: '';
-    position: absolute;
-  right: 6px;
-  bottom: 6px;
-  width: 18px;
-  height: 18px;
-  background: url('data:image/svg+xml;utf8,<svg width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M2 16h14M4 14h10M6 12h6" stroke="%23666" stroke-width="2" fill="none"/></svg>') no-repeat center center;
-  opacity: 0.5;
-  pointer-events: none;
-}
 
 body.dark-theme .section::-webkit-scrollbar,
 body.dark-theme .summary-card::-webkit-scrollbar,
@@ -1229,5 +1218,57 @@ body.dark-theme .fullscreenButton:hover {
       height: calc(100vh - 80px) !important;
       max-height: calc(100vh - 80px) !important;
     }
+  }
+}
+
+.pause-button { 
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--button-bg) !important;
+  color: var(--primary-text) !important;
+  font-size: 12px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.pause-button:hover {
+  background: var(--button-hover-bg) !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+}
+
+.pause-button:active {
+  transform: scale(0.95) !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+}
+
+/* Dark theme adjustments */
+body.dark-theme .pause-button {
+  background: var(--button-bg) !important;
+  color: var(--primary-text) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+}
+
+body.dark-theme .pause-button:hover {
+  background: var(--button-hover-bg) !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .pause-button {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 10px !important;
   }
 }

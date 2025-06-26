@@ -83,12 +83,12 @@ export function togglePauseFinance() {
     if (pauseButton.classList.contains('paused')) {
         // Resume auto-refresh
         pauseButton.classList.remove('paused');
-        pauseButton.textContent = 'Pause';
+        pauseButton.textContent = '⏸';
         startAutoRefresh('^IXIC', '5m', '1m');
     } else {
         // Pause auto-refresh
         pauseButton.classList.add('paused');
-        pauseButton.textContent = 'Resume';
+        pauseButton.textContent = '▶';
         stopAutoRefresh();
     }
 }

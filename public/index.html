@@ -505,7 +505,7 @@
                             <button id="maxButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="max" data-interval="1mo">Max</button>
                         </div>
                         <div class="section-controls">
-                            <button class="btn-small waves-effect waves-light" onclick="resetFinanceCardPositions()" title="Reset card positions">
+                            <button class="btn-small waves-effect waves-light" onclick="resetFinanceCardPositions()" title="Reset card positions" style="display: none;">
                                 <i class="material-icons">grid_on</i> Reset Layout
                             </button>
                             <div class="section-toggle" onclick="toggleSection('finance-content')" title="Show/Hide Section">
@@ -529,7 +529,7 @@
                                     </div>
                                     <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
                                     <div class="chart-controls">
-                                        <button class="btn waves-effect waves-light pause-button" onclick="togglePauseFinance()">Pause</button>
+                                        <button class="btn waves-effect waves-light" onclick="togglePauseFinance()">Pause</button>
                                         <button class="btn-small waves-effect waves-light" onclick="resetChartZoom()">Reset Zoom</button>
                                     </div>
                                 </div>
@@ -628,7 +628,7 @@
                             <div class="input-field">
                                 <select id="model-select">
                                     <option value="deepseek/deepseek-r1:free">DeepSeek (Accurate) [10-60s response time]</option>
-                                    <option value="google/gemini-2.0-pro-exp-02-05:free">Google Gemini (Fast) [3-30s response time]</option>
+                                    <option value="google/gemini-2.0-flash-exp:free">Google Gemini (Fast) [3-30s response time]</option>
                                 </select>
                                 <label>Select Model</label>
                             </div>
