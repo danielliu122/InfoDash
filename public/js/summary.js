@@ -40,52 +40,86 @@ function getSelectedDate() {
 
 // Function to collect data from all sections
 async function collectSectionData() {
-    // console.log('Starting to collect section data...');
+    console.log('collectSectionData: Starting to collect section data...');
     
     const data = {
-        news: collectNewsData(),
-        trends: await collectTrendsData(),
-        finance: await collectFinanceData()
-        // Weather is excluded from saved data - will be fetched separately
+        news: null,
+        trends: null,
+        finance: null
     };
     
-    // console.log('Section data collection completed:', {
-    //     hasNews: !!data.news,
-    //     hasTrends: !!data.trends,
-    //     hasFinance: !!data.finance
-    // });
+    // Collect news data
+    console.log('collectSectionData: Collecting news data...');
+    data.news = collectNewsData();
+    console.log('collectSectionData: News data collected:', {
+        hasData: !!data.news,
+        count: data.news?.length || 0
+    });
     
-    // console.log('Collected section data:', data);
+    // Collect trends data
+    console.log('collectSectionData: Collecting trends data...');
+    data.trends = await collectTrendsData();
+    console.log('collectSectionData: Trends data collected:', {
+        hasData: !!data.trends,
+        count: data.trends?.length || 0
+    });
+    
+    // Collect finance data
+    console.log('collectSectionData: Collecting finance data...');
+    data.finance = await collectFinanceData();
+    console.log('collectSectionData: Finance data collected:', {
+        hasData: !!data.finance,
+        hasNasdaq: !!data.finance?.nasdaq,
+        techStocksCount: Object.keys(data.finance?.techStocks || {}).length,
+        cryptoCount: Object.keys(data.finance?.crypto || {}).length
+    });
+    
+    console.log('collectSectionData: Section data collection completed:', {
+        hasNews: !!data.news,
+        hasTrends: !!data.trends,
+        hasFinance: !!data.finance
+    });
+    
     return data;
 }
 
 // Function to collect news data
 function collectNewsData() {
-    // console.log('Collecting news data...');
+    console.log('collectNewsData: Starting news data collection...');
     const newsContainer = document.querySelector('#news .data-container');
-    // console.log('News container found:', !!newsContainer);
+    console.log('collectNewsData: News container found:', !!newsContainer);
     
     if (!newsContainer) {
-        // console.log('No news container found');
+        console.log('collectNewsData: No news container found');
         return null;
     }
     
     const newsItems = newsContainer.querySelectorAll('li');
-    // console.log('News items found:', newsItems.length);
+    console.log('collectNewsData: News items found:', newsItems.length);
     
     if (newsItems.length === 0) {
-        // console.log('No news items found');
+        console.log('collectNewsData: No news items found');
         return null;
     }
     
     const newsData = [];
     newsItems.forEach((item, index) => {
         if (index < 5) { // Limit to top 5 news items
-            const title = item.querySelector('h3')?.textContent?.trim();
+            // Try multiple selectors for title
+            const title = item.querySelector('h3')?.textContent?.trim() || 
+                         item.querySelector('h5')?.textContent?.trim() || 
+                         item.querySelector('.article-title')?.textContent?.trim() ||
+                         item.querySelector('h1, h2, h3, h4, h5, h6')?.textContent?.trim();
+            
             const description = item.querySelector('.article-text')?.textContent?.trim();
             const source = item.querySelector('.article-descriptor')?.textContent?.trim();
             
-            // console.log(`News item ${index}:`, { title, description: description?.substring(0, 50), source });
+            console.log(`collectNewsData: News item ${index}:`, { 
+                title: title?.substring(0, 50), 
+                hasDescription: !!description, 
+                hasSource: !!source,
+                titleFound: !!title
+            });
             
             if (title) {
                 newsData.push({
@@ -93,12 +127,17 @@ function collectNewsData() {
                     description: description || '',
                     source: source || ''
                 });
+            } else {
+                console.log(`collectNewsData: No title found for item ${index}, skipping`);
             }
         }
     });
     
-    // console.log('News data collected:', newsData.length, 'items');
-    // console.log('Processed news data:', newsData);
+    console.log('collectNewsData: News data collected:', {
+        totalItems: newsData.length,
+        items: newsData.map(item => item.title.substring(0, 30))
+    });
+    
     return newsData.length > 0 ? newsData : null;
 }
 
@@ -164,7 +203,7 @@ async function collectTrendsData() {
 
 // Function to collect finance data
 async function collectFinanceData() {
-    // console.log('Collecting finance data...');
+    console.log('collectFinanceData: Starting finance data collection...');
     
     const financeData = {
         nasdaq: null,
@@ -173,16 +212,90 @@ async function collectFinanceData() {
     };
     
     try {
+        // First, check if the finance dashboard has already loaded data
+        const dashboardContainer = document.getElementById('stock-dashboard');
+        const dashboardGrid = dashboardContainer?.querySelector('.stock-dashboard-grid');
+        const stockCards = dashboardGrid?.querySelectorAll('.stock-card');
+        
+        console.log('collectFinanceData: Dashboard check:', {
+            hasDashboard: !!dashboardContainer,
+            hasGrid: !!dashboardGrid,
+            stockCardsCount: stockCards?.length || 0
+        });
+        
+        // If dashboard has data, try to extract it first
+        if (stockCards && stockCards.length > 0) {
+            console.log('collectFinanceData: Using dashboard data');
+            
+            stockCards.forEach(card => {
+                const symbol = card.getAttribute('data-symbol');
+                if (!symbol) return;
+                
+                const priceElement = card.querySelector('.stock-price');
+                const changeElement = card.querySelector('.stock-change');
+                
+                if (priceElement && changeElement) {
+                    const priceText = priceElement.textContent.replace('$', '').replace(',', '');
+                    const changeText = changeElement.textContent;
+                    
+                    // Extract percentage change
+                    const changeMatch = changeText.match(/([+-]?\d+\.\d+)%/);
+                    const changePercent = changeMatch ? parseFloat(changeMatch[1]) : 0;
+                    
+                    // Determine if it's crypto or stock
+                    const isCrypto = symbol.endsWith('-USD');
+                    
+                    const stockData = {
+                        price: parseFloat(priceText) || 0,
+                        change: 0, // We don't have absolute change, only percentage
+                        changePercent: changePercent,
+                        timeframe: 'Current'
+                    };
+                    
+                    if (symbol === '^IXIC') {
+                        financeData.nasdaq = stockData;
+                        console.log('collectFinanceData: NASDAQ data from dashboard:', stockData);
+                    } else if (isCrypto) {
+                        financeData.crypto[symbol] = stockData;
+                        console.log(`collectFinanceData: ${symbol} data from dashboard:`, stockData);
+                    } else {
+                        financeData.techStocks[symbol] = stockData;
+                        console.log(`collectFinanceData: ${symbol} data from dashboard:`, stockData);
+                    }
+                }
+            });
+            
+            // If we got good data from dashboard, return it
+            const hasDashboardData = financeData.nasdaq || 
+                                   Object.keys(financeData.techStocks).length > 0 || 
+                                   Object.keys(financeData.crypto).length > 0;
+            
+            if (hasDashboardData) {
+                console.log('collectFinanceData: Using dashboard data, skipping API calls');
+                console.log('collectFinanceData: Dashboard data summary:', {
+                    hasNasdaq: !!financeData.nasdaq,
+                    techStocksCount: Object.keys(financeData.techStocks).length,
+                    cryptoCount: Object.keys(financeData.crypto).length,
+                    techStocks: Object.keys(financeData.techStocks),
+                    crypto: Object.keys(financeData.crypto)
+                });
+                return financeData;
+            }
+        }
+        
+        console.log('collectFinanceData: Dashboard data not available, making API calls...');
+        
+        // Fallback to API calls if dashboard data is not available
         // Fetch NASDAQ data
-        // console.log('Fetching NASDAQ data...');
+        console.log('collectFinanceData: Fetching NASDAQ data...');
         const nasdaqResponse = await fetch('/api/finance/^IXIC?range=1d&interval=1m');
         if (nasdaqResponse.ok) {
             const nasdaqData = await nasdaqResponse.json();
-            // console.log('NASDAQ data received');
+            console.log('collectFinanceData: NASDAQ data received');
             if (nasdaqData.chart && nasdaqData.chart.result && nasdaqData.chart.result[0]) {
                 const result = nasdaqData.chart.result[0];
                 const meta = result.meta;
-                // console.log('NASDAQ meta data processed');
+                console.log('collectFinanceData: NASDAQ meta data processed');
                 
                 // Calculate current day's open-to-close (or latest) change
                 const currentPrice = meta.regularMarketPrice;
@@ -213,17 +326,17 @@ async function collectFinanceData() {
                         timeframe: 'Since Previous Close'
                     };
                 }
-                // console.log('NASDAQ data collected');
+                console.log('collectFinanceData: NASDAQ data collected:', financeData.nasdaq);
             } else {
-                // console.log('NASDAQ data structure invalid');
+                console.log('collectFinanceData: NASDAQ data structure invalid');
             }
         } else {
-            // console.log('NASDAQ response not ok:', nasdaqResponse.status);
+            console.log('collectFinanceData: NASDAQ response not ok:', nasdaqResponse.status);
         }
         
         // Fetch tech stocks data
         const techStocks = ['META', 'AAPL', 'GOOGL', 'AMZN', 'TSLA'];
-        // console.log('Fetching tech stocks data...');
+        console.log('collectFinanceData: Fetching tech stocks data...');
         for (const symbol of techStocks) {
             try {
                 const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
@@ -260,16 +373,17 @@ async function collectFinanceData() {
                                 timeframe: 'Since Previous Close'
                             };
                         }
+                        console.log(`collectFinanceData: ${symbol} data collected`);
                     }
                 }
             } catch (error) {
-                // console.log(`Error fetching ${symbol} data:`, error);
+                console.log(`collectFinanceData: Error fetching ${symbol} data:`, error);
             }
         }
         
         // Fetch crypto data
         const cryptoStocks = ['BTC-USD', 'ETH-USD', 'SOL-USD', 'XRP-USD'];
-        // console.log('Fetching crypto data...');
+        console.log('collectFinanceData: Fetching crypto data...');
         for (const symbol of cryptoStocks) {
             try {
                 const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
@@ -306,23 +420,26 @@ async function collectFinanceData() {
                                 timeframe: 'Since Previous Close'
                             };
                         }
+                        console.log(`collectFinanceData: ${symbol} data collected`);
                     }
                 }
             } catch (error) {
-                // console.log(`Error fetching ${symbol} data:`, error);
+                console.log(`collectFinanceData: Error fetching ${symbol} data:`, error);
             }
         }
         
-        // console.log('Finance data collected:', {
-        //     hasNasdaq: !!financeData.nasdaq,
-        //     techStocksCount: Object.keys(financeData.techStocks).length,
-        //     cryptoCount: Object.keys(financeData.crypto).length
-        // });
+        console.log('collectFinanceData: Finance data collection completed:', {
+            hasNasdaq: !!financeData.nasdaq,
+            techStocksCount: Object.keys(financeData.techStocks).length,
+            cryptoCount: Object.keys(financeData.crypto).length,
+            techStocks: Object.keys(financeData.techStocks),
+            crypto: Object.keys(financeData.crypto)
+        });
         
         return financeData;
         
     } catch (error) {
-        console.error('Error collecting finance data:', error);
+        console.error('collectFinanceData: Error collecting finance data:', error);
         return null;
     }
 }
@@ -436,69 +553,65 @@ async function generateSummary(sectionData) {
 
 // Function to create analysis prompt
 function createAnalysisPrompt(sectionData) {
-    let prompt = 'Please analyze the following current data and provide a comprehensive summary:\n\n';
+    let prompt = 'Please analyze the following current data and provide a comprehensive summary:';
     const selectedDate = new Date(getSelectedDate() + 'T00:00:00'); // Use selected date to check for weekend
     const isWeekend = selectedDate.getDay() === 0 || selectedDate.getDay() === 6;
     
     if (sectionData.news && sectionData.news.length > 0) {
-        prompt += '📰 TOP HEADLINES:\n';
+        prompt += ' TOP HEADLINES:';
         sectionData.news.forEach((item, index) => {
-            prompt += `${index + 1}. ${item.title}\n`;
+            prompt += ` ${index + 1}. ${item.title}`;
             if (item.description) {
-                prompt += `   ${item.description.substring(0, 100)}...\n`;
+                prompt += ` ${item.description.substring(0, 100)}...`;
             }
         });
-        prompt += '\n';
     }
     
     if (sectionData.trends && sectionData.trends.length > 0) {
-        prompt += '🔥 TRENDING TOPICS:\n';
+        prompt += ' TRENDING TOPICS:';
         sectionData.trends.forEach((item, index) => {
-            prompt += `${index + 1}. ${item.title} ${item.traffic ? `(${item.traffic})` : ''}\n`;
+            prompt += ` ${index + 1}. ${item.title} ${item.traffic ? `(${item.traffic})` : ''}`;
         });
-        prompt += '\n';
     }
     
     if (sectionData.finance) {
-        prompt += '📈 MARKET DATA:\n';
+        prompt += ' MARKET DATA:';
         if (isWeekend) {
-            prompt += 'Stock markets are closed for the weekend. Here is the latest crypto data:\n';
+            prompt += ' Stock markets are closed for the weekend. Here is the latest crypto data:';
         }
 
         if (sectionData.finance.nasdaq && !isWeekend) {
             const timeframe = sectionData.finance.nasdaq.timeframe || 'Today';
-            prompt += `NASDAQ (^IXIC): $${sectionData.finance.nasdaq.price} (${sectionData.finance.nasdaq.changePercent}% ${timeframe})\n`;
+            prompt += ` NASDAQ (^IXIC): $${sectionData.finance.nasdaq.price} (${sectionData.finance.nasdaq.changePercent}% ${timeframe})`;
         }
         if (sectionData.finance.techStocks && !isWeekend) {
             Object.entries(sectionData.finance.techStocks).forEach(([symbol, data]) => {
                 const timeframe = data.timeframe || 'Today';
-                prompt += `${symbol}: $${data.price} (${data.changePercent}% ${timeframe})\n`;
+                prompt += ` ${symbol}: $${data.price} (${data.changePercent}% ${timeframe})`;
             });
         }
         if (sectionData.finance.crypto) {
             Object.entries(sectionData.finance.crypto).forEach(([symbol, data]) => {
                 const timeframe = data.timeframe || 'Today';
-                prompt += `${symbol}: $${data.price} (${data.changePercent}% ${timeframe})\n`;
+                prompt += ` ${symbol}: $${data.price} (${data.changePercent}% ${timeframe})`;
             });
         }
-        prompt += '\n';
     }
     
-    prompt += `Please provide a structured summary with the following sections. Use the exact headers shown (e.g., "NEWS HIGHLIGHTS:").
+    prompt += ' Please provide a structured summary with the following sections. Use the exact headers shown and format your response professionally with clear section breaks.';
 
-NEWS HIGHLIGHTS: Summarize the key news stories. Place each distinct story in its own paragraph for readability.
-TRENDING TOPICS: List the top trending topics. For each topic, use **Topic Name** followed by a concise, one-sentence explanation of its context. Place each topic in a separate paragraph.
-`;
+    prompt += ' NEWS HIGHLIGHTS: Summarize the key news stories. Place each distinct story in its own paragraph for readability. MAXIMUM 300 WORDS.';
+    prompt += ' TRENDING TOPICS: List the top trending topics. For each topic, use **Topic Name** followed by a concise, one-sentence explanation of its context. Place each topic in a separate paragraph. MAXIMUM 300 WORDS.';
 
     if (isWeekend) {
-        prompt += `MARKET OVERVIEW: Provide insights on cryptocurrency performance. Note that traditional stock markets are closed.
-KEY INSIGHTS: Overall analysis and what users should pay attention to.`;
+        prompt += ' MARKET OVERVIEW: Provide insights on cryptocurrency performance. Note that traditional stock markets are closed. MAXIMUM 300 WORDS.';
+        prompt += ' KEY INSIGHTS: Overall analysis and what users should pay attention to. MAXIMUM 300 WORDS.';
     } else {
-        prompt += `MARKET OVERVIEW: Provide insights on today's trading session including tech stocks and crypto performance.
-KEY INSIGHTS: Overall analysis and what users should pay attention to.`;
+        prompt += ' MARKET OVERVIEW: Provide insights on today\'s trading session including tech stocks and crypto performance. MAXIMUM 300 WORDS.';
+        prompt += ' KEY INSIGHTS: Overall analysis and what users should pay attention to. MAXIMUM 300 WORDS.';
     }
 
-    prompt += `Keep each section's summary concise (2-3 sentences) and focus on the most important information. Use a professional but accessible tone.`;
+    prompt += ' IMPORTANT: Format your response professionally with clear section headers (NEWS HIGHLIGHTS:, TRENDING TOPICS:, MARKET OVERVIEW:, KEY INSIGHTS:). Use proper paragraph breaks between sections and within sections. Keep each section concise and focused. Do not exceed 300 words per section. Use a professional but accessible tone.';
 
     return prompt;
 }
@@ -1095,13 +1208,67 @@ async function loadOrGenerateTodaySummary() {
         updateSummaryDisplayFromData(summary);
     } else {
         console.log('loadOrGenerateTodaySummary: No summary found, generating new one');
-        setSummaryLoadingText(`No summary found for today. Generating a new one...`);
+        setSummaryLoadingText(`No summary found for today. Waiting for data to load...`);
+        
+        // Wait longer for other sections to load their data
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        
+        // Check if we have data from other sections before proceeding
+        let retryCount = 0;
+        const maxRetries = 3;
+        let sectionData = null;
+        
+        while (retryCount < maxRetries) {
+            console.log(`loadOrGenerateTodaySummary: Attempt ${retryCount + 1} to collect section data`);
+            setSummaryLoadingText(`Collecting data from other sections... (attempt ${retryCount + 1}/${maxRetries})`);
+            
+            sectionData = await collectSectionData();
+            
+            // Check if we have sufficient data
+            const hasNews = sectionData.news && sectionData.news.length > 0;
+            const hasTrends = sectionData.trends && sectionData.trends.length > 0;
+            const hasFinance = sectionData.finance && (
+                sectionData.finance.nasdaq || 
+                Object.keys(sectionData.finance.techStocks).length > 0 || 
+                Object.keys(sectionData.finance.crypto).length > 0
+            );
+            
+            console.log('loadOrGenerateTodaySummary: Data check:', {
+                hasNews,
+                hasTrends,
+                hasFinance,
+                newsCount: sectionData.news?.length || 0,
+                trendsCount: sectionData.trends?.length || 0,
+                techStocksCount: Object.keys(sectionData.finance?.techStocks || {}).length,
+                cryptoCount: Object.keys(sectionData.finance?.crypto || {}).length
+            });
+            
+            // If we have at least 2 out of 3 data types, proceed
+            const dataTypesAvailable = [hasNews, hasTrends, hasFinance].filter(Boolean).length;
+            if (dataTypesAvailable >= 2) {
+                console.log(`loadOrGenerateTodaySummary: Sufficient data available (${dataTypesAvailable}/3 types)`);
+                break;
+            }
+            
+            retryCount++;
+            if (retryCount < maxRetries) {
+                console.log(`loadOrGenerateTodaySummary: Insufficient data, waiting 2 seconds before retry...`);
+                setSummaryLoadingText(`Waiting for more data to load... (attempt ${retryCount + 1}/${maxRetries})`);
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
+        
+        if (retryCount >= maxRetries) {
+            console.warn('loadOrGenerateTodaySummary: Max retries reached, proceeding with available data');
+        }
+        
+        setSummaryLoadingText(`Generating summary with available data...`);
         const timeoutPromise = new Promise((_, reject) => {
             setTimeout(() => reject(new Error('Summary generation timed out after 180 seconds')), 180000);
         });
+        
         try {
             const summaryPromise = (async () => {
-                const sectionData = await collectSectionData();
                 const summaryText = await generateSummary(sectionData);
                 if (summaryText && !summaryText.includes('Error:') && !summaryText.includes('Unable to generate')) {
                     updateSummaryDisplay(summaryText);
