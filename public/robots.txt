@@ -23,3 +23,6 @@ Sitemap: https://infodash.app/sitemap.xml
 # Additional sitemaps if you have them
 # Sitemap: https://infodash.app/news-sitemap.xml
 # Sitemap: https://infodash.app/finance-sitemap.xml
+
+# Canonical URL for privacy policy
+<link rel="canonical" href="https://infodash.app/privacy-policy.html">
