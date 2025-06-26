@@ -26,3 +26,6 @@ Sitemap: https://infodash.app/sitemap.xml
 
 # Canonical URL for privacy policy
 <link rel="canonical" href="https://infodash.app/privacy-policy.html">
+
+# Canonical URL for terms of service
+<link rel="canonical" href="https://infodash.app/terms-of-service.html">
