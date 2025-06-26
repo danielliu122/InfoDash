@@ -347,6 +347,12 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
 body.dark-theme, body.dark-theme section, body.dark-theme .summary-card, body.dark-theme .stock-card, body.dark-theme .news-item, body.dark-theme .trend-card, body.dark-theme .chart-container {
   color: #fff !important;
 }
+body.dark-theme .card.chart-container {
+  color: #fff !important;
+}
+body.dark-theme #finance .card.chart-container {
+  color: #fff !important;
+}
 body.dark-theme .stock-symbol, body.dark-theme .stock-name, body.dark-theme .stock-price, body.dark-theme .stock-change {
   color: #fff !important;
 }
