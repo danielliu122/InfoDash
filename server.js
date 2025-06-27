@@ -299,15 +299,18 @@ app.get('/api/news', async (req, res) => {
         
     } catch (error) {
         console.error('Error in news API:', error);
+        console.error('Error response status:', error.response?.status);
+        console.error('Error response data:', error.response?.data);
+        console.error('Error message:', error.message);
         
         // Check if it's a rate limit error
         if (error.response && error.response.status === 429) {
-            // console.log('News API rate limit reached, checking for cached data...');
+            console.log('News API rate limit reached, checking for cached data...');
             
             // Try to load any cached data, even if stale
             const fileCache = await loadNewsCache();
             if (fileCache[cacheKey]) {
-                // console.log(`Using stale cached data for: ${cacheKey}`);
+                console.log(`Using stale cached data for: ${cacheKey}`);
                 return res.json({
                     ...fileCache[cacheKey].data,
                     _cached: true,
@@ -315,6 +318,7 @@ app.get('/api/news', async (req, res) => {
                     _message: 'Rate limit reached, showing cached data'
                 });
             } else {
+                console.log('No cached data available for rate limited request');
                 return res.status(429).json({ 
                     error: 'News API rate limit reached and no cached data available',
                     message: 'Please try again later or upgrade your API plan'
@@ -324,17 +328,18 @@ app.get('/api/news', async (req, res) => {
         
         // Check if it's an API key error
         if (error.response && error.response.status === 401) {
-            // console.log('News API key error, checking for cached data...');
+            console.log('News API key error, checking for cached data...');
             
             const fileCache = await loadNewsCache();
             if (fileCache[cacheKey]) {
-                // console.log(`Using cached data due to API key error for: ${cacheKey}`);
+                console.log(`Using cached data due to API key error for: ${cacheKey}`);
                 return res.json({
                     ...fileCache[cacheKey].data,
                     _cached: true,
                     _message: 'API key error, showing cached data'
                 });
             } else {
+                console.log('No cached data available for API key error');
                 return res.status(401).json({ 
                     error: 'News API key error and no cached data available',
                     message: 'Please check your API key configuration'
@@ -886,6 +891,60 @@ app.get('/api/news/cache-status', async (req, res) => {
     } catch (error) {
         console.error('Error getting cache status:', error);
         res.status(500).json({ error: 'Error getting cache status' });
+    }
+});
+
+// Endpoint to test News API key status
+app.get('/api/news/test-key', async (req, res) => {
+    const newsApiKey = process.env.NEWS_API_KEY;
+    
+    if (!newsApiKey) {
+        return res.status(500).json({ 
+            error: 'News API key is not set in environment variables',
+            status: 'missing_key'
+        });
+    }
+    
+    try {
+        // Test with a simple request
+        const testUrl = `https://newsapi.org/v2/top-headlines?country=us&category=general&apiKey=${newsApiKey}`;
+        const response = await axios.get(testUrl);
+        
+        if (response.status === 200) {
+            res.json({ 
+                status: 'working',
+                message: 'News API key is working correctly',
+                articlesCount: response.data.articles?.length || 0
+            });
+        } else {
+            res.json({ 
+                status: 'error',
+                message: 'News API returned unexpected status',
+                statusCode: response.status
+            });
+        }
+    } catch (error) {
+        console.error('News API key test error:', error);
+        
+        if (error.response?.status === 401) {
+            res.status(401).json({ 
+                status: 'invalid_key',
+                message: 'News API key is invalid or expired',
+                error: error.response.data
+            });
+        } else if (error.response?.status === 429) {
+            res.status(429).json({ 
+                status: 'rate_limited',
+                message: 'News API rate limit reached',
+                error: error.response.data
+            });
+        } else {
+            res.status(500).json({ 
+                status: 'error',
+                message: 'Error testing News API key',
+                error: error.message
+            });
+        }
     }
 });
 

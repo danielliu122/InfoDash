@@ -17,7 +17,7 @@ import {
     DEFAULT_TIME_RANGE,
     DEFAULT_INTERVAL
 } from './finance.js';
-import { fetchNewsData, updateNews } from './news.js';
+import { fetchNewsData, updateNews, updateNewsModeIndicator } from './news.js';
 import { fetchTrendsData, updateTrends } from './trends.js'; // Import from trends.js
 import { fetchRedditData, updateReddit } from './reddit.js'; // Import from reddit.js
 import { refreshSummary, initializeSummarySection } from './summary.js'; // Import summary functionality
@@ -25,6 +25,8 @@ import { userPrefs } from './userPreferences.js'; // Import user preferences
 
 // Make functions globally available immediately for HTML onclick handlers
 window.handleButtonClick = async function(type, category, subCategory = 'all') {
+    console.log(`handleButtonClick: Called with type=${type}, category=${category}, subCategory=${subCategory}`);
+    
     const countrySelect = document.getElementById('countrySelect');
     const languageSelect = document.getElementById('languageSelect');
     const trendsCountrySelect = document.getElementById('trendsCountrySelect');
@@ -36,6 +38,7 @@ window.handleButtonClick = async function(type, category, subCategory = 'all') {
     if (type === 'news') {
         country = countrySelect ? countrySelect.value : 'us';
         language = languageSelect ? languageSelect.value : 'en';
+        console.log(`handleButtonClick: News request - country=${country}, language=${language}, category=${category}`);
     } else if (type === 'trends') {
         country = trendsCountrySelect ? trendsCountrySelect.value : 'US';
         language = trendsLanguageSelect ? trendsLanguageSelect.value : 'en';
@@ -44,8 +47,10 @@ window.handleButtonClick = async function(type, category, subCategory = 'all') {
     try {
         let data;
         if (type === 'news') {
+            console.log(`handleButtonClick: Fetching news data for category: ${category}`);
             // Fetch news data with the specified category
             data = await fetchNewsData(category, country, language);
+            console.log(`handleButtonClick: Received news data, articles count: ${data?.length || 0}`);
             updateNews(data);
         } else if (type === 'trends') {
             data = await fetchTrendsData(category, subCategory, language, country);
@@ -101,6 +106,9 @@ window.resetFinanceCardPositions = resetFinanceCardPositions;
 
 // Make resetToDefaultWatchlist globally available
 window.resetToDefaultWatchlist = resetToDefaultWatchlist;
+
+// Make updateNewsModeIndicator globally available
+window.updateNewsModeIndicator = updateNewsModeIndicator;
 
 // Export refreshNews function
 export async function refreshNews() {
@@ -205,6 +213,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize Materialize components
     M.AutoInit();
 
+    // Initialize the news mode indicator
+    updateNewsModeIndicator();
+
     const countrySelect = document.getElementById('countrySelect');
     const languageSelect = document.getElementById('languageSelect');
     const trendsCountrySelect = document.getElementById('trendsCountrySelect');
@@ -234,8 +245,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         userPrefs.saveCurrentState();
     });
     languageSelect.addEventListener('change', () => {
+        console.log(`Language changed to: ${languageSelect.value}`);
+        // Force refresh news data when language changes to ensure proper mode selection
         refreshNews();
         userPrefs.saveCurrentState();
+        
+        // Update the news mode indicator
+        updateNewsModeIndicator();
     });
 
     // Fetch and display world news 

@@ -9,18 +9,56 @@ const PRIORITY_COUNTRIES = ['us', 'ca', 'gb'];
 // Import user preferences
 import { userPrefs } from './userPreferences.js';
 
+// Helper function to determine news mode based on language
+function getNewsModeForLanguage(language) {
+    // News API top-headlines has limited language support
+    // Use "everything" mode for non-English languages
+    // This ensures better coverage and more articles for non-English content
+    return language === 'en' ? 'top-headlines' : 'everything';
+}
+
+// Function to update the news mode indicator
+export function updateNewsModeIndicator() {
+    const languageSelect = document.getElementById('languageSelect');
+    const modeStatus = document.getElementById('mode-status');
+    
+    if (languageSelect && modeStatus) {
+        const currentLanguage = languageSelect.value;
+        const mode = getNewsModeForLanguage(currentLanguage);
+        
+        if (mode === 'top-headlines') {
+            modeStatus.innerHTML = '📰 Mode: Top Headlines';
+            modeStatus.style.color = '#4CAF50';
+        } else {
+            modeStatus.innerHTML = '🌍 Mode: Everything (Better for non-English)';
+            modeStatus.style.color = '#FF9800';
+        }
+    }
+}
+
 export const fetchNewsData = async (query = 'world', country = 'us', language = 'en', forceRefresh = false, newsType = 'top-headlines') => {
+    console.log(`fetchNewsData: Called with query=${query}, country=${country}, language=${language}, newsType=${newsType}`);
+    
+    // Auto-switch to "everything" mode for non-English languages
+    // News API top-headlines has limited language support
+    const appropriateMode = getNewsModeForLanguage(language);
+    if (newsType === 'top-headlines' && appropriateMode === 'everything') {
+        console.log(`fetchNewsData: Non-English language detected (${language}), switching to "everything" mode`);
+        newsType = 'everything';
+    }
+    
     const cacheKey = `${query}-${country}-${language}-${newsType}`;
+    console.log(`fetchNewsData: Cache key: ${cacheKey}`);
 
     // Check if cache exists and remove expired data
     if (newsCache[cacheKey] && (Date.now() - newsCache[cacheKey].timestamp >= newsCache[cacheKey].ttl)) {
-        // console.log(`Cache expired for ${cacheKey}, clearing it...`);
+        console.log(`fetchNewsData: Cache expired for ${cacheKey}, clearing it...`);
         delete newsCache[cacheKey];
     }
 
     // Check if cached data is available and still valid
     if (newsCache[cacheKey]?.data?.length > 0 && (Date.now() - newsCache[cacheKey].timestamp < TTL_MS)) {
-        // console.log(`Using cached news data for: ${cacheKey}`);
+        console.log(`fetchNewsData: Using cached news data for: ${cacheKey}`);
         return newsCache[cacheKey].data;
     }
 
@@ -28,28 +66,46 @@ export const fetchNewsData = async (query = 'world', country = 'us', language = 
         let articles = [];
         
         if (newsType === 'top-headlines') {
+            console.log(`fetchNewsData: Fetching top headlines for category: ${query}`);
             // Fetch top headlines from priority countries
             for (const priorityCountry of PRIORITY_COUNTRIES) {
                 const headlinesUrl = `/api/news?query=${query}&country=${priorityCountry}&language=${language}&category=${query === 'world' ? 'general' : query}`;
+                console.log(`fetchNewsData: Making request to: ${headlinesUrl}`);
                 const headlinesResponse = await fetch(headlinesUrl);
+                console.log(`fetchNewsData: Response status: ${headlinesResponse.status}`);
                 if (headlinesResponse.ok) {
                     const headlinesData = await headlinesResponse.json();
+                    console.log(`fetchNewsData: Received data with ${headlinesData.articles?.length || 0} articles`);
                     if (headlinesData.articles) {
                         articles.push(...headlinesData.articles);
                     }
+                } else {
+                    console.error(`fetchNewsData: Request failed with status ${headlinesResponse.status}`);
+                    const errorText = await headlinesResponse.text();
+                    console.error(`fetchNewsData: Error response: ${errorText}`);
                 }
             }
         } else {
+            console.log(`fetchNewsData: Fetching everything for query: ${query}`);
             // Fetch from the everything API
             const everythingUrl = `/api/news?query=${query}&country=${country}&language=${language}`;
+            console.log(`fetchNewsData: Making request to: ${everythingUrl}`);
             const everythingResponse = await fetch(everythingUrl);
+            console.log(`fetchNewsData: Response status: ${everythingResponse.status}`);
             if (everythingResponse.ok) {
                 const everythingData = await everythingResponse.json();
+                console.log(`fetchNewsData: Received data with ${everythingData.articles?.length || 0} articles`);
                 if (everythingData.articles) {
                     articles.push(...everythingData.articles);
                 }
+            } else {
+                console.error(`fetchNewsData: Request failed with status ${everythingResponse.status}`);
+                const errorText = await everythingResponse.text();
+                console.error(`fetchNewsData: Error response: ${errorText}`);
             }
         }
+
+        console.log(`fetchNewsData: Total articles collected: ${articles.length}`);
 
         // Sort articles by date (newest first) and then by popularity
         const sortedArticles = articles.sort((a, b) => {
@@ -65,9 +121,10 @@ export const fetchNewsData = async (query = 'world', country = 'us', language = 
             ttl: TTL_MS,
         };
 
+        console.log(`fetchNewsData: Returning ${sortedArticles.length} articles`);
         return sortedArticles;
     } catch (error) {
-        console.error('Error fetching news data:', error);
+        console.error('fetchNewsData: Error fetching news data:', error);
         return [];
     }
 }
@@ -93,6 +150,11 @@ export function updateNews(data) {
     const isStale = data._stale;
     const cacheMessage = data._message;
     
+    // Check if we're using "Everything" mode for non-English languages
+    const languageSelect = document.getElementById('languageSelect');
+    const currentLanguage = languageSelect ? languageSelect.value : 'en';
+    const isNonEnglishMode = currentLanguage !== 'en';
+    
     if (isCached) {
         // Show cache status message
         const cacheDiv = document.createElement('div');
@@ -108,6 +170,14 @@ export function updateNews(data) {
         
         cacheDiv.innerHTML = `<strong>${message}</strong>`;
         container.appendChild(cacheDiv);
+    }
+    
+    // Show language mode indicator for non-English languages
+    if (isNonEnglishMode) {
+        const languageDiv = document.createElement('div');
+        languageDiv.style.cssText = 'background-color: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 15px; border-radius: 4px;';
+        languageDiv.innerHTML = `<strong>🌍 Language Mode: Using "Everything" search for ${currentLanguage.toUpperCase()} language (better coverage for non-English content)</strong>`;
+        container.appendChild(languageDiv);
     }
 
     // Use the original data and filter to ensure each article has an image and description

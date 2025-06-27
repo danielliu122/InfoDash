@@ -280,7 +280,7 @@
                                     
                                     <div class="news-category-group">
                                         <h6>💼 Business & Finance</h6>
-                                        <button id="financeNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'finance')">Finance</button>
+                                        <button id="businessNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'business')">Business</button>
                                         <button id="techNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'technology')">Technology</button>
                                     </div>
                                     
@@ -288,8 +288,8 @@
                                         <h6>🎉 Lifestyle & Events</h6>
                                         <button id="sportsNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'sports')">Sports</button>
                                         <button id="healthNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'health')">Health</button>
-                                        <button id="eventsNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'events')">Events</button>
-                                        <button id="otherNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'other')">Other</button>
+                                        <button id="entertainmentNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'entertainment')">Entertainment</button>
+                                        <button id="scienceNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'science')">Science</button>
                                     </div>
                                 </div>
                             </div>
@@ -408,6 +408,13 @@
                                         <option value="is">Íslenska</option>
                                     </select>
                                     <label for="languageSelect">Language</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col s12">
+                                    <div id="news-mode-indicator" style="text-align: center; margin: 10px 0; font-size: 0.9em; color: #666;">
+                                        <span id="mode-status">📰 Mode: Top Headlines</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="data-container"></div>
