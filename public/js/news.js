@@ -9,7 +9,7 @@ const PRIORITY_COUNTRIES = ['us', 'ca', 'gb'];
 // Import user preferences
 import { userPrefs } from './userPreferences.js';
 
-export const fetchNewsData = async (query = 'world', country = 'us', language = 'en', forceRefresh = false, newsType = 'everything') => {
+export const fetchNewsData = async (query = 'world', country = 'us', language = 'en', forceRefresh = false, newsType = 'top-headlines') => {
     const cacheKey = `${query}-${country}-${language}-${newsType}`;
 
     // Check if cache exists and remove expired data
