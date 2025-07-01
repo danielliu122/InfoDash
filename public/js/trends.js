@@ -44,22 +44,11 @@ async function refreshTrends() {
     const trendsCountrySelect = document.getElementById('trendsCountrySelect');
     const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
     const country = trendsCountrySelect.value;
-
-    // Update language options based on selected country
     updateLanguageOptions(country);
-
     const language = trendsLanguageSelect.value;
-
-    // Validate language for the selected country
-    if (!validLanguageCountryMap[country] || !validLanguageCountryMap[country].includes(language)) {
-        console.error(`Invalid language "${language}" for country "${country}".`);
-        return; // Exit the function to prevent further execution
-    }
-
     // Save preferences
     userPrefs.setTrendsCountry(country);
     userPrefs.setTrendsLanguage(language);
-
     try {
         const trendsData = await fetchTrendsData('daily', 'all', language, country);
         updateTrends(trendsData, 'daily');
@@ -71,20 +60,18 @@ async function refreshTrends() {
 // Function to update language options based on selected country
 function updateLanguageOptions(country) {
     const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
-    trendsLanguageSelect.innerHTML = ''; // Clear existing options
-
-    const languages = validLanguageCountryMap[country] || [];
+    trendsLanguageSelect.innerHTML = '';
+    // Always allow 'en' (English)
+    const languages = ['en'];
+    // Optionally, add a main language for the country (could be improved with a map)
+    // For now, just 'en'
     languages.forEach(lang => {
         const option = document.createElement('option');
         option.value = lang;
-        option.textContent = lang === 'en' ? 'English' : lang === 'fr' ? 'Français' : lang; // Display 'Français' for 'fr'
+        option.textContent = lang === 'en' ? 'English' : lang;
         trendsLanguageSelect.appendChild(option);
     });
-
-    // Optionally, set the first language as selected
-    if (languages.length > 0) {
-        trendsLanguageSelect.value = languages[0];
-    }
+    trendsLanguageSelect.value = 'en';
 }
 
 export const updateTrends = (data, category) => {
@@ -275,17 +262,3 @@ function createTopicElement(topic) {
 
 // Note: DOMContentLoaded event listener is handled in app.js
 // No need for duplicate event listeners here
-
-const validLanguageCountryMap = {
-    'US': ['en'],
-    'CA': ['en', 'fr'],
-    'GB': ['en'],
-    'AU': ['en'],
-    'DE': ['de', 'en'],
-    'FR': ['fr', 'en'],
-    'JP': ['ja', 'en'],
-    'TW': ['zh', 'en'],
-    'BR': ['pt', 'en'],
-    'ES': ['es', 'en'],
-    // Add more countries and their valid languages as needed
-}; 

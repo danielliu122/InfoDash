@@ -307,7 +307,7 @@
                             <div class="row">
                                 <div class="col s12">
                                     <div class="input-field col s12 m3">
-                                        <select id="dateRangeSelect" onchange="handleDateRangeChange()" disabled>
+                                        <select id="dateRangeSelect" onchange="handleDateRangeChange()" style="display: none;">
                                             <option value="24h">Last 24 hours</option>
                                             <option value="7d">Last week</option>
                                             <option value="30d">Last month</option>
@@ -319,7 +319,7 @@
                             </div>
                             <div id="news-controls" class="row">
                                 <div class="input-field col s6">
-                                    <select id="countrySelect">
+                                    <select id="countrySelect" disabled>
                                         <option value="All">All</option>
                                         <option value="US">United States</option>
                                         <option value="CA">Canada</option>
@@ -379,11 +379,11 @@
                                         <option value="de">Deutsch</option>
                                         <option value="ru">Русский</option>
                                         <option value="zh">中文</option>
-                                        <option value="ja">日本語</option>
+                                        <option value="jp">日本語</option>
                                         <option value="ko">한국어</option>
                                         <option value="pt">Português</option>
                                         <option value="ar">العربية</option>
-                                        <option value="hi">हिन्दी</option> <!-- Hindi -->
+                                        <option value="hi">हिन्दी</option>
                                         <option value="it">Italiano</option>
                                         <option value="nl">Nederlands</option>
                                         <option value="sv">Svenska</option>
