@@ -10,6 +10,7 @@ let summaryData = {
 };
 
 let summaryGenerated = false;
+let lastError = null;
 
 // Function to get a YYYY-MM-DD string from a Date object in local time
 function getLocalDateString(date = new Date()) {
@@ -40,7 +41,7 @@ function getSelectedDate() {
 
 // Function to collect data from all sections
 async function collectSectionData() {
-    console.log('collectSectionData: Starting to collect section data...');
+    //console.log('collectSectionData: Starting to collect section data...');
     
     const data = {
         news: null,
@@ -49,7 +50,7 @@ async function collectSectionData() {
     };
     
     // Collect news data
-    console.log('collectSectionData: Collecting news data...');
+    //console.log('collectSectionData: Collecting news data...');
     data.news = collectNewsData();
     console.log('collectSectionData: News data collected:', {
         hasData: !!data.news,
@@ -57,7 +58,7 @@ async function collectSectionData() {
     });
     
     // Collect trends data
-    console.log('collectSectionData: Collecting trends data...');
+    //console.log('collectSectionData: Collecting trends data...');
     data.trends = await collectTrendsData();
     console.log('collectSectionData: Trends data collected:', {
         hasData: !!data.trends,
@@ -65,7 +66,7 @@ async function collectSectionData() {
     });
     
     // Collect finance data
-    console.log('collectSectionData: Collecting finance data...');
+    //console.log('collectSectionData: Collecting finance data...');
     data.finance = await collectFinanceData();
     console.log('collectSectionData: Finance data collected:', {
         hasData: !!data.finance,
@@ -85,9 +86,9 @@ async function collectSectionData() {
 
 // Function to collect news data
 function collectNewsData() {
-    console.log('collectNewsData: Starting news data collection...');
+    //console.log('collectNewsData: Starting news data collection...');
     const newsContainer = document.querySelector('#news .data-container');
-    console.log('collectNewsData: News container found:', !!newsContainer);
+    //console.log('collectNewsData: News container found:', !!newsContainer);
     
     if (!newsContainer) {
         console.log('collectNewsData: No news container found');
@@ -95,7 +96,7 @@ function collectNewsData() {
     }
     
     const newsItems = newsContainer.querySelectorAll('li');
-    console.log('collectNewsData: News items found:', newsItems.length);
+    //console.log('collectNewsData: News items found:', newsItems.length);
     
     if (newsItems.length === 0) {
         console.log('collectNewsData: No news items found');
@@ -114,12 +115,12 @@ function collectNewsData() {
             const description = item.querySelector('.article-text')?.textContent?.trim();
             const source = item.querySelector('.article-descriptor')?.textContent?.trim();
             
-            console.log(`collectNewsData: News item ${index}:`, { 
-                title: title?.substring(0, 50), 
-                hasDescription: !!description, 
-                hasSource: !!source,
-                titleFound: !!title
-            });
+            // console.log(`collectNewsData: News item ${index}:`, { 
+            //     title: title?.substring(0, 50), 
+            //     hasDescription: !!description, 
+            //     hasSource: !!source,
+            //     titleFound: !!title
+            // });
             
             if (title) {
                 newsData.push({
@@ -133,10 +134,10 @@ function collectNewsData() {
         }
     });
     
-    console.log('collectNewsData: News data collected:', {
-        totalItems: newsData.length,
-        items: newsData.map(item => item.title.substring(0, 30))
-    });
+    // console.log('collectNewsData: News data collected:', {
+    //     totalItems: newsData.length,
+    //     items: newsData.map(item => item.title.substring(0, 30))
+    // });
     
     return newsData.length > 0 ? newsData : null;
 }
@@ -217,11 +218,11 @@ async function collectFinanceData() {
         const dashboardGrid = dashboardContainer?.querySelector('.stock-dashboard-grid');
         const stockCards = dashboardGrid?.querySelectorAll('.stock-card');
         
-        console.log('collectFinanceData: Dashboard check:', {
-            hasDashboard: !!dashboardContainer,
-            hasGrid: !!dashboardGrid,
-            stockCardsCount: stockCards?.length || 0
-        });
+        // console.log('collectFinanceData: Dashboard check:', {
+        //     hasDashboard: !!dashboardContainer,
+        //     hasGrid: !!dashboardGrid,
+        //     stockCardsCount: stockCards?.length || 0
+        // });
         
         // If dashboard has data, try to extract it first
         if (stockCards && stockCards.length > 0) {
@@ -254,13 +255,13 @@ async function collectFinanceData() {
                     
                     if (symbol === '^IXIC') {
                         financeData.nasdaq = stockData;
-                        console.log('collectFinanceData: NASDAQ data from dashboard:', stockData);
+                        //console.log('collectFinanceData: NASDAQ data from dashboard:', stockData);
                     } else if (isCrypto) {
                         financeData.crypto[symbol] = stockData;
-                        console.log(`collectFinanceData: ${symbol} data from dashboard:`, stockData);
+                        //console.log(`collectFinanceData: ${symbol} data from dashboard:`, stockData);
                     } else {
                         financeData.techStocks[symbol] = stockData;
-                        console.log(`collectFinanceData: ${symbol} data from dashboard:`, stockData);
+                        //console.log(`collectFinanceData: ${symbol} data from dashboard:`, stockData);
                     }
                 }
             });
@@ -271,14 +272,14 @@ async function collectFinanceData() {
                                    Object.keys(financeData.crypto).length > 0;
             
             if (hasDashboardData) {
-                console.log('collectFinanceData: Using dashboard data, skipping API calls');
-                console.log('collectFinanceData: Dashboard data summary:', {
-                    hasNasdaq: !!financeData.nasdaq,
-                    techStocksCount: Object.keys(financeData.techStocks).length,
-                    cryptoCount: Object.keys(financeData.crypto).length,
-                    techStocks: Object.keys(financeData.techStocks),
-                    crypto: Object.keys(financeData.crypto)
-                });
+                // //console.log('collectFinanceData: Using dashboard data, skipping API calls');
+                // console.log('collectFinanceData: Dashboard data summary:', {
+                //     hasNasdaq: !!financeData.nasdaq,
+                //     techStocksCount: Object.keys(financeData.techStocks).length,
+                //     cryptoCount: Object.keys(financeData.crypto).length,
+                //     techStocks: Object.keys(financeData.techStocks),
+                //     crypto: Object.keys(financeData.crypto)
+                // });
                 return financeData;
             }
         }
@@ -291,11 +292,11 @@ async function collectFinanceData() {
         const nasdaqResponse = await fetch('/api/finance/^IXIC?range=1d&interval=1m');
         if (nasdaqResponse.ok) {
             const nasdaqData = await nasdaqResponse.json();
-            console.log('collectFinanceData: NASDAQ data received');
+            //console.log('collectFinanceData: NASDAQ data received');
             if (nasdaqData.chart && nasdaqData.chart.result && nasdaqData.chart.result[0]) {
                 const result = nasdaqData.chart.result[0];
                 const meta = result.meta;
-                console.log('collectFinanceData: NASDAQ meta data processed');
+                //console.log('collectFinanceData: NASDAQ meta data processed');
                 
                 // Calculate current day's open-to-close (or latest) change
                 const currentPrice = meta.regularMarketPrice;
@@ -326,9 +327,9 @@ async function collectFinanceData() {
                         timeframe: 'Since Previous Close'
                     };
                 }
-                console.log('collectFinanceData: NASDAQ data collected:', financeData.nasdaq);
+                //console.log('collectFinanceData: NASDAQ data collected:', financeData.nasdaq);
             } else {
-                console.log('collectFinanceData: NASDAQ data structure invalid');
+                //console.log('collectFinanceData: NASDAQ data structure invalid');
             }
         } else {
             console.log('collectFinanceData: NASDAQ response not ok:', nasdaqResponse.status);
@@ -373,7 +374,7 @@ async function collectFinanceData() {
                                 timeframe: 'Since Previous Close'
                             };
                         }
-                        console.log(`collectFinanceData: ${symbol} data collected`);
+                        //console.log(`collectFinanceData: ${symbol} data collected`);
                     }
                 }
             } catch (error) {
@@ -383,7 +384,7 @@ async function collectFinanceData() {
         
         // Fetch crypto data
         const cryptoStocks = ['BTC-USD', 'ETH-USD', 'SOL-USD', 'XRP-USD'];
-        console.log('collectFinanceData: Fetching crypto data...');
+        //console.log('collectFinanceData: Fetching crypto data...');
         for (const symbol of cryptoStocks) {
             try {
                 const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
@@ -420,7 +421,7 @@ async function collectFinanceData() {
                                 timeframe: 'Since Previous Close'
                             };
                         }
-                        console.log(`collectFinanceData: ${symbol} data collected`);
+                        //console.log(`collectFinanceData: ${symbol} data collected`);
                     }
                 }
             } catch (error) {
@@ -428,13 +429,13 @@ async function collectFinanceData() {
             }
         }
         
-        console.log('collectFinanceData: Finance data collection completed:', {
-            hasNasdaq: !!financeData.nasdaq,
-            techStocksCount: Object.keys(financeData.techStocks).length,
-            cryptoCount: Object.keys(financeData.crypto).length,
-            techStocks: Object.keys(financeData.techStocks),
-            crypto: Object.keys(financeData.crypto)
-        });
+        // console.log('collectFinanceData: Finance data collection completed:', {
+        //     hasNasdaq: !!financeData.nasdaq,
+        //     techStocksCount: Object.keys(financeData.techStocks).length,
+        //     cryptoCount: Object.keys(financeData.crypto).length,
+        //     techStocks: Object.keys(financeData.techStocks),
+        //     crypto: Object.keys(financeData.crypto)
+        // });
         
         return financeData;
         
@@ -472,20 +473,20 @@ async function generateSummary(sectionData) {
     const maxRetries = 3;
     let retryCount = 0;
     
-    while (retryCount < maxRetries) {
+    while (retryCount < maxRetries && !summaryGenerated) {
         try {
-            // console.log('generateSummary: Starting AI generation...');
-            // console.log('Generating summary with data:', sectionData);
+            console.log('generateSummary: Starting AI generation...');
+            //console.log('Generating summary with data:', sectionData);
             
             const selectedModel = document.getElementById('model-select')?.value || 'deepseek/deepseek-chat-v3-0324:free';
-            // console.log('generateSummary: Using model:', selectedModel);
+            //console.log('generateSummary: Using model:', selectedModel);
             
             // Prepare the data for AI analysis
             const analysisPrompt = createAnalysisPrompt(sectionData);
-            // console.log('generateSummary: Analysis prompt created, length:', analysisPrompt.length);
-            // console.log('Analysis prompt:', analysisPrompt);
+            //console.log('generateSummary: Analysis prompt created, length:', analysisPrompt.length);
+            //console.log('Analysis prompt:', analysisPrompt);
             
-            // console.log('generateSummary: Making API call to /api/chat...');
+            console.log('generateSummary: Making API call to /api/chat...');
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {
@@ -517,8 +518,8 @@ async function generateSummary(sectionData) {
                 }),
             });
             
-            // console.log('generateSummary: API response received, status:', response.status);
-            // console.log('API response status:', response.status);
+            console.log('generateSummary: API response received, status:', response.status);
+            console.log('API response status:', response.status);
             
             if (!response.ok) {
                 console.error('generateSummary: API response not ok:', response.status, response.statusText);
@@ -547,15 +548,22 @@ async function generateSummary(sectionData) {
                 throw new Error(`HTTP error! status: ${response.status}${errorDetails ? ` - ${errorDetails}` : ''}`);
             }
             
-            // console.log('generateSummary: Parsing JSON response...');
+            //console.log('generateSummary: Parsing JSON response...');
             const data = await response.json();
-            // console.log('generateSummary: JSON parsed successfully');
-            // console.log('API response data:', data);
+            //console.log('generateSummary: JSON parsed successfully');
+            //console.log('API response data:', data);
             
             const result = data.reply || 'Unable to generate summary at this time.';
-            // console.log('generateSummary: Returning result, length:', result.length);
-            return result;
+            //console.log('generateSummary: Returning result, length:', result.length);
             
+            if (result && !result.includes('Error:') && !result.includes('Unable to generate')) {
+                updateSummaryDisplay(result);
+                await saveCurrentSummary();
+                await updateSavedSummariesList();
+                summaryGenerated = true;
+            } else {
+                updateSummaryDisplay(result);
+            }
         } catch (error) {
             console.error('generateSummary: Error in AI generation:', error);
             console.error('generateSummary: Error details:', {
@@ -568,11 +576,11 @@ async function generateSummary(sectionData) {
                 const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff: 2s, 4s, 8s
                 console.log(`generateSummary: Retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
                 await new Promise(resolve => setTimeout(resolve, delay));
-                continue;
             }
-            
-            return 'Error: Unable to generate summary. Please try again later.';
         }
+    }
+    if (!summaryGenerated) {
+        updateSummaryDisplay(lastError?.message || 'Error: Unable to generate summary after multiple attempts.');
     }
 }
 
@@ -594,6 +602,7 @@ function createAnalysisPrompt(sectionData) {
     
     if (sectionData.trends && sectionData.trends.length > 0) {
         prompt += ' TRENDING TOPICS:';
+        prompt += ' Group the top trending topics by category (such as Sports, Technology, Entertainment, or Other). Under each category, list the relevant trending topics. If you are unsure of a topic\'s category, place it under \'Other\'. Only use categories that are relevant for the current set of topics.';
         sectionData.trends.forEach((item, index) => {
             prompt += ` ${index + 1}. ${item.title} ${item.traffic ? `(${item.traffic})` : ''}`;
         });
@@ -626,7 +635,7 @@ function createAnalysisPrompt(sectionData) {
     prompt += ' Please provide a structured summary with the following sections. Use the exact headers shown and format your response professionally with clear section breaks.';
 
     prompt += ' NEWS HIGHLIGHTS: Summarize the key news stories. Place each distinct story in its own paragraph for readability. MAXIMUM 300 WORDS.';
-    prompt += ' TRENDING TOPICS: List the top trending topics. For each topic, use **Topic Name** followed by a concise, one-sentence explanation of its context. Place each topic in a separate paragraph. MAXIMUM 300 WORDS.';
+    prompt += ' TRENDING TOPICS: Group the top trending topics by category (Sports, Technology, Entertainment, Other). For each category, list the topics. If a topic\'s category is unclear, place it under \'Other\'. MAXIMUM 300 WORDS.';
 
     if (isWeekend) {
         prompt += ' MARKET OVERVIEW: Provide insights on cryptocurrency performance. Note that traditional stock markets are closed. MAXIMUM 300 WORDS.';
@@ -645,7 +654,10 @@ function createAnalysisPrompt(sectionData) {
 async function displayCurrentWeather() {
     const location = userPrefs.getWeatherLocation();
     
-    const weatherSummaryContainer = document.querySelector('.weather-summary .summary-text');
+    // Wait 2 seconds to allow DOM to render weather-info structure
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const weatherSummaryContainer = document.querySelector('.weather-summary .weather-info');
     const preferencesWeatherContainer = document.getElementById('preferences-weather');
 
     if (!location) {
@@ -672,6 +684,16 @@ async function displayCurrentWeather() {
     
     try {
         const weatherData = await collectWeatherData();
+        
+        if (!weatherData) {
+            if (weatherSummaryContainer) {
+                weatherSummaryContainer.innerHTML = '<p>No weather data available.</p>';
+            }
+            if (preferencesWeatherContainer) {
+                preferencesWeatherContainer.innerHTML = '<p>No weather data available.</p>';
+            }
+            return;
+        }
         
         // Handle both old flat format and new nested format
         let current, locationData;
@@ -738,27 +760,19 @@ async function displayCurrentWeather() {
             second: '2-digit' 
         });
         
-        const weatherHtml = `
-            <div class="weather-info">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                    <h4>📍 ${locationDisplay}</h4>
-                    <div style="font-size: 0.8em; color: var(--text-secondary); text-align: right;">
-                        <div>🕐 Updated: ${timestamp}</div>
-                    </div>
-                </div>
-                <p><strong>${current.condition}</strong></p>
-                <p>Temperature: ${current.temperature}°${current.temperatureUnit}</p>
-                <p>Feels like: ${current.feelslike}°${current.temperatureUnit}</p>
-                <p>Humidity: ${current.humidity}%</p>
-                <p>Wind: ${wind} ${windUnit}</p>
-            </div>
-        `;
-        
+        // Update the weather-info card in summary
         if (weatherSummaryContainer) {
-            weatherSummaryContainer.innerHTML = weatherHtml;
+            weatherSummaryContainer.querySelector('.weather-location').innerHTML = `<h4>📍 ${locationDisplay}</h4>`;
+            weatherSummaryContainer.querySelector('.weather-updated').innerHTML = `<div style="font-size: 0.8em; color: var(--text-secondary); text-align: right;">🕐 Updated: ${timestamp}</div>`;
+            weatherSummaryContainer.querySelector('.weather-condition').textContent = current.condition;
+            weatherSummaryContainer.querySelector('.weather-temp').textContent = `Temperature: ${current.temperature}°${current.temperatureUnit}`;
+            weatherSummaryContainer.querySelector('.weather-feelslike').textContent = `Feels like: ${current.feelslike}°${current.temperatureUnit}`;
+            weatherSummaryContainer.querySelector('.weather-humidity').textContent = `Humidity: ${current.humidity}%`;
+            weatherSummaryContainer.querySelector('.weather-wind').textContent = `Wind: ${wind} ${windUnit}`;
         }
+        // For preferences section, just show a simple summary
         if (preferencesWeatherContainer) {
-            preferencesWeatherContainer.innerHTML = weatherHtml;
+            preferencesWeatherContainer.innerHTML = `<div><strong>${locationDisplay}</strong><br>${current.condition}, ${current.temperature}°${current.temperatureUnit}, Feels like: ${current.feelslike}°${current.temperatureUnit}, Humidity: ${current.humidity}%, Wind: ${wind} ${windUnit} <span style='font-size:0.8em;color:var(--text-secondary);'>🕐 ${timestamp}</span></div>`;
         }
     } catch (error) {
         console.error('Error displaying weather:', error);
@@ -838,37 +852,29 @@ function updateSummaryDisplay(summaryText) {
 function parseSummarySections(summaryText) {
     const sections = {};
     
-    // console.log('Parsing summary text:', summaryText);
-    
     // Extract news highlights - handle both markdown and plain text
     const newsMatch = summaryText.match(/(?:###\s*1\.\s*NEWS HIGHLIGHTS|NEWS HIGHLIGHTS:)(.*?)(?=###\s*2\.\s*TRENDING TOPICS|TRENDING TOPICS:|###\s*3\.\s*MARKET OVERVIEW|MARKET OVERVIEW:|###\s*4\.\s*KEY INSIGHTS|KEY INSIGHTS:|$)/s);
     if (newsMatch) {
         sections.news = newsMatch[1].trim();
-        // console.log('Extracted news section:', sections.news);
     }
     
     // Extract trending topics - handle both markdown and plain text
     const trendsMatch = summaryText.match(/(?:###\s*2\.\s*TRENDING TOPICS|TRENDING TOPICS:)(.*?)(?=###\s*3\.\s*MARKET OVERVIEW|MARKET OVERVIEW:|###\s*4\.\s*KEY INSIGHTS|KEY INSIGHTS:|$)/s);
     if (trendsMatch) {
         sections.trends = trendsMatch[1].trim();
-        // console.log('Extracted trends section:', sections.trends);
     }
     
     // Extract market overview - handle both markdown and plain text
     const financeMatch = summaryText.match(/(?:###\s*3\.\s*MARKET OVERVIEW|MARKET OVERVIEW:)(.*?)(?=###\s*4\.\s*KEY INSIGHTS|KEY INSIGHTS:|$)/s);
     if (financeMatch) {
         sections.finance = financeMatch[1].trim();
-        // console.log('Extracted finance section:', sections.finance);
     }
     
     // Extract key insights - handle both markdown and plain text
     const insightsMatch = summaryText.match(/(?:###\s*4\.\s*KEY INSIGHTS|KEY INSIGHTS:)(.*?)$/s);
     if (insightsMatch) {
         sections.insights = insightsMatch[1].trim();
-        // console.log('Extracted insights section:', sections.insights);
     }
-    
-    // console.log('Final parsed sections:', sections);
     return sections;
 }
 
@@ -966,12 +972,12 @@ export async function saveCurrentSummary() {
         const financeSummary = document.querySelector('.finance-summary .summary-text')?.innerHTML || '';
         const overallSummary = document.querySelector('.overall-summary .summary-text')?.innerHTML || '';
         
-        console.log('saveCurrentSummary: Summary content lengths:', {
-            news: newsSummary.length,
-            trends: trendsSummary.length,
-            finance: financeSummary.length,
-            overall: overallSummary.length
-        });
+        // console.log('saveCurrentSummary: Summary content lengths:', {
+        //     news: newsSummary.length,
+        //     trends: trendsSummary.length,
+        //     finance: financeSummary.length,
+        //     overall: overallSummary.length
+        // });
         
         if (!newsSummary && !trendsSummary && !financeSummary && !overallSummary) {
             console.warn('saveCurrentSummary: No summary data available to save');
@@ -988,7 +994,7 @@ export async function saveCurrentSummary() {
             // Weather is excluded from saved data - will be fetched fresh each time
         };
         
-        console.log('saveCurrentSummary: Sending data to server...');
+        //console.log('saveCurrentSummary: Sending data to server...');
         const response = await fetch('/api/summary/save', {
             method: 'POST',
             headers: {
@@ -997,7 +1003,7 @@ export async function saveCurrentSummary() {
             body: JSON.stringify(summaryData),
         });
         
-        console.log('saveCurrentSummary: Server response status:', response.status);
+        //console.log('saveCurrentSummary: Server response status:', response.status);
         
         if (response.ok) {
             const result = await response.json();
@@ -1019,11 +1025,11 @@ export async function saveCurrentSummary() {
 async function loadDailySummary(date = null) {
     try {
         const url = date ? `/api/summary/daily?date=${date}` : '/api/summary/daily';
-        console.log('loadDailySummary: Fetching from URL:', url);
+        //console.log('loadDailySummary: Fetching from URL:', url);
         const response = await fetch(url);
-        console.log('loadDailySummary: Response status:', response.status);
+        //console.log('loadDailySummary: Response status:', response.status);
         const result = await response.json();
-        console.log('loadDailySummary: Response result:', result);
+        //console.log('loadDailySummary: Response result:', result);
         
         if (result.success) {
             console.log('loadDailySummary: Summary found and returned');
@@ -1216,6 +1222,26 @@ function markRefreshedToday() {
     localStorage.setItem('lastSummaryRefreshDate', today);
 }
 
+// Function to warm up the chat endpoint before generating the summary
+async function warmUpChatEndpoint() {
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                messages: [{ role: 'user', content: 'ping' }],
+                model: document.getElementById('model-select')?.value || 'deepseek/deepseek-chat-v3-0324:free'
+            })
+        });
+        // Optionally check response.ok, but ignore errors
+        if (!response.ok) {
+            console.warn('warmUpChatEndpoint: Non-OK response', response.status);
+        }
+    } catch (e) {
+        console.warn('warmUpChatEndpoint: Error warming up chat endpoint', e);
+    }
+}
+
 // This function will now orchestrate the entire summary section's initial state
 async function loadOrGenerateTodaySummary() {
     const today = getLocalDateString();
@@ -1236,7 +1262,10 @@ async function loadOrGenerateTodaySummary() {
         setSummaryLoadingText(`No summary found for today. Waiting for data to load...`);
         
         // Wait longer for other sections to load their data
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        
+        // Warm up the chat endpoint before generating the summary
+        await warmUpChatEndpoint();
         
         // Check if we have data from other sections before proceeding
         let retryCount = 0;
@@ -1279,7 +1308,7 @@ async function loadOrGenerateTodaySummary() {
             if (retryCount < maxRetries) {
                 console.log(`loadOrGenerateTodaySummary: Insufficient data, waiting 2 seconds before retry...`);
                 setSummaryLoadingText(`Waiting for more data to load... (attempt ${retryCount + 1}/${maxRetries})`);
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                await new Promise(resolve => setTimeout(resolve, 5000));
             }
         }
         
@@ -1289,7 +1318,7 @@ async function loadOrGenerateTodaySummary() {
         
         setSummaryLoadingText(`Generating summary with available data...`);
         const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Summary generation timed out after 300 seconds')), 300000);
+            setTimeout(() => reject(new Error('Summary generation timed out after 120 seconds')), 120000);
         });
         
         try {
@@ -1305,7 +1334,7 @@ async function loadOrGenerateTodaySummary() {
             })();
             await Promise.race([summaryPromise, timeoutPromise]);
         } catch (error) {
-            console.error('Error auto-generating summary:', error);
+            // console.error('Error auto-generating summary:', error);
             if (error.message.includes('timed out')) {
                 updateSummaryDisplay('Error: Summary generation timed out after 5 minutes. Please try refreshing the page.');
             } else {
@@ -1320,7 +1349,7 @@ async function loadOrGenerateTodaySummary() {
 
 // Function to initialize the entire summary feature
 async function initializeSummarySection() {
-    // console.log('Initializing summary section...');
+    console.log('Initializing summary section...');
     
     // Set up event listeners
     const dateInput = document.getElementById('summaryDate');
@@ -1332,7 +1361,7 @@ async function initializeSummarySection() {
     }
     
     // Add a slight delay before loading or generating today's summary
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 3000));
     await loadOrGenerateTodaySummary();
     
     // Update saved summaries list
@@ -1344,7 +1373,7 @@ async function initializeSummarySection() {
     // Update refresh button status
     updateRefreshButtonStatus();
     
-    // console.log('Summary section initialized');
+    console.log('Summary section initialized');
 }
 
 // Function to refresh summary (generates new one and saves to server)
@@ -1359,8 +1388,10 @@ export async function refreshSummary() {
     summaryGenerated = false;
     setControlsDisabled(true);
     showSummaryLoading();
+    // Warm up the chat endpoint before generating the summary
+    //await warmUpChatEndpoint();
     const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Summary generation timed out after 300 seconds')), 300000);
+        setTimeout(() => reject(new Error('Summary generation timed out after 60 seconds')), 60000);
     });
     try {
         const summaryPromise = (async () => {
