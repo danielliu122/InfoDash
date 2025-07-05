@@ -551,18 +551,20 @@ async function generateSummary(sectionData) {
             //console.log('generateSummary: Parsing JSON response...');
             const data = await response.json();
             //console.log('generateSummary: JSON parsed successfully');
-            //console.log('API response data:', data);
+            console.log('API response data:', data);
             
             const result = data.reply || 'Unable to generate summary at this time.';
-            //console.log('generateSummary: Returning result, length:', result.length);
+            console.log('generateSummary: Returning result, length:', result.length);
             
             if (result && !result.includes('Error:') && !result.includes('Unable to generate')) {
-                updateSummaryDisplay(result);
+                await updateSummaryDisplay(result);
                 await saveCurrentSummary();
                 await updateSavedSummariesList();
                 summaryGenerated = true;
+                return result; // Return the result to the calling function
             } else {
-                updateSummaryDisplay(result);
+                await updateSummaryDisplay(result);
+                return result; // Return the result even if it's an error
             }
         } catch (error) {
             console.error('generateSummary: Error in AI generation:', error);
@@ -580,8 +582,11 @@ async function generateSummary(sectionData) {
         }
     }
     if (!summaryGenerated) {
-        updateSummaryDisplay(lastError?.message || 'Error: Unable to generate summary after multiple attempts.');
+        const errorMessage = lastError?.message || 'Error: Unable to generate summary after multiple attempts.';
+        await updateSummaryDisplay(errorMessage);
+        return errorMessage;
     }
+    return null; // Return null if no summary was generated
 }
 
 // Function to create analysis prompt
@@ -786,65 +791,89 @@ async function displayCurrentWeather() {
 }
 
 // Function to update summary display
-function updateSummaryDisplay(summaryText) {
-    // console.log('Updating summary display with:', summaryText);
+async function updateSummaryDisplay(summaryText) {
+    console.log('updateSummaryDisplay: Starting with summary text length:', summaryText?.length || 0);
+    
+    // Add a small delay to ensure DOM elements are ready
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
     // Debug: Check if summary elements exist
     const newsSummary = document.querySelector('.news-summary .summary-text');
     const trendsSummary = document.querySelector('.trends-summary .summary-text');
     const financeSummary = document.querySelector('.finance-summary .summary-text');
-    const weatherSummary = document.querySelector('.weather-summary .summary-text');
     const overallSummary = document.querySelector('.overall-summary .summary-text');
     const summaryContentDiv = document.querySelector('.summary-content');
     
-    // console.log('Summary elements found:', {
-    //     newsSummary: !!newsSummary,
-    //     trendsSummary: !!trendsSummary,
-    //     financeSummary: !!financeSummary,
-    //     weatherSummary: !!weatherSummary,
-    //     overallSummary: !!overallSummary,
-    //     summaryContentDiv: !!summaryContentDiv
-    // });
+    console.log('updateSummaryDisplay: Summary elements found:', {
+        newsSummary: !!newsSummary,
+        trendsSummary: !!trendsSummary,
+        financeSummary: !!financeSummary,
+        overallSummary: !!overallSummary,
+        summaryContentDiv: !!summaryContentDiv
+    });
     
     // Force the summary content to be visible
     if (summaryContentDiv) {
         summaryContentDiv.style.display = 'block';
         summaryContentDiv.classList.add('show');
-        // console.log('Forced summary content to be visible');
+        console.log('updateSummaryDisplay: Forced summary content to be visible');
     }
     
     if (!summaryText || summaryText === 'Error: Unable to generate summary. Please try again later.') {
+        console.log('updateSummaryDisplay: No valid summary text, showing error messages');
         // Update all summary text elements with error message
         if (newsSummary) newsSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
         if (trendsSummary) trendsSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
         if (financeSummary) financeSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
-        if (weatherSummary) weatherSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
         if (overallSummary) overallSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
         return;
     }
     
     // Parse the summary text and extract sections
     const sections = parseSummarySections(summaryText);
-    // console.log('Parsed sections:', sections);
+    console.log('updateSummaryDisplay: Parsed sections:', {
+        hasNews: !!sections.news,
+        hasTrends: !!sections.trends,
+        hasFinance: !!sections.finance,
+        hasInsights: !!sections.insights,
+        newsLength: sections.news?.length || 0,
+        trendsLength: sections.trends?.length || 0,
+        financeLength: sections.finance?.length || 0,
+        insightsLength: sections.insights?.length || 0
+    });
     
     // Update each section with specific selectors
     if (sections.news && newsSummary) {
         newsSummary.innerHTML = sections.news;
+        console.log('updateSummaryDisplay: Updated news summary');
+    } else {
+        console.warn('updateSummaryDisplay: Could not update news summary - missing section or element');
     }
     
     if (sections.trends && trendsSummary) {
         trendsSummary.innerHTML = sections.trends;
+        console.log('updateSummaryDisplay: Updated trends summary');
+    } else {
+        console.warn('updateSummaryDisplay: Could not update trends summary - missing section or element');
     }
     
     if (sections.finance && financeSummary) {
         financeSummary.innerHTML = sections.finance;
+        console.log('updateSummaryDisplay: Updated finance summary');
+    } else {
+        console.warn('updateSummaryDisplay: Could not update finance summary - missing section or element');
     }
     
     if (sections.insights && overallSummary) {
         overallSummary.innerHTML = sections.insights;
+        console.log('updateSummaryDisplay: Updated overall summary');
+    } else {
+        console.warn('updateSummaryDisplay: Could not update overall summary - missing section or element');
     }
     
-    // Fetch and display current weather separately
+    console.log('updateSummaryDisplay: Summary display update completed');
+    
+    // Fetch and display current weather separately (independent of summary generation)
     displayCurrentWeather();
 }
 
@@ -852,29 +881,51 @@ function updateSummaryDisplay(summaryText) {
 function parseSummarySections(summaryText) {
     const sections = {};
     
-    // Extract news highlights - handle both markdown and plain text
-    const newsMatch = summaryText.match(/(?:###\s*1\.\s*NEWS HIGHLIGHTS|NEWS HIGHLIGHTS:)(.*?)(?=###\s*2\.\s*TRENDING TOPICS|TRENDING TOPICS:|###\s*3\.\s*MARKET OVERVIEW|MARKET OVERVIEW:|###\s*4\.\s*KEY INSIGHTS|KEY INSIGHTS:|$)/s);
+    console.log('parseSummarySections: Parsing text:', summaryText.substring(0, 200) + '...');
+    
+    // Extract news highlights - handle markdown format with ** and --- separators
+    const newsMatch = summaryText.match(/(?:\*\*NEWS HIGHLIGHTS\*\*|NEWS HIGHLIGHTS:?)(.*?)(?=\*\*TRENDING TOPICS\*\*|TRENDING TOPICS:?|---)/s);
     if (newsMatch) {
         sections.news = newsMatch[1].trim();
+        console.log('parseSummarySections: Found news section, length:', sections.news.length);
+    } else {
+        console.warn('parseSummarySections: No news section found');
     }
     
-    // Extract trending topics - handle both markdown and plain text
-    const trendsMatch = summaryText.match(/(?:###\s*2\.\s*TRENDING TOPICS|TRENDING TOPICS:)(.*?)(?=###\s*3\.\s*MARKET OVERVIEW|MARKET OVERVIEW:|###\s*4\.\s*KEY INSIGHTS|KEY INSIGHTS:|$)/s);
+    // Extract trending topics - handle markdown format with ** and --- separators
+    const trendsMatch = summaryText.match(/(?:\*\*TRENDING TOPICS\*\*|TRENDING TOPICS:?)(.*?)(?=\*\*MARKET OVERVIEW\*\*|MARKET OVERVIEW:?|---)/s);
     if (trendsMatch) {
         sections.trends = trendsMatch[1].trim();
+        console.log('parseSummarySections: Found trends section, length:', sections.trends.length);
+    } else {
+        console.warn('parseSummarySections: No trends section found');
     }
     
-    // Extract market overview - handle both markdown and plain text
-    const financeMatch = summaryText.match(/(?:###\s*3\.\s*MARKET OVERVIEW|MARKET OVERVIEW:)(.*?)(?=###\s*4\.\s*KEY INSIGHTS|KEY INSIGHTS:|$)/s);
+    // Extract market overview - handle markdown format with ** and --- separators
+    const financeMatch = summaryText.match(/(?:\*\*MARKET OVERVIEW\*\*|MARKET OVERVIEW:?)(.*?)(?=\*\*KEY INSIGHTS\*\*|KEY INSIGHTS:?|---)/s);
     if (financeMatch) {
         sections.finance = financeMatch[1].trim();
+        console.log('parseSummarySections: Found finance section, length:', sections.finance.length);
+    } else {
+        console.warn('parseSummarySections: No finance section found');
     }
     
-    // Extract key insights - handle both markdown and plain text
-    const insightsMatch = summaryText.match(/(?:###\s*4\.\s*KEY INSIGHTS|KEY INSIGHTS:)(.*?)$/s);
+    // Extract key insights - handle markdown format with **
+    const insightsMatch = summaryText.match(/(?:\*\*KEY INSIGHTS\*\*|KEY INSIGHTS:?)(.*?)$/s);
     if (insightsMatch) {
         sections.insights = insightsMatch[1].trim();
+        console.log('parseSummarySections: Found insights section, length:', sections.insights.length);
+    } else {
+        console.warn('parseSummarySections: No insights section found');
     }
+    
+    console.log('parseSummarySections: Final sections:', {
+        hasNews: !!sections.news,
+        hasTrends: !!sections.trends,
+        hasFinance: !!sections.finance,
+        hasInsights: !!sections.insights
+    });
+    
     return sections;
 }
 
@@ -1145,7 +1196,7 @@ export async function loadSummaryForDate() {
         updateSummaryDisplayFromData(summary);
     } else {
         // No summary exists for this date. Clear the display.
-        updateSummaryDisplay(null); 
+        await updateSummaryDisplay(null); 
         showNotification('No summary found for the selected date.');
     }
     
@@ -1168,7 +1219,7 @@ function displayHistoricalSummary(summary) {
     if (financeSummary) financeSummary.innerHTML = summary.finance || '<p>No finance data available</p>';
     if (overallSummary) overallSummary.innerHTML = summary.overall || '<p>No overall insights available</p>';
     
-    // Fetch and display current weather (not historical)
+    // Fetch and display current weather (independent of historical summary)
     displayCurrentWeather();
 }
 
@@ -1189,7 +1240,7 @@ function updateSummaryDisplayFromData(summaryData) {
     if (financeSummary) financeSummary.innerHTML = summaryData.finance || '<p>No finance data available</p>';
     if (overallSummary) overallSummary.innerHTML = summaryData.overall || '<p>No overall insights available</p>';
     
-    // Fetch and display current weather separately
+    // Fetch and display current weather separately (independent of summary data)
     displayCurrentWeather();
 }
 
@@ -1325,20 +1376,20 @@ async function loadOrGenerateTodaySummary() {
             const summaryPromise = (async () => {
                 const summaryText = await generateSummary(sectionData);
                 if (summaryText && !summaryText.includes('Error:') && !summaryText.includes('Unable to generate')) {
-                    updateSummaryDisplay(summaryText);
+                    await updateSummaryDisplay(summaryText);
                     await saveCurrentSummary();
                     await updateSavedSummariesList();
                 } else {
-                    updateSummaryDisplay(summaryText);
+                    await updateSummaryDisplay(summaryText);
                 }
             })();
             await Promise.race([summaryPromise, timeoutPromise]);
         } catch (error) {
             // console.error('Error auto-generating summary:', error);
             if (error.message.includes('timed out')) {
-                updateSummaryDisplay('Error: Summary generation timed out after 5 minutes. Please try refreshing the page.');
+                await updateSummaryDisplay('Error: Summary generation timed out after 5 minutes. Please try refreshing the page.');
             } else {
-                updateSummaryDisplay('Error: Unable to automatically generate the daily summary.');
+                await updateSummaryDisplay('Error: Unable to automatically generate the daily summary.');
             }
         }
     }
@@ -1398,13 +1449,13 @@ export async function refreshSummary() {
             const sectionData = await collectSectionData();
             const summaryText = await generateSummary(sectionData);
             if (summaryText && !summaryText.includes('Error:') && !summaryText.includes('Unable to generate')) {
-                updateSummaryDisplay(summaryText);
+                await updateSummaryDisplay(summaryText);
                 await saveCurrentSummary();
                 await updateSavedSummariesList();
                 markRefreshedToday();
                 showNotification('Summary refreshed and saved successfully! Daily limit: 1 manual refresh per day.');
             } else {
-                updateSummaryDisplay(summaryText);
+                await updateSummaryDisplay(summaryText);
                 showNotification('Summary refreshed but could not be saved due to generation errors.');
             }
             setControlsDisabled(false);
