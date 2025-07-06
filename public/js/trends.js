@@ -44,11 +44,17 @@ async function refreshTrends() {
     const trendsCountrySelect = document.getElementById('trendsCountrySelect');
     const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
     const country = trendsCountrySelect.value;
+    
+    // Update language options based on the selected country
     updateLanguageOptions(country);
+    
+    // Get the language after updating options
     const language = trendsLanguageSelect.value;
+    
     // Save preferences
     userPrefs.setTrendsCountry(country);
     userPrefs.setTrendsLanguage(language);
+    
     try {
         const trendsData = await fetchTrendsData('daily', 'all', language, country);
         updateTrends(trendsData, 'daily');
@@ -61,17 +67,55 @@ async function refreshTrends() {
 function updateLanguageOptions(country) {
     const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
     trendsLanguageSelect.innerHTML = '';
-    // Always allow 'en' (English)
-    const languages = ['en'];
-    // Optionally, add a main language for the country (could be improved with a map)
-    // For now, just 'en'
+    
+    // Country to language mapping for trends
+    const countryLanguages = {
+        'US': ['en'], 'CA': ['en'], 'GB': ['en'], 'AU': ['en'], 'NZ': ['en'], 'IE': ['en'],
+        'ES': ['es', 'en'], 'MX': ['es', 'en'], 'AR': ['es', 'en'], 'CL': ['es', 'en'], 
+        'CO': ['es', 'en'], 'PE': ['es', 'en'],
+        'FR': ['fr', 'en'], 'DE': ['de', 'en'], 'AT': ['de', 'en'], 'CH': ['de', 'fr', 'en'],
+        'IT': ['it', 'en'], 'PT': ['pt', 'en'], 'BR': ['pt', 'en'], 'RU': ['ru', 'en'],
+        'JP': ['jp', 'en'], 'KR': ['ko', 'en'], 'CN': ['zh', 'en'], 'SA': ['ar', 'en'],
+        'IN': ['hi', 'en'], 'VN': ['vi', 'en'], 'TH': ['th', 'en'], 'ID': ['id', 'en'],
+        'TR': ['tr', 'en'], 'PL': ['pl', 'en'], 'NL': ['nl', 'en'], 'SE': ['sv', 'en'],
+        'NO': ['no', 'en'], 'FI': ['fi', 'en'], 'DK': ['da', 'en'], 'CZ': ['cs', 'en'],
+        'HU': ['hu', 'en'], 'GR': ['el', 'en'], 'RO': ['ro', 'en'], 'UA': ['uk', 'en'],
+        'IL': ['he', 'en'], 'IR': ['fa', 'en'], 'BD': ['bn', 'en'], 'NP': ['ne', 'en'],
+        'AZ': ['az', 'en'], 'GE': ['ka', 'en'], 'RS': ['sr', 'en'], 'MK': ['mk', 'en'],
+        'SI': ['sl', 'en'], 'SK': ['sk', 'en'], 'EE': ['et', 'en'], 'IS': ['is', 'en']
+    };
+    
+    // Language names mapping
+    const languageNames = {
+        'en': 'English', 'es': 'Español', 'fr': 'Français', 'de': 'Deutsch',
+        'ru': 'Русский', 'zh': '中文', 'jp': '日本語', 'ko': '한국어',
+        'pt': 'Português', 'ar': 'العربية', 'hi': 'हिन्दी', 'it': 'Italiano',
+        'nl': 'Nederlands', 'sv': 'Svenska', 'no': 'Norsk', 'fi': 'Suomi',
+        'da': 'Dansk', 'pl': 'Polski', 'cs': 'Čeština', 'hu': 'Magyar',
+        'el': 'Ελληνικά', 'tr': 'Türkçe', 'th': 'ไทย', 'vi': 'Tiếng Việt',
+        'id': 'Bahasa Indonesia', 'uk': 'Українська', 'fa': 'فارسی', 'bn': 'বাংলা',
+        'ne': 'नेपाली', 'az': 'Azərbaycan dili', 'ka': 'ქართული', 'ro': 'Română',
+        'sr': 'Српски', 'mk': 'Македонски', 'sl': 'Slovenščina', 'sk': 'Slovenčina',
+        'et': 'Eesti', 'is': 'Íslenska'
+    };
+    
+    // Get languages for the selected country, default to English if not found
+    const languages = countryLanguages[country] || ['en'];
+    
     languages.forEach(lang => {
         const option = document.createElement('option');
         option.value = lang;
-        option.textContent = lang === 'en' ? 'English' : lang;
+        option.textContent = languageNames[lang] || lang;
         trendsLanguageSelect.appendChild(option);
     });
-    trendsLanguageSelect.value = 'en';
+    
+    // Set default to first language (usually the primary language for the country)
+    trendsLanguageSelect.value = languages[0];
+    
+    // Trigger Materialize update if available
+    if (window.M && window.M.FormSelect) {
+        M.FormSelect.init(trendsLanguageSelect);
+    }
 }
 
 export const updateTrends = (data, category) => {
@@ -255,6 +299,63 @@ function createTopicElement(topic) {
     }
 
     return topicElement;
+}
+
+// Function to initialize trends section
+export function initializeTrends() {
+    console.log('Initializing trends section...');
+    
+    // Initialize language options based on current country
+    const trendsCountrySelect = document.getElementById('trendsCountrySelect');
+    if (trendsCountrySelect) {
+        const currentCountry = trendsCountrySelect.value || 'US';
+        updateLanguageOptions(currentCountry);
+    }
+    
+    // Load initial trends data
+    refreshTrends();
+}
+
+// Function to set trends region (called from geolocation.js)
+export function setTrendsRegion(language, country) {
+    console.log(`Setting trends region: ${language}-${country}`);
+    
+    const trendsCountrySelect = document.getElementById('trendsCountrySelect');
+    const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
+    
+    if (trendsCountrySelect) {
+        trendsCountrySelect.value = country;
+        // Trigger Materialize update
+        if (window.M && window.M.FormSelect) {
+            M.FormSelect.init(trendsCountrySelect);
+        }
+    }
+    
+    // Update language options and set the language
+    updateLanguageOptions(country);
+    
+    if (trendsLanguageSelect) {
+        // Find the language in the updated options
+        const options = trendsLanguageSelect.querySelectorAll('option');
+        for (let option of options) {
+            if (option.value === language) {
+                trendsLanguageSelect.value = language;
+                break;
+            }
+        }
+        // If language not found, use the first available option
+        if (!trendsLanguageSelect.value && options.length > 0) {
+            trendsLanguageSelect.value = options[0].value;
+        }
+        
+        // Trigger Materialize update
+        if (window.M && window.M.FormSelect) {
+            M.FormSelect.init(trendsLanguageSelect);
+        }
+    }
+    
+    // Refresh trends data with new region
+    refreshTrends();
 }
 
 // Remove the dailyTrendsButton event listener since the button no longer exists

@@ -1017,6 +1017,19 @@ export async function saveCurrentSummary() {
         const date = getSelectedDate();
         console.log('saveCurrentSummary: Date to save:', date);
         
+        // Get current region settings
+        const regionSelect = document.getElementById('summaryRegionSelect');
+        let language = 'en';
+        let country = 'US';
+        
+        if (regionSelect) {
+            const selectedOption = regionSelect.options[regionSelect.selectedIndex];
+            language = selectedOption.getAttribute('data-language');
+            country = selectedOption.getAttribute('data-country');
+        }
+        
+        console.log('saveCurrentSummary: Saving for region:', { language, country });
+        
         // Get current summary content
         const newsSummary = document.querySelector('.news-summary .summary-text')?.innerHTML || '';
         const trendsSummary = document.querySelector('.trends-summary .summary-text')?.innerHTML || '';
@@ -1041,7 +1054,9 @@ export async function saveCurrentSummary() {
             trends: trendsSummary,
             finance: financeSummary,
             overall: overallSummary,
-            date: date
+            date: date,
+            language: language,
+            country: country
             // Weather is excluded from saved data - will be fetched fresh each time
         };
         
@@ -1059,7 +1074,7 @@ export async function saveCurrentSummary() {
         if (response.ok) {
             const result = await response.json();
             console.log('saveCurrentSummary: Save successful:', result);
-            showNotification('Summary saved successfully!', 3000);
+            showNotification(`Summary saved successfully for ${country} (${language})!`, 3000);
             await updateSavedSummariesList(); // Refresh the archive list
         } else {
             const errorData = await response.json();
@@ -1073,14 +1088,19 @@ export async function saveCurrentSummary() {
 }
 
 // Function to load daily summary from server
-async function loadDailySummary(date = null) {
+async function loadDailySummary(date = null, language = 'en', country = 'US') {
     try {
-        const url = date ? `/api/summary/daily?date=${date}` : '/api/summary/daily';
-        //console.log('loadDailySummary: Fetching from URL:', url);
+        let url;
+        if (date) {
+            url = `/api/summary/daily?date=${date}&language=${language}&country=${country}`;
+        } else {
+            url = `/api/summary/daily?language=${language}&country=${country}`;
+        }
+        console.log('loadDailySummary: Fetching from URL:', url);
         const response = await fetch(url);
-        //console.log('loadDailySummary: Response status:', response.status);
+        console.log('loadDailySummary: Response status:', response.status);
         const result = await response.json();
-        //console.log('loadDailySummary: Response result:', result);
+        console.log('loadDailySummary: Response result:', result);
         
         if (result.success) {
             console.log('loadDailySummary: Summary found and returned');
@@ -1134,7 +1154,19 @@ async function updateSavedSummariesList() {
         item.dataset.date = summary.date;
         item.onclick = () => selectSummaryItem(summary.date);
         
+        // Validate date format before parsing
+        if (!summary.date || !/^\d{4}-\d{2}-\d{2}$/.test(summary.date)) {
+            console.warn(`updateSavedSummariesList: Invalid date format: ${summary.date}`);
+            return; // Skip this summary
+        }
+        
         const date = new Date(summary.date + 'T00:00:00'); // Treat date string as local, not UTC
+        
+        // Check if date is valid
+        if (isNaN(date.getTime())) {
+            console.warn(`updateSavedSummariesList: Invalid date: ${summary.date}`);
+            return; // Skip this summary
+        }
         
         const formattedDate = date.toLocaleDateString('en-US', { 
             weekday: 'short', 
@@ -1145,11 +1177,12 @@ async function updateSavedSummariesList() {
         
         const time = new Date(summary.timestamp).toLocaleTimeString();
         const marketStatus = summary.marketClosed ? '📈 Market Closed' : '📊 Trading Day';
+        const regionInfo = summary.language && summary.country ? ` (${summary.country}, ${summary.language})` : '';
         
         item.innerHTML = `
             <div>
                 <div class="saved-summary-date">${formattedDate}</div>
-                <div class="saved-summary-time">${time} - ${marketStatus}</div>
+                <div class="saved-summary-time">${time} - ${marketStatus}${regionInfo}</div>
             </div>
         `;
         
@@ -1173,31 +1206,63 @@ async function selectSummaryItem(date) {
     // Update date input
     document.getElementById('summaryDate').value = date;
     
-    // Load and display the selected summary
-    const summary = await loadDailySummary(date);
+    // Get current region settings
+    const regionSelect = document.getElementById('summaryRegionSelect');
+    let language = 'en';
+    let country = 'US';
+    
+    if (regionSelect) {
+        const selectedOption = regionSelect.options[regionSelect.selectedIndex];
+        language = selectedOption.getAttribute('data-language');
+        country = selectedOption.getAttribute('data-country');
+    }
+    
+    // Load and display the selected summary for the current region
+    const summary = await loadDailySummary(date, language, country);
     if (summary) {
         displayHistoricalSummary(summary);
+    } else {
+        // If no summary found for current region, show notification
+        showNotification(`No summary found for ${date} (${country}, ${language}). Try a different region.`, 3000);
     }
 }
 
-// Function to load summary for a specific date from the datepicker
+// Function to refresh the summary archive list
+export async function refreshSummaryArchive() {
+    console.log('refreshSummaryArchive: Refreshing summary archive list...');
+    await updateSavedSummariesList();
+    showNotification('Summary archive refreshed!', 2000);
+}
+
+// Function to load summary for a specific date and region from the datepicker and region selector
 export async function loadSummaryForDate() {
     const dateInput = document.getElementById('summaryDate');
+    const regionSelect = document.getElementById('summaryRegionSelect');
     const date = dateInput.value;
     const today = getLocalDateString();
     
+    // Get selected region info
+    let language = 'en';
+    let country = 'US';
+    
+    if (regionSelect) {
+        const selectedOption = regionSelect.options[regionSelect.selectedIndex];
+        language = selectedOption.getAttribute('data-language');
+        country = selectedOption.getAttribute('data-country');
+    }
+    
     setControlsDisabled(true);
-    setSummaryLoadingText(`Loading summary for ${new Date(date + 'T00:00:00').toLocaleDateString()}...`);
+    setSummaryLoadingText(`Loading summary for ${new Date(date + 'T00:00:00').toLocaleDateString()} (${country}, ${language})...`);
     showSummaryLoading();
     
-    const summary = await loadDailySummary(date);
+    const summary = await loadDailySummary(date, language, country);
     
     if (summary) {
         updateSummaryDisplayFromData(summary);
     } else {
-        // No summary exists for this date. Clear the display.
+        // No summary exists for this date and region. Clear the display.
         await updateSummaryDisplay(null); 
-        showNotification('No summary found for the selected date.');
+        showNotification(`No summary found for ${new Date(date + 'T00:00:00').toLocaleDateString()} (${country}, ${language}).`);
     }
     
     // The refresh button should only be active for the current day
@@ -1297,11 +1362,25 @@ async function warmUpChatEndpoint() {
 async function loadOrGenerateTodaySummary() {
     const today = getLocalDateString();
     console.log('loadOrGenerateTodaySummary: Starting for date:', today);
+    
+    // Get current region settings
+    const regionSelect = document.getElementById('summaryRegionSelect');
+    let language = 'en';
+    let country = 'US';
+    
+    if (regionSelect) {
+        const selectedOption = regionSelect.options[regionSelect.selectedIndex];
+        language = selectedOption.getAttribute('data-language');
+        country = selectedOption.getAttribute('data-country');
+    }
+    
+    console.log('loadOrGenerateTodaySummary: Using region:', { language, country });
+    
     setControlsDisabled(true);
-    setSummaryLoadingText(`Loading summary for ${new Date(today + 'T00:00:00').toLocaleDateString()}...`);
+    setSummaryLoadingText(`Loading summary for ${new Date(today + 'T00:00:00').toLocaleDateString()} (${country}, ${language})...`);
     showSummaryLoading();
 
-    const summary = await loadDailySummary(today);
+    const summary = await loadDailySummary(today, language, country);
     console.log('loadOrGenerateTodaySummary: Summary found:', !!summary);
     
     if (summary) {
@@ -1411,6 +1490,27 @@ async function initializeSummarySection() {
         dateInput.value = today;
     }
     
+    // Set up region dropdown for archive
+    const regionSelect = document.getElementById('summaryRegionSelect');
+    if (regionSelect) {
+        regionSelect.addEventListener('change', loadSummaryForDate);
+        // Set default to current user preferences
+        const currentLanguage = userPrefs.getNewsLanguage() || 'en';
+        const currentCountry = userPrefs.getTrendsCountry() || 'US';
+        
+        // Find and select the matching option
+        const options = regionSelect.querySelectorAll('option');
+        for (let option of options) {
+            const optionLanguage = option.getAttribute('data-language');
+            const optionCountry = option.getAttribute('data-country');
+            
+            if (optionLanguage === currentLanguage && optionCountry === currentCountry) {
+                regionSelect.value = option.value;
+                break;
+            }
+        }
+    }
+    
     // Add a slight delay before loading or generating today's summary
     await new Promise(resolve => setTimeout(resolve, 3000));
     await loadOrGenerateTodaySummary();
@@ -1491,6 +1591,7 @@ window.saveCurrentSummary = saveCurrentSummary;
 window.loadSummaryForDate = loadSummaryForDate;
 window.deleteSelectedSummary = deleteSelectedSummary; 
 window.refreshSummary = refreshSummary;
+window.refreshSummaryArchive = refreshSummaryArchive;
 window.toggleSection = toggleSection;
 
 // Function to initialize location button

@@ -17,33 +17,60 @@ let isDashboardPaused = false; // Track pause state
 const MAX_POINTS = 50;
 let userSelectedSymbol = false; // Track if user manually selected a symbol
 
-// Default watchlist with popular stocks and cryptocurrencies
+// Default watchlist with global markets, stocks, cryptocurrencies, and precious metals
 const DEFAULT_WATCHLIST = [
+    // US Markets
+    'SPY',     // S&P 500 ETF - Market benchmark
+    '^IXIC',   // NASDAQ Composite - Tech index
+    '^DJI',    // Dow Jones Industrial Average
+    '^GSPC',   // S&P 500 Index
+    
+    // US Tech Stocks
     'NVDA',    // NVIDIA - AI/GPU leader
     'AAPL',    // Apple - Tech giant
     'GOOGL',   // Google (Alphabet) - Tech/Advertising
     'META',    // Meta (Facebook) - Social media/AI
-    'BTC-USD', // Bitcoin - Leading cryptocurrency
-    'ETH-USD', // Ethereum - Smart contract platform
-    '^IXIC',   // NASDAQ Composite - Tech index
-    'NFLX',    // Netflix - Streaming entertainment
-    'DJT',     // Trump Media & Technology Group
-    'TSLA',    // Tesla - Electric vehicles/AI
     'MSFT',    // Microsoft - Software/AI
     'AMZN',    // Amazon - E-commerce/Cloud
-    'SPY',     // S&P 500 ETF - Market benchmark
-    '^DJI',    // Dow Jones Industrial Average
-    '^GSPC'    // S&P 500 Index
+    'TSLA',    // Tesla - Electric vehicles/AI
+    'NFLX',    // Netflix - Streaming entertainment
+    'DJT',     // Trump Media & Technology Group
+    
+    // Cryptocurrencies
+    'BTC-USD', // Bitcoin - Leading cryptocurrency
+    'ETH-USD', // Ethereum - Smart contract platform
+    
+    // European Markets
+    'N100',    // Euronext 100 - European blue chips
+    'GDAXI',   // DAX - German stock index
+    'FCHI',    // CAC 40 - French stock index
+    
+    // Asian Markets
+    '000001.SS', // Shanghai Composite - Chinese market
+    'N225',    // Nikkei 225 - Japanese market
+    'HSI',     // Hang Seng - Hong Kong market
+    'AXJO',    // ASX 200 - Australian market
+    'ADOW',    // Asia Dow - Pan-Asian index
+    
+    // Currency Pairs
+    'EURUSD=X', // Euro/US Dollar
+    'GBP=X',   // British Pound/US Dollar
+    'JPY=X',   // Japanese Yen/US Dollar
+    
+    // Precious Metals
+    'GC=F',    // Gold Futures
+    'SI=F'     // Silver Futures
 ];
 
 // Set default time range and interval
 export const DEFAULT_TIME_RANGE = '2h';
 export const DEFAULT_INTERVAL = '1m';
 
-// Helper function to get default symbol based on market status
+// Helper function to get default symbol based on market status and global trading hours
 function getDefaultSymbol() {
     const now = new Date();
     const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    const utcNow = new Date();
     const day = etNow.getDay();
     const hours = etNow.getHours();
     const minutes = etNow.getMinutes();
@@ -51,15 +78,27 @@ function getDefaultSymbol() {
     // Check if it's a weekend
     const isWeekend = day === 0 || day === 6; // Sunday or Saturday
     
-    // Check if it's a weekday during market hours (9:30AM - 4:00PM ET)
-    const isMarketHours = !isWeekend && 
-                         (hours > 9 || (hours === 9 && minutes >= 30)) && 
-                         (hours < 16);
+    // Check if it's a weekday during US market hours (9:30AM - 4:00PM ET)
+    const isUSMarketHours = !isWeekend && 
+                           (hours > 9 || (hours === 9 && minutes >= 30)) && 
+                           (hours < 16);
     
-    if (isWeekend || !isMarketHours) {
-        return 'BTC-USD'; // Default to Bitcoin on weekends and outside market hours
+    // Check if it's during Asian market hours (roughly 6PM-6AM ET)
+    const isAsianMarketHours = (hours >= 18 || hours < 6);
+    
+    // Check if it's during European market hours (roughly 3AM-11AM ET)
+    const isEuropeanMarketHours = (hours >= 3 && hours < 11);
+    
+    if (isWeekend) {
+        return 'BTC-USD'; // Default to Bitcoin on weekends (crypto trades 24/7)
+    } else if (isUSMarketHours) {
+        return '^IXIC'; // Default to NASDAQ during US market hours
+    } else if (isAsianMarketHours) {
+        return 'N225'; // Default to Nikkei during Asian market hours
+    } else if (isEuropeanMarketHours) {
+        return 'GDAXI'; // Default to DAX during European market hours
     } else {
-        return '^IXIC'; // Default to NASDAQ during market hours on weekdays
+        return 'BTC-USD'; // Default to Bitcoin during off-hours
     }
 }
 
@@ -558,6 +597,16 @@ export function isMarketOpen() {
     if (symbol.endsWith('-USD')) {
         return true; // Crypto markets are always open
     }
+    
+    // Check if it's a currency pair
+    if (symbol.includes('=X') || symbol.includes('=X')) {
+        return true; // Forex markets are open 24/5 (closed weekends)
+    }
+    
+    // Check if it's a futures contract (precious metals)
+    if (symbol.includes('=F')) {
+        return true; // Futures trade nearly 24/7
+    }
 
     // Use Eastern Time for market hours check
     const now = new Date();
@@ -566,14 +615,31 @@ export function isMarketOpen() {
     const hour = etNow.getHours();
     const minute = etNow.getMinutes();
 
-    // Check if it's a weekday (Monday = 1, Friday = 5)
-    if (day >= 1 && day <= 5) {
-        // Check if it's between 9:30 AM and 4:00 PM ET
-        if ((hour === 9 && minute >= 30) || (hour > 9 && hour < 16) || (hour === 16 && minute === 0)) {
-            return true;
-        }
+    // Check if it's a weekend
+    if (day === 0 || day === 6) {
+        return false; // All traditional markets closed on weekends
     }
-    return false;
+
+    // Check US market hours (9:30 AM - 4:00 PM ET)
+    const isUSMarketHours = (hour === 9 && minute >= 30) || (hour > 9 && hour < 16) || (hour === 16 && minute === 0);
+    
+    // Check European market hours (roughly 3:30 AM - 11:30 AM ET)
+    const isEuropeanMarketHours = (hour >= 3 && hour < 12);
+    
+    // Check Asian market hours (roughly 6:00 PM - 6:00 AM ET)
+    const isAsianMarketHours = (hour >= 18 || hour < 6);
+    
+    // Determine which market the symbol belongs to
+    if (symbol.startsWith('^') || symbol === 'SPY' || symbol === 'DJT' || 
+        ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NFLX', 'NVDA'].includes(symbol)) {
+        return isUSMarketHours; // US stocks and indices
+    } else if (['N100', 'GDAXI', 'FCHI'].includes(symbol)) {
+        return isEuropeanMarketHours; // European indices
+    } else if (['000001.SS', 'N225', 'HSI', 'AXJO', 'ADOW'].includes(symbol)) {
+        return isAsianMarketHours; // Asian indices
+    } else {
+        return isUSMarketHours; // Default to US market hours
+    }
 }
 
 // Add this helper function to ensure data points are properly connected

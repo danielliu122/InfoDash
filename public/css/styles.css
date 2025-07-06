@@ -229,7 +229,6 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    justify-content: stretch;
     /* Mobile-specific viewport adjustments */
     position: fixed;
     top: 0;
@@ -1271,4 +1270,187 @@ body.dark-theme .pause-button:hover {
     height: 20px !important;
     font-size: 10px !important;
   }
+}
+
+/* Region selector dropdown styling */
+.region-selector {
+    margin: 10px 0;
+}
+
+.region-selector .input-field {
+    display: inline-block;
+    min-width: 300px;
+}
+
+/* Header dropdown styling */
+header .input-field {
+    margin: 0;
+    min-width: 250px;
+}
+
+header .input-field select {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+    height: auto;
+    margin: 0;
+}
+
+header .input-field select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.2);
+}
+
+header .input-field select option {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    padding: 8px;
+}
+
+header .input-field label {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-top: 5px;
+    position: absolute;
+    top: -20px;
+    left: 0;
+}
+
+/* General region selector styling */
+.region-selector select {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+}
+
+.region-selector select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.2);
+}
+
+.region-selector select option {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    padding: 8px;
+}
+
+.region-selector label {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+    header .input-field {
+        min-width: 200px;
+    }
+    
+    header .input-field select {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    .region-selector .input-field {
+        min-width: 250px;
+    }
+    
+    .region-selector select {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+
+/* Summary Archive Controls */
+.summary-archive-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.summary-archive-controls .input-field {
+    margin-bottom: 0;
+}
+
+.summary-archive-controls .btn-small {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.summary-archive-controls .btn-small i {
+    font-size: 14px;
+}
+
+.saved-summaries-container {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 10px;
+    background: var(--card-bg);
+}
+
+.saved-summary-item {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.saved-summary-item:hover {
+    background-color: var(--hover-bg);
+}
+
+.saved-summary-item.selected {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.saved-summary-item:last-child {
+    border-bottom: none;
+}
+
+.saved-summary-date {
+    font-weight: 600;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.saved-summary-time {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .summary-archive-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .summary-archive-controls .input-field {
+        margin-bottom: 10px;
+    }
+    
+    .summary-archive-controls .btn-small {
+        width: 100%;
+        justify-content: center;
+    }
 }

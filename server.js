@@ -87,9 +87,9 @@ function isMarketClosed() {
 }
 
 // Function to save daily summary to file
-async function saveDailySummary(summaryData, date) {
+async function saveDailySummary(summaryData, date, language = 'en', country = 'US') {
     try {
-        console.log(`saveDailySummary: Saving summary for date: ${date}`);
+        console.log(`saveDailySummary: Saving summary for date: ${date}, language: ${language}, country: ${country}`);
         console.log(`saveDailySummary: Using file path: ${SUMMARY_FILE}`);
         
         // Ensure data directory exists
@@ -112,20 +112,41 @@ async function saveDailySummary(summaryData, date) {
             summaries = {};
         }
         
-        // Add today's summary
-        summaries[date] = {
+        // Create summary object with language and country info
+        const summaryWithMetadata = {
             ...summaryData,
+            language,
+            country,
             timestamp: new Date().toISOString(),
             marketClosed: isMarketClosed()
         };
         
+        // Check if we already have summaries for this date
+        if (summaries[date]) {
+            // If it's an array, add to it
+            if (Array.isArray(summaries[date])) {
+                // Remove existing summary with same language/country if it exists
+                summaries[date] = summaries[date].filter(summary => 
+                    !(summary.language === language && summary.country === country)
+                );
+                summaries[date].push(summaryWithMetadata);
+            } else {
+                // Convert single object to array and add new summary
+                const existingSummary = summaries[date];
+                summaries[date] = [existingSummary, summaryWithMetadata];
+            }
+        } else {
+            // First summary for this date
+            summaries[date] = summaryWithMetadata;
+        }
+        
         // Save to file
         await fs.writeFile(SUMMARY_FILE, JSON.stringify(summaries, null, 2));
-        console.log(`saveDailySummary: Successfully saved summary for ${date}`);
+        console.log(`saveDailySummary: Successfully saved summary for ${date} (${country}, ${language})`);
         
-        // Update global variables if it's for today
+        // Update global variables if it's for today and default region
         const today = new Date().toISOString().split('T')[0];
-        if (date === today) {
+        if (date === today && language === 'en' && country === 'US') {
             dailySummary = summaryData;
             lastSummaryDate = today;
             console.log('saveDailySummary: Updated global variables for today');
@@ -139,10 +160,10 @@ async function saveDailySummary(summaryData, date) {
 }
 
 // Function to load daily summary from file
-async function loadDailySummary(date = null) {
+async function loadDailySummary(date = null, language = 'en', country = 'US') {
     try {
         const targetDate = date || new Date().toISOString().split('T')[0];
-        console.log(`loadDailySummary: Loading summary for date: ${targetDate}`);
+        console.log(`loadDailySummary: Loading summary for date: ${targetDate}, language: ${language}, country: ${country}`);
         console.log(`loadDailySummary: Using file path: ${SUMMARY_FILE}`);
         console.log(`loadDailySummary: Current working directory: ${process.cwd()}`);
         console.log(`loadDailySummary: __dirname: ${__dirname}`);
@@ -178,14 +199,39 @@ async function loadDailySummary(date = null) {
         console.log(`loadDailySummary: JSON parsed successfully`);
         console.log(`loadDailySummary: Found summaries for dates: ${Object.keys(summaries).join(', ')}`);
         
-        const summary = summaries[targetDate] || null;
-        console.log(`loadDailySummary: Summary found for ${targetDate}:`, !!summary);
-        
-        if (summary) {
-            console.log(`loadDailySummary: Summary data keys: ${Object.keys(summary).join(', ')}`);
+        // Look for summary with matching date, language, and country
+        const dateSummary = summaries[targetDate];
+        if (!dateSummary) {
+            console.log(`loadDailySummary: No summary found for date: ${targetDate}`);
+            return null;
         }
         
-        return summary;
+        // If dateSummary is an array, look for matching language/country
+        if (Array.isArray(dateSummary)) {
+            const matchingSummary = dateSummary.find(summary => 
+                summary.language === language && summary.country === country
+            );
+            console.log(`loadDailySummary: Array format - found matching summary:`, !!matchingSummary);
+            return matchingSummary || null;
+        }
+        
+        // If dateSummary is an object, check if it has language/country properties
+        if (dateSummary.language && dateSummary.country) {
+            // New format with explicit language/country
+            if (dateSummary.language === language && dateSummary.country === country) {
+                console.log(`loadDailySummary: Object format - found matching summary`);
+                return dateSummary;
+            }
+        } else {
+            // Legacy format without language/country - treat as English/US
+            if (language === 'en' && country === 'US') {
+                console.log(`loadDailySummary: Using legacy summary for en-US (backward compatibility)`);
+                return dateSummary;
+            }
+        }
+        
+        console.log(`loadDailySummary: No matching summary found for ${targetDate} (${country}, ${language})`);
+        return null;
     } catch (error) {
         console.error('loadDailySummary: Error loading daily summary:', error);
         console.error('loadDailySummary: Error details:', error.message);
@@ -197,7 +243,7 @@ async function loadDailySummary(date = null) {
 // Initialize daily summary on server start
 async function initializeDailySummary() {
     const today = new Date().toISOString().split('T')[0];
-    const savedSummary = await loadDailySummary(today);
+    const savedSummary = await loadDailySummary(today, 'en', 'US');
     
     if (savedSummary) {
         dailySummary = savedSummary;
@@ -208,8 +254,138 @@ async function initializeDailySummary() {
     }
 }
 
+// Function to clean up malformed summary data
+async function cleanupSummaryData() {
+    try {
+        console.log('cleanupSummaryData: Starting cleanup of malformed summary data...');
+        
+        const data = await fs.readFile(SUMMARY_FILE, 'utf8');
+        const summaries = JSON.parse(data);
+        
+        let hasChanges = false;
+        const cleanedSummaries = {};
+        
+        for (const [key, value] of Object.entries(summaries)) {
+            console.log(`cleanupSummaryData: Processing key: ${key}`);
+            
+            // Skip invalid keys like "2025" (just year)
+            if (key === '2025' || key.length < 8) {
+                console.log(`cleanupSummaryData: Skipping invalid key: ${key}`);
+                continue;
+            }
+            
+            // Handle the corrupted "2025" key that contains an array
+            if (key === '2025' && Array.isArray(value)) {
+                console.log(`cleanupSummaryData: Processing corrupted 2025 array with ${value.length} items`);
+                
+                value.forEach((item, index) => {
+                    // Skip nested objects with numeric keys
+                    if (typeof item === 'object' && item !== null && Object.keys(item).some(k => !isNaN(k))) {
+                        console.log(`cleanupSummaryData: Skipping nested object with numeric keys at index ${index}`);
+                        return;
+                    }
+                    
+                    // Extract date from timestamp if available
+                    if (item.timestamp) {
+                        const date = new Date(item.timestamp).toISOString().split('T')[0];
+                        console.log(`cleanupSummaryData: Extracted date ${date} from timestamp`);
+                        
+                        if (!cleanedSummaries[date]) {
+                            cleanedSummaries[date] = [];
+                        }
+                        
+                        // Fix the language/country values (they're corrupted)
+                        const fixedItem = {
+                            ...item,
+                            language: 'en', // Default to English
+                            country: 'US'   // Default to US
+                        };
+                        
+                        // Remove duplicate language/country properties
+                        delete fixedItem.language;
+                        delete fixedItem.country;
+                        
+                        cleanedSummaries[date].push(fixedItem);
+                        hasChanges = true;
+                    }
+                });
+                continue;
+            }
+            
+            // Handle normal date keys
+            if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
+                console.log(`cleanupSummaryData: Valid date key: ${key}`);
+                
+                if (Array.isArray(value)) {
+                    // Remove duplicates and fix any corrupted entries
+                    const uniqueSummaries = [];
+                    const seen = new Set();
+                    
+                    value.forEach(summary => {
+                        // Skip nested objects with numeric keys
+                        if (typeof summary === 'object' && summary !== null && Object.keys(summary).some(k => !isNaN(k))) {
+                            console.log(`cleanupSummaryData: Skipping nested object with numeric keys in ${key}`);
+                            return;
+                        }
+                        
+                        // Create a unique identifier for deduplication
+                        const identifier = `${summary.timestamp}-${summary.language || 'en'}-${summary.country || 'US'}`;
+                        
+                        if (!seen.has(identifier)) {
+                            seen.add(identifier);
+                            
+                            // Ensure language and country are properly set
+                            const fixedSummary = {
+                                ...summary,
+                                language: summary.language || 'en',
+                                country: summary.country || 'US'
+                            };
+                            
+                            uniqueSummaries.push(fixedSummary);
+                        }
+                    });
+                    
+                    if (uniqueSummaries.length > 0) {
+                        cleanedSummaries[key] = uniqueSummaries;
+                        hasChanges = true;
+                    }
+                } else {
+                    // Single object
+                    cleanedSummaries[key] = {
+                        ...value,
+                        language: value.language || 'en',
+                        country: value.country || 'US'
+                    };
+                    hasChanges = true;
+                }
+            } else {
+                console.log(`cleanupSummaryData: Skipping invalid key format: ${key}`);
+            }
+        }
+        
+        if (hasChanges) {
+            // Save the cleaned data
+            await fs.writeFile(SUMMARY_FILE, JSON.stringify(cleanedSummaries, null, 2));
+            console.log('cleanupSummaryData: Successfully cleaned up malformed summary data');
+        } else {
+            console.log('cleanupSummaryData: No malformed data found');
+        }
+        
+        return cleanedSummaries;
+    } catch (error) {
+        console.error('cleanupSummaryData: Error cleaning up summary data:', error);
+        return null;
+    }
+}
+
 // Call initialization
-initializeDailySummary();
+(async () => {
+    // Clean up any malformed summary data first
+    await cleanupSummaryData();
+    
+    // Then initialize daily summary
+    await initializeDailySummary();
+})();
 
 // Rate limiter middleware
 // const limiter = rateLimit({
@@ -272,11 +448,16 @@ app.get('/api/news', async (req, res) => {
         // console.log(`Fetching fresh news data for: ${cacheKey}`);
 
     // Build API URL based on parameters
+    // NewsAPI top-headlines only supports English language
+    // For non-English languages, always use everything endpoint
     let newsUrl;
-    if (category) {
-        newsUrl = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&language=${language}&apiKey=${newsApiKey}`;
+    if (category && language === 'en') {
+        // Use top-headlines for English with category
+        newsUrl = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&apiKey=${newsApiKey}`;
     } else {
-        newsUrl = `https://newsapi.org/v2/everything?q=${query}&language=${language}&sortBy=popularity${from ? `&from=${from}` : ''}&apiKey=${newsApiKey}`;
+        // Use everything endpoint for non-English languages or when no category specified
+        const searchQuery = category ? category : query;
+        newsUrl = `https://newsapi.org/v2/everything?q=${searchQuery}&language=${language}&sortBy=popularity${from ? `&from=${from}` : ''}&apiKey=${newsApiKey}`;
     }
 
         const response = await axios.get(newsUrl);
@@ -719,23 +900,27 @@ app.post('/api/summary/save', async (req, res) => {
         // console.log('Received summary save request');
         // console.log('Request body:', req.body);
         
-        const { news, trends, finance, overall, date } = req.body;
+        const { news, trends, finance, overall, date, language, country } = req.body;
         
         if (!date) {
             return res.status(400).json({ success: false, message: 'Date is required' });
         }
+
+        // Use default values if not provided
+        const targetLanguage = language || 'en';
+        const targetCountry = country || 'US';
 
         // Determine if the date is today
         const today = new Date().toISOString().split('T')[0];
         
         // Only block overwriting for past dates
         if (date !== today) {
-            const existingSummary = await loadDailySummary(date);
+            const existingSummary = await loadDailySummary(date, targetLanguage, targetCountry);
             if (existingSummary) {
-                // console.log(`Daily summary already exists for ${date}`);
+                // console.log(`Daily summary already exists for ${date} (${targetCountry}, ${targetLanguage})`);
                 return res.json({ 
                     success: false, 
-                    message: `Daily summary already exists for ${date}`,
+                    message: `Daily summary already exists for ${date} (${targetCountry}, ${targetLanguage})`,
                     summary: existingSummary 
                 });
             }
@@ -760,13 +945,13 @@ app.post('/api/summary/save', async (req, res) => {
         };
         
         // console.log('Saving summary data...');
-        const saved = await saveDailySummary(summaryData, date);
+        const saved = await saveDailySummary(summaryData, date, targetLanguage, targetCountry);
         
         if (saved) {
-            // console.log(`Summary saved successfully for ${date}`);
+            // console.log(`Summary saved successfully for ${date} (${targetCountry}, ${targetLanguage})`);
             res.json({ 
                 success: true, 
-                message: 'Daily summary saved successfully',
+                message: `Daily summary saved successfully for ${targetCountry} (${targetLanguage})`,
                 summary: summaryData
             });
         } else {
@@ -787,13 +972,15 @@ app.post('/api/summary/save', async (req, res) => {
 
 app.get('/api/summary/daily', async (req, res) => {
     try {
-        const { date } = req.query;
+        const { date, language, country } = req.query;
         const targetDate = date || new Date().toISOString().split('T')[0];
+        const targetLanguage = language || 'en';
+        const targetCountry = country || 'US';
         
-        console.log(`/api/summary/daily: Request received for date: ${targetDate}`);
+        console.log(`/api/summary/daily: Request received for date: ${targetDate}, language: ${targetLanguage}, country: ${targetCountry}`);
         console.log(`/api/summary/daily: Query parameters:`, req.query);
         
-        const summary = await loadDailySummary(targetDate);
+        const summary = await loadDailySummary(targetDate, targetLanguage, targetCountry);
         
         console.log(`/api/summary/daily: loadDailySummary returned:`, !!summary);
         
@@ -802,14 +989,18 @@ app.get('/api/summary/daily', async (req, res) => {
             res.json({ 
                 success: true, 
                 summary,
-                date: targetDate
+                date: targetDate,
+                language: targetLanguage,
+                country: targetCountry
             });
         } else {
             console.log(`/api/summary/daily: Sending failure response - no summary found`);
             res.json({ 
                 success: false, 
-                message: 'No summary found for the specified date',
-                date: targetDate
+                message: `No summary found for ${targetDate} (${targetCountry}, ${targetLanguage})`,
+                date: targetDate,
+                language: targetLanguage,
+                country: targetCountry
             });
         }
     } catch (error) {
@@ -829,15 +1020,52 @@ app.get('/api/summary/history', async (req, res) => {
         try {
             const data = await fs.readFile(SUMMARY_FILE, 'utf8');
             const summaries = JSON.parse(data);
+            console.log(`summary/history: Loaded summaries object with keys:`, Object.keys(summaries));
             
             // Convert to array format for easier frontend consumption
-            const summaryArray = Object.entries(summaries).map(([date, summary]) => ({
-                date,
-                timestamp: summary.timestamp,
-                marketClosed: summary.marketClosed,
-                hasData: !!(summary.news || summary.trends || summary.finance || summary.overall)
-            })).sort((a, b) => new Date(b.date) - new Date(a.date));
+            const summaryArray = [];
             
+            Object.entries(summaries).forEach(([date, summary]) => {
+                // Skip malformed keys that contain language/country info (should have more than 3 parts when split by '-')
+                if (date.includes('-') && date.split('-').length > 3) {
+                    console.log(`summary/history: Skipping malformed date key: ${date}`);
+                    return;
+                }
+                
+                // Validate date format
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                    console.log(`summary/history: Skipping invalid date format: ${date}`);
+                    return;
+                }
+                
+                // Handle both array format (new) and object format (legacy)
+                if (Array.isArray(summary)) {
+                    // New format: array of summaries with different languages/countries
+                    summary.forEach(singleSummary => {
+                        summaryArray.push({
+                            date,
+                            timestamp: singleSummary.timestamp,
+                            marketClosed: singleSummary.marketClosed,
+                            language: singleSummary.language || 'en',
+                            country: singleSummary.country || 'US',
+                            hasData: !!(singleSummary.news || singleSummary.trends || singleSummary.finance || singleSummary.overall)
+                        });
+                    });
+                } else {
+                    // Legacy format: single object without explicit language/country
+                    summaryArray.push({
+                        date,
+                        timestamp: summary.timestamp,
+                        marketClosed: summary.marketClosed,
+                        language: summary.language || 'en',
+                        country: summary.country || 'US',
+                        hasData: !!(summary.news || summary.trends || summary.finance || summary.overall)
+                    });
+                }
+            });
+            
+            // Sort by date (newest first)
+            summaryArray.sort((a, b) => new Date(b.date) - new Date(a.date));
             res.json({ 
                 success: true, 
                 summaries: summaryArray
@@ -983,6 +1211,85 @@ app.post('/api/finance/bulk-real-time', async (req, res) => {
     } catch (error) {
         console.error('Error fetching bulk real-time data:', error);
         res.status(500).json({ error: 'Failed to fetch bulk real-time financial data' });
+    }
+});
+
+// Geolocation endpoint to detect user's location from IP
+app.get('/api/geolocation', (req, res) => {
+    try {
+        // Get client IP address
+        const clientIP = req.ip || 
+                        req.connection.remoteAddress || 
+                        req.socket.remoteAddress || 
+                        req.connection.socket?.remoteAddress ||
+                        req.headers['x-forwarded-for']?.split(',')[0] ||
+                        req.headers['x-real-ip'] ||
+                        '127.0.0.1';
+        
+        console.log(`Geolocation request from IP: ${clientIP}`);
+        
+        // Use geoip-lite to get location data
+        const geo = geoip.lookup(clientIP);
+        
+        if (!geo) {
+            console.log('No geolocation data found, using defaults');
+            return res.json({
+                success: false,
+                message: 'Unable to detect location',
+                suggestedCountry: 'US',
+                suggestedLanguage: 'en',
+                city: null,
+                region: null
+            });
+        }
+        
+        console.log('Geolocation data:', geo);
+        
+        // Extract country and region info
+        const country = geo.country || 'US';
+        const region = geo.region || null;
+        const city = geo.city || null;
+        
+        // Determine suggested language based on country
+        let suggestedLanguage = 'en'; // default
+        
+        // Map countries to languages (using the same mapping as frontend)
+        const countryToLanguage = {
+            'US': 'en', 'CA': 'en', 'GB': 'en', 'AU': 'en', 'NZ': 'en', 'IE': 'en',
+            'ES': 'es', 'MX': 'es', 'AR': 'es', 'CL': 'es', 'CO': 'es', 'PE': 'es',
+            'FR': 'fr', 'DE': 'de', 'AT': 'de', 'CH': 'de', 'IT': 'it', 'PT': 'pt',
+            'BR': 'pt', 'RU': 'ru', 'JP': 'jp', 'KR': 'ko', 'CN': 'zh', 'AR': 'ar',
+            'SA': 'ar', 'EG': 'ar', 'IN': 'hi', 'NL': 'nl', 'SE': 'sv', 'NO': 'no',
+            'FI': 'fi', 'DK': 'da', 'PL': 'pl', 'CZ': 'cs', 'HU': 'hu', 'GR': 'el',
+            'TR': 'tr', 'TH': 'th', 'VN': 'vi', 'ID': 'id', 'MY': 'ms', 'PH': 'tl',
+            'ZA': 'af', 'IL': 'he', 'IR': 'fa', 'BD': 'bn', 'NP': 'ne', 'UA': 'uk',
+            'AZ': 'az', 'GE': 'ka', 'RO': 'ro', 'RS': 'sr', 'MK': 'mk', 'SI': 'sl',
+            'SK': 'sk', 'EE': 'et', 'IS': 'is'
+        };
+        
+        suggestedLanguage = countryToLanguage[country] || 'en';
+        
+        res.json({
+            success: true,
+            ip: clientIP,
+            country: country,
+            region: region,
+            city: city,
+            suggestedCountry: country,
+            suggestedLanguage: suggestedLanguage,
+            timezone: geo.timezone || null
+        });
+        
+    } catch (error) {
+        console.error('Error in geolocation endpoint:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error detecting location',
+            suggestedCountry: 'US',
+            suggestedLanguage: 'en',
+            city: null,
+            region: null
+        });
     }
 });
 

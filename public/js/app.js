@@ -18,10 +18,11 @@ import {
     DEFAULT_INTERVAL
 } from './finance.js';
 import { fetchNewsData, updateNews, updateNewsModeIndicator } from './news.js';
-import { fetchTrendsData, updateTrends } from './trends.js'; // Import from trends.js
+import { fetchTrendsData, updateTrends, initializeTrends, setTrendsRegion } from './trends.js'; // Import from trends.js
 import { fetchRedditData, updateReddit } from './reddit.js'; // Import from reddit.js
 import { refreshSummary, initializeSummarySection } from './summary.js'; // Import summary functionality
 import { userPrefs } from './userPreferences.js'; // Import user preferences
+import { initializeGeolocation } from './geolocation.js'; // Import geolocation functionality
 
 // Make functions globally available immediately for HTML onclick handlers
 window.handleButtonClick = async function(type, category, subCategory = 'all') {
@@ -121,6 +122,9 @@ export async function refreshNews() {
     updateNews(newsData);
 }
 
+// Make refreshNews globally available
+window.refreshNews = refreshNews;
+
 // Function to refresh trends data
 async function refreshTrends() {
     const trendsCountrySelect = document.getElementById('trendsCountrySelect');
@@ -131,6 +135,9 @@ async function refreshTrends() {
     const trendsData = await fetchTrendsData('daily', 'all', language, country);
     updateTrends(trendsData, 'daily');
 }
+
+// Make refreshTrends globally available
+window.refreshTrends = refreshTrends;
 
 // Function to toggle section visibility
 window.toggleSection = function(sectionContentId) {
@@ -181,6 +188,15 @@ function initializeTheme() {
 document.addEventListener('DOMContentLoaded', async () => {
     // Initialize theme
     initializeTheme();
+
+    // Initialize geolocation and region dropdown
+    await initializeGeolocation();
+
+    // Initialize trends section
+    initializeTrends();
+
+    // Make setTrendsRegion globally available for geolocation.js
+    window.setTrendsRegion = setTrendsRegion;
 
     // Apply user preferences to UI
     userPrefs.applyPreferences();

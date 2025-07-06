@@ -128,5 +128,21 @@
     "IHG": "InterContinental Hotels Group",
     "CHH": "Choice Hotels",
     "WYN": "Wyndham Hotels & Resorts",
-    "^DJI": "Dow Jones Industrial Average"
+    "^DJI": "Dow Jones Industrial Average",
+    "SPY": "SPDR S&P 500 ETF",
+    "^GSPC": "S&P 500 Index",
+    "DJT": "Trump Media & Technology Group",
+    "N100": "Euronext 100",
+    "GDAXI": "DAX Index",
+    "FCHI": "CAC 40 Index",
+    "000001.SS": "Shanghai Composite",
+    "N225": "Nikkei 225",
+    "HSI": "Hang Seng Index",
+    "AXJO": "ASX 200",
+    "ADOW": "Asia Dow",
+    "EURUSD=X": "EUR/USD",
+    "GBP=X": "GBP/USD",
+    "JPY=X": "JPY/USD",
+    "GC=F": "Gold Futures",
+    "SI=F": "Silver Futures"
 }
