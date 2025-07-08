@@ -558,7 +558,6 @@ async function generateSummary(sectionData) {
             
             if (result && !result.includes('Error:') && !result.includes('Unable to generate')) {
                 await updateSummaryDisplay(result);
-                await saveCurrentSummary();
                 await updateSavedSummariesList();
                 summaryGenerated = true;
                 return result; // Return the result to the calling function
@@ -1456,7 +1455,6 @@ async function loadOrGenerateTodaySummary() {
                 const summaryText = await generateSummary(sectionData);
                 if (summaryText && !summaryText.includes('Error:') && !summaryText.includes('Unable to generate')) {
                     await updateSummaryDisplay(summaryText);
-                    await saveCurrentSummary();
                     await updateSavedSummariesList();
                 } else {
                     await updateSummaryDisplay(summaryText);
@@ -1550,7 +1548,6 @@ export async function refreshSummary() {
             const summaryText = await generateSummary(sectionData);
             if (summaryText && !summaryText.includes('Error:') && !summaryText.includes('Unable to generate')) {
                 await updateSummaryDisplay(summaryText);
-                await saveCurrentSummary();
                 await updateSavedSummariesList();
                 markRefreshedToday();
                 showNotification('Summary refreshed and saved successfully! Daily limit: 1 manual refresh per day.');
