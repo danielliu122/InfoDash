@@ -17,60 +17,45 @@ let isDashboardPaused = false; // Track pause state
 const MAX_POINTS = 50;
 let userSelectedSymbol = false; // Track if user manually selected a symbol
 
-// Default watchlist with global markets, stocks, cryptocurrencies, and precious metals
+// Default watchlist with popular stocks and cryptocurrencies
 const DEFAULT_WATCHLIST = [
-    // US Markets
-    'SPY',     // S&P 500 ETF - Market benchmark
-    '^IXIC',   // NASDAQ Composite - Tech index
-    '^DJI',    // Dow Jones Industrial Average
-    '^GSPC',   // S&P 500 Index
-    
-    // US Tech Stocks
     'NVDA',    // NVIDIA - AI/GPU leader
     'AAPL',    // Apple - Tech giant
     'GOOGL',   // Google (Alphabet) - Tech/Advertising
     'META',    // Meta (Facebook) - Social media/AI
-    'MSFT',    // Microsoft - Software/AI
-    'AMZN',    // Amazon - E-commerce/Cloud
-    'TSLA',    // Tesla - Electric vehicles/AI
-    'NFLX',    // Netflix - Streaming entertainment
-    'DJT',     // Trump Media & Technology Group
-    
-    // Cryptocurrencies
     'BTC-USD', // Bitcoin - Leading cryptocurrency
     'ETH-USD', // Ethereum - Smart contract platform
-    
-    // European Markets
-    'N100',    // Euronext 100 - European blue chips
-    'GDAXI',   // DAX - German stock index
-    'FCHI',    // CAC 40 - French stock index
-    
-    // Asian Markets
-    '000001.SS', // Shanghai Composite - Chinese market
-    'N225',    // Nikkei 225 - Japanese market
-    'HSI',     // Hang Seng - Hong Kong market
-    'AXJO',    // ASX 200 - Australian market
-    'ADOW',    // Asia Dow - Pan-Asian index
-    
-    // Currency Pairs
-    'EURUSD=X', // Euro/US Dollar
-    'GBP=X',   // British Pound/US Dollar
-    'JPY=X',   // Japanese Yen/US Dollar
-    
-    // Precious Metals
+    '^IXIC',   // NASDAQ Composite - Tech index
+    'NFLX',    // Netflix - Streaming entertainment
+    'DJT',     // Trump Media & Technology Group
+    'TSLA',    // Tesla - Electric vehicles/AI
+    'MSFT',    // Microsoft - Software/AI
+    'AMZN',    // Amazon - E-commerce/Cloud
+    'SPY',     // S&P 500 ETF - Market benchmark
+    '^DJI',    // Dow Jones Industrial Average
+    '^GSPC',   // S&P 500 Index
+    '^HSI',    // Hang Seng Index - Hong Kong
+    '^N225',   // Nikkei 225 - Japan
+    '^GDAXI',  // DAX - Germany
+    '^FTSE',   // FTSE 100 - UK
+    '^FCHI',   // CAC 40 - France
+    '^STOXX50E', // EURO STOXX 50 - Europe
     'GC=F',    // Gold Futures
-    'SI=F'     // Silver Futures
+    'SI=F',    // Silver Futures
+    'EURUSD=X', // Euro to US Dollar
+    'USDJPY=X', // US Dollar to Japanese Yen
+    'GBPUSD=X', // British Pound to US Dollar
+    'USDCNY=X'  // US Dollar to Chinese Yuan
 ];
 
 // Set default time range and interval
 export const DEFAULT_TIME_RANGE = '2h';
 export const DEFAULT_INTERVAL = '1m';
 
-// Helper function to get default symbol based on market status and global trading hours
+// Helper function to get default symbol based on market status
 function getDefaultSymbol() {
     const now = new Date();
     const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-    const utcNow = new Date();
     const day = etNow.getDay();
     const hours = etNow.getHours();
     const minutes = etNow.getMinutes();
@@ -78,27 +63,15 @@ function getDefaultSymbol() {
     // Check if it's a weekend
     const isWeekend = day === 0 || day === 6; // Sunday or Saturday
     
-    // Check if it's a weekday during US market hours (9:30AM - 4:00PM ET)
-    const isUSMarketHours = !isWeekend && 
-                           (hours > 9 || (hours === 9 && minutes >= 30)) && 
-                           (hours < 16);
+    // Check if it's a weekday during market hours (9:30AM - 4:00PM ET)
+    const isMarketHours = !isWeekend && 
+                         (hours > 9 || (hours === 9 && minutes >= 30)) && 
+                         (hours < 16);
     
-    // Check if it's during Asian market hours (roughly 6PM-6AM ET)
-    const isAsianMarketHours = (hours >= 18 || hours < 6);
-    
-    // Check if it's during European market hours (roughly 3AM-11AM ET)
-    const isEuropeanMarketHours = (hours >= 3 && hours < 11);
-    
-    if (isWeekend) {
-        return 'BTC-USD'; // Default to Bitcoin on weekends (crypto trades 24/7)
-    } else if (isUSMarketHours) {
-        return '^IXIC'; // Default to NASDAQ during US market hours
-    } else if (isAsianMarketHours) {
-        return 'N225'; // Default to Nikkei during Asian market hours
-    } else if (isEuropeanMarketHours) {
-        return 'GDAXI'; // Default to DAX during European market hours
+    if (isWeekend || !isMarketHours) {
+        return 'BTC-USD'; // Default to Bitcoin on weekends and outside market hours
     } else {
-        return 'BTC-USD'; // Default to Bitcoin during off-hours
+        return '^IXIC'; // Default to NASDAQ during market hours on weekdays
     }
 }
 
@@ -470,6 +443,8 @@ export function setupAutocomplete() {
                     <button class="btn-small add-watchlist" onclick="addToWatchlist('${symbol}')">+</button>
                 `;
                 item.addEventListener('click', () => {
+                    userSelectedSymbol = true; // User manually selected this symbol
+                    window.userSelectedSymbol = true; // Update global variable
                     input.value = symbol;
                     autocompleteList.style.display = 'none';
                     updateFinanceData(symbol);
@@ -502,6 +477,8 @@ export function setupAutocomplete() {
         if (e.key === 'Enter') {
             const symbol = this.value.trim().toUpperCase();
             if (symbol && stockSymbols[symbol]) {
+                userSelectedSymbol = true; // User manually entered this symbol
+                window.userSelectedSymbol = true; // Update global variable
                 if (!watchlist.includes(symbol)) {
                     addToWatchlist(symbol);
                     autocompleteList.style.display = 'none';
@@ -597,16 +574,6 @@ export function isMarketOpen() {
     if (symbol.endsWith('-USD')) {
         return true; // Crypto markets are always open
     }
-    
-    // Check if it's a currency pair
-    if (symbol.includes('=X') || symbol.includes('=X')) {
-        return true; // Forex markets are open 24/5 (closed weekends)
-    }
-    
-    // Check if it's a futures contract (precious metals)
-    if (symbol.includes('=F')) {
-        return true; // Futures trade nearly 24/7
-    }
 
     // Use Eastern Time for market hours check
     const now = new Date();
@@ -615,31 +582,14 @@ export function isMarketOpen() {
     const hour = etNow.getHours();
     const minute = etNow.getMinutes();
 
-    // Check if it's a weekend
-    if (day === 0 || day === 6) {
-        return false; // All traditional markets closed on weekends
+    // Check if it's a weekday (Monday = 1, Friday = 5)
+    if (day >= 1 && day <= 5) {
+        // Check if it's between 9:30 AM and 4:00 PM ET
+        if ((hour === 9 && minute >= 30) || (hour > 9 && hour < 16) || (hour === 16 && minute === 0)) {
+            return true;
+        }
     }
-
-    // Check US market hours (9:30 AM - 4:00 PM ET)
-    const isUSMarketHours = (hour === 9 && minute >= 30) || (hour > 9 && hour < 16) || (hour === 16 && minute === 0);
-    
-    // Check European market hours (roughly 3:30 AM - 11:30 AM ET)
-    const isEuropeanMarketHours = (hour >= 3 && hour < 12);
-    
-    // Check Asian market hours (roughly 6:00 PM - 6:00 AM ET)
-    const isAsianMarketHours = (hour >= 18 || hour < 6);
-    
-    // Determine which market the symbol belongs to
-    if (symbol.startsWith('^') || symbol === 'SPY' || symbol === 'DJT' || 
-        ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NFLX', 'NVDA'].includes(symbol)) {
-        return isUSMarketHours; // US stocks and indices
-    } else if (['N100', 'GDAXI', 'FCHI'].includes(symbol)) {
-        return isEuropeanMarketHours; // European indices
-    } else if (['000001.SS', 'N225', 'HSI', 'AXJO', 'ADOW'].includes(symbol)) {
-        return isAsianMarketHours; // Asian indices
-    } else {
-        return isUSMarketHours; // Default to US market hours
-    }
+    return false;
 }
 
 // Add this helper function to ensure data points are properly connected
@@ -1003,6 +953,7 @@ if (stockSymbolInput) {
 // Update selectStock to set userSelectedSymbol to true
 export function selectStock(symbol) {
     userSelectedSymbol = true;
+    window.userSelectedSymbol = true; // Update global variable
     document.getElementById('stockSymbolInput').value = symbol;
     handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
 }
@@ -1020,39 +971,47 @@ export function startAutoRefresh() {
     if (pauseButton && pauseButton.classList.contains('paused')) {
         return; // Do not start if paused
     }
-    // Only auto-refresh if the market is open OR if it's a cryptocurrency.
-    if (isMarketOpen() || isCrypto) {
+    
+    // Determine if we should start auto-refresh
+    const shouldStartRefresh = isMarketOpen() || isCrypto || userSelectedSymbol;
+    
+    if (shouldStartRefresh) {
         updateInterval = setInterval(() => {
-            // Check if market status has changed and we need to switch symbols
-            const shouldSwitchToCrypto = !isMarketOpen() && !currentSymbol.endsWith('-USD');
-            if (shouldSwitchToCrypto && !userSelectedSymbol) {
-                // Market just closed, switch to BTC-USD only if user hasn't selected a symbol
-                currentSymbol = 'BTC-USD';
-                const stockSymbolInput = document.getElementById('stockSymbolInput');
-                if (stockSymbolInput) {
-                    stockSymbolInput.value = currentSymbol;
+            // Only check for market close transition if user hasn't manually selected a symbol
+            if (!userSelectedSymbol) {
+                const shouldSwitchToCrypto = !isMarketOpen() && !currentSymbol.endsWith('-USD');
+                if (shouldSwitchToCrypto) {
+                    // Market just closed, switch to BTC-USD only if user hasn't selected a symbol
+                    currentSymbol = 'BTC-USD';
+                    const stockSymbolInput = document.getElementById('stockSymbolInput');
+                    if (stockSymbolInput) {
+                        stockSymbolInput.value = currentSymbol;
+                    }
+                    userSelectedSymbol = false; // App is now in auto mode
+                    window.userSelectedSymbol = false; // Update global variable
+                    updateFinanceData(currentSymbol, undefined, undefined, false);
+                    return;
                 }
-                userSelectedSymbol = false; // App is now in auto mode
-                updateFinanceData(currentSymbol, undefined, undefined, false);
-            } else {
-                // Normal refresh - Pass `true` for the `isRefresh` flag to prevent full chart recreation
-                updateFinanceData(currentSymbol, undefined, undefined, true);
             }
+            
+            // Normal refresh - Pass `true` for the `isRefresh` flag to prevent full chart recreation
+            updateFinanceData(currentSymbol, undefined, undefined, true);
         }, 5000); // Refresh every 5 seconds
     } else {
-        logger.warn(`Market is closed for ${currentSymbol}. Auto-refresh will not start.`);
+        logger.warn(`Market is closed for ${currentSymbol} and user hasn't selected a symbol. Auto-refresh will not start.`);
     }
 }
 
 // Update handleMarketCloseTransition to respect userSelectedSymbol
 export function handleMarketCloseTransition() {
     const currentSymbol = document.getElementById('stockSymbolInput')?.value.toUpperCase();
-    // If we're currently showing a stock (not crypto) and market just closed
+    // If we're currently showing a stock (not crypto) and market just closed, and user hasn't manually selected a symbol
     if (currentSymbol && !currentSymbol.endsWith('-USD') && !isMarketOpen() && !userSelectedSymbol) {
         // Switch to BTC-USD only if user hasn't selected a symbol
         const newSymbol = 'BTC-USD';
         document.getElementById('stockSymbolInput').value = newSymbol;
         userSelectedSymbol = false; // App is now in auto mode
+        window.userSelectedSymbol = false; // Update global variable
         updateFinanceData(newSymbol, DEFAULT_TIME_RANGE, DEFAULT_INTERVAL, false);
         if (updateInterval) {
             stopAutoRefresh();
@@ -1293,6 +1252,14 @@ export function clearWatchlist() {
     watchlist = [];
     userPrefs.setFinanceWatchlist(watchlist);
     updateWatchlistUI();
+    
+    // Refresh the stock dashboard to show empty state
+    if (stockDashboardInterval) {
+        fetchTopStocks();
+        logger.success('Watchlist cleared and dashboard refreshed');
+    } else {
+        logger.success('Watchlist cleared');
+    }
 }
 
 // Reset watchlist to default selection
@@ -1300,7 +1267,14 @@ export function resetToDefaultWatchlist() {
     watchlist = [...DEFAULT_WATCHLIST];
     userPrefs.setFinanceWatchlist(watchlist);
     updateWatchlistUI();
-    logger.success('Watchlist reset to default selection');
+    
+    // Refresh the stock dashboard to show the new symbols
+    if (stockDashboardInterval) {
+        fetchTopStocks();
+        logger.success('Watchlist reset to default selection and dashboard refreshed');
+    } else {
+        logger.success('Watchlist reset to default selection');
+    }
 }
 
 // Reset chart zoom
@@ -1590,6 +1564,19 @@ window.resetFinanceCardPositions = resetFinanceCardPositions;
 window.togglePauseFinance = togglePauseFinance;
 window.handleMarketCloseTransition = handleMarketCloseTransition;
 
+// Make userSelectedSymbol globally accessible
+window.userSelectedSymbol = userSelectedSymbol;
+
+// Function to reset to auto mode (allow automatic symbol switching)
+export function resetToAutoMode() {
+    userSelectedSymbol = false;
+    window.userSelectedSymbol = false;
+    logger.info('Reset to auto mode - allowing automatic symbol switching');
+}
+
+// Make resetToAutoMode globally available
+window.resetToAutoMode = resetToAutoMode;
+
 // Utility: Detect if device is mobile
 function isMobileDevice() {
   return /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
@@ -1672,4 +1659,3 @@ export function stopAutoRefresh() {
         updateInterval = null;
     }
 }
-
