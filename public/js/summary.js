@@ -558,6 +558,7 @@ async function generateSummary(sectionData) {
             
             if (result && !result.includes('Error:') && !result.includes('Unable to generate')) {
                 await updateSummaryDisplay(result);
+                await saveCurrentSummary();
                 await updateSavedSummariesList();
                 summaryGenerated = true;
                 return result; // Return the result to the calling function
