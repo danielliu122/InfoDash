@@ -387,46 +387,10 @@
                                 <span class="toggle-icon">−</span>
                             </div>
                         </div>
-                        <div id="news-content" class="section-content">
-                            <div class="row">
-                                <div class="col s12">
-                                    <div class="news-category-group">
-                                        <h6>📰 Main Categories</h6>
-                                        <button id="topHeadlinesButton" class="btn-small waves-effect waves-light" onclick="handleNewsTypeClick('top-headlines')">Top Headlines</button>
-                                        <button id="worldNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'world')">General</button>
-                                        <button id="everythingButton" class="btn-small waves-effect waves-light" onclick="handleNewsTypeClick('everything')">Everything</button>
-                                    </div>
-                                    
-                                    <div class="news-category-group">
-                                        <h6>💼 Business & Finance</h6>
-                                        <button id="businessNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'business')">Business</button>
-                                        <button id="techNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'technology')">Technology</button>
-                                    </div>
-                                    
-                                    <div class="news-category-group">
-                                        <h6>🎉 Lifestyle & Events</h6>
-                                        <button id="sportsNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'sports')">Sports</button>
-                                        <button id="healthNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'health')">Health</button>
-                                        <button id="entertainmentNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'entertainment')">Entertainment</button>
-                                        <button id="scienceNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'science')">Science</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col s12">
-                                    <div class="input-field col s12 m3">
-                                        <select id="dateRangeSelect" onchange="handleDateRangeChange()" disabled>
-                                            <option value="24h">Last 24 hours</option>
-                                            <option value="7d">Last week</option>
-                                            <option value="30d">Last month</option>
-                                            <option value="all">All time</option>
-                                        </select>
-                                        <label>Date Range</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="news-controls" class="row">
+                        <div id="news-controls" class="row">
+                            <div class="news-controls-container">
                                 <div class="input-field col s6">
+                                    <label for="countrySelect">Country</label>
                                     <select id="countrySelect" disabled>
                                         <option value="All">All</option>
                                         <option value="US">United States</option>
@@ -477,9 +441,9 @@
                                         <option value="RO">Romania</option>
                                         <option value="UA">Ukraine</option>
                                     </select>
-                                    <label for="countrySelect">Country</label>
                                 </div>
                                 <div class="input-field col s6">
+                                    <label for="languageSelect">Language</label>
                                     <select id="languageSelect">
                                         <option value="en">English</option>
                                         <option value="es">Español</option>
@@ -526,9 +490,48 @@
                                         <option value="et">Eesti</option>
                                         <option value="is">Íslenska</option>
                                     </select>
-                                    <label for="languageSelect">Language</label>
                                 </div>
                             </div>
+                        </div>
+                        <div id="news-content" class="section-content">
+                            <div class="row">
+                                <div class="col s12">
+                                    <div class="news-category-group">
+                                        <h6>📰 Main Categories</h6>
+                                        <button id="topHeadlinesButton" class="btn-small waves-effect waves-light" onclick="handleNewsTypeClick('top-headlines')">Top Headlines</button>
+                                        <button id="worldNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'world')">General</button>
+                                        <button id="everythingButton" class="btn-small waves-effect waves-light" onclick="handleNewsTypeClick('everything')">Everything</button>
+                                    </div>
+                                    
+                                    <div class="news-category-group">
+                                        <h6>💼 Business & Finance</h6>
+                                        <button id="businessNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'business')">Business</button>
+                                        <button id="techNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'technology')">Technology</button>
+                                    </div>
+                                    
+                                    <div class="news-category-group">
+                                        <h6>🎉 Lifestyle & Events</h6>
+                                        <button id="sportsNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'sports')">Sports</button>
+                                        <button id="healthNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'health')">Health</button>
+                                        <button id="entertainmentNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'entertainment')">Entertainment</button>
+                                        <button id="scienceNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'science')">Science</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col s12">
+                                    <div class="input-field col s12 m3">
+                                        <select id="dateRangeSelect" onchange="handleDateRangeChange()" disabled>
+                                            <option value="24h">Last 24 hours</option>
+                                            <option value="7d">Last week</option>
+                                            <option value="30d">Last month</option>
+                                            <option value="all">All time</option>
+                                        </select>
+                                        <label>Date Range</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="height: 16px;"></div>
                             <div class="row">
                                 <div class="col s12">
                                     <div id="news-mode-indicator" style="text-align: center; margin: 10px 0; font-size: 0.9em; color: #666;">
@@ -549,14 +552,16 @@
                             </div>
                         </div>
                         <div id="trends-content" class="section-content">
+                            <div class="trends-controls-container"></div>
                             <div class="row">
                                 <div class="input-field col s6">
+                                    <label for="trendsLanguageSelect">Language</label>
                                     <select id="trendsLanguageSelect">
                                         <!-- Options will be populated dynamically -->
                                     </select>
-                                    <label for="trendsLanguageSelect">Language</label>
                                 </div>
                                 <div class="input-field col s6">
+                                    <label for="trendsCountrySelect">Country</label>
                                     <select id="trendsCountrySelect">
                                         <option value="US">United States</option>
                                         <option value="CA">Canada</option>
@@ -606,7 +611,6 @@
                                         <option value="RO">Romania</option>
                                         <option value="UA">Ukraine</option>
                                     </select>
-                                    <label for="trendsCountrySelect">Country</label>
                                 </div>
                             </div>
                             <div class="data-container"></div>

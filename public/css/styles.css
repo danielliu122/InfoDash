@@ -52,6 +52,7 @@ body, html {
   background: var(--primary-bg);
     color: var(--primary-text);
   min-height: 100vh;
+  font-size: 20px;
 }
 
 /* === Layout === */
@@ -641,6 +642,7 @@ body.dark-theme #news-controls input.select-dropdown {
   background: #23272e !important;
   color: #fff !important;
   border-color: #444 !important;
+  font-size: 20px;
 }
 body.dark-theme .dropdown-content {
   background: #23272e !important;
@@ -679,7 +681,7 @@ body.dark-theme #reddit-content > .data-container {
   border: none;
   padding: 8px 16px;
   border-radius: 20px;
-    font-size: 14px;
+    font-size: 20px;
   font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1454,3 +1456,78 @@ header .input-field label {
         justify-content: center;
     }
 }
+
+/* === Trends Section Dropdown Styling (match News section) === */
+#trends .input-field select {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+    height: auto;
+    margin: 0;
+}
+#trends .input-field select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.2);
+}
+#trends .input-field select option {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    padding: 8px;
+}
+#trends .input-field label {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-bottom: 4px;
+    margin-top: 0;
+    position: static;
+    display: block;
+    width: 100%;
+}
+@media (max-width: 768px) {
+    #trends .input-field {
+        min-width: 250px;
+    }
+    #trends .input-field select {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+body.dark-theme #trends .input-field select {
+    color: #fff !important;
+    background-color: var(--input-bg) !important;
+    border-color: var(--input-border) !important;
+}
+body.dark-theme #trends .dropdown-content {
+    background: #23272e !important;
+    color: #fff !important;
+}
+body.dark-theme #trends .dropdown-content li > span {
+    color: #fff !important;
+}
+body.dark-theme #trends-content input.select-dropdown,
+body.dark-theme #trends .select-dropdown {
+  background: #23272e !important;
+  color: #fff !important;
+  border-color: #444 !important;
+  font-size: 20px;
+}
+body.dark-theme #trends .dropdown-content {
+  background: #23272e !important;
+  color: #fff !important;
+}
+body.dark-theme #trends .dropdown-content li > span {
+  color: #fff !important;
+}
+label {
+    padding: 8px 0;
+    color: var(--text-primary);
+}
+body.dark-theme label {
+    color: var(--text-secondary);
+}
+
+
