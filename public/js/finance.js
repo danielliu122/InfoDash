@@ -291,17 +291,26 @@ export function addToWatchlist(symbol) {
         userPrefs.setFinanceWatchlist(watchlist);
         updateWatchlistUI();
 
-        // If the dashboard is live, add the new stock card dynamically
-        if (stockDashboardInterval) {
-            fetchRealTimeYahooFinanceData(symbol).then(newStockData => {
-                if (newStockData && !newStockData.error) {
+        // Fetch real-time data and add to dashboard
+        fetchRealTimeYahooFinanceData(symbol).then(newStockData => {
+            if (newStockData && !newStockData.error) {
+                // Check if already in topStocks to avoid duplicates
+                const existingIndex = topStocks.findIndex(stock => stock.symbol === symbol);
+                if (existingIndex === -1) {
                     topStocks.push(newStockData);
-                    
-                    // Add the new stock card to the existing dashboard
-                    const dashboardContainer = document.getElementById('stock-dashboard');
-                    const grid = dashboardContainer?.querySelector('.stock-dashboard-grid');
-                    
-                    if (grid) {
+                } else {
+                    // Update existing data
+                    topStocks[existingIndex] = newStockData;
+                }
+                
+                // Add the new stock card to the existing dashboard
+                const dashboardContainer = document.getElementById('stock-dashboard');
+                const grid = dashboardContainer?.querySelector('.stock-dashboard-grid');
+                
+                if (grid) {
+                    // Check if card already exists
+                    const existingCard = grid.querySelector(`[data-symbol="${symbol}"]`);
+                    if (!existingCard) {
                         const change = newStockData.change || 0;
                         const changePercent = newStockData.changePercent || 0;
                         const changeColor = change >= 0 ? 'green' : 'red';
@@ -338,35 +347,64 @@ export function addToWatchlist(symbol) {
                         }, 10);
                     }
                 }
-            });
+                
+                // Show notification
+                if (window.showNotification) {
+                    window.showNotification(`${symbol} added to watchlist`, 3000);
+                }
+            } else {
+                // Show error notification
+                if (window.showNotification) {
+                    window.showNotification(`Failed to fetch data for ${symbol}`, 4000);
+                }
+            }
+        }).catch(error => {
+            console.error(`Error adding ${symbol} to watchlist:`, error);
+            if (window.showNotification) {
+                window.showNotification(`Error adding ${symbol} to watchlist`, 4000);
+            }
+        });
+    } else {
+        // Already in watchlist
+        if (window.showNotification) {
+            window.showNotification(`${symbol} is already in your watchlist`, 3000);
         }
     }
 }
 
 export function removeFromWatchlist(symbol) {
+    // Remove from watchlist array
     watchlist = watchlist.filter(s => s !== symbol);
     userPrefs.setFinanceWatchlist(watchlist);
     updateWatchlistUI();
 
-    // If the dashboard is live, remove the stock card dynamically
-    if (stockDashboardInterval) {
-        topStocks = topStocks.filter(stock => stock.symbol !== symbol);
+    // Remove from topStocks array
+    topStocks = topStocks.filter(stock => stock.symbol !== symbol);
+    
+    // Remove the stock card from the dashboard with animation
+    const dashboardContainer = document.getElementById('stock-dashboard');
+    const stockCard = dashboardContainer?.querySelector(`[data-symbol="${symbol}"]`);
+    
+    if (stockCard) {
+        stockCard.style.transition = 'all 0.3s ease';
+        stockCard.style.opacity = '0';
+        stockCard.style.transform = 'scale(0.8)';
         
-        // Remove the stock card from the dashboard with animation
-        const dashboardContainer = document.getElementById('stock-dashboard');
-        const stockCard = dashboardContainer?.querySelector(`[data-symbol="${symbol}"]`);
-        
-        if (stockCard) {
-            stockCard.style.transition = 'all 0.3s ease';
-            stockCard.style.opacity = '0';
-            stockCard.style.transform = 'scale(0.8)';
-            
-            setTimeout(() => {
-                if (stockCard.parentNode) {
-                    stockCard.parentNode.removeChild(stockCard);
-                }
-            }, 300);
-        }
+        setTimeout(() => {
+            if (stockCard.parentNode) {
+                stockCard.parentNode.removeChild(stockCard);
+            }
+        }, 300);
+    }
+    
+    // Also remove from previousStockData to prevent memory leaks
+    if (previousStockData[symbol]) {
+        delete previousStockData[symbol];
+    }
+    
+    // Show notification
+    if (window.showNotification) {
+        window.showNotification(`${symbol} removed from watchlist`, 3000);
     }
 }
 
@@ -387,7 +425,13 @@ export function updateWatchlistUI() {
                 <span class="company-name">${stockSymbols[symbol] || symbol}</span>
                 <button class="btn-small remove-watchlist" onclick="removeFromWatchlist('${symbol}')">×</button>
             `;
-            watchlistItem.addEventListener('click', () => {
+            
+            // Add click event to the watchlist item (but not the remove button)
+            watchlistItem.addEventListener('click', (e) => {
+                // Don't trigger if clicking the remove button
+                if (e.target.classList.contains('remove-watchlist')) {
+                    return;
+                }
                 document.getElementById('stockSymbolInput').value = symbol;
                 updateFinanceData(symbol);
             });
@@ -414,6 +458,123 @@ export function loadWatchlistFromPreferences() {
     updateWatchlistUI();
 }
 
+// Function to validate a stock symbol by attempting to fetch its data
+async function validateStockSymbol(symbol) {
+    // Basic validation first
+    if (!symbol || symbol.trim().length === 0) {
+        return { valid: false, error: 'Symbol cannot be empty' };
+    }
+    
+    // Check for common invalid patterns
+    const invalidPatterns = [
+        /^[0-9]+$/, // Just numbers
+        /^[^A-Z0-9.-]+$/i, // No alphanumeric characters
+        /^[A-Z]{1}$/i, // Single character
+        /^[A-Z]{20,}$/i, // Too long (most symbols are 1-5 chars)
+    ];
+    
+    for (const pattern of invalidPatterns) {
+        if (pattern.test(symbol)) {
+            return { valid: false, error: 'Invalid symbol format' };
+        }
+    }
+    
+    try {
+        // Show loading state
+        const input = document.getElementById('stockSymbolInput');
+        if (input) {
+            input.style.borderColor = '#FFC107'; // Yellow for loading
+            input.title = `Validating ${symbol}...`;
+        }
+        
+        const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`, {
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
+        
+        if (!response.ok) {
+            if (response.status === 404) {
+                return { valid: false, error: 'Symbol not found' };
+            } else if (response.status === 429) {
+                return { valid: false, error: 'Rate limit exceeded. Please try again later.' };
+            } else if (response.status >= 500) {
+                return { valid: false, error: 'Server error. Please try again later.' };
+            } else {
+                return { valid: false, error: `HTTP ${response.status}: ${response.statusText}` };
+            }
+        }
+        
+        const data = await response.json();
+        
+        // Check for various error conditions in the response
+        if (!data.chart) {
+            return { valid: false, error: 'Invalid response format' };
+        }
+        
+        if (data.chart.error) {
+            const error = data.chart.error;
+            if (error.code === 'Not Found') {
+                return { valid: false, error: 'Symbol not found' };
+            } else if (error.code === 'Unauthorized') {
+                return { valid: false, error: 'Access denied' };
+            } else {
+                return { valid: false, error: error.description || 'Unknown error' };
+            }
+        }
+        
+        if (!data.chart.result || !data.chart.result[0]) {
+            return { valid: false, error: 'No data available for this symbol' };
+        }
+        
+        const result = data.chart.result[0];
+        const meta = result.meta;
+        
+        if (!meta) {
+            return { valid: false, error: 'No metadata available' };
+        }
+        
+        if (!meta.symbol) {
+            return { valid: false, error: 'Invalid symbol data' };
+        }
+        
+        // Check if the symbol has any price data
+        const quotes = result.indicators?.quote?.[0];
+        if (!quotes || !quotes.close || quotes.close.every(price => price === null || price === undefined)) {
+            return { valid: false, error: 'No price data available for this symbol' };
+        }
+        
+        // Success - return validated data
+        return { 
+            valid: true, 
+            name: meta.shortName || meta.longName || meta.symbol || symbol,
+            symbol: meta.symbol,
+            price: meta.regularMarketPrice,
+            marketCap: meta.marketCap,
+            volume: meta.volume
+        };
+        
+    } catch (error) {
+        console.error(`Error validating symbol ${symbol}:`, error);
+        
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            return { valid: false, error: 'Network error. Please check your connection.' };
+        } else if (error.name === 'SyntaxError') {
+            return { valid: false, error: 'Invalid response from server' };
+        } else {
+            return { valid: false, error: 'Validation failed. Please try again.' };
+        }
+    } finally {
+        // Reset input styling
+        const input = document.getElementById('stockSymbolInput');
+        if (input) {
+            input.style.borderColor = '';
+            input.title = 'Enter a stock symbol';
+        }
+    }
+}
+
 // Enhanced autocomplete functionality
 export function setupAutocomplete() {
     const input = document.getElementById('stockSymbolInput');
@@ -427,10 +588,13 @@ export function setupAutocomplete() {
             autocompleteList.style.display = 'none';
             return;
         }
+        
+        // Show matches from stockSymbols.json
         const matches = Object.entries(stockSymbols)
             .filter(([symbol, name]) => symbol.includes(value) || name.toUpperCase().includes(value))
             .slice(0, 10);
         let symbolInMatches = false;
+        
         if (matches.length > 0) {
             autocompleteList.style.display = 'block';
             matches.forEach(([symbol, name]) => {
@@ -442,7 +606,11 @@ export function setupAutocomplete() {
                     <span class="name">${name}</span>
                     <button class="btn-small add-watchlist" onclick="addToWatchlist('${symbol}')">+</button>
                 `;
-                item.addEventListener('click', () => {
+                item.addEventListener('click', (e) => {
+                    // Don't trigger if clicking the add button
+                    if (e.target.classList.contains('add-watchlist')) {
+                        return;
+                    }
                     userSelectedSymbol = true; // User manually selected this symbol
                     window.userSelectedSymbol = true; // Update global variable
                     input.value = symbol;
@@ -455,13 +623,34 @@ export function setupAutocomplete() {
         } else {
             autocompleteList.style.display = 'block';
         }
-        // Only show persistent add button if not already in matches
+        
+        // Show add button for any symbol (not just those in stockSymbols.json)
         const symbol = value.trim();
-        if (symbol && stockSymbols[symbol] && !watchlist.includes(symbol) && !symbolInMatches) {
+        if (symbol && symbol.length > 0 && !watchlist.includes(symbol) && !symbolInMatches) {
             const addBtn = document.createElement('div');
             addBtn.className = 'autocomplete-item';
-            addBtn.innerHTML = `<span class="symbol">${symbol}</span><span class="name">${stockSymbols[symbol]}</span><button class="btn-small add-watchlist" onclick="addToWatchlist('${symbol}')">Add to Watchlist</button>`;
-            addBtn.addEventListener('click', () => {
+            const displayName = stockSymbols[symbol] || symbol;
+            addBtn.innerHTML = `<span class="symbol">${symbol}</span><span class="name">${displayName}</span><button class="btn-small add-watchlist" onclick="addToWatchlist('${symbol}')">Add to Watchlist</button>`;
+            addBtn.addEventListener('click', async (e) => {
+                // Don't trigger if clicking the add button
+                if (e.target.classList.contains('add-watchlist')) {
+                    return;
+                }
+                
+                // Validate unknown symbols before adding
+                if (!stockSymbols[symbol]) {
+                    const validation = await validateStockSymbol(symbol);
+                    if (!validation.valid) {
+                        const errorMessage = validation.error || 'Unknown error occurred';
+                        if (window.showNotification) {
+                            window.showNotification(`Error: ${errorMessage}`, 5000);
+                        }
+                        return;
+                    }
+                    // Add to stockSymbols cache for future use
+                    stockSymbols[symbol] = validation.name;
+                }
+                
                 addToWatchlist(symbol);
                 autocompleteList.style.display = 'none';
             });
@@ -472,41 +661,66 @@ export function setupAutocomplete() {
     input.addEventListener('input', renderSuggestions);
     input.addEventListener('focus', renderSuggestions);
 
-    // Pressing Enter with a valid symbol adds to watchlist
-    input.addEventListener('keypress', function(e) {
+    // Pressing Enter with any symbol - validate and add to watchlist
+    input.addEventListener('keypress', async function(e) {
         if (e.key === 'Enter') {
             const symbol = this.value.trim().toUpperCase();
-            if (symbol && stockSymbols[symbol]) {
+            if (symbol && symbol.length > 0) {
                 userSelectedSymbol = true; // User manually entered this symbol
                 window.userSelectedSymbol = true; // Update global variable
-                if (!watchlist.includes(symbol)) {
-                    addToWatchlist(symbol);
-                    autocompleteList.style.display = 'none';
-                } else {
+                
+                // First check if it's already in watchlist
+                if (watchlist.includes(symbol)) {
                     updateFinanceData(symbol);
                     fetchStockInfo(symbol);
                     autocompleteList.style.display = 'none';
+                    return;
                 }
-            } else {
-                if (window.showNotification) {
-                    window.showNotification(`Symbol "${symbol}" not found. Please check the spelling or try a different symbol.`, 4000);
+                
+                // Validate the symbol by attempting to fetch data
+                const validation = await validateStockSymbol(symbol);
+                if (validation.valid) {
+                    // Add to stockSymbols cache for future use
+                    stockSymbols[symbol] = validation.name;
+                    
+                    // Add to watchlist
+                    addToWatchlist(symbol);
+                    autocompleteList.style.display = 'none';
+                    
+                    // Show success notification with company name
+                    if (window.showNotification) {
+                        window.showNotification(`${symbol} (${validation.name}) added to watchlist!`, 3000);
+                    }
                 } else {
-                    alert(`Symbol "${symbol}" not found. Please check the spelling or try a different symbol.`);
+                    // Show specific error message
+                    const errorMessage = validation.error || 'Unknown error occurred';
+                    if (window.showNotification) {
+                        window.showNotification(`Error: ${errorMessage}`, 5000);
+                    } else {
+                        alert(`Error: ${errorMessage}`);
+                    }
                 }
             }
         }
     });
 
-    // Add a visual indicator for valid symbols
+    // Add a visual indicator for symbols
     input.addEventListener('input', function() {
         const symbol = this.value.trim().toUpperCase();
-        const isValidSymbol = stockSymbols[symbol];
-        if (symbol && isValidSymbol) {
-            this.style.borderColor = '#4CAF50';
-            this.title = `Valid symbol: ${symbol}`;
-        } else if (symbol && !isValidSymbol) {
-            this.style.borderColor = '#f44336';
-            this.title = `Invalid symbol: ${symbol}`;
+        if (symbol && symbol.length > 0) {
+            if (stockSymbols[symbol]) {
+                // Known symbol from our list
+                this.style.borderColor = '#4CAF50';
+                this.title = `Known symbol: ${symbol} - ${stockSymbols[symbol]}`;
+            } else if (watchlist.includes(symbol)) {
+                // Symbol already in watchlist
+                this.style.borderColor = '#2196F3';
+                this.title = `Already in watchlist: ${symbol}`;
+            } else {
+                // Unknown symbol - will be validated when added
+                this.style.borderColor = '#FF9800';
+                this.title = `Unknown symbol: ${symbol} - Will validate when added`;
+            }
         } else {
             this.style.borderColor = '';
             this.title = 'Enter a stock symbol';
@@ -1515,7 +1729,7 @@ export function stopStockDashboard() {
 }
 
 // Function to add current symbol to watchlist
-export function addCurrentSymbolToWatchlist() {
+export async function addCurrentSymbolToWatchlist() {
     const input = document.getElementById('stockSymbolInput');
     if (!input) return;
     
@@ -1523,13 +1737,6 @@ export function addCurrentSymbolToWatchlist() {
     if (!symbol) {
         if (window.showNotification) {
             window.showNotification('Please enter a stock symbol first', 3000);
-        }
-        return;
-    }
-    
-    if (!stockSymbols[symbol]) {
-        if (window.showNotification) {
-            window.showNotification(`Symbol "${symbol}" not found. Please check the spelling.`, 4000);
         }
         return;
     }
@@ -1543,12 +1750,24 @@ export function addCurrentSymbolToWatchlist() {
         return;
     }
     
+    // If not in stockSymbols, validate it first
+    if (!stockSymbols[symbol]) {
+        const validation = await validateStockSymbol(symbol);
+        if (!validation.valid) {
+            const errorMessage = validation.error || 'Unknown error occurred';
+            if (window.showNotification) {
+                window.showNotification(`Error: ${errorMessage}`, 5000);
+            }
+            return;
+        }
+        // Add to stockSymbols cache for future use
+        stockSymbols[symbol] = validation.name;
+    }
+    
     // Add to watchlist
     addToWatchlist(symbol);
     
-    if (window.showNotification) {
-        window.showNotification(`${symbol} added to watchlist!`, 3000);
-    }
+    // Success notification will be shown by addToWatchlist function
 }
 
 // Make functions available globally for HTML onclick handlers
