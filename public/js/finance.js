@@ -541,8 +541,14 @@ async function validateStockSymbol(symbol) {
         
         // Check if the symbol has any price data
         const quotes = result.indicators?.quote?.[0];
-        if (!quotes || !quotes.close || quotes.close.every(price => price === null || price === undefined)) {
+        if (!quotes || !quotes.close) {
             return { valid: false, error: 'No price data available for this symbol' };
+        }
+        
+        // Check if there's at least one valid price (not all null/undefined)
+        const hasValidPrice = quotes.close.some(price => price !== null && price !== undefined);
+        if (!hasValidPrice) {
+            return { valid: false, error: 'No valid price data available for this symbol' };
         }
         
         // Success - return validated data
@@ -584,10 +590,14 @@ export function setupAutocomplete() {
     function renderSuggestions() {
         const value = input.value.toUpperCase();
         autocompleteList.innerHTML = '';
+        
         if (value.length < 1) {
             autocompleteList.style.display = 'none';
             return;
         }
+        
+        // Always show the autocomplete list when there's input
+        autocompleteList.style.display = 'block';
         
         // Show matches from stockSymbols.json
         const matches = Object.entries(stockSymbols)
@@ -596,7 +606,6 @@ export function setupAutocomplete() {
         let symbolInMatches = false;
         
         if (matches.length > 0) {
-            autocompleteList.style.display = 'block';
             matches.forEach(([symbol, name]) => {
                 if (symbol === value.trim()) symbolInMatches = true;
                 const item = document.createElement('div');
@@ -620,13 +629,11 @@ export function setupAutocomplete() {
                 });
                 autocompleteList.appendChild(item);
             });
-        } else {
-            autocompleteList.style.display = 'block';
         }
         
-        // Show add button for any symbol (not just those in stockSymbols.json)
+        // Always show add button for the current input if it's not already in the watchlist
         const symbol = value.trim();
-        if (symbol && symbol.length > 0 && !watchlist.includes(symbol) && !symbolInMatches) {
+        if (symbol && symbol.length > 0 && !watchlist.includes(symbol)) {
             const addBtn = document.createElement('div');
             addBtn.className = 'autocomplete-item';
             const displayName = stockSymbols[symbol] || symbol;
@@ -1770,11 +1777,59 @@ export async function addCurrentSymbolToWatchlist() {
     // Success notification will be shown by addToWatchlist function
 }
 
+// Function to search and add stock from the search button
+export async function searchAndAddStock() {
+    const input = document.getElementById('stockSymbolInput');
+    if (!input) return;
+    
+    const symbol = input.value.trim().toUpperCase();
+    if (!symbol) {
+        if (window.showNotification) {
+            window.showNotification('Please enter a stock symbol first', 3000);
+        }
+        return;
+    }
+    
+    // Check if already in watchlist
+    if (watchlist.includes(symbol)) {
+        updateFinanceData(symbol);
+        fetchStockInfo(symbol);
+        if (window.showNotification) {
+            window.showNotification(`${symbol} is already in your watchlist`, 3000);
+        }
+        return;
+    }
+    
+    // Validate the symbol by attempting to fetch data
+    const validation = await validateStockSymbol(symbol);
+    if (validation.valid) {
+        // Add to stockSymbols cache for future use
+        stockSymbols[symbol] = validation.name;
+        
+        // Add to watchlist
+        addToWatchlist(symbol);
+        
+        // Show success notification with company name
+        if (window.showNotification) {
+            window.showNotification(`${symbol} (${validation.name}) added to watchlist!`, 3000);
+        }
+    } else {
+        // Show specific error message
+        const errorMessage = validation.error || 'Unknown error occurred';
+        if (window.showNotification) {
+            window.showNotification(`Error: ${errorMessage}`, 5000);
+        } else {
+            alert(`Error: ${errorMessage}`);
+        }
+    }
+}
+
 // Make functions available globally for HTML onclick handlers
 window.addToWatchlist = addToWatchlist;
 window.removeFromWatchlist = removeFromWatchlist;
 window.clearWatchlist = clearWatchlist;
 window.addCurrentSymbolToWatchlist = addCurrentSymbolToWatchlist;
+window.searchAndAddStock = searchAndAddStock;
 window.startStockDashboard = startStockDashboard;
 window.stopStockDashboard = stopStockDashboard;
 window.selectStock = selectStock;
