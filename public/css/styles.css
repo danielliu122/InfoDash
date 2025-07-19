@@ -514,6 +514,7 @@ body.dark-theme .collapsible-header:hover {
     margin-bottom: 10px;
   }
   .stock-dashboard-grid .stock-card {
+    background: lab(90.06% -5.3 -4.59)!important;
     width: 100%;
     max-width: 100%;
     min-width: 0;
