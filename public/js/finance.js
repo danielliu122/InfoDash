@@ -292,8 +292,8 @@ export function addToWatchlist(symbol) {
         updateWatchlistUI();
 
         // Fetch real-time data and add to dashboard
-        fetchRealTimeYahooFinanceData(symbol).then(newStockData => {
-            if (newStockData && !newStockData.error) {
+            fetchRealTimeYahooFinanceData(symbol).then(newStockData => {
+                if (newStockData && !newStockData.error) {
                 // Check if already in topStocks to avoid duplicates
                 const existingIndex = topStocks.findIndex(stock => stock.symbol === symbol);
                 if (existingIndex === -1) {
@@ -302,12 +302,12 @@ export function addToWatchlist(symbol) {
                     // Update existing data
                     topStocks[existingIndex] = newStockData;
                 }
-                
-                // Add the new stock card to the existing dashboard
-                const dashboardContainer = document.getElementById('stock-dashboard');
-                const grid = dashboardContainer?.querySelector('.stock-dashboard-grid');
-                
-                if (grid) {
+                    
+                    // Add the new stock card to the existing dashboard
+                    const dashboardContainer = document.getElementById('stock-dashboard');
+                    const grid = dashboardContainer?.querySelector('.stock-dashboard-grid');
+                    
+                    if (grid) {
                     // Check if card already exists
                     const existingCard = grid.querySelector(`[data-symbol="${symbol}"]`);
                     if (!existingCard) {
@@ -379,23 +379,23 @@ export function removeFromWatchlist(symbol) {
     updateWatchlistUI();
 
     // Remove from topStocks array
-    topStocks = topStocks.filter(stock => stock.symbol !== symbol);
-    
-    // Remove the stock card from the dashboard with animation
-    const dashboardContainer = document.getElementById('stock-dashboard');
-    const stockCard = dashboardContainer?.querySelector(`[data-symbol="${symbol}"]`);
-    
-    if (stockCard) {
-        stockCard.style.transition = 'all 0.3s ease';
-        stockCard.style.opacity = '0';
-        stockCard.style.transform = 'scale(0.8)';
+        topStocks = topStocks.filter(stock => stock.symbol !== symbol);
         
-        setTimeout(() => {
-            if (stockCard.parentNode) {
-                stockCard.parentNode.removeChild(stockCard);
-            }
-        }, 300);
-    }
+        // Remove the stock card from the dashboard with animation
+        const dashboardContainer = document.getElementById('stock-dashboard');
+        const stockCard = dashboardContainer?.querySelector(`[data-symbol="${symbol}"]`);
+        
+        if (stockCard) {
+            stockCard.style.transition = 'all 0.3s ease';
+            stockCard.style.opacity = '0';
+            stockCard.style.transform = 'scale(0.8)';
+            
+            setTimeout(() => {
+                if (stockCard.parentNode) {
+                    stockCard.parentNode.removeChild(stockCard);
+                }
+            }, 300);
+        }
     
     // Also remove from previousStockData to prevent memory leaks
     if (previousStockData[symbol]) {
@@ -697,13 +697,13 @@ export function setupAutocomplete() {
                     // Show success notification with company name
                     if (window.showNotification) {
                         window.showNotification(`${symbol} (${validation.name}) added to watchlist!`, 3000);
-                    }
-                } else {
+                }
+            } else {
                     // Show specific error message
                     const errorMessage = validation.error || 'Unknown error occurred';
-                    if (window.showNotification) {
+                if (window.showNotification) {
                         window.showNotification(`Error: ${errorMessage}`, 5000);
-                    } else {
+                } else {
                         alert(`Error: ${errorMessage}`);
                     }
                 }
@@ -717,7 +717,7 @@ export function setupAutocomplete() {
         if (symbol && symbol.length > 0) {
             if (stockSymbols[symbol]) {
                 // Known symbol from our list
-                this.style.borderColor = '#4CAF50';
+            this.style.borderColor = '#4CAF50';
                 this.title = `Known symbol: ${symbol} - ${stockSymbols[symbol]}`;
             } else if (watchlist.includes(symbol)) {
                 // Symbol already in watchlist
@@ -1762,7 +1762,7 @@ export async function addCurrentSymbolToWatchlist() {
         const validation = await validateStockSymbol(symbol);
         if (!validation.valid) {
             const errorMessage = validation.error || 'Unknown error occurred';
-            if (window.showNotification) {
+        if (window.showNotification) {
                 window.showNotification(`Error: ${errorMessage}`, 5000);
             }
             return;
@@ -1805,12 +1805,12 @@ export async function searchAndAddStock() {
     if (validation.valid) {
         // Add to stockSymbols cache for future use
         stockSymbols[symbol] = validation.name;
-        
-        // Add to watchlist
-        addToWatchlist(symbol);
-        
+    
+    // Add to watchlist
+    addToWatchlist(symbol);
+    
         // Show success notification with company name
-        if (window.showNotification) {
+    if (window.showNotification) {
             window.showNotification(`${symbol} (${validation.name}) added to watchlist!`, 3000);
         }
     } else {

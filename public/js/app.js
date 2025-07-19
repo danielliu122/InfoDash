@@ -1,4 +1,3 @@
-import { loadGoogleMapsScript, updateTrafficInfo } from './map.js';
 import { 
     updateInterval,
     fetchFinancialData, 
@@ -336,12 +335,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 });
-
-// Make sure to call loadGoogleMapsScript in your initialization code
-loadGoogleMapsScript().catch(error => {
-    console.error('Error initializing map:', error);
-});
-
 
 // Update the autocomplete logic
 document.getElementById('stockSymbolInput').addEventListener('input', function() {

@@ -74,7 +74,6 @@
     <script type="module" src="js/trends.js"></script>
     <script type="module" src="js/reddit.js"></script>
     <script type="module" src="js/summary.js"></script>
-    <script type="module" src="js/map.js"></script>
     
     <!-- Google AdSense -->
     <meta name="google-adsense-account" content="ca-pub-4393237786045277">
@@ -309,7 +308,7 @@
                                                         <option value="pt-BR" data-language="pt" data-country="BR">🇧🇷 Brasil (Português)</option>
                                                         <option value="it-IT" data-language="it" data-country="IT">🇮🇹 Italia (Italiano)</option>
                                                         <option value="ru-RU" data-language="ru" data-country="RU">🇷🇺 Россия (Русский)</option>
-                                                        <option value="jp-JP" data-language="jp" data-country="JP">🇯🇵 日本 (日本語)</option>
+                                                        <option value="jp-JP" data-language="jp" data-country="JP">🇯�� 日本 (日本語)</option>
                                                         <option value="ko-KR" data-language="ko" data-country="KR">🇰🇷 한국 (한국어)</option>
                                                         <option value="zh-CN" data-language="zh" data-country="CN">🇨🇳 中国 (中文)</option>
                                                         <option value="ar-SA" data-language="ar" data-country="SA">🇸🇦 السعودية (العربية)</option>
@@ -712,39 +711,48 @@
             
             <!-- Group 3: Traffic and Reddit -->
             <div class="col s12">
-                <div class="col s12 m6">
-                    <section id="traffic" class="section">
-                        <div class="section-header">
-                            <h4>Google Maps Traffic</h4>
-                            <div class="section-toggle" onclick="toggleSection('traffic-content')" title="Show/Hide Section">
-                                <span class="toggle-icon">−</span>
+                <section id="traffic" class="section">
+                    <div class="section-header">
+                        <h4>Google Maps Traffic</h4>
+                        <div class="section-toggle" onclick="toggleSection('traffic-content')" title="Show/Hide Section">
+                            <span class="toggle-icon">−</span>
+                        </div>
+                    </div>
+                    <div id="traffic-content" class="section-content">
+                        <form id="directions-form" style="margin-bottom: 1em; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                            <input id="origin-input" class="controls" type="text" placeholder="Enter origin" style="flex: 1; min-width: 180px;" required>
+                            <input id="destination-input" class="controls" type="text" placeholder="Enter destination" style="flex: 1; min-width: 180px;" required>
+                            <select id="travel-mode" class="controls" style="min-width: 120px;">
+                                <option value="DRIVING">Driving</option>
+                                <option value="WALKING">Walking</option>
+                                <option value="BICYCLING">Bicycling</option>
+                                <option value="TRANSIT">Transit</option>
+                            </select>
+                            <button type="submit" class="btn waves-effect waves-light">Get Directions</button>
+                        </form>
+                        <div id="map" style="height: 400px; width: 100%;"></div>
+                        <div id="directions-panel" style="margin-top: 1em; background: #fafafa; padding: 1em; border-radius: 8px; min-height: 60px;"></div>
+                    </div>
+                </section>
+            </div>
+            <div class="col s12">
+                <section id="reddit" class="section">
+                    <div class="section-header">
+                        <h4>Reddit Top Posts</h4>
+                        <div class="section-toggle" onclick="toggleSection('reddit-content')" title="Show/Hide Section">
+                            <span class="toggle-icon">−</span>
+                        </div>
+                    </div>
+                    <div id="reddit-content" class="section-content">
+                        <div class="row">
+                            <div class="col s12">
+                                <button id="dayRedditButton" class="btn waves-effect waves-light" onclick="handleButtonClick('reddit', 'day')">Top Posts Today</button>
+                                <button id="weekRedditButton" class="btn waves-effect waves-light" onclick="handleButtonClick('reddit', 'week')">Top Posts This Week</button>
                             </div>
                         </div>
-                        <div id="traffic-content" class="section-content">
-                            <div id="map" style="height: 400px; width: 100%;"></div>
-                            <div class="data-container"></div>
-                        </div>
-                    </section>
-                </div>
-                <div class="col s12 m6">
-                    <section id="reddit" class="section">
-                        <div class="section-header">
-                            <h4>Reddit Top Posts</h4>
-                            <div class="section-toggle" onclick="toggleSection('reddit-content')" title="Show/Hide Section">
-                                <span class="toggle-icon">−</span>
-                            </div>
-                        </div>
-                        <div id="reddit-content" class="section-content">
-                            <div class="row">
-                                <div class="col s12">
-                                    <button id="dayRedditButton" class="btn waves-effect waves-light" onclick="handleButtonClick('reddit', 'day')">Top Posts Today</button>
-                                    <button id="weekRedditButton" class="btn waves-effect waves-light" onclick="handleButtonClick('reddit', 'week')">Top Posts This Week</button>
-                                </div>
-                            </div>
-                            <div class="data-container"></div>
-                        </div>
-                    </section>
-                </div>
+                        <div class="data-container"></div>
+                    </div>
+                </section>
             </div>
             
             <!-- Group 4: Chat -->
@@ -931,5 +939,9 @@
             }
         });
     </script>
+
+<!-- Google Maps JS API (secure, via server proxy) -->
+<script src="/api/googlemaps/script"></script>
+<script src="js/map.js"></script>
 </body>
 </html>

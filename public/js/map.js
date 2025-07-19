@@ -1,330 +1,148 @@
 // map.js
-
-// Define light mode style with default colors
-const lightModeStyle = [
-    {
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "color": "#ffffff" // White background for light mode
-            }
-        ]
-    },
-    {
-        "elementType": "labels.icon",
-        "stylers": [
-            {
-                "visibility": "off"
-            }
-        ]
-    },
-    {
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#000000" // Black text for light mode
-            }
-        ]
-    },
-    {
-        "featureType": "road",
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "color": "#e0e0e0" // Light gray roads
-            }
-        ]
-    },
-    {
-        "featureType": "water",
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "color": "#b0d3f1" // Light blue for water
-            }
-        ]
-    },
-    {
-        "featureType": "landscape",
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "color": "#f5f5f5" // Light color for landscape
-            }
-        ]
-    },
-    {
-        "featureType": "administrative",
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "color": "#e0e0e0" // Light gray for administrative areas
-            }
-        ]
-    }
-];
-
-// Define night mode style
-const darkModeStyle = [
-    { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
-    { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
-    { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
-    {
-        featureType: "administrative.locality",
-        elementType: "labels.text.fill",
-        stylers: [{ color: "#d59563" }],
-    },
-    {
-        featureType: "poi",
-        elementType: "labels.text.fill",
-        stylers: [{ color: "#d59563" }],
-    },
-    {
-        featureType: "poi.park",
-        elementType: "geometry",
-        stylers: [{ color: "#263c3f" }],
-    },
-    {
-        featureType: "poi.park",
-        elementType: "labels.text.fill",
-        stylers: [{ color: "#6b9a76" }],
-    },
-    {
-        featureType: "road",
-        elementType: "geometry",
-        stylers: [{ color: "#38414e" }],
-    },
-    {
-        featureType: "road",
-        elementType: "geometry.stroke",
-        stylers: [{ color: "#212a37" }],
-    },
-    {
-        featureType: "road",
-        elementType: "labels.text.fill",
-        stylers: [{ color: "#9ca5b3" }],
-    },
-    {
-        featureType: "road.highway",
-        elementType: "geometry",
-        stylers: [{ color: "#746855" }],
-    },
-    {
-        featureType: "road.highway",
-        elementType: "geometry.stroke",
-        stylers: [{ color: "#1f2835" }],
-    },
-    {
-        featureType: "road.highway",
-        elementType: "labels.text.fill",
-        stylers: [{ color: "#f3d19c" }],
-    },
-    {
-        featureType: "transit",
-        elementType: "geometry",
-        stylers: [{ color: "#2f3948" }],
-    },
-    {
-        featureType: "transit.station",
-        elementType: "labels.text.fill",
-        stylers: [{ color: "#d59563" }],
-    },
-    {
-        featureType: "water",
-        elementType: "geometry",
-        stylers: [{ color: "#17263c" }],
-    },
-    {
-        featureType: "water",
-        elementType: "labels.text.fill",
-        stylers: [{ color: "#515c6d" }],
-    },
-    {
-        featureType: "water",
-        elementType: "labels.text.stroke",
-        stylers: [{ color: "#17263c" }],
-    },
-];
+// Google Maps JS API: Directions, Dark/Light Mode Toggle, Locate Me
 
 let map;
-let trafficLayer;
-let trafficUpdateInterval;
-let isMapInitialized = false;
-let currentMapStyle = lightModeStyle; // Default to light mode
-const defaultCenter = { lat: 40.674, lng: -73.945 }; // Default center coordinates
+let directionsService;
+let directionsRenderer;
+let isDarkMode = false;
+let locationMarker = null;
 
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
+const lightModeStyle = [];
+const darkModeStyle = [
+  { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#d59563' }] },
+  { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#d59563' }] },
+  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#263c3f' }] },
+  { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#6b9a76' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#38414e' }] },
+  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#212a37' }] },
+  { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#9ca5b3' }] },
+  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#746855' }] },
+  { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#1f2835' }] },
+  { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#f3d19c' }] },
+  { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#2f3948' }] },
+  { featureType: 'transit.station', elementType: 'labels.text.fill', stylers: [{ color: '#d59563' }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#17263c' }] },
+  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#515c6d' }] },
+  { featureType: 'water', elementType: 'labels.text.stroke', stylers: [{ color: '#17263c' }] }
+];
+
+window.initMap = function() {
+  // Try to use user's geolocation for default center
+  let defaultCenter = { lat: 40.7128, lng: -74.0060 }; // Fallback: New York City
+  let defaultZoom = 15;
+
+  // Create the map with fallback center
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: defaultCenter,
+    zoom: defaultZoom,
+    mapTypeControl: true,
+    streetViewControl: true,
+    fullscreenControl: true,
+    styles: lightModeStyle
+  });
+
+  // Add the traffic layer by default
+  const trafficLayer = new google.maps.TrafficLayer();
+  trafficLayer.setMap(map);
+
+  // Try to get user's location and recenter map
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
         };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-async function fetchData(url) {
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-}
-
-async function loadGoogleMapsScript() {
-    try {
-        // Store original console methods
-        const originalConsoleError = console.error;
-        const originalConsoleWarn = console.warn;
-
-        // Override console methods to suppress errors and warnings
-        console.error = () => {};
-        console.warn = () => {};
-
-        const script = document.createElement('script');
-        script.src = '/api/googlemaps/script';
-        script.async = true;
-
-        // Restore original console methods after the script is loaded
-        script.onload = () => {
-            console.error = originalConsoleError;
-            console.warn = originalConsoleWarn;
-        };
-
-        // Restore original console methods if there's an error loading the script
-        script.onerror = () => {
-            console.error = originalConsoleError;
-            console.warn = originalConsoleWarn;
-            console.error('Error loading Google Maps script');
-        };
-
-        document.head.appendChild(script);
-    } catch (error) {
-        console.error('Error loading Google Maps script:', error);
-    }
-}
-
-// Ensure initMap is available globally
-window.initMap = initMap;
-
-async function initMap() {
-    // Import the ColorScheme from the Google Maps library
-    const { ColorScheme } = await google.maps.importLibrary("core");
-
-    // Set the default color scheme to DARK
-    let currentColorScheme = ColorScheme.DARK;
-
-    const mapOptions = {
-        center: defaultCenter, // Use the default center variable
-        zoom: 12,
-        colorScheme: currentColorScheme, // Set the initial color scheme to DARK
-    };
-
-    map = new google.maps.Map(document.getElementById("map"), mapOptions);
-
-    const input = document.createElement("input");
-    input.id = "MapsInput";
-    input.type = "text";
-    input.placeholder = "Enter a location";
-    input.className = "controls";
-
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-    const searchBox = new google.maps.places.SearchBox(input);
-
-    map.addListener("bounds_changed", () => {
-        searchBox.setBounds(map.getBounds());
-    });
-
-    searchBox.addListener("places_changed", () => {
-        const places = searchBox.getPlaces();
-
-        if (places.length == 0) {
-            return;
-        }
-
-        const bounds = new google.maps.LatLngBounds();
-
-        places.forEach((place) => {
-            if (!place.geometry || !place.geometry.location) {
-                // console.log("Returned place contains no geometry");
-                return;
-            }
-
-            if (place.geometry.viewport) {
-                bounds.union(place.geometry.viewport);
-            } else {
-                bounds.extend(place.geometry.location);
-            }
+        map.setCenter(pos);
+        if (locationMarker) locationMarker.setMap(null);
+        locationMarker = new google.maps.Marker({
+          map,
+          position: pos,
+          title: 'Your Location',
+          icon: {
+            url: 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png',
+            scaledSize: new google.maps.Size(36, 36)
+          }
         });
-        map.fitBounds(bounds);
+      },
+      () => {/* do nothing, fallback to default center */}
+    );
+  }
 
-        if (places[0] && places[0].geometry) {
-            const location = places[0].geometry.location;
-            updateTrafficInfo({ lat: location.lat(), lng: location.lng() });
-        }
+  // Directions
+  directionsService = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer();
+  directionsRenderer.setMap(map);
+  directionsRenderer.setPanel(document.getElementById('directions-panel'));
+
+  // Directions form
+  const originInput = document.getElementById('origin-input');
+  const destinationInput = document.getElementById('destination-input');
+  const travelModeSelect = document.getElementById('travel-mode');
+  const form = document.getElementById('directions-form');
+
+  // Places Autocomplete for origin/destination
+  const originAutocomplete = new google.maps.places.Autocomplete(originInput);
+  const destinationAutocomplete = new google.maps.places.Autocomplete(destinationInput);
+
+  form.onsubmit = function(e) {
+    e.preventDefault();
+    calculateAndDisplayRoute();
+  };
+
+  travelModeSelect.onchange = calculateAndDisplayRoute;
+  originAutocomplete.addListener('place_changed', calculateAndDisplayRoute);
+  destinationAutocomplete.addListener('place_changed', calculateAndDisplayRoute);
+
+  function calculateAndDisplayRoute() {
+    const origin = originInput.value;
+    const destination = destinationInput.value;
+    const travelMode = travelModeSelect.value;
+    if (!origin || !destination) return;
+    directionsService.route({
+      origin,
+      destination,
+      travelMode: travelMode.toUpperCase()
+    }, (result, status) => {
+      if (status === 'OK') {
+        directionsRenderer.setDirections(result);
+            } else {
+        directionsRenderer.setDirections({ routes: [] });
+        document.getElementById('directions-panel').innerHTML = '<p>No route found.</p>';
+      }
     });
+  }
 
-    trafficLayer = new google.maps.TrafficLayer();
-    trafficLayer.setMap(map);
+  // --- Dark/Light Mode Toggle ---
+  const themeToggleBtn = document.createElement('button');
+  themeToggleBtn.textContent = 'Dark Mode';
+  themeToggleBtn.className = 'map-theme-toggle styled-map-btn';
+  themeToggleBtn.setAttribute('aria-label', 'Toggle dark/light mode');
+  themeToggleBtn.style.margin = '8px';
+  themeToggleBtn.onclick = function() {
+    isDarkMode = !isDarkMode;
+    map.setOptions({ styles: isDarkMode ? darkModeStyle : lightModeStyle });
+    themeToggleBtn.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
+  };
+  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(themeToggleBtn);
 
-    isMapInitialized = true;
-    // console.log('Map initialized');
+  // --- Controls container (top left) ---
+  const controlsContainer = document.createElement('div');
+  controlsContainer.style.display = 'flex';
+  controlsContainer.style.alignItems = 'center';
+  controlsContainer.style.gap = '8px';
+  controlsContainer.style.background = 'transparent';
 
-    // Add event listener for map interaction to request location
-    map.addListener('click', requestLocation);
-
-    // Add a button to re-center the map to the user's current location
-    const locationButton = document.createElement("button");
-    locationButton.textContent = "Re-center Map";
-    locationButton.className = "location-button";
-    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(locationButton);
-
-    locationButton.addEventListener("click", requestLocation);
-
-    const debouncedUpdate = debounce(async () => {
-        const center = map.getCenter();
-        await updateTrafficInfo({ lat: center.lat(), lng: center.lng() });
-    }, 300);
-
-    map.addListener('idle', debouncedUpdate);
-
-    startPeriodicTrafficUpdates();
-
-    // Add event listener for the theme toggle button
-    const themeToggleBtn = document.getElementById('themeToggle');
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', async () => {
-        // Toggle between DARK and LIGHT
-        currentColorScheme = currentColorScheme === ColorScheme.DARK ? ColorScheme.LIGHT : ColorScheme.DARK;
-        map.setOptions({ colorScheme: currentColorScheme });
-    });
-    }
-}
-
-function startPeriodicTrafficUpdates() {
-    trafficUpdateInterval = setInterval(async () => {
-        const center = map.getCenter();
-        await updateTrafficInfo({ lat: center.lat(), lng: center.lng() });
-    }, 300000);
-}
-
-const updateTrafficInfo = async (location) => {
-    if (!location || typeof location.lat === 'undefined' || typeof location.lng === 'undefined') {
-        console.error('Invalid location provided to updateTrafficInfo');
-        return;
-    }
-    // console.log('Updating traffic info for location:', location);
-}
-
-// New function to request location
-function requestLocation() {
-    if (!map) {
-        console.error('Map not initialized yet');
-        return;
-    }
-
+  // --- Locate Me Button (modern icon) ---
+  const locateBtn = document.createElement('button');
+  locateBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" stroke="#1976d2" fill="none"/><circle cx="12" cy="12" r="3" fill="#1976d2"/><line x1="12" y1="2" x2="12" y2="6" /><line x1="12" y1="18" x2="12" y2="22" /><line x1="2" y1="12" x2="6" y2="12" /><line x1="18" y1="12" x2="22" y2="12" /></svg>`;
+  locateBtn.title = 'Locate Me';
+  locateBtn.className = 'map-locate-btn styled-map-btn';
+  locateBtn.setAttribute('aria-label', 'Locate Me');
+  locateBtn.onclick = function() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -332,40 +150,125 @@ function requestLocation() {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 };
-                // console.log('User location obtained:', pos);
                 map.setCenter(pos);
-                map.setZoom(12);
-                updateTrafficInfo(pos);
-            },
-            (error) => {
-                console.warn('Geolocation error:', error.message);
-                console.warn('Using default center:', defaultCenter);
-                map.setCenter(defaultCenter);
-                map.setZoom(12);
-                updateTrafficInfo(defaultCenter);
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 60000
+          if (locationMarker) locationMarker.setMap(null);
+          locationMarker = new google.maps.Marker({
+            map,
+            position: pos,
+            title: 'Your Location',
+            icon: {
+              url: 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png',
+              scaledSize: new google.maps.Size(36, 36)
             }
+          });
+        },
+        () => alert('Unable to retrieve your location.')
         );
     } else {
-        console.warn('Geolocation not supported. Using default center.');
-        map.setCenter(defaultCenter);
-        map.setZoom(12);
-        updateTrafficInfo(defaultCenter);
+      alert('Geolocation is not supported by your browser.');
     }
-}
+  };
+  controlsContainer.appendChild(locateBtn);
 
-// Function to toggle between light and dark mode
-async function toggleMapStyle() {
-    const { ColorScheme } = await google.maps.importLibrary("core");
-    const currentColorScheme = map.get('colorScheme');
+  // --- Search Bar (Google Places Autocomplete) ---
+  const searchForm = document.createElement('form');
+  searchForm.style.display = 'flex';
+  searchForm.style.alignItems = 'center';
+  searchForm.style.background = '#fff';
+  searchForm.style.borderRadius = '24px';
+  searchForm.style.boxShadow = '0 2px 8px rgba(0,0,0,0.12)';
+  searchForm.style.padding = '0 12px';
+  searchForm.style.height = '40px';
+  searchForm.style.gap = '8px';
 
-    // Toggle between LIGHT and DARK
-    const newColorScheme = currentColorScheme === ColorScheme.LIGHT ? ColorScheme.DARK : ColorScheme.LIGHT;
-    map.setOptions({ colorScheme: newColorScheme });
-}
+  const searchInput = document.createElement('input');
+  searchInput.type = 'search';
+  searchInput.placeholder = 'Search location...';
+  searchInput.style.border = 'none';
+  searchInput.style.outline = 'none';
+  searchInput.style.fontSize = '16px';
+  searchInput.style.background = 'transparent';
+  searchInput.style.height = '38px';
+  searchInput.style.width = '220px';
+  searchInput.style.padding = '0 0 0 32px';
+  searchInput.setAttribute('aria-label', 'Search location');
 
-export { loadGoogleMapsScript, initMap, startPeriodicTrafficUpdates, updateTrafficInfo };
+  // Search icon
+  const searchIcon = document.createElement('span');
+  searchIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
+  searchIcon.style.position = 'absolute';
+  searchIcon.style.left = '12px';
+  searchIcon.style.top = '10px';
+  searchIcon.style.pointerEvents = 'none';
+
+  // Position search icon absolutely inside the form
+  searchForm.style.position = 'relative';
+  searchForm.appendChild(searchIcon);
+  searchForm.appendChild(searchInput);
+
+  // Google Places Autocomplete
+  const autocomplete = new google.maps.places.Autocomplete(searchInput);
+  autocomplete.addListener('place_changed', () => {
+    const place = autocomplete.getPlace();
+    if (!place.geometry || !place.geometry.location) return;
+    map.setCenter(place.geometry.location);
+    map.setZoom(17);
+    if (locationMarker) locationMarker.setMap(null);
+    locationMarker = new google.maps.Marker({
+      map,
+      position: place.geometry.location,
+      title: place.name || 'Selected Location',
+      icon: {
+        url: 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png',
+        scaledSize: new google.maps.Size(36, 36)
+      }
+    });
+  });
+  searchForm.onsubmit = function(e) {
+    e.preventDefault();
+    google.maps.event.trigger(searchInput, 'focus');
+    google.maps.event.trigger(searchInput, 'keydown', { keyCode: 13 });
+  };
+  controlsContainer.appendChild(searchForm);
+
+  // Add controls to map
+  map.controls[google.maps.ControlPosition.TOP_LEFT].push(controlsContainer);
+};
+
+// Add styles for the map buttons
+(function() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .styled-map-btn {
+      background: #fff;
+      border: none;
+      border-radius: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      padding: 10px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+      margin: 8px;
+      outline: none;
+      color: #222;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .styled-map-btn:hover, .styled-map-btn:focus {
+      background: #f5f5f5;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+      color: #1976d2;
+    }
+    .map-theme-toggle {
+      min-width: 110px;
+    }
+    .map-locate-btn {
+      font-size: 22px;
+      min-width: 48px;
+      justify-content: center;
+    }
+  `;
+  document.head.appendChild(style);
+})();

@@ -1551,4 +1551,476 @@ body.dark-theme label {
     width: 100%;
 }
 
+/* --- Google Maps Card Modern Styling (Flat, Dark Mode Aware) --- */
+#traffic-content, #map-card {
+  position: relative;
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  padding: 0;
+  min-height: 350px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+#map-card {
+  min-height: 350px;
+  width: 100%;
+  position: relative;
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  overflow: hidden;
+}
+
+/* --- Map container adjustments for better zoom and size --- */
+#map {
+  width: 100%;
+  height: 400px;
+  min-height: 300px;
+  border-radius: 8px;
+  transition: height 0.3s, width 0.3s;
+  resize: both;
+  overflow: auto;
+  background: #e3eafc;
+}
+@media (max-width: 768px) {
+  #map {
+    max-width: 100vw;
+    height: 220px;
+    min-height: 120px;
+  }
+}
+
+/* --- Google Maps Info Window Text Color Fix --- */
+.gm-style-iw, .gm-style-iw-d {
+  color: #222 !important;
+  background: #fff !important;
+  border-radius: 8px !important;
+  border: 1px solid #bdbdbd !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18) !important;
+}
+body.dark-theme .gm-style-iw, body.dark-theme .gm-style-iw-d {
+  color: #fff !important;
+  background: #23272e !important;
+  border: 1px solid #444 !important;
+}
+
+.map-search-bar {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 80px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  padding: 2px 8px;
+  max-width: 400px;
+  border: 1px solid var(--border-color, #bdbdbd);
+}
+.map-search-bar input {
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+  flex: 1;
+  padding: 8px 0;
+  color: var(--primary-text, #222);
+}
+.map-search-bar .clear-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #888;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: color 0.2s;
+}
+.map-search-bar .clear-btn:hover {
+  color: #f44336;
+}
+.map-search-bar .locate-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--primary-color, #2196F3);
+  cursor: pointer;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.map-search-bar .locate-btn:hover {
+  color: #1565c0;
+}
+
+body.dark-theme .map-search-bar {
+  background: #23272e;
+  border: 1px solid #444;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+}
+body.dark-theme .map-search-bar input {
+  color: #fff;
+}
+body.dark-theme .map-search-bar .clear-btn {
+  color: #bbb;
+}
+body.dark-theme .map-search-bar .clear-btn:hover {
+  color: #ff5252;
+}
+body.dark-theme .map-search-bar .locate-btn {
+  color: #64B5F6;
+}
+body.dark-theme .map-search-bar .locate-btn:hover {
+  color: #2196F3;
+}
+
+.map-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.map-controls button {
+  background: var(--button-bg, #f5f5f5);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--primary-text, #333);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.map-controls button:hover {
+  background: var(--button-hover-bg, #e0e0e0);
+}
+
+@media (max-width: 768px) {
+  #map-card, #traffic-content {
+    min-height: 220px;
+  }
+  #map {
+    height: 220px;
+    min-height: 120px;
+  }
+  .map-search-bar {
+    left: 8px;
+    right: 8px;
+    max-width: 98vw;
+    font-size: 14px;
+  }
+  .map-controls {
+    top: 8px;
+    right: 8px;
+  }
+  .map-controls button {
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+  }
+}
+
+/* --- Google Maps Official Search Box Styling (Material/Google.com style) --- */
+.searchbox {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #bdbdbd;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  padding: 0 12px;
+  height: 48px;
+  z-index: 10;
+  min-width: 280px;
+  max-width: 400px;
+}
+.searchbox input[type='search'] {
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+  flex: 1;
+  padding: 12px 0 12px 36px;
+  color: #222;
+  height: 48px;
+  min-width: 0;
+}
+.searchbox .search-icon {
+  position: absolute;
+  left: 24px;
+  width: 20px;
+  height: 20px;
+  fill: #888;
+  pointer-events: none;
+}
+.searchbox input[type='search']::placeholder {
+  color: #888;
+  opacity: 1;
+}
+.searchbox input[type='search']:focus {
+  border-color: #45a0bd;
+  box-shadow: 0px 0px 5px #45a0bd;
+  outline: 1px solid transparent;
+}
+body.dark-theme .searchbox {
+  background: #23272e;
+  border: 1px solid #444;
+}
+body.dark-theme .searchbox input[type='search'] {
+  color: #fff;
+}
+body.dark-theme .searchbox .search-icon {
+  fill: #bbb;
+}
+body.dark-theme .searchbox input[type='search']::placeholder {
+  color: #bbb;
+}
+@media (max-width: 768px) {
+  .searchbox {
+    left: 8px;
+    min-width: 0;
+    max-width: 98vw;
+    font-size: 14px;
+    height: 40px;
+    padding: 0 8px;
+  }
+  .searchbox input[type='search'] {
+    height: 40px;
+    padding: 8px 0 8px 32px;
+    font-size: 14px;
+  }
+  .searchbox .search-icon {
+    left: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+
+
+/* Make Google Maps controls larger */
+.gm-control-active, .gm-style-mtc, .gm-fullscreen-control, .gm-svpc, .gm-bundled-control, .gm-style .gm-style-mtc, .gm-style .gm-fullscreen-control, .gm-style .gm-svpc, .gm-style .gm-bundled-control {
+  font-size: 1.3em !important;
+}
+
+/* Optionally, increase the size of map type and zoom controls */
+.gm-style .gm-control-active button, .gm-style .gm-fullscreen-control button, .gm-style .gm-style-mtc button {
+  font-size: 1.2em !important;
+  padding: 8px 16px !important;
+}
+
+/* Make sure the map container font-size is normal */
+#map {
+  font-size: 20px !important;
+}
+
+
+
+/* --- Directions Panel Styling --- */
+#directions-panel {
+  margin-top: 1em;
+  background: #fafafa;
+  padding: 1em;
+  border-radius: 8px;
+  min-height: 60px;
+  direction: ltr;
+  color: #222;
+  font-size: 1em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 1px solid #e0e0e0;
+}
+#directions-panel .adp, #directions-panel .adp-text, #directions-panel .adp-summary, #directions-panel .adp-directions, #directions-panel .adp-distance, #directions-panel .adp-legal {
+  color: #222;
+}
+#directions-panel .adp-summary {
+  font-weight: 500;
+  margin-bottom: 0.5em;
+}
+#directions-panel .adp-directions {
+  width: 100%;
+  border-collapse: collapse;
+}
+#directions-panel .adp-directions td {
+  padding: 0.3em 0.5em;
+  vertical-align: middle;
+}
+#directions-panel .adp-marker2 {
+  filter: none;
+}
+#directions-panel .adp-legal {
+  font-size: 0.9em;
+  color: #888;
+  margin-top: 0.5em;
+}
+
+body.dark-theme #directions-panel {
+  background: #23272e !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+body.dark-theme #directions-panel .adp, 
+body.dark-theme #directions-panel .adp-text, 
+body.dark-theme #directions-panel .adp-summary, 
+body.dark-theme #directions-panel .adp-directions, 
+body.dark-theme #directions-panel .adp-distance, 
+body.dark-theme #directions-panel .adp-legal {
+  color: #fff !important;
+}
+body.dark-theme #directions-panel .adp-legal {
+  color: #bbb !important;
+}
+body.dark-theme #directions-panel .adp-marker2 {
+  filter: brightness(1.2) contrast(1.2) drop-shadow(0 0 2px #23272e);
+}
+
+
+
+/* --- Custom Map Button Styling for Light/Dark Mode --- */
+.styled-map-btn, .map-theme-toggle, .map-locate-btn {
+  background: #fff;
+  color: #222;
+  border: 1px solid #bdbdbd;
+  border-radius: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  padding: 10px 18px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, color 0.2s, border 0.2s;
+  margin: 8px;
+  outline: none;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.styled-map-btn:hover, .styled-map-btn:focus,
+.map-theme-toggle:hover, .map-theme-toggle:focus,
+.map-locate-btn:hover, .map-locate-btn:focus {
+  background: #f5f5f5;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  color: #1976d2;
+  border-color: #1976d2;
+}
+
+body.dark-theme .styled-map-btn,
+body.dark-theme .map-theme-toggle,
+body.dark-theme .map-locate-btn {
+  background: #23272e !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.32) !important;
+}
+body.dark-theme .styled-map-btn:hover,
+body.dark-theme .styled-map-btn:focus,
+body.dark-theme .map-theme-toggle:hover,
+body.dark-theme .map-theme-toggle:focus,
+body.dark-theme .map-locate-btn:hover,
+body.dark-theme .map-locate-btn:focus {
+  background: #30343a !important;
+  color: #64B5F6 !important;
+  border-color: #64B5F6 !important;
+}
+
+/* --- Map Search Bar Styling for Light/Dark Mode --- */
+#map .search-bar-form, .map-search-bar, form[role="search"] {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  padding: 0 12px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #bdbdbd;
+  position: relative;
+}
+#map .search-bar-form input[type="search"],
+.map-search-bar input[type="search"],
+form[role="search"] input[type="search"] {
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+  height: 38px;
+  width: 220px;
+  color: #222;
+  padding: 0 0 0 32px;
+}
+#map .search-bar-form span,
+.map-search-bar span,
+form[role="search"] span {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  pointer-events: none;
+}
+#map .search-bar-form span svg,
+.map-search-bar span svg,
+form[role="search"] span svg {
+  stroke: #888;
+}
+body.dark-theme #map .search-bar-form,
+body.dark-theme .map-search-bar,
+body.dark-theme form[role="search"] {
+  background: #23272e !important;
+  border: 1px solid #444 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.32) !important;
+}
+body.dark-theme #map .search-bar-form input[type="search"],
+body.dark-theme .map-search-bar input[type="search"],
+body.dark-theme form[role="search"] input[type="search"] {
+  color: #fff !important;
+}
+body.dark-theme #map .search-bar-form span svg,
+body.dark-theme .map-search-bar span svg,
+body.dark-theme form[role="search"] span svg {
+  stroke: #bbb !important;
+}
+
+
+
+/* --- Default Google Maps Controls Styling for Dark Mode --- */
+body.dark-theme .gm-control-active,
+body.dark-theme .gm-style-mtc,
+body.dark-theme .gm-fullscreen-control,
+body.dark-theme .gm-svpc,
+body.dark-theme .gm-bundled-control {
+  background: #23272e !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.32) !important;
+}
+body.dark-theme .gm-control-active button,
+body.dark-theme .gm-style-mtc button,
+body.dark-theme .gm-fullscreen-control button,
+body.dark-theme .gm-svpc button,
+body.dark-theme .gm-bundled-control button {
+  background: #23272e !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+body.dark-theme .gm-control-active button:hover,
+body.dark-theme .gm-style-mtc button:hover,
+body.dark-theme .gm-fullscreen-control button:hover,
+body.dark-theme .gm-svpc button:hover,
+body.dark-theme .gm-bundled-control button:hover {
+  background: #30343a !important;
+  color: #64B5F6 !important;
+  border-color: #64B5F6 !important;
+}
+
 
