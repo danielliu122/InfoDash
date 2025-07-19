@@ -1530,4 +1530,25 @@ body.dark-theme label {
     color: var(--text-secondary);
 }
 
+#summaryRegionSelect + label,
+.select-wrapper + label[for="summaryRegionSelect"] {
+  display: block !important;
+  position: absolute !important;
+  top: -25px !important;
+  left: 0 !important;
+  z-index: 2 !important;
+  pointer-events: auto !important;
+  color: var(--text-secondary) !important;
+}
+
+#news-controls .input-field label {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-bottom: 4px;
+    margin-top: 0;
+    position: static;
+    display: block;
+    width: 100%;
+}
+
 
