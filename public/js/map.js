@@ -8,31 +8,67 @@ let isDarkMode = false;
 let locationMarker = null;
 
 const lightModeStyle = [];
+
+// Updated dark mode style to match Material Design dark blue theme
 const darkModeStyle = [
-  { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
-  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#d59563' }] },
-  { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#d59563' }] },
-  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#263c3f' }] },
-  { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#6b9a76' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#38414e' }] },
-  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#212a37' }] },
-  { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#9ca5b3' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#746855' }] },
-  { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#1f2835' }] },
-  { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#f3d19c' }] },
-  { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#2f3948' }] },
-  { featureType: 'transit.station', elementType: 'labels.text.fill', stylers: [{ color: '#d59563' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#17263c' }] },
-  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#515c6d' }] },
-  { featureType: 'water', elementType: 'labels.text.stroke', stylers: [{ color: '#17263c' }] }
+  { elementType: 'geometry', stylers: [{ color: '#1A1F2E' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#1A1F2E' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#B0BEC5' }] },
+  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#64B5F6' }] },
+  { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#64B5F6' }] },
+  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#222B45' }] },
+  { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#81C784' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2C3E50' }] },
+  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#222B45' }] },
+  { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#B0BEC5' }] },
+  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#34495E' }] },
+  { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#222B45' }] },
+  { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#FFD54F' }] },
+  { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#2C3E50' }] },
+  { featureType: 'transit.station', elementType: 'labels.text.fill', stylers: [{ color: '#64B5F6' }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#1565C0' }] },
+  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#90CAF9' }] },
+  { featureType: 'water', elementType: 'labels.text.stroke', stylers: [{ color: '#1565C0' }] }
 ];
+
+// Function to check current app theme
+function getCurrentAppTheme() {
+  return document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+}
+
+// Function to apply theme to map
+function applyThemeToMap() {
+  const appTheme = getCurrentAppTheme();
+  const shouldBeDark = appTheme === 'dark';
+  
+  if (isDarkMode !== shouldBeDark) {
+    isDarkMode = shouldBeDark;
+    if (map) {
+      map.setOptions({ styles: isDarkMode ? darkModeStyle : lightModeStyle });
+    }
+    
+    // Update theme toggle button text
+    const themeToggleBtn = document.querySelector('.map-theme-toggle');
+    if (themeToggleBtn) {
+      themeToggleBtn.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
+    }
+  }
+}
+
+// Function to initialize map theme based on app theme
+function initializeMapTheme() {
+  const appTheme = getCurrentAppTheme();
+  isDarkMode = appTheme === 'dark';
+  return isDarkMode ? darkModeStyle : lightModeStyle;
+}
 
 window.initMap = function() {
   // Try to use user's geolocation for default center
   let defaultCenter = { lat: 40.7128, lng: -74.0060 }; // Fallback: New York City
   let defaultZoom = 15;
+
+  // Initialize map with current app theme
+  const initialStyles = initializeMapTheme();
 
   // Create the map with fallback center
   map = new google.maps.Map(document.getElementById('map'), {
@@ -41,7 +77,7 @@ window.initMap = function() {
     mapTypeControl: true,
     streetViewControl: true,
     fullscreenControl: true,
-    styles: lightModeStyle
+    styles: initialStyles
   });
 
   // Add the traffic layer by default
@@ -118,7 +154,7 @@ window.initMap = function() {
 
   // --- Dark/Light Mode Toggle ---
   const themeToggleBtn = document.createElement('button');
-  themeToggleBtn.textContent = 'Dark Mode';
+  themeToggleBtn.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
   themeToggleBtn.className = 'map-theme-toggle styled-map-btn';
   themeToggleBtn.setAttribute('aria-label', 'Toggle dark/light mode');
   themeToggleBtn.style.margin = '8px';
@@ -171,7 +207,7 @@ window.initMap = function() {
   controlsContainer.appendChild(locateBtn);
 
   // --- Search Bar (Google Places Autocomplete) ---
-  const searchForm = document.createElement('form');
+  const searchForm = document.createElement('div');
   searchForm.style.display = 'flex';
   searchForm.style.alignItems = 'center';
   searchForm.style.background = '#fff';
@@ -272,3 +308,7 @@ window.initMap = function() {
   `;
   document.head.appendChild(style);
 })();
+
+// Make functions globally available
+window.applyThemeToMap = applyThemeToMap;
+window.getCurrentAppTheme = getCurrentAppTheme;

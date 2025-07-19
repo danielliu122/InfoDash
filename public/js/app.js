@@ -23,6 +23,180 @@ import { refreshSummary, initializeSummarySection } from './summary.js'; // Impo
 import { userPrefs } from './userPreferences.js'; // Import user preferences
 import { initializeGeolocation } from './geolocation.js'; // Import geolocation functionality
 
+// Weather functionality
+let weatherInterval = null;
+let currentWeatherLocation = '';
+
+// Weather icon mapping
+const weatherIcons = {
+    'Clear': '☀️',
+    'Sunny': '☀️',
+    'Partly Cloudy': '⛅',
+    'Mostly Cloudy': '⛅',
+    'Cloudy': '☁️',
+    'Overcast': '☁️',
+    'Rain': '🌧️',
+    'Light Rain': '🌦️',
+    'Heavy Rain': '🌧️',
+    'Showers': '🌦️',
+    'Thunderstorm': '⛈️',
+    'Storm': '⛈️',
+    'Snow': '❄️',
+    'Light Snow': '🌨️',
+    'Heavy Snow': '❄️',
+    'Sleet': '🌨️',
+    'Fog': '🌫️',
+    'Mist': '🌫️',
+    'Haze': '🌫️',
+    'Windy': '💨',
+    'Breezy': '💨'
+};
+
+// Function to get weather icon based on condition
+function getWeatherIcon(condition) {
+    if (!condition) return '🌤️';
+    
+    const conditionLower = condition.toLowerCase();
+    
+    // Check for exact matches first
+    for (const [key, icon] of Object.entries(weatherIcons)) {
+        if (conditionLower.includes(key.toLowerCase())) {
+            return icon;
+        }
+    }
+    
+    // Fallback based on condition keywords
+    if (conditionLower.includes('clear') || conditionLower.includes('sunny')) return '☀️';
+    if (conditionLower.includes('cloud')) return '☁️';
+    if (conditionLower.includes('rain')) return '🌧️';
+    if (conditionLower.includes('snow')) return '❄️';
+    if (conditionLower.includes('storm') || conditionLower.includes('thunder')) return '⛈️';
+    if (conditionLower.includes('fog') || conditionLower.includes('mist')) return '🌫️';
+    if (conditionLower.includes('wind')) return '💨';
+    
+    return '🌤️'; // Default
+}
+
+// Function to get user's location for weather
+async function getUserLocationForWeather() {
+    // First try to get from user preferences
+    const savedLocation = userPrefs.getWeatherLocation();
+    if (savedLocation) {
+        return savedLocation;
+    }
+    
+    // If no saved location, try to get from geolocation
+    try {
+        const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                timeout: 5000,
+                enableHighAccuracy: false
+            });
+        });
+        
+        const { latitude, longitude } = position.coords;
+        return `${latitude},${longitude}`;
+    } catch (error) {
+        console.log('Could not get location for weather, using default');
+        return 'New York, NY'; // Default fallback
+    }
+}
+
+// Function to fetch weather data
+async function fetchWeatherData(location) {
+    try {
+        const response = await fetch(`/api/weather?location=${encodeURIComponent(location)}`);
+        if (!response.ok) {
+            throw new Error('Weather API request failed');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching weather:', error);
+        return null;
+    }
+}
+
+// Function to update header weather display
+function updateHeaderWeather(weatherData) {
+    const weatherIcon = document.getElementById('weather-icon');
+    const weatherTemp = document.getElementById('weather-temp');
+    const weatherLocation = document.getElementById('weather-location');
+    
+    if (!weatherData || !weatherData.current) {
+        weatherIcon.textContent = '🌤️';
+        weatherTemp.textContent = '--°F';
+        weatherLocation.textContent = 'Weather unavailable';
+        return;
+    }
+    
+    const current = weatherData.current;
+    const location = weatherData.location;
+    
+    // Update weather icon
+    weatherIcon.textContent = getWeatherIcon(current.skytext);
+    
+    // Update temperature
+    weatherTemp.textContent = `${current.temperature}°F`;
+    
+    // Update location (shortened for header)
+    const locationName = location.name || location.city || 'Unknown';
+    weatherLocation.textContent = locationName.length > 15 ? 
+        locationName.substring(0, 12) + '...' : locationName;
+}
+
+// Function to initialize weather display
+async function initializeWeather() {
+    try {
+        const location = await getUserLocationForWeather();
+        currentWeatherLocation = location;
+        
+        const weatherData = await fetchWeatherData(location);
+        updateHeaderWeather(weatherData);
+        
+        // Start weather refresh interval (every 10 minutes)
+        if (weatherInterval) {
+            clearInterval(weatherInterval);
+        }
+        
+        weatherInterval = setInterval(async () => {
+            const updatedWeather = await fetchWeatherData(currentWeatherLocation);
+            updateHeaderWeather(updatedWeather);
+        }, 10 * 60 * 1000); // 10 minutes
+        
+    } catch (error) {
+        console.error('Error initializing weather:', error);
+        updateHeaderWeather(null);
+    }
+}
+
+// Function to update weather location
+async function updateWeatherLocation(newLocation) {
+    currentWeatherLocation = newLocation;
+    userPrefs.setWeatherLocation(newLocation);
+    
+    const weatherData = await fetchWeatherData(newLocation);
+    updateHeaderWeather(weatherData);
+}
+
+// Function to handle weather display click
+function handleWeatherClick() {
+    const newLocation = prompt('Enter your location for weather updates (e.g., "New York, NY" or "London, UK"):', currentWeatherLocation);
+    
+    if (newLocation && newLocation.trim()) {
+        updateWeatherLocation(newLocation.trim());
+        
+        // Show notification if available
+        if (window.showNotification) {
+            window.showNotification(`Weather location updated to ${newLocation.trim()}`, 3000);
+        }
+    }
+}
+
+// Make weather functions globally available
+window.updateWeatherLocation = updateWeatherLocation;
+window.initializeWeather = initializeWeather;
+window.handleWeatherClick = handleWeatherClick;
+
 // Make functions globally available immediately for HTML onclick handlers
 window.handleButtonClick = async function(type, category, subCategory = 'all') {
     console.log(`handleButtonClick: Called with type=${type}, category=${category}, subCategory=${subCategory}`);
@@ -169,6 +343,11 @@ function toggleTheme() {
     
     // Update chart theme
     updateChartTheme();
+    
+    // Update map theme if map is initialized
+    if (window.applyThemeToMap && typeof window.applyThemeToMap === 'function') {
+        window.applyThemeToMap();
+    }
 }
 
 // Make toggleTheme globally available for HTML onclick handlers
@@ -182,6 +361,31 @@ function initializeTheme() {
     if (themeToggleButton) {
         themeToggleButton.textContent = savedTheme === 'light' ? '🌞' : '🌙';
     }
+    
+    // Set up theme change observer
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                // Check if theme changed
+                const isDark = document.body.classList.contains('dark-theme');
+                const wasDark = mutation.oldValue && mutation.oldValue.includes('dark-theme');
+                
+                if (isDark !== wasDark) {
+                    // Theme changed, update map if available
+                    if (window.applyThemeToMap && typeof window.applyThemeToMap === 'function') {
+                        window.applyThemeToMap();
+                    }
+                }
+            }
+        });
+    });
+    
+    // Start observing the body element for class changes
+    observer.observe(document.body, {
+        attributes: true,
+        attributeOldValue: true,
+        attributeFilter: ['class']
+    });
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -230,6 +434,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Initialize the news mode indicator
     updateNewsModeIndicator();
+
+    // Initialize weather display
+    initializeWeather();
 
     const countrySelect = document.getElementById('countrySelect');
     const languageSelect = document.getElementById('languageSelect');

@@ -4,44 +4,120 @@
 
 /* === CSS Variables === */
 :root {
-  --secondary-bg: #f5f5f5;
-    --primary-text: #212121;
-    --secondary-text: #757575;
-    --accent-color: #3F51B5;
-    --button-bg: #e1dbdbec;
-    --button-hover-bg: #D5D5D5;
-    --border-color: #BDBDBD;
-  --input-bg: #fff;
-    --input-border: #BDBDBD;
-  --primary-color: #2196F3;
-  --secondary-color: #FF9800;
-  --success-color: #4CAF50;
-  --error-color: #f44336;
-  --warning-color: #ff9800;
-  --info-color: #2196F3;
-  --text-color: #333;
-  --text-secondary: #666;
-  --background-color: #f5f5f5;
-  --card-bg: #fff;
-  --hover-bg: #f0f0f0;
+  --primary-bg: #d3eae4;
+  --secondary-bg: #f1fffb;
+  --primary-text: #212529;
+  --secondary-text: #6c757d;
+  --accent-color: #26a69a;
+  --button-bg: #26a69a;
+  --button-hover-bg: #2bbbad;
+  --border-color: #dee2e6;
+  --input-bg: #ffffff;
+  --input-border: #ced4da;
+  --text-color: #212529;
+  --text-secondary: #6c757d;
+  --background-color: #ffffff;
+  --card-bg: #e9ecef;
+  --summary-card-bg: #e9ecef;
+  --stock-card-bg: #e9ecef;
+  --hover-bg: #e9ecef;
 }
 body.dark-theme {
-    --primary-bg: #121212;
-    --secondary-bg: #424242;
-  --primary-text: #fff;
-    --secondary-text: #BDBDBD;
-    --accent-color: #3F51B5;
-    --button-bg: #616161;
-    --button-hover-bg: #757575;
-    --border-color: #757575;
-    --input-bg: #424242;
-    --input-border: #757575;
-  --text-color: #fff;
+  --primary-bg: #181b1f;
+  --secondary-bg: rgb(39, 48, 62);
+  --primary-text: #e0e0e0;
+  --secondary-text: #b0b0b0;
+  --accent-color: #26a69a;
+  --button-bg: #26a69a;
+  --button-hover-bg: #2bbbad;
+  --border-color: #2f343a;
+  --input-bg: rgb(39, 48, 62);
+  --input-border: #2f343a;
+  --text-color: #e0e0e0;
   --text-secondary: #b0b0b0;
-  --background-color: #121212;
-  --card-bg: #1e1e1e;
-  --hover-bg: #2a2a2a;
-  background: #121212 !important;
+  --background-color: #181b1f;
+  --card-bg: #1a1d21;
+  --summary-card-bg: #1a1d21;
+  --stock-card-bg: rgb(39, 48, 62);
+  --hover-bg: #2f343a;
+  background: #181b1f !important;
+}
+
+/* Dark mode specific overrides for bright elements */
+body.dark-theme .chart-container {
+  background: #121729 !important;
+}
+
+body.dark-theme .chart-container canvas {
+  background: #121729 !important;
+}
+
+body.dark-theme .stock-card {
+  background: #121729 !important;
+  color: #e0e6e4 !important;
+}
+
+body.dark-theme .stock-card .stock-symbol,
+body.dark-theme .stock-card .stock-name,
+body.dark-theme .stock-card .stock-price,
+body.dark-theme .stock-card .stock-change {
+  color: #e0e6e4 !important;
+}
+
+body.dark-theme .watchlist-item {
+  color: #e0e6e4 !important;
+}
+
+body.dark-theme .watchlist-item .symbol,
+body.dark-theme .watchlist-item .company-name {
+  color: #e0e6e4 !important;
+}
+
+body.dark-theme .time-range-button {
+  background: #121729 !important;
+  color: #e0e6e4 !important;
+  border: 1px solid #2a2f3e !important;
+}
+
+body.dark-theme .time-range-button.active {
+  background: #64B5F6 !important;
+  color: #1a1f2e !important;
+}
+
+body.dark-theme .zoom-button,
+body.dark-theme .fullscreenButton,
+body.dark-theme .pause-button {
+  background: #121729 !important;
+  color: #e0e6e4 !important;
+  border: 1px solid #2a2f3e !important;
+}
+
+body.dark-theme .market-status-indicator {
+  background: #4caf50 !important;
+  color: #1a1f2e !important;
+}
+
+body.dark-theme .btn-small {
+  background: #121729 !important;
+  color: #e0e6e4 !important;
+  border: 1px solid #2a2f3e !important;
+}
+
+body.dark-theme .btn-small.green {
+  background: #4caf50 !important;
+  color: #1a1f2e !important;
+}
+
+body.dark-theme .btn-small.red {
+  background: #f44336 !important;
+  color: #1a1f2e !important;
+}
+
+/* Daily Summary card specific styling */
+body.dark-theme .card.daily-summary,
+body.dark-theme .card[data-section="daily-summary"] {
+  background: #436b5a !important;
+  border: 1px solid #2a2f3e !important;
 }
 
 /* === Reset & Base === */
@@ -122,6 +198,8 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   display: block !important;
   visibility: visible !important;
 }
+
+
 .summary-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 36px rgba(0,0,0,0.22), 0 3px 12px rgba(0,0,0,0.16);
@@ -462,7 +540,15 @@ body.dark-theme .summary-card,
 body.dark-theme .news-item,
 body.dark-theme #finance .card,
 body.dark-theme .card.chart-container {
-  background: #232323 !important;
+  background: var(--card-bg) !important;
+}
+
+body.dark-theme .summary-card {
+  background: var(--summary-card-bg) !important;
+}
+
+body.dark-theme .stock-card {
+  background: var(--stock-card-bg) !important;
 }
 
 .card.timeframe-controls {
@@ -1991,6 +2077,73 @@ body.dark-theme form[role="search"] span svg {
   stroke: #bbb !important;
 }
 
+/* Override Google Maps default search box styling for dark mode */
+body.dark-theme .pac-container {
+  background: #23272e !important;
+  border: 1px solid #2f343a !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.32) !important;
+}
+
+body.dark-theme .pac-item {
+  background: #23272e !important;
+  color: #fff !important;
+  border-top: 1px solid #2f343a !important;
+}
+
+body.dark-theme .pac-item:hover {
+  background: #2f343a !important;
+}
+
+body.dark-theme .pac-item-selected {
+  background: #2f343a !important;
+}
+
+/* Fix autocomplete text color in dark mode */
+body.dark-theme .pac-item span {
+  color: #fff !important;
+}
+
+body.dark-theme .pac-item .pac-item-query {
+  color: #fff !important;
+}
+
+body.dark-theme .pac-item .pac-matched {
+  color: #64B5F6 !important;
+  font-weight: bold;
+}
+
+/* Ensure all text in autocomplete is visible */
+body.dark-theme .pac-container * {
+  color: #fff !important;
+}
+
+body.dark-theme .pac-container .pac-item-query {
+  color: #fff !important;
+}
+
+body.dark-theme .pac-container .pac-secondary-text {
+  color: #b0b0b0 !important;
+}
+
+/* Override Google Maps search input styling */
+body.dark-theme input[type="text"][placeholder*="Search"],
+body.dark-theme input[type="search"][placeholder*="Search"],
+body.dark-theme .gmnoprint input[type="text"],
+body.dark-theme .gmnoprint input[type="search"] {
+  background: #23272e !important;
+  color: #fff !important;
+  border: 1px solid #2f343a !important;
+}
+
+/* Override Google Maps search box container */
+body.dark-theme .gmnoprint .gm-style-moc,
+body.dark-theme .gmnoprint .gm-style-mtc,
+body.dark-theme .gmnoprint .gm-style-mcc {
+  background: #23272e !important;
+  border: 1px solid #2f343a !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.32) !important;
+}
+
 
 
 /* --- Default Google Maps Controls Styling for Dark Mode --- */
@@ -2021,6 +2174,109 @@ body.dark-theme .gm-bundled-control button:hover {
   background: #30343a !important;
   color: #64B5F6 !important;
   border-color: #64B5F6 !important;
+}
+
+
+
+/* Traffic Section Height */
+#traffic {
+    min-height: 600px !important;
+}
+
+#traffic-content {
+    min-height: 550px !important;
+}
+
+/* Light mode: Make individual summary content items darker than parent */
+.summary-content > div > div > div {
+    background: lab(90.06% -5.3 -4.59)!important;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+/* Light mode: Make individual news items darker than parent */
+#news-content > div.data-container > div {
+    background: #d1d5db !important;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+/* Light mode: Make featured highlights items darker */
+.news-item {
+    background: lab(90.06% -5.3 -4.59)!important;
+}
+
+/* Header Weather Display */
+#header-weather {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+#header-weather:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background: var(--hover-bg) !important;
+}
+
+#header-weather:active {
+    transform: translateY(0);
+}
+
+#weather-icon {
+    transition: transform 0.3s ease;
+}
+
+#header-weather:hover #weather-icon {
+    transform: scale(1.1);
+}
+
+#weather-temp {
+    font-family: 'Google Sans Text', sans-serif;
+    color: var(--primary-text);
+}
+
+#weather-location {
+    font-family: 'Google Sans Text', sans-serif;
+    opacity: 0.8;
+}
+
+/* Responsive design for header weather */
+@media (max-width: 768px) {
+    #header-weather {
+        min-width: 100px !important;
+        padding: 6px 8px !important;
+    }
+    
+    #weather-icon {
+        font-size: 1em !important;
+    }
+    
+    #weather-temp {
+        font-size: 0.8em !important;
+    }
+    
+    #weather-location {
+        font-size: 0.6em !important;
+    }
+}
+
+@media (max-width: 480px) {
+    header .container > div {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    #header-weather {
+        order: 2;
+        min-width: 120px !important;
+    }
+    
+    .input-field {
+        min-width: 200px !important;
+    }
 }
 
 

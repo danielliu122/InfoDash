@@ -14,11 +14,11 @@
 [data-theme="dark"] {
     --primary-color: #64B5F6;
     --primary-color-rgb: 100, 181, 246;
-    --text-color: #E0E0E0;
-    --background-color: #121212;
-    --border-color: #333;
-    --container-bg: #1E1E1E;
-    --shadow-color: rgba(0,0,0,0.3);
+    --text-color: #e0e6e4;
+    --background-color: #1a1f2e;
+    --border-color: #0F2B25;
+    --container-bg: #0F2B25;
+    --shadow-color: rgba(26, 31, 46, 0.25);
 }
 
 body {
@@ -30,6 +30,24 @@ body {
     padding: 20px;
     background-color: var(--background-color);
     transition: all 0.3s ease;
+}
+
+body[data-theme="dark"] {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+body[data-theme="dark"] .section,
+body[data-theme="dark"] .tos-container {
+    background: var(--container-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+    box-shadow: 0 4px 6px var(--shadow-color);
+}
+body[data-theme="dark"] .theme-toggle {
+    background: var(--container-bg);
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
 }
 
 .theme-toggle {

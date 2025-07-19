@@ -137,8 +137,19 @@
     <header class="container">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <h4 class="center-align" style="margin: 0;">Info Dash</h4>
+            
+            <!-- Weather Display -->
+            <div id="header-weather" class="weather-display" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color); min-width: 120px; justify-content: center;" onclick="handleWeatherClick()" title="Click to change location">
+                <span id="weather-icon" style="font-size: 1.2em;">🌤️</span>
+                <div style="display: flex; flex-direction: column; align-items: center; line-height: 1.2;">
+                    <span id="weather-temp" style="font-weight: 600; font-size: 0.9em;">--°F</span>
+                    <span id="weather-location" style="font-size: 0.7em; color: var(--text-secondary);">Loading...</span>
+                </div>
+            </div>
+            
             <div style="display: flex; align-items: center; gap: 15px;">
                 <div class="input-field" style="margin: 0; min-width: 250px;">
+                    <label for="regionSelect">Select Region & Language</label>
                     <select id="regionSelect" onchange="handleRegionChange()">
                         <option value="en-US" data-language="en" data-country="US">🇺🇸 United States (English)</option>
                         <option value="en-GB" data-language="en" data-country="GB">🇬🇧 United Kingdom (English)</option>
@@ -185,7 +196,6 @@
                         <option value="et-EE" data-language="et" data-country="EE">🇪🇪 Eesti (Eesti)</option>
                         <option value="is-IS" data-language="is" data-country="IS">🇮🇸 Ísland (Íslenska)</option>
                     </select>
-                    <label for="regionSelect">Select Region & Language</label>
                 </div>
                 <button class="theme-toggle" id="themeToggle">🌓</button>
             </div>
@@ -763,12 +773,12 @@
                     </div>
                     <div id="chat-content" class="section-content">
                         <div class="chat-container">
+                            <label>Select Model</label>
                             <div class="input-field">
                                 <select id="model-select">
                                     <option value="deepseek/deepseek-r1:free">DeepSeek (Accurate) [10-60s response time]</option>
                                     <option value="google/gemini-2.0-flash-exp:free">Google Gemini (Fast) [3-30s response time]</option>
                                 </select>
-                                <label>Select Model</label>
                             </div>
                             <div id="chat-log" class="data-container"></div>
                             <div class="chat-input-container">
