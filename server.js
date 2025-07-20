@@ -16,7 +16,7 @@ const openai = new OpenAI({
     baseURL: 'https://openrouter.ai/api/v1',
     apiKey: process.env.DEEPSEEK_API_KEY,
 });
-const DDG = require('duck-duck-scrape');
+const fetch = require('node-fetch');
 const weather = require('weather-js');
 const fs = require('fs').promises;
 
@@ -717,20 +717,22 @@ app.post('/api/lookup', async (req, res) => {
             return res.status(400).json({ error: 'Query is required' });
         }
 
-        // First try DuckDuckGo
-        const searchResults = await DDG.search(query, {
-            safeSearch: DDG.SafeSearchType.STRICT
-        });
-
-        if (searchResults.noResults || !searchResults.results || searchResults.results.length === 0) {
+        // Use DuckDuckGo Instant Answer API
+        const ddgUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json`;
+        const ddgResponse = await fetch(ddgUrl);
+        if (!ddgResponse.ok) {
             return res.json({ result: null });
         }
-
-        // Get the first result
-        const firstResult = searchResults.results[0];
-        const rawResult = firstResult.description || firstResult.title || null;
-
-        // If it's a direct answer (for a simple query), return it
+        const ddgData = await ddgResponse.json();
+        let rawResult = null;
+        if (ddgData.AbstractText) {
+            rawResult = ddgData.AbstractText;
+        } else if (ddgData.RelatedTopics && ddgData.RelatedTopics.length > 0) {
+            const topic = ddgData.RelatedTopics[0];
+            rawResult = topic.Text || topic.Name || null;
+        } else if (ddgData.Results && ddgData.Results.length > 0) {
+            rawResult = ddgData.Results[0].Text || null;
+        }
         if (rawResult) {
             return res.json({ result: rawResult });
         }
@@ -854,18 +856,21 @@ app.post('/api/enhanced-lookup', async (req, res) => {
             }
         }
 
-        // If no specific data found, use general DuckDuckGo search
+        // If no specific data found, use DuckDuckGo Instant Answer API
         if (!result) {
-            const searchResults = await DDG.search(query, {
-                safeSearch: DDG.SafeSearchType.STRICT
-            });
-
-            if (searchResults.noResults || !searchResults.results || searchResults.results.length === 0) {
-                return res.json({ result: null });
+            const ddgUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json`;
+            const ddgResponse = await fetch(ddgUrl);
+            if (ddgResponse.ok) {
+                const ddgData = await ddgResponse.json();
+                if (ddgData.AbstractText) {
+                    result = ddgData.AbstractText;
+                } else if (ddgData.RelatedTopics && ddgData.RelatedTopics.length > 0) {
+                    const topic = ddgData.RelatedTopics[0];
+                    result = topic.Text || topic.Name || null;
+                } else if (ddgData.Results && ddgData.Results.length > 0) {
+                    result = ddgData.Results[0].Text || null;
+                }
             }
-
-            const firstResult = searchResults.results[0];
-            result = firstResult.description || firstResult.title || null;
         }
 
         // If we have a result, optionally enhance it with AI

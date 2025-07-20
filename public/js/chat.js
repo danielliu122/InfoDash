@@ -2,6 +2,14 @@ const chatLog = document.getElementById('chat-log');
 const chatInput = document.getElementById('chat-input');
 const sendButton = document.getElementById('send-button');
 
+// Allow sending message with Enter key
+chatInput.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendButton.click();
+    }
+});
+
 // Initialize conversation memory
 let conversationHistory = [];
 let userMessageCount = 0; // Counter for user messages
@@ -62,6 +70,14 @@ sendButton.addEventListener('click', async () => {
 //     return message.split(' ').length;
 // }
 
+function isSimpleQuery(message) {
+    const trimmed = message.trim().toLowerCase();
+    // Exclude greetings and small talk
+    if (/^(hi|hello|hey|how are you|what's up|sup)[!., ]*$/i.test(trimmed)) return false;
+    // Match simple lookup patterns
+    return /^(what|where|when|why|who|how|define|capital of|weather in|meaning of)\b/i.test(trimmed);
+}
+
 function appendMessage(message, isAI = false) {
     const messageElement = document.createElement('div');
     messageElement.textContent = message;
@@ -77,21 +93,32 @@ async function fetchAIResponse(history, attempt = 0) {
     try {
         const selectedModel = document.getElementById('model-select').value;
         const lastMessage = history[history.length - 1];
+        const lookupResult = await performOnlineLookup(lastMessage);
+        console.log('Enhanced lookup result:', lookupResult);
+
+        // If it's a simple query and we have a lookup result, use it directly
+        if (isSimpleQuery(lastMessage) && lookupResult) {
+            return lookupResult;
+        }
+
+        // Otherwise, proceed with AI as before
         const messages = [
             {
                 role: 'system',
-                content: 'This is a conversation between a user and an AI engine. ' +
-                         'Please determine the next appropriate response to the current user query. ' +
-                         'Each user query is independent unless explicitly related to previous queries.'
+                content: 'This is a conversation between a user and an AI engine. Please determine the next appropriate response to the current user query. Each user query is independent unless explicitly related to previous queries.'
             },
-            ...history.map((message, index) => ({
+            ...history.slice(0, -1).map((message, index) => ({
                 role: index % 2 === 0 ? 'user' : 'assistant',
                 content: message
-            }))
+            })),
+            {
+                role: 'user',
+                content: lookupResult
+                    ? `Based on this information: "${lookupResult}", answer: ${lastMessage}`
+                    : lastMessage
+            }
         ];
-        if (isSimpleQuery(lastMessage)) {
-            return await handleSimpleQuery(lastMessage, messages, selectedModel);
-        }
+
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: {
@@ -102,82 +129,24 @@ async function fetchAIResponse(history, attempt = 0) {
                 model: selectedModel 
             }),
         });
-        if (response.status === 503) {
-            if (attempt < maxRetries) {
-                appendMessage("AI: The AI is starting up, please wait... (retrying)");
-                await new Promise(res => setTimeout(res, retryDelay));
-                return fetchAIResponse(history, attempt + 1);
-            } else {
-                return "AI: The AI is still unavailable after several attempts. Please try again later.";
+        if (!response.ok) {
+            let errorMsg = 'Sorry, the AI service is temporarily unavailable.';
+            try {
+                const errorData = await response.json();
+                if (errorData && errorData.error) {
+                    errorMsg = errorData.error;
+                }
+            } catch (e) {}
+            if (lookupResult) {
+                return lookupResult;
             }
+            return errorMsg;
         }
         const data = await response.json();
         return data.reply || 'Sorry, I did not understand that.';
     } catch (error) {
         console.error('Error fetching AI response:', error);
         return 'Error: Unable to get response.';
-    }
-}
-
-// Function to check if a message is a simple factual question
-function isSimpleQuery(message) {
-    const firstWord = message.trim().split(' ')[0].toLowerCase();
-    const questionWords = ['what', 'where', 'when', 'why', 'who', 'how'];
-    return questionWords.includes(firstWord);
-}
-
-async function handleSimpleQuery(query, history, model) {
-    try {
-        const lookupResult = await performOnlineLookup(query);
-        
-        if (lookupResult) {
-            // Add lookup result to the conversation context
-            const messages = [
-                ...history.slice(0, -1),
-                {
-                    role: 'user',
-                    content: `Based on this information: "${lookupResult}", answer: ${query}`
-                }
-            ];
-
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ 
-                    messages,
-                    model 
-                }),
-            });
-            const data = await response.json();
-            return data.reply;
-        }
-        
-        // If no lookup result, ask directly
-        const messages = [
-            ...history.slice(0, -1),
-            {
-                role: 'user',
-                content: `Explain or answer: ${query}`
-            }
-        ];
-
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                messages,
-                model 
-            }),
-        });
-        const data = await response.json();
-        return data.reply;
-    } catch (error) {
-        console.error('Error handling simple query:', error);
-        return 'Error: Unable to process your request.';
     }
 }
 
