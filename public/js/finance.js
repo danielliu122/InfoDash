@@ -955,7 +955,7 @@ export function updateFinance(data) {
 
     // Ensure canvas has proper dimensions before initializing chart
     const ensureCanvasReady = () => {
-        const parent = canvas.parentElement;
+    const parent = canvas.parentElement;
         if (!parent) return false;
         
         // Wait for parent to have dimensions
@@ -964,8 +964,8 @@ export function updateFinance(data) {
         }
         
         // Set canvas dimensions
-        canvas.width = parent.clientWidth;
-        canvas.height = parent.clientHeight;
+    canvas.width = parent.clientWidth;
+    canvas.height = parent.clientHeight;
         
         return true;
     };
@@ -976,13 +976,13 @@ export function updateFinance(data) {
             // If canvas isn't ready, retry after a short delay
             setTimeout(initializeChartWithRetry, 50);
             return;
-        }
-        
-        const ctx = canvas.getContext('2d');
-        const processedData = processChartData(data.dates, data.prices, data.symbol);
-        processedData.timeRange = data.timeRange; 
-        
-        window.financeChart = initializeChart(ctx, processedData);
+    }
+    
+    const ctx = canvas.getContext('2d');
+    const processedData = processChartData(data.dates, data.prices, data.symbol);
+    processedData.timeRange = data.timeRange; 
+    
+    window.financeChart = initializeChart(ctx, processedData);
         
         // Force a resize and update to ensure proper rendering
         if (window.financeChart) {

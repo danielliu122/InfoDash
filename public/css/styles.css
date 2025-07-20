@@ -282,6 +282,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
     min-width: 0 !important;
     box-sizing: border-box !important;
     overflow-x: auto !important;
+    background: lab(90.06% -5.3 -4.59)!important;
   }
   #financeChart, .card.chart-container canvas {
     width: 100% !important;
@@ -2263,6 +2264,75 @@ body.dark-theme .gm-bundled-control button:hover {
     min-height: 550px !important;
 }
 
+/* === Google Maps API Generated Elements - Simplified Fix === */
+/* Simplified approach for Google Maps generated elements */
+
+/* Specific Google Maps generated elements */
+div[jstcache],
+div[jsinstance],
+div[jsan] {
+  color: var(--primary-text) !important;
+}
+
+/* Force override for any Google Maps elements with inline white text */
+div[style*="color: rgb(255, 255, 255)"],
+div[style*="color: white"],
+div[style*="color: #ffffff"],
+div[style*="color: #fff"] {
+  color: var(--primary-text) !important;
+}
+
+/* Override any Google Maps elements with white backgrounds in light mode */
+body:not(.dark-theme) div[style*="background: rgb(255, 255, 255)"],
+body:not(.dark-theme) div[style*="background: white"],
+body:not(.dark-theme) div[style*="background: #ffffff"],
+body:not(.dark-theme) div[style*="background: #fff"] {
+  background: var(--card-bg) !important;
+}
+
+/* Ensure Google Maps text is always visible */
+.gm-style *,
+div[jstcache] *,
+div[jsinstance] *,
+div[jsan] * {
+  color: inherit !important;
+}
+
+/* Specific fix for the address-line element you mentioned */
+div[jstcache="128"][jsinstance="0"].address-line.full-width[jsan*="address-line"] {
+  color: var(--primary-text) !important;
+  background: transparent !important;
+}
+
+/* Dark theme specific overrides for Google Maps generated elements */
+body.dark-theme .address-line,
+body.dark-theme div[class*="address-line"],
+body.dark-theme div[jstcache*="address-line"],
+body.dark-theme div[jsinstance*="address-line"],
+body.dark-theme div[class*="full-width"][jstcache*="address-line"],
+body.dark-theme div[jsan*="address-line"] {
+  color: #e0e6e4 !important;
+  background: transparent !important;
+}
+
+body.dark-theme div[jstcache],
+body.dark-theme div[jsinstance],
+body.dark-theme div[jsan] {
+  color: #e0e6e4 !important;
+}
+
+body.dark-theme div[style*="color: rgb(255, 255, 255)"],
+body.dark-theme div[style*="color: white"],
+body.dark-theme div[style*="color: #ffffff"],
+body.dark-theme div[style*="color: #fff"] {
+  color: #e0e6e4 !important;
+}
+
+body.dark-theme div[jstcache="128"][jsinstance="0"].address-line.full-width[jsan*="address-line"] {
+  color: #e0e6e4 !important;
+  background: transparent !important;
+}
+
 /* Light mode: Make individual summary content items darker than parent */
 .summary-content > div > div > div {
     background: lab(90.06% -5.3 -4.59)!important;
@@ -2488,3 +2558,428 @@ body:not(.dark-theme) div[style*="background: rgb(255, 255, 255)"] {
 .financeChart {
   background: lab(90.06% -5.3 -4.59)!important;
 }
+
+/* === Google Maps Tile Border Fix === */
+/* Fix grey box borders and tile rendering artifacts */
+.gm-style img,
+.gm-style-moc img,
+.gm-style-mtc img,
+.gm-style-mcc img,
+.gm-style .gm-style-moc img,
+.gm-style .gm-style-mtc img,
+.gm-style .gm-style-mcc img {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove borders from map tile containers */
+.gm-style > div,
+.gm-style-moc > div,
+.gm-style-mtc > div,
+.gm-style-mcc > div,
+.gm-style .gm-style-moc > div,
+.gm-style .gm-style-mtc > div,
+.gm-style .gm-style-mcc > div {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Fix tile grid lines and borders */
+.gm-style canvas,
+.gm-style-moc canvas,
+.gm-style-mtc canvas,
+.gm-style-mcc canvas {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove any grid lines or borders from map overlays */
+.gm-style .gm-style-moc,
+.gm-style .gm-style-mtc,
+.gm-style .gm-style-mcc,
+.gm-style-moc,
+.gm-style-mtc,
+.gm-style-mcc {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Fix specific tile rendering issues */
+.gm-style img[src*="maps.googleapis.com"],
+.gm-style img[src*="maps.gstatic.com"] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Remove any grey borders from map containers */
+#map > div,
+#map > div > div,
+#map > div > div > div {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Fix dark mode specific tile rendering */
+body.dark-theme .gm-style img,
+body.dark-theme .gm-style-moc img,
+body.dark-theme .gm-style-mtc img,
+body.dark-theme .gm-style-mcc img {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  filter: brightness(0.8) contrast(1.1);
+}
+
+/* Ensure seamless tile blending */
+.gm-style,
+.gm-style-moc,
+.gm-style-mtc,
+.gm-style-mcc {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Fix any remaining grid artifacts */
+.gm-style *,
+.gm-style-moc *,
+.gm-style-mtc *,
+.gm-style-mcc * {
+  border-color: transparent !important;
+}
+
+/* === End Google Maps Tile Border Fix === */
+
+/* === Google Maps InfoWindow Button Fix === */
+/* Ensure InfoWindow   is always visible */
+.gm-style-iw-tc,
+.gm-style-iw-t,
+.gm-style-iw-t::after,
+.gm-style-iw-c,
+.gm-style-iw-d {
+  background: var(--card-bg) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Fix button specifically */
+.gm-style-iw-tc .gm-style-iw-t,
+.gm-style-iw-tc .gm-style-iw-t::after,
+.gm-style-iw-tc .gm-style-iw-c,
+.gm-style-iw-tc .gm-style-iw-d {
+  background: var(--card-bg) !important;
+}
+
+/* Ensure button has proper contrast */
+.gm-style-iw-tc button,
+.gm-style-iw-t button,
+.gm-style-iw-c button,
+.gm-style-iw-d button,
+.gm-style-iw-tc .gm-style-iw-t button,
+.gm-style-iw-tc .gm-style-iw-c button,
+.gm-style-iw-tc .gm-style-iw-d button {
+  background: #ffffff !important;
+  color: #333333 !important;
+  border: 1px solid #cccccc !important;
+  border-radius: 50% !important;
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+  z-index: 1000 !important;
+  position: relative !important;
+}
+
+/* button hover state */
+.gm-style-iw-tc button:hover,
+.gm-style-iw-t button:hover,
+.gm-style-iw-c button:hover,
+.gm-style-iw-d button:hover,
+.gm-style-iw-tc .gm-style-iw-t button:hover,
+.gm-style-iw-tc .gm-style-iw-c button:hover,
+.gm-style-iw-tc .gm-style-iw-d button:hover {
+  background: #f0f0f0 !important;
+  color: #000000 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+}
+
+/* Dark mode button styling */
+body.dark-theme .gm-style-iw-tc button,
+body.dark-theme .gm-style-iw-t button,
+body.dark-theme .gm-style-iw-c button,
+body.dark-theme .gm-style-iw-d button,
+body.dark-theme .gm-style-iw-tc .gm-style-iw-t button,
+body.dark-theme .gm-style-iw-tc .gm-style-iw-c button,
+body.dark-theme .gm-style-iw-tc .gm-style-iw-d button {
+  background: #ffffff !important;
+  color: #333333 !important;
+  border: 1px solid #666666 !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+}
+
+body.dark-theme .gm-style-iw-tc button:hover,
+body.dark-theme .gm-style-iw-t button:hover,
+body.dark-theme .gm-style-iw-c button:hover,
+body.dark-theme .gm-style-iw-d button:hover,
+body.dark-theme .gm-style-iw-tc .gm-style-iw-t button:hover,
+body.dark-theme .gm-style-iw-tc .gm-style-iw-c button:hover,
+body.dark-theme .gm-style-iw-tc .gm-style-iw-d button:hover {
+  background: #f0f0f0 !important;
+  color: #000000 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+}
+
+/* Map theme specific button fixes */
+#map[data-map-theme="light"] .gm-style-iw-tc button,
+#map[data-map-theme="light"] .gm-style-iw-t button,
+#map[data-map-theme="light"] .gm-style-iw-c button,
+#map[data-map-theme="light"] .gm-style-iw-d button {
+  background: #ffffff !important;
+  color: #333333 !important;
+  border: 1px solid #cccccc !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+#map[data-map-theme="dark"] .gm-style-iw-tc button,
+#map[data-map-theme="dark"] .gm-style-iw-t button,
+#map[data-map-theme="dark"] .gm-style-iw-c button,
+#map[data-map-theme="dark"] .gm-style-iw-d button {
+  background: #ffffff !important;
+  color: #333333 !important;
+  border: 1px solid #666666 !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+}
+
+/* Ensure button text/content is visible */
+.gm-style-iw-tc button *,
+.gm-style-iw-t button *,
+.gm-style-iw-c button *,
+.gm-style-iw-d button * {
+  color: inherit !important;
+  background: transparent !important;
+}
+
+/* Fix any Google Maps generated button elements */
+.gm-style-iw-tc .gm-style-iw-tc,
+.gm-style-iw-tc .gm-style-iw-t,
+.gm-style-iw-tc .gm-style-iw-c,
+.gm-style-iw-tc .gm-style-iw-d {
+  background: transparent !important;
+}
+
+/* Ensure button container is properly positioned */
+.gm-style-iw-tc {
+  position: relative !important;
+  z-index: 1000 !important;
+}
+
+/* === End Google Maps InfoWindow button Fix === */
+
+/* === Google Maps InfoWindow Text Fix - Modern Solution === */
+/* Based on https://gist.github.com/SimonEast/16b5bf3d56c0e5035b31 */
+
+/* Fix InfoWindow scrollbars and text visibility */
+.gm-style .gm-style-iw.gm-style-iw-c {
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  overflow: auto !important;
+  background: var(--card-bg) !important;
+}
+
+.gm-style .gm-style-iw.gm-style-iw-c .gm-style-iw-d {
+  overflow: visible !important;
+  background: var(--card-bg) !important;
+  color: var(--primary-text) !important;
+}
+
+/* Ensure InfoWindow content is properly styled */
+.gm-style-iw,
+.gm-style-iw-d,
+.gm-style-iw-c,
+.gm-style-iw-t {
+  background: var(--card-bg) !important;
+  color: var(--primary-text) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Fix text color for all InfoWindow elements */
+.gm-style-iw *,
+.gm-style-iw-d *,
+.gm-style-iw-c *,
+.gm-style-iw-t * {
+  color: var(--primary-text) !important;
+  background: transparent !important;
+}
+
+/* Light mode specific styling */
+body:not(.dark-theme) .gm-style-iw,
+body:not(.dark-theme) .gm-style-iw-d,
+body:not(.dark-theme) .gm-style-iw-c,
+body:not(.dark-theme) .gm-style-iw-t {
+  background: #ffffff !important;
+  color: #212529 !important;
+}
+
+body:not(.dark-theme) .gm-style-iw *,
+body:not(.dark-theme) .gm-style-iw-d *,
+body:not(.dark-theme) .gm-style-iw-c *,
+body:not(.dark-theme) .gm-style-iw-t * {
+  color: #212529 !important;
+}
+
+/* Dark mode specific styling */
+body.dark-theme .gm-style-iw,
+body.dark-theme .gm-style-iw-d,
+body.dark-theme .gm-style-iw-c,
+body.dark-theme .gm-style-iw-t {
+  background: #1a1d21 !important;
+  color: #e0e6e4 !important;
+}
+
+body.dark-theme .gm-style-iw *,
+body.dark-theme .gm-style-iw-d *,
+body.dark-theme .gm-style-iw-c *,
+body.dark-theme .gm-style-iw-t * {
+  color: #e0e6e4 !important;
+}
+
+/* Map theme specific overrides */
+#map[data-map-theme="light"] .gm-style-iw,
+#map[data-map-theme="light"] .gm-style-iw-d,
+#map[data-map-theme="light"] .gm-style-iw-c,
+#map[data-map-theme="light"] .gm-style-iw-t {
+  background: #ffffff !important;
+  color: #212529 !important;
+}
+
+#map[data-map-theme="light"] .gm-style-iw *,
+#map[data-map-theme="light"] .gm-style-iw-d *,
+#map[data-map-theme="light"] .gm-style-iw-c *,
+#map[data-map-theme="light"] .gm-style-iw-t * {
+  color: #212529 !important;
+}
+
+#map[data-map-theme="dark"] .gm-style-iw,
+#map[data-map-theme="dark"] .gm-style-iw-d,
+#map[data-map-theme="dark"] .gm-style-iw-c,
+#map[data-map-theme="dark"] .gm-style-iw-t {
+  background: #1a1d21 !important;
+  color: #e0e6e4 !important;
+}
+
+#map[data-map-theme="dark"] .gm-style-iw *,
+#map[data-map-theme="dark"] .gm-style-iw-d *,
+#map[data-map-theme="dark"] .gm-style-iw-c *,
+#map[data-map-theme="dark"] .gm-style-iw-t * {
+  color: #e0e6e4 !important;
+}
+
+/* Fix for Google Maps generated elements with inline styles */
+div[style*="color: rgb(255, 255, 255)"],
+div[style*="color: white"],
+div[style*="color: #ffffff"],
+div[style*="color: #fff"] {
+  color: var(--primary-text) !important;
+}
+
+/* Address line specific fix */
+.address-line,
+div[class*="address-line"],
+div[jstcache*="address-line"],
+div[jsinstance*="address-line"],
+div[jsan*="address-line"] {
+  color: var(--primary-text) !important;
+  background: transparent !important;
+}
+
+/* === End Google Maps InfoWindow Text Fix === */
+
+/* === Chart Container Background Fix === */
+/* Ensure chart container has the correct background in light mode */
+body:not(.dark-theme) #finance-content > div.cards-container > div.card.chart-container,
+body:not(.dark-theme) .card.chart-container,
+body:not(.dark-theme) #finance .card.chart-container {
+  background: lab(90.06% -5.3 -4.59) !important;
+}
+
+/* Ensure chart container canvas also has the correct background in light mode */
+body:not(.dark-theme) #finance-content > div.cards-container > div.card.chart-container canvas,
+body:not(.dark-theme) .card.chart-container canvas,
+body:not(.dark-theme) #finance .card.chart-container canvas {
+  background: lab(90.06% -5.3 -4.59) !important;
+}
+
+/* Desktop specific light mode chart container background */
+@media (min-width: 1000px) {
+  body:not(.dark-theme) #finance .cards-container .card.chart-container {
+    background: lab(90.06% -5.3 -4.59) !important;
+  }
+  
+  body:not(.dark-theme) #finance .cards-container .card.chart-container canvas {
+    background: lab(90.06% -5.3 -4.59) !important;
+  }
+}
+
+/* Mobile specific light mode chart container background */
+@media (max-width: 768px) {
+  body:not(.dark-theme) #finance .card.chart-container,
+  body:not(.dark-theme) .card.chart-container {
+    background: lab(90.06% -5.3 -4.59) !important;
+  }
+  
+  body:not(.dark-theme) #finance .card.chart-container canvas,
+  body:not(.dark-theme) .card.chart-container canvas {
+    background: lab(90.06% -5.3 -4.59) !important;
+  }
+}
+
+/* === End Chart Container Background Fix === */
+
+/* === Hide Google Maps InfoWindow button === */
+/* Hide the InfoWindow button container */
+#map > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(4) > div > div > div > div.gm-style-iw-tc {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Alternative selectors to ensure the button is hidden */
+.gm-style-iw-tc {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Hide any button elements within InfoWindows */
+.gm-style-iw-tc button,
+.gm-style-iw-tc .gm-style-iw-t,
+.gm-style-iw-tc .gm-style-iw-c,
+.gm-style-iw-tc .gm-style-iw-d {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* === End Hide Google Maps InfoWindow button === */
+

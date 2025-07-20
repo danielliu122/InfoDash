@@ -77,7 +77,10 @@ window.initMap = function() {
     mapTypeControl: true,
     streetViewControl: true,
     fullscreenControl: true,
-    styles: initialStyles
+    styles: initialStyles,
+    gestureHandling: 'greedy', // Enable mouse wheel zoom control
+    scrollwheel: true, // Enable scroll wheel zoom (legacy option for compatibility)
+    zoomControl: true // Ensure zoom controls are visible
   });
 
   // Add the traffic layer by default
@@ -93,16 +96,7 @@ window.initMap = function() {
           lng: position.coords.longitude
         };
         map.setCenter(pos);
-        if (locationMarker) locationMarker.setMap(null);
-        locationMarker = new google.maps.Marker({
-          map,
-          position: pos,
-          title: 'Your Location',
-          icon: {
-            url: 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png',
-            scaledSize: new google.maps.Size(36, 36)
-          }
-        });
+        // Don't add a marker, just center the map
       },
       () => {/* do nothing, fallback to default center */}
     );
