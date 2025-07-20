@@ -948,22 +948,53 @@ export function updateFinance(data) {
     const canvas = document.getElementById('financeChart');
     if (!canvas) return;
 
-    // --- Synchronize canvas drawing buffer size with displayed size ---
-    const parent = canvas.parentElement;
-    canvas.width = parent.clientWidth;
-    canvas.height = parent.clientHeight;
-    // ---------------------------------------------------------------
-
     // Destroy existing chart if it exists
     if (window.financeChart && typeof window.financeChart.destroy === 'function') {
         window.financeChart.destroy();
     }
-    
-    const ctx = canvas.getContext('2d');
-    const processedData = processChartData(data.dates, data.prices, data.symbol);
-    processedData.timeRange = data.timeRange; 
-    
-    window.financeChart = initializeChart(ctx, processedData);
+
+    // Ensure canvas has proper dimensions before initializing chart
+    const ensureCanvasReady = () => {
+        const parent = canvas.parentElement;
+        if (!parent) return false;
+        
+        // Wait for parent to have dimensions
+        if (parent.clientWidth === 0 || parent.clientHeight === 0) {
+            return false;
+        }
+        
+        // Set canvas dimensions
+        canvas.width = parent.clientWidth;
+        canvas.height = parent.clientHeight;
+        
+        return true;
+    };
+
+    // Initialize chart with proper timing
+    const initializeChartWithRetry = () => {
+        if (!ensureCanvasReady()) {
+            // If canvas isn't ready, retry after a short delay
+            setTimeout(initializeChartWithRetry, 50);
+            return;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        const processedData = processChartData(data.dates, data.prices, data.symbol);
+        processedData.timeRange = data.timeRange; 
+        
+        window.financeChart = initializeChart(ctx, processedData);
+        
+        // Force a resize and update to ensure proper rendering
+        if (window.financeChart) {
+            setTimeout(() => {
+                window.financeChart.resize();
+                window.financeChart.update('none');
+            }, 100);
+        }
+    };
+
+    // Start initialization
+    initializeChartWithRetry();
 
     // Re-attach event listeners
     document.getElementById('zoomIn').addEventListener('click', () => window.financeChart.zoom(1.1));

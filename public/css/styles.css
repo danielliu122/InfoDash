@@ -470,6 +470,41 @@ body.dark-theme .collapsible-header:hover {
   background-color: #616161 !important;
 }
 
+/* Ensure all borders are dark in dark mode */
+body.dark-theme * {
+  border-color: #333 !important;
+}
+
+/* Specific overrides for better contrast */
+body.dark-theme .collapsible-header {
+  border-bottom-color: #444 !important;
+}
+
+body.dark-theme .card {
+  border-color: #444 !important;
+}
+
+body.dark-theme .summary-card,
+body.dark-theme .news-item,
+body.dark-theme .trend-card {
+  border-color: #444 !important;
+}
+
+/* Light mode: Archive row elements should use the light green background */
+body:not(.dark-theme) #summary-content-container .archive-row ul li {
+  background: lab(90.06% -5.3 -4.59) !important;
+  border-radius: 6px !important;
+  margin-bottom: 8px !important;
+}
+
+body:not(.dark-theme) #summary-content-container .archive-row ul li .collapsible-header {
+  background: lab(90.06% -5.3 -4.59) !important;
+  border: none !important;
+  border-bottom: 1px solid #c1d5d0 !important;
+}
+
+
+
 /* === DESKTOP: LIVE STOCK DASHBOARD MODULES HALF WIDTH === */
 @media (min-width: 1000px) {
   #finance .cards-container {
@@ -488,6 +523,11 @@ body.dark-theme .collapsible-header:hover {
   #finance .cards-container .card.chart-container,
   #finance .cards-container .finance-bottom-row {
     grid-column: span 2;
+  }
+
+  body:not(.dark-theme) #finance .cards-container .card.chart-container,
+  #finance .cards-container .finance-bottom-row {
+    background: lab(90.06% -5.3 -4.59)!important;
   }
 
   .section {
@@ -1108,6 +1148,41 @@ body.dark-theme .fullscreenButton:hover {
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
+}
+
+/* Mobile responsive fixes for finance chart */
+@media (max-width: 768px) {
+  #finance .chart-container {
+    min-height: 300px !important;
+    max-height: 400px !important;
+    overflow: hidden;
+  }
+  
+  #finance .chart-container canvas {
+    max-height: 350px !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Ensure proper spacing between finance and dashboard sections */
+  #finance {
+    margin-bottom: 20px !important;
+  }
+  
+  #stock-dashboard {
+    margin-top: 20px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #finance .chart-container {
+    min-height: 250px !important;
+    max-height: 300px !important;
+  }
+  
+  #finance .chart-container canvas {
+    max-height: 250px !important;
+  }
 }
 
 .scroll-to-top {
@@ -2196,6 +2271,8 @@ body.dark-theme .gm-bundled-control button:hover {
     margin-bottom: 8px;
 }
 
+
+
 /* Light mode: Make individual news items darker than parent */
 #news-content > div.data-container > div {
     background: #d1d5db !important;
@@ -2280,4 +2357,131 @@ body.dark-theme .gm-bundled-control button:hover {
     }
 }
 
+.row-archive-row {
+  background: lab(90.06% -5.3 -4.59)!important;
+}
+
+/* Light mode scrollbar styling */
+body:not(.dark-theme) ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+body:not(.dark-theme) ::-webkit-scrollbar-track {
+  background: lab(90.06% -5.3 -4.59);
+  border-radius: 6px;
+}
+
+body:not(.dark-theme) ::-webkit-scrollbar-thumb {
+  background: #c1d5d0;
+  border-radius: 6px;
+  border: 2px solid lab(90.06% -5.3 -4.59);
+}
+
+body:not(.dark-theme) ::-webkit-scrollbar-thumb:hover {
+  background: #a8c4bc;
+}
+
+body:not(.dark-theme) ::-webkit-scrollbar-corner {
+  background: lab(90.06% -5.3 -4.59);
+}
+
+/* Firefox scrollbar styling - light mode only */
+body:not(.dark-theme) * {
+  scrollbar-width: thin;
+  scrollbar-color: #c1d5d0 lab(90.06% -5.3 -4.59);
+}
+
+/* Google Maps Places Autocomplete styling */
+.pac-container {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  margin-top: 4px !important;
+}
+
+.pac-item {
+  background: var(--card-bg) !important;
+  color: var(--primary-text) !important;
+  padding: 8px 12px !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.pac-item:hover {
+  background: var(--hover-bg) !important;
+}
+
+.pac-item:last-child {
+  border-bottom: none !important;
+}
+
+.pac-item-query {
+  color: var(--primary-text) !important;
+  font-weight: 500 !important;
+}
+
+.pac-matched {
+  color: var(--accent-color) !important;
+  font-weight: bold !important;
+}
+
+/* Dark theme overrides for Google Maps */
+body.dark-theme .pac-container {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.dark-theme .pac-item {
+  background: var(--card-bg) !important;
+  color: var(--primary-text) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.dark-theme .pac-item:hover {
+  background: var(--hover-bg) !important;
+}
+
+/* Dark mode styling for Google Maps search input container */
+body.dark-theme .pac-target-input {
+  background: var(--card-bg) !important;
+  color: var(--primary-text) !important;
+}
+
+/* Target the search container div that Google Maps generates - dark mode only */
+body.dark-theme div[style*="background: rgb(255, 255, 255)"] {
+  background: var(--card-bg) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Light mode: ensure Google Maps search container stays light */
+body:not(.dark-theme) div[style*="background: rgb(255, 255, 255)"] {
+  background: rgb(255, 255, 255) !important;
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 2px 8px !important;
+}
+
+/* Google Maps theme toggle button styling */
+.map-theme-toggle.styled-map-btn {
+  background: var(--card-bg) !important;
+  color: var(--primary-text) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.map-theme-toggle.styled-map-btn:hover {
+  background: var(--hover-bg) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.map-theme-toggle.styled-map-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
 
