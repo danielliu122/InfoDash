@@ -2485,3 +2485,6 @@ body:not(.dark-theme) div[style*="background: rgb(255, 255, 255)"] {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
+.financeChart {
+  background: lab(90.06% -5.3 -4.59)!important;
+}
