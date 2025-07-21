@@ -1,6 +1,7 @@
 // summary.js - Handles the summary section functionality
 
 import { userPrefs } from './userPreferences.js';
+import { updateSummaryWeather } from './weather.js';
 
 let summaryData = {
     news: null,
@@ -445,29 +446,6 @@ async function collectFinanceData() {
     }
 }
 
-// Function to collect weather data
-async function collectWeatherData() {
-    const location = userPrefs.getWeatherLocation();
-    
-    if (!location) {
-        return null;
-    }
-    
-    try {
-        const response = await fetch(`/api/weather?location=${encodeURIComponent(location)}`);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error collecting weather data:', error);
-        return null;
-    }
-}
-
 // Function to generate summary using AI
 async function generateSummary(sectionData) {
     const maxRetries = 3;
@@ -655,141 +633,6 @@ function createAnalysisPrompt(sectionData) {
     return prompt;
 }
 
-// Function to display current weather in the summary and preferences sections
-async function displayCurrentWeather() {
-    const location = userPrefs.getWeatherLocation();
-    
-    // Wait 2 seconds to allow DOM to render weather-info structure
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const weatherSummaryContainer = document.querySelector('.weather-summary .weather-info');
-    const preferencesWeatherContainer = document.getElementById('preferences-weather');
-
-    if (!location) {
-        if (weatherSummaryContainer) {
-            // Check if cookies are declined
-            const cookiesDeclined = getCookie('cookiesDeclined') === 'true';
-            
-            if (cookiesDeclined) {
-                weatherSummaryContainer.innerHTML = `
-                    <p>No location set. <button onclick="showLocationModal()">Set Location</button></p>
-                    <p style="font-style: italic; color: #9e9e9e; font-size: 0.85em; margin-top: 10px;">
-                        ⚠️ Cookies are disabled. Please click "🍪 Reset Cookies" above and accept cookies to save your weather location.
-                    </p>
-                `;
-            } else {
-                weatherSummaryContainer.innerHTML = '<p>No location set. <button onclick="showLocationModal()">Set Location</button></p>';
-            }
-        }
-        if (preferencesWeatherContainer) {
-            preferencesWeatherContainer.innerHTML = '<p>No location set.</p>';
-        }
-        return;
-    }
-    
-    try {
-        const weatherData = await collectWeatherData();
-        
-        if (!weatherData) {
-            if (weatherSummaryContainer) {
-                weatherSummaryContainer.innerHTML = '<p>No weather data available.</p>';
-            }
-            if (preferencesWeatherContainer) {
-                preferencesWeatherContainer.innerHTML = '<p>No weather data available.</p>';
-            }
-            return;
-        }
-        
-        // Handle both old flat format and new nested format
-        let current, locationData;
-        
-        if (weatherData && weatherData.current && weatherData.location) {
-            // New nested format
-            current = weatherData.current;
-            locationData = weatherData.location;
-        } else if (weatherData && weatherData.temperature) {
-            // Old flat format - convert to new format
-            current = {
-                temperature: weatherData.temperature,
-                temperatureUnit: 'F',
-                condition: weatherData.condition,
-                humidity: weatherData.humidity,
-                wind: weatherData.wind,
-                windUnit: 'mph',
-                feelslike: weatherData.feelslike
-            };
-            locationData = {
-                name: weatherData.location || location,
-                country: 'Unknown',
-                timezone: 'Unknown'
-            };
-        } else {
-            console.error('Weather data structure is invalid:', weatherData);
-            if (weatherSummaryContainer) {
-                weatherSummaryContainer.innerHTML = '<p>No weather data available.</p>';
-            }
-            if (preferencesWeatherContainer) {
-                preferencesWeatherContainer.innerHTML = '<p>No weather data available.</p>';
-            }
-            return;
-        }
-        
-        // Clean up location display - handle undefined country properly
-        const locationName = locationData.name || 'Unknown Location';
-        const locationCountry = locationData.country;
-        
-        // Only show country if it exists and is not empty/undefined
-        const locationDisplay = locationCountry && locationCountry !== 'undefined' && locationCountry.trim() !== '' 
-            ? `${locationName}, ${locationCountry}` 
-            : locationName;
-        
-        // Fix wind display - remove duplicate units and clean up the data
-        let wind = current.wind || 'N/A';
-        let windUnit = current.windUnit || '';
-        
-        // If wind already contains the unit, extract just the number
-        if (typeof wind === 'string' && wind.includes('mph')) {
-            wind = wind.replace(' mph', '').replace('mph', '').trim();
-            windUnit = 'mph';
-        } else if (typeof wind === 'string' && wind.includes('m/s')) {
-            wind = wind.replace(' m/s', '').replace('m/s', '').trim();
-            windUnit = 'm/s';
-        }
-        
-        // Get current timestamp for when the request was made
-        const now = new Date();
-        const timestamp = now.toLocaleTimeString('en-US', { 
-            hour12: true, 
-            hour: 'numeric', 
-            minute: '2-digit', 
-            second: '2-digit' 
-        });
-        
-        // Update the weather-info card in summary
-        if (weatherSummaryContainer) {
-            weatherSummaryContainer.querySelector('.weather-location').innerHTML = `<h4>📍 ${locationDisplay}</h4>`;
-            weatherSummaryContainer.querySelector('.weather-updated').innerHTML = `<div style="font-size: 0.8em; color: var(--text-secondary); text-align: right;">🕐 Updated: ${timestamp}</div>`;
-            weatherSummaryContainer.querySelector('.weather-condition').textContent = current.condition;
-            weatherSummaryContainer.querySelector('.weather-temp').textContent = `Temperature: ${current.temperature}°${current.temperatureUnit}`;
-            weatherSummaryContainer.querySelector('.weather-feelslike').textContent = `Feels like: ${current.feelslike}°${current.temperatureUnit}`;
-            weatherSummaryContainer.querySelector('.weather-humidity').textContent = `Humidity: ${current.humidity}%`;
-            weatherSummaryContainer.querySelector('.weather-wind').textContent = `Wind: ${wind} ${windUnit}`;
-        }
-        // For preferences section, just show a simple summary
-        if (preferencesWeatherContainer) {
-            preferencesWeatherContainer.innerHTML = `<div><strong>${locationDisplay}</strong><br>${current.condition}, ${current.temperature}°${current.temperatureUnit}, Feels like: ${current.feelslike}°${current.temperatureUnit}, Humidity: ${current.humidity}%, Wind: ${wind} ${windUnit} <span style='font-size:0.8em;color:var(--text-secondary);'>🕐 ${timestamp}</span></div>`;
-        }
-    } catch (error) {
-        console.error('Error displaying weather:', error);
-        if (weatherSummaryContainer) {
-            weatherSummaryContainer.innerHTML = '<p>Error loading weather data.</p>';
-        }
-        if (preferencesWeatherContainer) {
-            preferencesWeatherContainer.innerHTML = '<p>Error loading weather data.</p>';
-        }
-    }
-}
-
 // Function to update summary display
 async function updateSummaryDisplay(summaryText) {
     console.log('updateSummaryDisplay: Starting with summary text length:', summaryText?.length || 0);
@@ -874,7 +717,7 @@ async function updateSummaryDisplay(summaryText) {
     console.log('updateSummaryDisplay: Summary display update completed');
     
     // Fetch and display current weather separately (independent of summary generation)
-    displayCurrentWeather();
+    updateSummaryWeather();
 }
 
 // Function to parse summary sections
@@ -1285,7 +1128,7 @@ function displayHistoricalSummary(summary) {
     if (overallSummary) overallSummary.innerHTML = summary.overall || '<p>No overall insights available</p>';
     
     // Fetch and display current weather (independent of historical summary)
-    displayCurrentWeather();
+    updateSummaryWeather();
 }
 
 // Function to delete selected summary (disabled for server-side summaries)
@@ -1306,7 +1149,7 @@ function updateSummaryDisplayFromData(summaryData) {
     if (overallSummary) overallSummary.innerHTML = summaryData.overall || '<p>No overall insights available</p>';
     
     // Fetch and display current weather separately (independent of summary data)
-    displayCurrentWeather();
+    updateSummaryWeather();
 }
 
 // Helper: Get current time slot
@@ -1518,7 +1361,7 @@ async function initializeSummarySection() {
     await updateSavedSummariesList();
     
     // Initialize weather display
-    displayCurrentWeather();
+    updateSummaryWeather();
     
     // Update refresh button status
     updateRefreshButtonStatus();
@@ -1600,7 +1443,7 @@ function initializeLocationButton() {
 
 // Make functions globally available
 window.initializeLocationButton = initializeLocationButton;
-window.displayCurrentWeather = displayCurrentWeather;
+window.updateSummaryWeather = updateSummaryWeather;
 
 // After setting weather location, update weather display in both sections
 window.setWeatherLocation = function() {
@@ -1629,7 +1472,7 @@ window.setWeatherLocation = function() {
     }
     
     // Update weather in both summary and preferences
-    displayCurrentWeather();
+    updateSummaryWeather();
 };
 
 // Function to reset daily summary generation limit (for testing or admin use)
