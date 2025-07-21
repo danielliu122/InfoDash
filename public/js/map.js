@@ -1,15 +1,8 @@
 // map.js
 // Google Maps JS API: Directions, Dark/Light Mode Toggle, Locate Me
 
-// Ensure initMap is available globally immediately to prevent timing issues
-window.initMap = window.initMap || function() {
-    console.warn('initMap called before map.js fully loaded, retrying...');
-    setTimeout(() => {
-        if (typeof window.initMap === 'function' && window.initMap !== arguments.callee) {
-            window.initMap();
-        }
-    }, 100);
-};
+// Flag to track if the real initMap is ready
+let initMapReady = false;
 
 let map;
 let directionsService;
@@ -72,8 +65,8 @@ function initializeMapTheme() {
   return isDarkMode ? darkModeStyle : lightModeStyle;
 }
 
-// Ensure initMap is available globally immediately
-window.initMap = window.initMap || function() {
+// Define the real initMap function
+function initMapReal() {
   // Try to use user's geolocation for default center
   let defaultCenter = { lat: 40.7128, lng: -74.0060 }; // Fallback: New York City
   let defaultZoom = 15;
@@ -274,7 +267,28 @@ window.initMap = window.initMap || function() {
 
   // Add controls to map
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(controlsContainer);
+}
+
+// Set up the global initMap function with retry logic
+window.initMap = function() {
+  if (initMapReady) {
+    // The real function is ready, call it
+    initMapReal();
+  } else {
+    // Function not ready yet, retry after a short delay
+    console.warn('initMap called before ready, retrying...');
+    setTimeout(() => {
+      if (initMapReady) {
+        initMapReal();
+      } else {
+        console.error('initMap still not ready after retry');
+      }
+    }, 100);
+  }
 };
+
+// Mark initMap as ready
+initMapReady = true;
 
 // Add styles for the map buttons
 (function() {
