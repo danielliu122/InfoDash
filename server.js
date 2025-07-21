@@ -44,8 +44,8 @@ async function loadNewsCache() {
 // Function to save news cache to file
 async function saveNewsCache(cacheData) {
     try {
-        // Ensure data directory exists
-        const dataDir = path.join(__dirname, 'data');
+        // Ensure data directory and subdirectory exist
+        const dataDir = path.dirname(NEWS_CACHE_FILE);
         try {
             await fs.access(dataDir);
         } catch {
@@ -96,8 +96,8 @@ async function saveDailySummary(summaryData, date, language = 'en', country = 'U
         console.log(`saveDailySummary: Saving summary for date: ${date}, language: ${language}, country: ${country}`);
         console.log(`saveDailySummary: Using file path: ${SUMMARY_FILE}`);
         
-        // Ensure data directory exists
-        const dataDir = path.join(__dirname, 'data');
+        // Ensure data directory and subdirectory exist
+        const dataDir = path.dirname(SUMMARY_FILE);
         try {
             await fs.access(dataDir);
         } catch {
@@ -183,7 +183,7 @@ async function loadDailySummary(date = null, language = 'en', country = 'US') {
         }
         
         // Check if data directory exists
-        const dataDir = path.join(__dirname, 'data');
+        const dataDir = path.dirname(SUMMARY_FILE);
         try {
             await fs.access(dataDir);
             console.log(`loadDailySummary: Data directory exists at ${dataDir}`);
