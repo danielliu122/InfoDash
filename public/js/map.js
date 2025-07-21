@@ -1,8 +1,7 @@
 // map.js
 // Google Maps JS API: Directions, Dark/Light Mode Toggle, Locate Me
 
-// Flag to track if the real initMap is ready
-let initMapReady = false;
+
 
 let map;
 let directionsService;
@@ -269,26 +268,26 @@ function initMapReal() {
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(controlsContainer);
 }
 
+// Make the real initMap function globally available
+window.initMapReal = initMapReal;
+
 // Set up the global initMap function with retry logic
 window.initMap = function() {
-  if (initMapReady) {
+  if (typeof window.initMapReal === 'function') {
     // The real function is ready, call it
-    initMapReal();
+    window.initMapReal();
   } else {
     // Function not ready yet, retry after a short delay
     console.warn('initMap called before ready, retrying...');
     setTimeout(() => {
-      if (initMapReady) {
-        initMapReal();
+      if (typeof window.initMapReal === 'function') {
+        window.initMapReal();
       } else {
-        console.error('initMap still not ready after retry');
+        console.error('initMapReal still not ready after retry');
       }
     }, 100);
   }
 };
-
-// Mark initMap as ready
-initMapReady = true;
 
 // Add styles for the map buttons
 (function() {

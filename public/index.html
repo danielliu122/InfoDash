@@ -952,8 +952,16 @@
 <!-- Google Maps JS API (secure, via server proxy) -->
 <script>
     // Ensure initMap is available globally before Google Maps loads
-    window.initMap = window.initMap || function() {
+    window.initMap = function() {
         console.warn('initMap called before map.js loaded, will retry...');
+        // Retry after a short delay to allow map.js to load
+        setTimeout(() => {
+            if (typeof window.initMapReal === 'function') {
+                window.initMapReal();
+            } else {
+                console.error('initMapReal function not available after retry');
+            }
+        }, 500);
     };
 </script>
 <script src="/api/googlemaps/script"></script>
