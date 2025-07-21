@@ -90,3 +90,7 @@ data/news-cache.json
 daily-summaries.json
 news-cache.json
 data/daily-summaries.json
+
+# Local and production data files
+data/local/
+data/production/
