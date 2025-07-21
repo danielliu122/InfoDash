@@ -950,6 +950,12 @@
     </script>
 
 <!-- Google Maps JS API (secure, via server proxy) -->
+<script>
+    // Ensure initMap is available globally before Google Maps loads
+    window.initMap = window.initMap || function() {
+        console.warn('initMap called before map.js loaded, will retry...');
+    };
+</script>
 <script src="/api/googlemaps/script"></script>
 <script src="js/map.js"></script>
 </body>

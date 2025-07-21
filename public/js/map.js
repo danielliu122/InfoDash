@@ -1,6 +1,16 @@
 // map.js
 // Google Maps JS API: Directions, Dark/Light Mode Toggle, Locate Me
 
+// Ensure initMap is available globally immediately to prevent timing issues
+window.initMap = window.initMap || function() {
+    console.warn('initMap called before map.js fully loaded, retrying...');
+    setTimeout(() => {
+        if (typeof window.initMap === 'function' && window.initMap !== arguments.callee) {
+            window.initMap();
+        }
+    }, 100);
+};
+
 let map;
 let directionsService;
 let directionsRenderer;
@@ -62,7 +72,8 @@ function initializeMapTheme() {
   return isDarkMode ? darkModeStyle : lightModeStyle;
 }
 
-window.initMap = function() {
+// Ensure initMap is available globally immediately
+window.initMap = window.initMap || function() {
   // Try to use user's geolocation for default center
   let defaultCenter = { lat: 40.7128, lng: -74.0060 }; // Fallback: New York City
   let defaultZoom = 15;
