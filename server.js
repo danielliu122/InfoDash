@@ -20,11 +20,15 @@ const fetch = require('node-fetch');
 const weather = require('weather-js');
 const fs = require('fs').promises;
 
+// Environment-based data paths
+const isProduction = process.env.NODE_ENV === 'production' || process.env.PORT;
+const dataSubdir = isProduction ? 'production' : 'local';
+
 // News cache file path
-const NEWS_CACHE_FILE = path.join(__dirname, 'data', 'news-cache.json');
+const NEWS_CACHE_FILE = path.join(__dirname, 'data', dataSubdir, 'news-cache.json');
 
 // Summary file path
-const SUMMARY_FILE = path.join(__dirname, 'data', 'daily-summaries.json');
+const SUMMARY_FILE = path.join(__dirname, 'data', dataSubdir, 'daily-summaries.json');
 
 // Function to load news cache from file
 async function loadNewsCache() {

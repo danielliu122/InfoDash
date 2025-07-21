@@ -23,6 +23,7 @@
   --hover-bg: #e9ecef;
 }
 body.dark-theme {
+  scrollbar-color: #2f343a #181b1f;
   --primary-bg: #181b1f;
   --secondary-bg: rgb(39, 48, 62);
   --primary-text: #e0e0e0;
@@ -2982,4 +2983,6 @@ body:not(.dark-theme) #finance .card.chart-container canvas {
 }
 
 /* === End Hide Google Maps InfoWindow button === */
-
+.pagination-controls {
+  background-color: var(--card-bg) !important;
+}
