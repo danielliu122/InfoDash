@@ -923,7 +923,10 @@ app.post('/api/summary/save', async (req, res) => {
         const today = new Date().toISOString().split('T')[0];
         
         // Only block overwriting for past dates
-        if (date !== today) {
+        // Convert both dates to Date objects and compare ISO strings to ensure same format
+        const dateObj = new Date(date);
+        const todayObj = new Date(today);
+        if (dateObj.toISOString().split('T')[0] !== todayObj.toISOString().split('T')[0]) {
             const existingSummary = await loadDailySummary(date, targetLanguage, targetCountry);
             if (existingSummary) {
                 // console.log(`Daily summary already exists for ${date} (${targetCountry}, ${targetLanguage})`);
