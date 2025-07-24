@@ -535,13 +535,13 @@ async function generateSummary(sectionData) {
             console.log('generateSummary: Returning result, length:', result.length);
             
             if (result && !result.includes('Error:') && !result.includes('Unable to generate')) {
-                await updateSummaryDisplay(result);
+                await updateSummaryDisplay(result);  // CALL #1: Called when AI generation succeeds
                 await saveCurrentSummary();
                 await updateSavedSummariesList();
                 summaryGenerated = true;
                 return result; // Return the result to the calling function
             } else {
-                await updateSummaryDisplay(result);
+                await updateSummaryDisplay(result);  // CALL #2: Called when AI generation returns error
                 return result; // Return the result even if it's an error
             }
         } catch (error) {
@@ -561,7 +561,7 @@ async function generateSummary(sectionData) {
     }
     if (!summaryGenerated) {
         const errorMessage = lastError?.message || 'Error: Unable to generate summary after multiple attempts.';
-        await updateSummaryDisplay(errorMessage);
+        await updateSummaryDisplay(errorMessage);  // CALL #3: Called when all retries fail
         return errorMessage;
     }
     return null; // Return null if no summary was generated
@@ -990,6 +990,8 @@ async function updateSavedSummariesList() {
         list.innerHTML = '<p class="empty-state">No past summaries found.</p>';
         return; 
     }
+
+    
     
     summaries.forEach((summary, index) => {
         const item = document.createElement('div');
@@ -1028,6 +1030,8 @@ async function updateSavedSummariesList() {
                 <div class="saved-summary-time">${time} - ${marketStatus}${regionInfo}</div>
             </div>
         `;
+
+        
         
         list.appendChild(item);
     });
@@ -1046,8 +1050,10 @@ async function selectSummaryItem(date) {
         selectedItem.classList.add('selected');
     }
     
-    // Update date input
+    // Update date input and title date
     document.getElementById('summaryDate').value = date;
+    // Update the title text
+    document.getElementById('titleDate').textContent = `${date}`;
     
     // Get current region settings
     const regionSelect = document.getElementById('summaryRegionSelect');
@@ -1084,6 +1090,9 @@ export async function loadSummaryForDate() {
     const date = dateInput.value;
     const today = getLocalDateString();
     
+    // Update the title text
+    document.getElementById('titleDate').textContent = `${date}`;
+
     // Get selected region info
     let language = 'en';
     let country = 'US';
@@ -1104,7 +1113,7 @@ export async function loadSummaryForDate() {
         updateSummaryDisplayFromData(summary);
     } else {
         // No summary exists for this date and region. Clear the display.
-        await updateSummaryDisplay(null); 
+        await updateSummaryDisplay(null);  // CALL #4: Called when no summary found for selected date
         showNotification(`No summary found for ${new Date(date + 'T00:00:00').toLocaleDateString()} (${country}, ${language}).`);
     }
     
@@ -1228,6 +1237,8 @@ async function loadOrGenerateTodaySummary() {
     
     if (summary) {
         console.log('loadOrGenerateTodaySummary: Displaying existing summary');
+        // Update the title text
+        document.getElementById('titleDate').textContent = `${today}`;
         // A summary for today already exists, just display it
         updateSummaryDisplayFromData(summary);
     } else {
@@ -1298,19 +1309,19 @@ async function loadOrGenerateTodaySummary() {
             const summaryPromise = (async () => {
                 const summaryText = await generateSummary(sectionData);
                 if (summaryText && !summaryText.includes('Error:') && !summaryText.includes('Unable to generate')) {
-                    await updateSummaryDisplay(summaryText);
+                    await updateSummaryDisplay(summaryText);  // CALL #5: Called when auto-generation succeeds
                     await updateSavedSummariesList();
                 } else {
-                    await updateSummaryDisplay(summaryText);
+                    await updateSummaryDisplay(summaryText);  // CALL #6: Called when auto-generation returns error
                 }
             })();
             await Promise.race([summaryPromise, timeoutPromise]);
         } catch (error) {
             // console.error('Error auto-generating summary:', error);
             if (error.message.includes('timed out')) {
-                await updateSummaryDisplay('Error: Summary generation timed out after 5 minutes. Please try refreshing the page.');
+                await updateSummaryDisplay('Error: Summary generation timed out after 5 minutes. Please try refreshing the page.');  // CALL #7: Called when auto-generation times out
             } else {
-                await updateSummaryDisplay('Error: Unable to automatically generate the daily summary.');
+                await updateSummaryDisplay('Error: Unable to automatically generate the daily summary.');  // CALL #8: Called when auto-generation fails with other error
             }
         }
     }
@@ -1323,6 +1334,7 @@ async function loadOrGenerateTodaySummary() {
 async function initializeSummarySection() {
     console.log('Initializing summary section...');
     
+
     // Set up event listeners
     const dateInput = document.getElementById('summaryDate');
     if (dateInput) {
@@ -1330,6 +1342,7 @@ async function initializeSummarySection() {
         // Initialize the date picker with today's date
         const today = getLocalDateString();
         dateInput.value = today;
+        
     }
     
     // Set up region dropdown for archive
@@ -1391,12 +1404,12 @@ export async function refreshSummary() {
             const sectionData = await collectSectionData();
             const summaryText = await generateSummary(sectionData);
             if (summaryText && !summaryText.includes('Error:') && !summaryText.includes('Unable to generate')) {
-                await updateSummaryDisplay(summaryText);
+                await updateSummaryDisplay(summaryText);  // CALL #9: Called when manual refresh succeeds
                 await updateSavedSummariesList();
                 markRefreshedToday();
                 showNotification('Summary refreshed and saved successfully! Daily limit: 1 manual refresh per day.');
             } else {
-                await updateSummaryDisplay(summaryText);
+                await updateSummaryDisplay(summaryText);  // CALL #10: Called when manual refresh returns error
                 showNotification('Summary refreshed but could not be saved due to generation errors.');
             }
             setControlsDisabled(false);
@@ -1405,9 +1418,9 @@ export async function refreshSummary() {
     } catch (error) {
         console.error('Error refreshing summary:', error);
         if (error.message.includes('timed out')) {
-            updateSummaryDisplay('Error: Summary generation timed out after 5 minutes. Please try again.');
+            updateSummaryDisplay('Error: Summary generation timed out after 5 minutes. Please try again.');  // CALL #11: Called when manual refresh times out
         } else {
-            updateSummaryDisplay('Error: Unable to refresh summary. Please try again later.');
+            updateSummaryDisplay('Error: Unable to refresh summary. Please try again later.');  // CALL #12: Called when manual refresh fails with other error
         }
     } finally {
         hideSummaryLoading();
@@ -1516,3 +1529,5 @@ function getCookie(name) {
     }
     return null;
 } 
+
+

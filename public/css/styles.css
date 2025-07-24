@@ -805,7 +805,7 @@ body.dark-theme #reddit-content > .data-container {
 }
 
 .topic-button {
-  background: var(--accent-color);
+  background: #00a587;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -822,9 +822,9 @@ body.dark-theme #reddit-content > .data-container {
 }
 
 .topic-button:hover {
-  background: var(--primary-color);
+  background: #005344;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .topic-button:active {
@@ -834,14 +834,15 @@ body.dark-theme #reddit-content > .data-container {
 
 /* Dark theme for trending topics */
 body.dark-theme .topic-button {
-  background: var(--accent-color);
+  background: #00a587;
     color: white;
   box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 body.dark-theme .topic-button:hover {
-  background: var(--primary-color);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+  background: #005344;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Trends section improvements */
