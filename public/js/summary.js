@@ -943,7 +943,7 @@ async function loadDailySummary(date = null, language = 'en', country = 'US') {
         const response = await fetch(url);
         console.log('loadDailySummary: Response status:', response.status);
         const result = await response.json();
-        console.log('loadDailySummary: Response result:', result);
+        //console.log('loadDailySummary: Response result:', result);
         
         if (result.success) {
             console.log('loadDailySummary: Summary found and returned');
