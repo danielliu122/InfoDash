@@ -802,11 +802,11 @@ function hideSummaryLoading() {
     }
     
     // Also ensure the summary section itself is visible
-    const summarySection = document.querySelector('#summary');
-    if (summarySection) {
-        summarySection.style.display = 'block';
-        // console.log('Summary section is visible');
-    }
+    // const summarySection = document.querySelector('#summary');
+    // if (summarySection) {
+    //     summarySection.style.display = 'block';
+    //     // console.log('Summary section is visible');
+    // }
 }
 
 // Function to update the loading text
@@ -1102,11 +1102,6 @@ export async function loadSummaryForDate() {
         language = selectedOption.getAttribute('data-language');
         country = selectedOption.getAttribute('data-country');
     }
-    
-    setControlsDisabled(true);
-    setSummaryLoadingText(`Loading summary for ${new Date(date + 'T00:00:00').toLocaleDateString()} (${country}, ${language})...`);
-    showSummaryLoading();
-    
     const summary = await loadDailySummary(date, language, country);
     
     if (summary) {
@@ -1145,21 +1140,51 @@ export async function deleteSelectedSummary() {
     alert('Daily summaries are shared across all users and cannot be deleted. Contact the administrator if you need to remove a summary.');
 }
 
-// Function to update summary display from saved data
 function updateSummaryDisplayFromData(summaryData) {
     const newsSummary = document.querySelector('.news-summary .summary-text');
     const trendsSummary = document.querySelector('.trends-summary .summary-text');
     const financeSummary = document.querySelector('.finance-summary .summary-text');
     const overallSummary = document.querySelector('.overall-summary .summary-text');
-    
-    if (newsSummary) newsSummary.innerHTML = summaryData.news || '<p>No news data available</p>';
-    if (trendsSummary) trendsSummary.innerHTML = summaryData.trends || '<p>No trends data available</p>';
-    if (financeSummary) financeSummary.innerHTML = summaryData.finance || '<p>No finance data available</p>';
-    if (overallSummary) overallSummary.innerHTML = summaryData.overall || '<p>No overall insights available</p>';
-    
-    // Fetch and display current weather separately (independent of summary data)
+
+    if (newsSummary) {
+        newsSummary.innerHTML = summaryData.news && summaryData.news.length > 3
+            ? summaryData.news
+            : '<p>No news data available</p>';
+    }
+
+    if (trendsSummary) {
+        trendsSummary.innerHTML = summaryData.trends && summaryData.trends.length > 3
+            ? summaryData.trends
+            : '<p>No trends data available</p>';
+    }
+
+    if (financeSummary) {
+        financeSummary.innerHTML = summaryData.finance && summaryData.finance.length > 3
+            ? summaryData.finance
+            : '<p>No finance data available</p>';
+    }
+
+    if (overallSummary) {
+        overallSummary.innerHTML = summaryData.overall && summaryData.overall.length > 3
+            ? summaryData.overall
+            : '<p>No overall insights available</p>';
+    }
+
+    // ✅ Show summary content
+    const summaryContentDiv = document.querySelector('.summary-content');
+    if (summaryContentDiv) {
+        summaryContentDiv.style.display = 'block';
+        summaryContentDiv.classList.add('show');
+    }
+
+    // ✅ Hide loading and re-enable controls
+    hideSummaryLoading();
+    setControlsDisabled(false);
+
+    // ✅ Update weather
     updateSummaryWeather();
 }
+
 
 // Helper: Get current time slot
 function getCurrentTimeSlot(date = new Date()) {
@@ -1190,28 +1215,12 @@ function markRefreshedToday() {
     localStorage.setItem('lastSummaryRefreshDate', today);
 }
 
-// Function to warm up the chat endpoint before generating the summary
-async function warmUpChatEndpoint() {
-    try {
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                messages: [{ role: 'user', content: 'ping' }],
-                model: document.getElementById('model-select')?.value || 'deepseek/deepseek-chat-v3-0324:free'
-            })
-        });
-        // Optionally check response.ok, but ignore errors
-        if (!response.ok) {
-            console.warn('warmUpChatEndpoint: Non-OK response', response.status);
-        }
-    } catch (e) {
-        console.warn('warmUpChatEndpoint: Error warming up chat endpoint', e);
-    }
-}
 
 // This function will now orchestrate the entire summary section's initial state
 async function loadOrGenerateTodaySummary() {
+    // try to prevent refreshing while summary is loading or generating
+    setControlsDisabled(true);
+
     const today = getLocalDateString();
     console.log('loadOrGenerateTodaySummary: Starting for date:', today);
     
@@ -1228,106 +1237,44 @@ async function loadOrGenerateTodaySummary() {
     
     console.log('loadOrGenerateTodaySummary: Using region:', { language, country });
     
-    setControlsDisabled(true);
+
     setSummaryLoadingText(`Loading summary for ${new Date(today + 'T00:00:00').toLocaleDateString()} (${country}, ${language})...`);
     showSummaryLoading();
 
     const summary = await loadDailySummary(today, language, country);
-    console.log('loadOrGenerateTodaySummary: Summary found:', !!summary);
+    
     
     if (summary) {
+        console.log('loadOrGenerateTodaySummary: Summary found:', !!summary);
         console.log('loadOrGenerateTodaySummary: Displaying existing summary');
         // Update the title text
         document.getElementById('titleDate').textContent = `${today}`;
         // A summary for today already exists, just display it
         updateSummaryDisplayFromData(summary);
     } else {
-        console.log('loadOrGenerateTodaySummary: No summary found, generating new one');
-        setSummaryLoadingText(`No summary found for today. Waiting for data to load...`);
+        console.log('loadOrGenerateTodaySummary: No summary found, user can generate new summary');
+        setSummaryLoadingText(`No summary found for today. User can generate new summary by clicking refresh button.`);
+        // update summary archive
+        refreshSummaryArchive();
+        hideSummaryLoading();
+
+        // instruct user how to generate a summary by pressing refresh button
+        const newsSummary = document.querySelector('.news-summary .summary-text');
+        const trendsSummary = document.querySelector('.trends-summary .summary-text');
+        const financeSummary = document.querySelector('.finance-summary .summary-text');
+        const overallSummary = document.querySelector('.overall-summary .summary-text');
         
-        // Wait longer for other sections to load their data
-        await new Promise(resolve => setTimeout(resolve, 10000));
-        
-        // Warm up the chat endpoint before generating the summary
-        await warmUpChatEndpoint();
-        
-        // Check if we have data from other sections before proceeding
-        let retryCount = 0;
-        const maxRetries = 3;
-        let sectionData = null;
-        
-        while (retryCount < maxRetries) {
-            console.log(`loadOrGenerateTodaySummary: Attempt ${retryCount + 1} to collect section data`);
-            setSummaryLoadingText(`Collecting data from other sections... (attempt ${retryCount + 1}/${maxRetries})`);
-            
-            sectionData = await collectSectionData();
-            
-            // Check if we have sufficient data
-            const hasNews = sectionData.news && sectionData.news.length > 0;
-            const hasTrends = sectionData.trends && sectionData.trends.length > 0;
-            const hasFinance = sectionData.finance && (
-                sectionData.finance.nasdaq || 
-                Object.keys(sectionData.finance.techStocks).length > 0 || 
-                Object.keys(sectionData.finance.crypto).length > 0
-            );
-            
-            console.log('loadOrGenerateTodaySummary: Data check:', {
-                hasNews,
-                hasTrends,
-                hasFinance,
-                newsCount: sectionData.news?.length || 0,
-                trendsCount: sectionData.trends?.length || 0,
-                techStocksCount: Object.keys(sectionData.finance?.techStocks || {}).length,
-                cryptoCount: Object.keys(sectionData.finance?.crypto || {}).length
-            });
-            
-            // If we have at least 2 out of 3 data types, proceed
-            const dataTypesAvailable = [hasNews, hasTrends, hasFinance].filter(Boolean).length;
-            if (dataTypesAvailable >= 2) {
-                console.log(`loadOrGenerateTodaySummary: Sufficient data available (${dataTypesAvailable}/3 types)`);
-                break;
-            }
-            
-            retryCount++;
-            if (retryCount < maxRetries) {
-                console.log(`loadOrGenerateTodaySummary: Insufficient data, waiting 2 seconds before retry...`);
-                setSummaryLoadingText(`Waiting for more data to load... (attempt ${retryCount + 1}/${maxRetries})`);
-                await new Promise(resolve => setTimeout(resolve, 5000));
-            }
-        }
-        
-        if (retryCount >= maxRetries) {
-            console.warn('loadOrGenerateTodaySummary: Max retries reached, proceeding with available data');
-        }
-        
-        setSummaryLoadingText(`Generating summary with available data...`);
-        const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Summary generation timed out after 120 seconds')), 120000);
-        });
-        
-        try {
-            const summaryPromise = (async () => {
-                const summaryText = await generateSummary(sectionData);
-                if (summaryText && !summaryText.includes('Error:') && !summaryText.includes('Unable to generate')) {
-                    await updateSummaryDisplay(summaryText);  // CALL #5: Called when auto-generation succeeds
-                    await updateSavedSummariesList();
-                } else {
-                    await updateSummaryDisplay(summaryText);  // CALL #6: Called when auto-generation returns error
-                }
-            })();
-            await Promise.race([summaryPromise, timeoutPromise]);
-        } catch (error) {
-            // console.error('Error auto-generating summary:', error);
-            if (error.message.includes('timed out')) {
-                await updateSummaryDisplay('Error: Summary generation timed out after 5 minutes. Please try refreshing the page.');  // CALL #7: Called when auto-generation times out
-            } else {
-                await updateSummaryDisplay('Error: Unable to automatically generate the daily summary.');  // CALL #8: Called when auto-generation fails with other error
-            }
-        }
+        const placeholderSummary= '<p>No summary date is currently selected. Press the refresh button to generate a summary for the current date or view the summary archive to select historical summaries.</p>';
+
+        newsSummary.innerHTML = placeholderSummary;
+        trendsSummary.innerHTML =  placeholderSummary;
+        financeSummary.innerHTML =  placeholderSummary;
+        overallSummary.innerHTML =  placeholderSummary;
+
+
+        // alow refresh button to work
+        setControlsDisabled(false);
     }
-    hideSummaryLoading();
-    setControlsDisabled(false);
-    updateRefreshButtonStatus();
 }
 
 // Function to initialize the entire summary feature
@@ -1394,8 +1341,7 @@ export async function refreshSummary() {
     summaryGenerated = false;
     setControlsDisabled(true);
     showSummaryLoading();
-    // Warm up the chat endpoint before generating the summary
-    //await warmUpChatEndpoint();
+
     const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error('Summary generation timed out after 60 seconds')), 60000);
     });
