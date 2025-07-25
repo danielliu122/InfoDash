@@ -9,44 +9,31 @@ const PRIORITY_COUNTRIES = ['us', 'ca', 'gb'];
 // Import user preferences
 import { userPrefs } from './userPreferences.js';
 
-// Helper function to determine news mode based on language
-function getNewsModeForLanguage(language) {
-    // News API top-headlines has limited language support
-    // Use "everything" mode for non-English languages
-    // This ensures better coverage and more articles for non-English content
-    return language === 'en' ? 'top-headlines' : 'everything';
-}
-
 // Function to update the news mode indicator
-export function updateNewsModeIndicator() {
-    const languageSelect = document.getElementById('languageSelect');
-    const modeStatus = document.getElementById('mode-status');
-    
-    if (languageSelect && modeStatus) {
-        const currentLanguage = languageSelect.value;
-        const mode = getNewsModeForLanguage(currentLanguage);
-        
-        if (mode === 'top-headlines') {
-            modeStatus.innerHTML = '📰 Mode: Top Headlines';
-            modeStatus.style.color = '#4CAF50';
-        } else {
-            modeStatus.innerHTML = '🌍 Mode: Everything (Better for non-English)';
-            modeStatus.style.color = '#FF9800';
-        }
+export function updateNewsModeIndicator(newsType) {
+    let modeStatus=document.getElementById("mode-status");
+
+    if (newsType === 'top-headlines') {
+        modeStatus.innerHTML = '📰 Mode: Top Headlines';
+        modeStatus.style.color = '#4CAF50';
+    } 
+    else if (newsType === 'everything') {
+        modeStatus.innerHTML = '🌍 Mode: Everything';
+        modeStatus.style.color = '#FF9800';
     }
 }
 
 export const fetchNewsData = async (query = 'world', country = 'us', language = 'en', forceRefresh = false, newsType = 'top-headlines') => {
     console.log(`fetchNewsData: Called with query=${query}, country=${country}, language=${language}, newsType=${newsType}`);
     
-    // Auto-switch to "everything" mode for non-English languages
+    // Auto-switch to "everything" mode for non-English languages, because newsAPI has limited support 
     // News API top-headlines has limited language support
-    const appropriateMode = getNewsModeForLanguage(language);
-    if (newsType === 'top-headlines' && appropriateMode === 'everything') {
-        console.log(`fetchNewsData: Non-English language detected (${language}), switching to "everything" mode`);
+    if (language != "en") {
         newsType = 'everything';
     }
-    
+    //update html mode status indicator
+    updateNewsModeIndicator(newsType);
+
     const cacheKey = `${query}-${country}-${language}-${newsType}`;
     console.log(`fetchNewsData: Cache key: ${cacheKey}`);
 

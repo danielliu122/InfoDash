@@ -80,6 +80,9 @@ window.handleButtonClick = async function(type, category, subCategory = 'all') {
     let country = 'us';
     let language = 'en';
 
+    //set default newsType to top-headlines
+    let newsType = 'top-headlines';
+
     if (type === 'news') {
         country = countrySelect ? countrySelect.value : 'us';
         language = languageSelect ? languageSelect.value : 'en';
@@ -94,7 +97,7 @@ window.handleButtonClick = async function(type, category, subCategory = 'all') {
         if (type === 'news') {
             console.log(`handleButtonClick: Fetching news data for category: ${category}`);
             // Fetch news data with the specified category
-            data = await fetchNewsData(category, country, language);
+            data = await fetchNewsData(category, country, language, null, newsType);
             console.log(`handleButtonClick: Received news data, articles count: ${data?.length || 0}`);
             updateNews(data);
         } else if (type === 'trends') {
@@ -162,7 +165,10 @@ export async function refreshNews() {
     const country = countrySelect.value;
     const language = languageSelect.value;
 
-    const newsData = await fetchNewsData('world', country, language, true); // Force refresh
+    // newsAPI set default news to top headlines
+    let newsType= 'top-headlines';
+
+    const newsData = await fetchNewsData('world', country, language, true, newsType); // Force refresh
     updateNews(newsData);
 }
 
@@ -309,6 +315,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize weather display and auto-refresh
     initializeWeather();
 
+    //set default newsType as top-headlines
+    let newsType= 'top-headlines';
+
     const countrySelect = document.getElementById('countrySelect');
     const languageSelect = document.getElementById('languageSelect');
     const trendsCountrySelect = document.getElementById('trendsCountrySelect');
@@ -318,9 +327,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('One or more elements not found in the DOM');
         return;
     }
-
-    // Enable the country select dropdown
-    countrySelect.disabled = false;
 
     // Add event listeners for country and language select to update trends data and save preferences
     trendsCountrySelect.addEventListener('change', () => {
@@ -353,7 +359,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const language = languageSelect.value;
 
         // Fetch prioritized news data
-        const newsData = await fetchNewsData('world', country, language, false, 'top-headlines');
+        const newsData = await fetchNewsData('world', country, language, false, newsType);
         updateNews(newsData);
 
         // Fetch other default data
@@ -381,18 +387,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error during initial data fetch:', error);
     }
     // console.log("DOM fully loaded")
-
-    // Add event listeners for pagination controls
-    const paginationButtons = document.querySelectorAll('.pagination-controls button');
-    paginationButtons.forEach(button => {
-        button.addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent default button behavior
-
-            // Your logic for pagination (e.g., fetching new data)
-            // After fetching new data, the viewport will adjust automatically
-            // No need to scroll to the top here, as it should maintain its position
-        });
-    });
 
     const scrollToTopBtn = document.getElementById('scrollToTopBtn');
 
@@ -513,7 +507,7 @@ window.handleDateRangeChange = async function() {
 
     try {
         // Force refresh to get new data with the selected date range
-        const newsData = await fetchNewsData('world', country, language, true);
+        const newsData = await fetchNewsData('world', country, language, true, newsType);
         updateNews(newsData);
     } catch (error) {
         console.error('Error updating news with new date range:', error);
