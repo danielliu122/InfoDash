@@ -789,29 +789,34 @@ export function updateRealTimeFinance(data) {
 }
 
 export function isMarketOpen() {
-    const symbol = document.getElementById('stockSymbolInput').value.toUpperCase();
-    
-    // Check if it's a crypto symbol
-    if (symbol.endsWith('-USD')) {
-        return true; // Crypto markets are always open
-    }
+    const input = document.getElementById('stockSymbolInput');
+    const symbol = input?.value?.toUpperCase() || '';
 
-    // Use Eastern Time for market hours check
+    // Crypto markets are always open
+    if (symbol.endsWith('-USD')) return true;
+
+    // Get current time in US Eastern Time
     const now = new Date();
     const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-    const day = etNow.getDay();
+
+    const day = etNow.getDay(); // 0 = Sun, 1 = Mon, ..., 5 = Fri, 6 = Sat
     const hour = etNow.getHours();
     const minute = etNow.getMinutes();
 
-    // Check if it's a weekday (Monday = 1, Friday = 5)
+    // Weekday check (Monday–Friday)
     if (day >= 1 && day <= 5) {
-        // Check if it's between 9:30 AM and 4:00 PM ET
-        if ((hour === 9 && minute >= 30) || (hour > 9 && hour < 16) || (hour === 16 && minute === 0)) {
+        // Between 9:30 AM and 4:00 PM (exclusive)
+        if (
+            (hour === 9 && minute >= 30) ||  // After 9:30 AM
+            (hour > 9 && hour < 16)          // Until 3:59 PM
+        ) {
             return true;
         }
     }
+
     return false;
 }
+
 
 // Add this helper function to ensure data points are properly connected
 // Modify the processChartData function to accept symbol as a parameter

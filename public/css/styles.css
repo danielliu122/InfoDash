@@ -2987,3 +2987,9 @@ body:not(.dark-theme) #finance .card.chart-container canvas {
 .pagination-controls {
   background-color: var(--card-bg) !important;
 }
+
+.dropdown-content {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+}
