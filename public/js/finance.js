@@ -789,34 +789,29 @@ export function updateRealTimeFinance(data) {
 }
 
 export function isMarketOpen() {
-    const input = document.getElementById('stockSymbolInput');
-    const symbol = input?.value?.toUpperCase() || '';
+    const symbol = document.getElementById('stockSymbolInput').value.toUpperCase();
+    
+    // Check if it's a crypto symbol
+    if (symbol.endsWith('-USD')) {
+        return true; // Crypto markets are always open
+    }
 
-    // Crypto markets are always open
-    if (symbol.endsWith('-USD')) return true;
-
-    // Get current time in US Eastern Time
+    // Use Eastern Time for market hours check
     const now = new Date();
     const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-
-    const day = etNow.getDay(); // 0 = Sun, 1 = Mon, ..., 5 = Fri, 6 = Sat
+    const day = etNow.getDay();
     const hour = etNow.getHours();
     const minute = etNow.getMinutes();
 
-    // Weekday check (Monday–Friday)
+    // Check if it's a weekday (Monday = 1, Friday = 5)
     if (day >= 1 && day <= 5) {
-        // Between 9:30 AM and 4:00 PM (exclusive)
-        if (
-            (hour === 9 && minute >= 30) ||  // After 9:30 AM
-            (hour > 9 && hour < 16)          // Until 3:59 PM
-        ) {
+        // Check if it's between 9:30 AM and 4:00 PM ET
+        if ((hour === 9 && minute >= 30) || (hour > 9 && hour < 16) || (hour === 16 && minute === 0)) {
             return true;
         }
     }
-
     return false;
 }
-
 
 // Add this helper function to ensure data points are properly connected
 // Modify the processChartData function to accept symbol as a parameter
@@ -987,7 +982,10 @@ export function updateFinance(data) {
     const processedData = processChartData(data.dates, data.prices, data.symbol);
     processedData.timeRange = data.timeRange; 
     
-    window.financeChart = initializeChart(ctx, processedData);
+    // canvas/chart.js resizing/rendering issues requires slightly delayed initialization
+    setTimeout(() => {
+        window.financeChart = initializeChart(ctx, processedData);
+    }, 777); 
         
         // Force a resize and update to ensure proper rendering
         if (window.financeChart) {
@@ -1969,3 +1967,5 @@ export function stopAutoRefresh() {
         updateInterval = null;
     }
 }
+
+

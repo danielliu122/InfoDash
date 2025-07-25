@@ -377,12 +377,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Update the chart once even if the market is closed
             handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
         }
-
-        // Theme toggle functionality
-        const themeToggleButton = document.getElementById('themeToggle');
-        if (themeToggleButton) {
-            themeToggleButton.addEventListener('click', toggleTheme);
-        }
     } catch (error) {
         console.error('Error during initial data fetch:', error);
     }
@@ -487,6 +481,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const realtimeButton = document.getElementById('realtimeButton');
     if (realtimeButton) {
         realtimeButton.classList.add('active');
+    }
+    // Theme toggle functionality
+    const themeToggleButton = document.getElementById('themeToggle');
+    if (themeToggleButton) {
+        themeToggleButton.addEventListener('click', toggleTheme);
     }
 });
 
