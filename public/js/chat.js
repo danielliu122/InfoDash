@@ -72,8 +72,19 @@ sendButton.addEventListener('click', async () => {
 
 function isSimpleQuery(message) {
     const trimmed = message.trim().toLowerCase();
+    
     // Exclude greetings and small talk
     if (/^(hi|hello|hey|how are you|what's up|sup)[!., ]*$/i.test(trimmed)) return false;
+    
+    // Single word queries are always simple
+    if (!/\s/.test(trimmed)) return true;
+    
+    // Check for complex query indicators
+    if (/^(if|suppose|imagine|assume|consider|let's say|what if)\b/i.test(trimmed)) return false;
+    
+    // Check for word problem indicators (longer queries with numbers or specific structures)
+    if (trimmed.split(' ').length > 10 || /\d+/.test(trimmed)) return false;
+    
     // Match simple lookup patterns
     return /^(what|where|when|why|who|how|define|capital of|weather in|meaning of)\b/i.test(trimmed);
 }
