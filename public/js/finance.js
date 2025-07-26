@@ -1056,7 +1056,7 @@ export function updateFinance(data) {
                                     prices: existingData.datasets?.[0]?.data || [],
                                     symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
                                 }, false); // Disable maintainAspectRatio when entering fullscreen
-                            }, 50); // Add 50ms delay before initializing chart
+                            }, 200); // Add delay before initializing chart
                             
                             // Ensure chart is properly sized and coordinate system is recalculated
                             if (window.financeChart) {
