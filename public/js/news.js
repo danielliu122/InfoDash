@@ -1,7 +1,7 @@
 // Global cache object for news data
 const newsCache = {};
 
-const TTL_MS = 43200000;
+const TTL_MS = 300000;
 
 // Define priority countries
 const PRIORITY_COUNTRIES = ['us', 'ca', 'gb'];
