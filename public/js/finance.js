@@ -1029,9 +1029,8 @@ export function updateFinance(data) {
         }
     
         if (!document.fullscreenElement) {
-            // Entering fullscreen with error handling
-            try {
-                chartContainer.requestFullscreen();
+            // Entering fullscreen
+            chartContainer.requestFullscreen().then(() => {
                 // Wait for the fullscreen state to be fully established
                 const checkFullscreen = () => {
                     if (document.fullscreenElement === chartContainer) {
@@ -1051,13 +1050,11 @@ export function updateFinance(data) {
                                 canvas.height = chartContainer.clientHeight;
                             }
                             
-                            setTimeout(() => {
-                                window.financeChart = initializeChart(ctx, {
-                                    dates: existingData.labels || [],
-                                    prices: existingData.datasets?.[0]?.data || [],
-                                    symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
-                                }, false); // Disable maintainAspectRatio when entering fullscreen
-                            }, 50); // Add delay before initializing chart
+                            window.financeChart = initializeChart(ctx, {
+                                dates: existingData.labels || [],
+                                prices: existingData.datasets?.[0]?.data || [],
+                                symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
+                            }, false); // Disable maintainAspectRatio when entering fullscreen
                             
                             // Ensure chart is properly sized and coordinate system is recalculated
                             if (window.financeChart) {
@@ -1071,37 +1068,38 @@ export function updateFinance(data) {
                     }
                 };
                 checkFullscreen();
-            } catch (error) {
-                console.error('Fullscreen request failed:', error);
-                // Handle the error gracefully, perhaps by showing a user-friendly message
-                alert('Unable to enter fullscreen mode. Please ensure you initiated this action with a user gesture (like a click).');
-            }
+            });
         } else {
             // Exiting fullscreen
             document.exitFullscreen().then(() => {
-                // Wait for the fullscreen state to be fully cleared
-                const checkNormalMode = () => {
+                // Wait for fullscreen to fully exit before reinitializing
+                const checkExit = () => {
                     if (!document.fullscreenElement) {
-                        // DOM is ready, now trigger the 2-hour timeframe button specifically
-                        setTimeout(() => {
-                            // Find and trigger the 2-hour button specifically
-                            const twoHourButton = document.getElementById('hourlyButton');
-                            if (twoHourButton) {
-                                twoHourButton.click();
-                            } else {
-                                // Fallback to active button if 2-hour button not found
-                                const activeButton = document.querySelector('.time-range-button.active');
-                                if (activeButton) {
-                                    activeButton.click();
-                                }
-                            }
-                        }, 200); // Increased delay to ensure chart is fully settled
+                        // Fullscreen has exited, destroy and recreate chart
+                        if (window.financeChart) window.financeChart.destroy();
+                        
+                        // Reset canvas dimensions to container size
+                        canvas.width = chartContainer.clientWidth;
+                        canvas.height = chartContainer.clientHeight;
+                        
+                        // Reinitialize chart with original dimensions
+                        window.financeChart = initializeChart(ctx, {
+                            dates: existingData.labels || [],
+                            prices: existingData.datasets?.[0]?.data || [],
+                            symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
+                        }, true); // Re-enable maintainAspectRatio when exiting fullscreen
+                        
+                        // Force chart resize and update
+                        if (window.financeChart) {
+                            window.financeChart.resize();
+                            window.financeChart.update('none');
+                        }
                     } else {
-                        // Still waiting for fullscreen to be cleared
-                        requestAnimationFrame(checkNormalMode);
+                        // Still waiting for fullscreen to exit
+                        requestAnimationFrame(checkExit);
                     }
                 };
-                checkNormalMode();
+                checkExit();
             });
         }
     }
