@@ -985,7 +985,7 @@ export function updateFinance(data) {
     // canvas/chart.js resizing/rendering issues requires slightly delayed initialization
     setTimeout(() => {
         window.financeChart = initializeChart(ctx, processedData);
-    }, 777); 
+    }, 50); 
         
         // Force a resize and update to ensure proper rendering
         if (window.financeChart) {
@@ -1050,11 +1050,13 @@ export function updateFinance(data) {
                                 canvas.height = chartContainer.clientHeight;
                             }
                             
-                            window.financeChart = initializeChart(ctx, {
-                                dates: existingData.labels || [],
-                                prices: existingData.datasets?.[0]?.data || [],
-                                symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
-                            }, false); // Disable maintainAspectRatio when entering fullscreen
+                            setTimeout(() => {
+                                window.financeChart = initializeChart(ctx, {
+                                    dates: existingData.labels || [],
+                                    prices: existingData.datasets?.[0]?.data || [],
+                                    symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
+                                }, false); // Disable maintainAspectRatio when entering fullscreen
+                            }, 50); // Add 50ms delay before initializing chart
                             
                             // Ensure chart is properly sized and coordinate system is recalculated
                             if (window.financeChart) {
