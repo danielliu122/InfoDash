@@ -1875,6 +1875,7 @@ window.selectStock = selectStock;
 window.resetChartZoom = resetChartZoom;
 window.resetFinanceCardPositions = resetFinanceCardPositions;
 window.togglePauseFinance = togglePauseFinance;
+window.toggleStockDashboard = toggleStockDashboard;
 window.handleMarketCloseTransition = handleMarketCloseTransition;
 
 // Make userSelectedSymbol globally accessible
