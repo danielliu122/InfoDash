@@ -6,11 +6,15 @@ export const fetchRedditData = async (timePeriod = 'day') => {
         throw new Error('Invalid time period specified');
     }
 
-    const redditUrl = `https://www.reddit.com/top.json?sort=top&t=${timePeriod}`;
+    // Use our server as a proxy endpoint
+    const proxyUrl = `/api/reddit/top?timePeriod=${timePeriod}`;
 
     try {
-        const response = await fetch(redditUrl);
+        const response = await fetch(proxyUrl);
         const data = await response.json();
+
+        console.log(" response "+ response);
+        console.log("  data "+ data );
 
         if (data && data.data && data.data.children) {
             return data.data.children

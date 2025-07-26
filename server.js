@@ -71,10 +71,6 @@ const port = process.env.PORT || 3000;
 // Middleware to parse JSON requests
 app.use(express.json());
 
-// Global variable to store the daily summary
-let dailySummary = null;
-let lastSummaryDate = null;
-
 // Function to check if market is closed (4:00 PM ET)
 function isMarketClosed() {
     const now = new Date();
@@ -902,6 +898,22 @@ app.post('/api/enhanced-lookup', async (req, res) => {
         res.status(500).json({ error: 'Error performing lookup' });
     }
 });
+
+    // Reddit API proxy endpoint
+    app.get('/api/reddit/top', async (req, res) => {
+        const timePeriod = req.query.timePeriod || 'day';
+        
+        try {
+            const redditUrl = `https://www.reddit.com/r/all/top.json?t=${timePeriod}&limit=25`;
+            const response = await fetch(redditUrl);
+            const data = await response.json();
+            res.json(data);
+        } catch (error) {
+            console.error('Error fetching Reddit data:', error);
+            res.status(500).json({ error: 'Error fetching Reddit data' });
+        }
+    });
+
 
 // Daily Summary API endpoints
 app.post('/api/summary/save', async (req, res) => {
