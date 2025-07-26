@@ -1029,8 +1029,9 @@ export function updateFinance(data) {
         }
     
         if (!document.fullscreenElement) {
-            // Entering fullscreen
-            chartContainer.requestFullscreen().then(() => {
+            // Entering fullscreen with error handling
+            try {
+                chartContainer.requestFullscreen();
                 // Wait for the fullscreen state to be fully established
                 const checkFullscreen = () => {
                     if (document.fullscreenElement === chartContainer) {
@@ -1056,7 +1057,7 @@ export function updateFinance(data) {
                                     prices: existingData.datasets?.[0]?.data || [],
                                     symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
                                 }, false); // Disable maintainAspectRatio when entering fullscreen
-                            }, 200); // Add delay before initializing chart
+                            }, 50); // Add delay before initializing chart
                             
                             // Ensure chart is properly sized and coordinate system is recalculated
                             if (window.financeChart) {
@@ -1070,7 +1071,11 @@ export function updateFinance(data) {
                     }
                 };
                 checkFullscreen();
-            });
+            } catch (error) {
+                console.error('Fullscreen request failed:', error);
+                // Handle the error gracefully, perhaps by showing a user-friendly message
+                alert('Unable to enter fullscreen mode. Please ensure you initiated this action with a user gesture (like a click).');
+            }
         } else {
             // Exiting fullscreen
             document.exitFullscreen().then(() => {
