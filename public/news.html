@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfoDash - News</title>
+    
+    <!-- Fonts and Stylesheets -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="js/sidebar.js"></script>
+    <script type="module" src="js/userPreferences.js"></script>
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/news.js"></script>
+</head>
+<body class="dark-theme">
+    <!-- Top Header -->
+    <header class="top-header">
+        <div class="header-left">
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="page-title">News</h1>
+        </div>
+        <div class="header-right">
+            <div class="weather-widget" id="header-weather">
+                <i class="fas fa-sun"></i>
+                <span id="weather-temp">--°F</span>
+                <span id="weather-location">Loading...</span>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- News Content -->
+    <div class="news-content">
+        <!-- News Controls Section -->
+        <div class="card news-controls">
+            <div class="card-header">
+                <h4><i class="fas fa-cog"></i> News Controls</h4>
+            </div>
+            <div class="card-content">
+                <div class="news-filters">
+                    <div class="input-field">
+                        <select id="countrySelect">
+                            <option value="US">United States</option>
+                            <option value="CA">Canada</option>
+                            <option value="GB">United Kingdom</option>
+                            <option value="AU">Australia</option>
+                            <option value="DE">Germany</option>
+                            <option value="FR">France</option>
+                            <option value="JP">Japan</option>
+                            <option value="IN">India</option>
+                            <option value="BR">Brazil</option>
+                        </select>
+                        <label for="countrySelect">Country</label>
+                    </div>
+                    <div class="input-field">
+                        <select id="languageSelect">
+                            <option value="en">English</option>
+                            <option value="es">Español</option>
+                            <option value="fr">Français</option>
+                            <option value="de">Deutsch</option>
+                            <option value="ru">Русский</option>
+                            <option value="zh">中文</option>
+                            <option value="jp">日本語</option>
+                            <option value="ko">한국어</option>
+                        </select>
+                        <label for="languageSelect">Language</label>
+                    </div>
+                    <button class="btn" onclick="refreshNews()">
+                        <i class="fas fa-sync-alt"></i> Refresh News
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Latest Headlines Section -->
+        <div class="card news-headlines">
+            <div class="card-header">
+                <h4><i class="fas fa-newspaper"></i> Latest Headlines</h4>
+            </div>
+            <div class="card-content">
+                <div class="news-category-group">
+                    <h6>📰 Main Categories</h6>
+                    <button id="topHeadlinesButton" class="btn-small waves-effect waves-light" onclick="handleNewsTypeClick('top-headlines')">Top Headlines</button>
+                    <button id="everythingButton" class="btn-small waves-effect waves-light" onclick="handleNewsTypeClick('everything')">Everything</button>
+                </div>
+                
+                <div class="news-category-group">
+                    <h6>💼 Business & Finance</h6>
+                    <button id="businessNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'business')">Business</button>
+                    <button id="techNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'technology')">Technology</button>
+                </div>
+                
+                <div class="news-category-group">
+                    <h6>🎉 Lifestyle & Events</h6>
+                    <button id="sportsNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'sports')">Sports</button>
+                    <button id="healthNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'health')">Health</button>
+                    <button id="entertainmentNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'entertainment')">Entertainment</button>
+                    <button id="scienceNewsButton" class="btn-small waves-effect waves-light" onclick="handleButtonClick('news', 'science')">Science</button>
+                </div>
+                
+                <div class="input-field">
+                    <select id="dateRangeSelect" onchange="handleDateRangeChange()">
+                        <option value="24h">Last 24 hours</option>
+                        <option value="7d">Last week</option>
+                        <option value="30d">Last month</option>
+                        <option value="all">All time</option>
+                    </select>
+                    <label>Date Range</label>
+                </div>
+                
+                <div id="news-mode-indicator" style="text-align: center; margin: 10px 0; font-size: 0.9em; color: #666;">
+                    <span id="mode-status">📰 Mode: Top Headlines</span>
+                </div>
+                
+                <div id="news" class="section">
+                    <div class="data-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script type="module">
+        import { showNotification, toggleSection } from './js/uiUtils.js';
+        import { handleRegionChange } from './js/geolocation.js';
+        
+        // Global functions for onclick handlers
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            if (sidebar && mainContent) {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            }
+        };
+        
+        window.toggleTheme = function() {
+            const body = document.body;
+            const isDark = body.classList.contains('dark-theme');
+            
+            if (isDark) {
+                body.classList.remove('dark-theme');
+                body.classList.add('light-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.remove('light-theme');
+                body.classList.add('dark-theme');
+                localStorage.setItem('theme', 'dark');
+            }
+        };
+        
+        window.toggleNewsAutoRefresh = function() {
+            // Placeholder for auto-refresh functionality
+            console.log('Toggle news auto-refresh');
+        };
+        
+        window.showNotification = showNotification;
+        window.toggleSection = toggleSection;
+        window.handleRegionChange = handleRegionChange;
+        
+        // Initialize Materialize components
+        document.addEventListener('DOMContentLoaded', function() {
+            M.AutoInit();
+        });
+    </script>
+</body>
+</html>

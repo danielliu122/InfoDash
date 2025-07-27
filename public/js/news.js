@@ -12,6 +12,10 @@ import { userPrefs } from './userPreferences.js';
 // Function to update the news mode indicator
 export function updateNewsModeIndicator(newsType) {
     let modeStatus=document.getElementById("mode-status");
+    if (!modeStatus) {
+        console.log('Mode status element not found on this page, skipping update');
+        return;
+    }
 
     if (newsType === 'top-headlines') {
         modeStatus.innerHTML = '📰 Mode: Top Headlines';
@@ -119,6 +123,10 @@ export const fetchNewsData = async (query = 'world', country = 'us', language = 
 // Function to update UI with news data
 export function updateNews(data) {
     const container = document.querySelector('#news .data-container');
+    if (!container) {
+        console.log('News container not found on this page, skipping update');
+        return;
+    }
     container.innerHTML = ''; // Clear previous data
 
     if (!data || !Array.isArray(data) || data.length === 0) {
@@ -187,55 +195,81 @@ export function updateNews(data) {
         const end = start + itemsPerPage;
         const pageData = articlesToDisplay.slice(start, end);
 
-        const ul = document.createElement('ul');
+        const newsGrid = document.createElement('div');
+        newsGrid.classList.add('news-grid');
+        
         pageData.forEach(article => {
-            const li = document.createElement('li');
-            li.classList.add('news-item');
+            const card = document.createElement('div');
+            card.classList.add('news-card');
+            card.onclick = () => window.open(article.url, '_blank');
 
-            const img = document.createElement('img');
-            img.src = article.urlToImage;
-            img.alt = 'Thumbnail';
-            img.classList.add('news-thumbnail');
+            // Image section
+            const imageDiv = document.createElement('div');
+            imageDiv.classList.add('news-card-image');
+            
+            if (article.urlToImage) {
+                const img = document.createElement('img');
+                img.src = article.urlToImage;
+                img.alt = article.title;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.onerror = () => {
+                    imageDiv.innerHTML = '<i class="material-icons">image</i><br>No Image';
+                };
+                imageDiv.appendChild(img);
+            } else {
+                imageDiv.innerHTML = '<i class="material-icons">image</i><br>No Image';
+            }
 
-            const title = document.createElement('h5');
-            title.classList.add('article-title');
+            // Content section
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('news-card-content');
+
+            const title = document.createElement('div');
+            title.classList.add('news-card-title');
             title.textContent = article.title;
 
-            const description = document.createElement('p');
-            description.classList.add('article-text');
-            description.textContent = article.description;
+            const description = document.createElement('div');
+            description.classList.add('news-card-description');
+            description.textContent = article.description || 'No description available.';
 
-            const space1 = document.createElement('br');
-            description.appendChild(space1);
-            const space2 = document.createElement('br');
-            description.appendChild(space2);
+            const meta = document.createElement('div');
+            meta.classList.add('news-card-meta');
+            
+            const source = document.createElement('span');
+            source.classList.add('news-card-source');
+            source.textContent = article.source.name || 'Unknown Source';
+            
+            const time = document.createElement('span');
+            time.classList.add('news-card-time');
+            const publishedDate = new Date(article.publishedAt);
+            const now = new Date();
+            const diffTime = Math.abs(now - publishedDate);
+            const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffDays > 0) {
+                time.textContent = `${diffDays}d ago`;
+            } else if (diffHours > 0) {
+                time.textContent = `${diffHours}h ago`;
+            } else {
+                time.textContent = 'Just now';
+            }
+            
+            meta.appendChild(source);
+            meta.appendChild(time);
 
-            const authorDate = document.createElement('p');
-            authorDate.classList.add('article-descriptor');
-            authorDate.textContent = `Written by: ${article.author || 'Unknown'} on ${new Date(article.publishedAt).toLocaleDateString() || 'N/A'}`;
+            contentDiv.appendChild(title);
+            contentDiv.appendChild(description);
+            contentDiv.appendChild(meta);
 
-            const source = document.createElement('p');
-            source.classList.add('article-descriptor');
-            source.textContent = `From: ${article.source.name || 'N/A'}`;
-
-            const readMore = document.createElement('a');
-            readMore.href = article.url;
-            readMore.target = '_blank';
-            readMore.textContent = 'Read more';
-
-            // Append all elements to the list item
-            li.appendChild(img);
-            li.appendChild(title);
-            li.appendChild(description);
-            li.appendChild(authorDate);
-            li.appendChild(source);
-            li.appendChild(readMore);
-
-            // Append the list item to the unordered list
-            ul.appendChild(li);
+            card.appendChild(imageDiv);
+            card.appendChild(contentDiv);
+            newsGrid.appendChild(card);
         });
 
-        container.appendChild(ul);
+        container.appendChild(newsGrid);
 
         // Pagination controls
         const paginationControls = document.createElement('div');

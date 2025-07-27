@@ -132,6 +132,12 @@ function formatChangeValue(value) {
 }
 
 function addData(chart, label, newData) {
+    // Check if chart and required data structure exist
+    if (!chart || !chart.data || !chart.data.labels || !chart.data.datasets || !chart.data.datasets[0]) {
+        console.log('Chart data structure not properly initialized, skipping addData');
+        return;
+    }
+    
     // Always use ISO string for comparison
     const labelStr = (typeof label === 'string') ? label : label.toISOString();
     // Convert all labels in chart to ISO strings for comparison
@@ -160,7 +166,7 @@ function addData(chart, label, newData) {
 function updateStockDashboard() {
     const dashboardContainer = document.getElementById('stock-dashboard');
     if (!dashboardContainer) {
-        console.error('Dashboard container not found');
+        console.log('Stock dashboard container not found on this page, skipping update');
         return;
     }
 
@@ -919,6 +925,10 @@ export const fetchRealTimeYahooFinanceData = async (symbol = '^IXIC') => {
 // Function to update UI with financial data
 export function updateFinance(data) {
     const chartContainer = document.querySelector('#finance .chart-container');
+    if (!chartContainer) {
+        console.log('Finance chart container not found on this page, skipping update');
+        return;
+    }
     if (data.error) {
         chartContainer.innerHTML = '<p>Unable to fetch financial data.</p>';
         return;
@@ -1284,6 +1294,10 @@ export function handleMarketCloseTransition() {
 // In handleFinanceUpdate, only start auto-refresh if not paused
 export async function handleFinanceUpdate(timeRange, interval) {
     const symbolInput = document.getElementById('stockSymbolInput');
+    if (!symbolInput) {
+        console.log('Stock symbol input not found on this page, skipping finance update');
+        return;
+    }
     const symbol = symbolInput.value.toUpperCase() || currentSymbol;
     try {
         stopAutoRefresh();

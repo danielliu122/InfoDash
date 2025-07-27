@@ -87,17 +87,30 @@ async function collectSectionData() {
 
 // Function to collect news data
 function collectNewsData() {
-    //console.log('collectNewsData: Starting news data collection...');
-    const newsContainer = document.querySelector('#news .data-container');
-    //console.log('collectNewsData: News container found:', !!newsContainer);
+    console.log('collectNewsData: Starting news data collection...');
+    
+    // First try to find the modern news grid structure
+    let newsContainer = document.querySelector('#news .data-container .news-grid');
+    let newsItems = [];
+    
+    if (newsContainer) {
+        console.log('collectNewsData: Found modern news grid');
+        newsItems = newsContainer.querySelectorAll('.news-card');
+        console.log('collectNewsData: Modern news cards found:', newsItems.length);
+    } else {
+        // Fallback to old structure
+        console.log('collectNewsData: Looking for legacy news structure');
+        newsContainer = document.querySelector('#news .data-container');
+        if (newsContainer) {
+            newsItems = newsContainer.querySelectorAll('li');
+            console.log('collectNewsData: Legacy news items found:', newsItems.length);
+        }
+    }
     
     if (!newsContainer) {
         console.log('collectNewsData: No news container found');
         return null;
     }
-    
-    const newsItems = newsContainer.querySelectorAll('li');
-    //console.log('collectNewsData: News items found:', newsItems.length);
     
     if (newsItems.length === 0) {
         console.log('collectNewsData: No news items found');
@@ -107,21 +120,30 @@ function collectNewsData() {
     const newsData = [];
     newsItems.forEach((item, index) => {
         if (index < 5) { // Limit to top 5 news items
-            // Try multiple selectors for title
-            const title = item.querySelector('h3')?.textContent?.trim() || 
-                         item.querySelector('h5')?.textContent?.trim() || 
-                         item.querySelector('.article-title')?.textContent?.trim() ||
-                         item.querySelector('h1, h2, h3, h4, h5, h6')?.textContent?.trim();
+            let title, description, source;
             
-            const description = item.querySelector('.article-text')?.textContent?.trim();
-            const source = item.querySelector('.article-descriptor')?.textContent?.trim();
+            // Handle modern news card structure
+            if (item.classList.contains('news-card')) {
+                title = item.querySelector('.news-card-title')?.textContent?.trim();
+                description = item.querySelector('.news-card-description')?.textContent?.trim();
+                source = item.querySelector('.news-card-source')?.textContent?.trim();
+            } else {
+                // Handle legacy structure
+                title = item.querySelector('h3')?.textContent?.trim() || 
+                       item.querySelector('h5')?.textContent?.trim() || 
+                       item.querySelector('.article-title')?.textContent?.trim() ||
+                       item.querySelector('h1, h2, h3, h4, h5, h6')?.textContent?.trim();
+                
+                description = item.querySelector('.article-text')?.textContent?.trim();
+                source = item.querySelector('.article-descriptor')?.textContent?.trim();
+            }
             
-            // console.log(`collectNewsData: News item ${index}:`, { 
-            //     title: title?.substring(0, 50), 
-            //     hasDescription: !!description, 
-            //     hasSource: !!source,
-            //     titleFound: !!title
-            // });
+            console.log(`collectNewsData: News item ${index}:`, { 
+                title: title?.substring(0, 50), 
+                hasDescription: !!description, 
+                hasSource: !!source,
+                isModernCard: item.classList.contains('news-card')
+            });
             
             if (title) {
                 newsData.push({
@@ -135,10 +157,10 @@ function collectNewsData() {
         }
     });
     
-    // console.log('collectNewsData: News data collected:', {
-    //     totalItems: newsData.length,
-    //     items: newsData.map(item => item.title.substring(0, 30))
-    // });
+    console.log('collectNewsData: News data collected:', {
+        totalItems: newsData.length,
+        items: newsData.map(item => item.title.substring(0, 30))
+    });
     
     return newsData.length > 0 ? newsData : null;
 }
@@ -1204,6 +1226,12 @@ function getTimeSlotForTimestamp(timestamp) {
 
 // Function to check if user has already refreshed summary today (for manual refresh limit)
 function hasRefreshedToday() {
+    // Bypass refresh limit on localhost for development testing
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        console.log('Development mode: Bypassing daily refresh limit on localhost');
+        return false;
+    }
+    
     const today = getLocalDateString();
     const lastRefreshDate = localStorage.getItem('lastSummaryRefreshDate');
     return lastRefreshDate === today;
@@ -1248,7 +1276,10 @@ async function loadOrGenerateTodaySummary() {
         console.log('loadOrGenerateTodaySummary: Summary found:', !!summary);
         console.log('loadOrGenerateTodaySummary: Displaying existing summary');
         // Update the title text
-        document.getElementById('titleDate').textContent = `${today}`;
+        const titleDateElement = document.getElementById('titleDate');
+        if (titleDateElement) {
+            titleDateElement.textContent = `${today}`;
+        }
         // A summary for today already exists, just display it
         updateSummaryDisplayFromData(summary);
     } else {

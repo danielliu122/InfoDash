@@ -162,6 +162,13 @@ window.updateNewsModeIndicator = updateNewsModeIndicator;
 export async function refreshNews() {
     const countrySelect = document.getElementById('countrySelect');
     const languageSelect = document.getElementById('languageSelect');
+    
+    // Check if elements exist (only on news page)
+    if (!countrySelect || !languageSelect) {
+        console.log('News controls not found on this page, skipping news refresh');
+        return;
+    }
+    
     const country = countrySelect.value;
     const language = languageSelect.value;
 
@@ -324,7 +331,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
 
     if (!countrySelect || !languageSelect || !trendsCountrySelect || !trendsLanguageSelect) {
-        console.error('One or more elements not found in the DOM');
+        console.log('Some controls not found on this page - this is expected in multipage setup');
         return;
     }
 
@@ -369,13 +376,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         const trendsData = await fetchTrendsData('daily', 'all', trendsLanguageSelect.value, trendsCountrySelect.value);
         updateTrends(trendsData, 'daily');
 
-        // Start auto-refresh with default values (minutely) only if the market is open
-        if (isMarketOpen()) {
-            startAutoRefresh('^IXIC', '5m', '1m');
+        // Only start finance functionality if finance chart elements exist on this page
+        const stockChart = document.getElementById('stockChart');
+        const stockDashboard = document.getElementById('stock-dashboard');
+        
+        if (stockChart || stockDashboard) {
+            console.log('Finance elements found, initializing finance functionality');
+            // Start auto-refresh with default values (minutely) only if the market is open
+            if (isMarketOpen()) {
+                startAutoRefresh('^IXIC', '5m', '1m');
+            } else {
+                console.log('Market is closed. Auto-refresh will not start.');
+                // Update the chart once even if the market is closed
+                handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
+            }
         } else {
-            console.log('Market is closed. Auto-refresh will not start.');
-            // Update the chart once even if the market is closed
-            handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
+            console.log('No finance chart elements found on this page, skipping finance initialization');
         }
     } catch (error) {
         console.error('Error during initial data fetch:', error);
@@ -384,29 +400,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const scrollToTopBtn = document.getElementById('scrollToTopBtn');
 
-    // Show the button when the user scrolls down 100px from the top of the document
-    window.onscroll = function() {
-        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-            scrollToTopBtn.style.display = "flex"; // Use flex to ensure it is centered
-        } else {
-            scrollToTopBtn.style.display = "none";
-        }
-    };
+    // Only add scroll functionality if the button exists on this page
+    if (scrollToTopBtn) {
+        // Show the button when the user scrolls down 100px from the top of the document
+        window.onscroll = function() {
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                scrollToTopBtn.style.display = "flex"; // Use flex to ensure it is centered
+            } else {
+                scrollToTopBtn.style.display = "none";
+            }
+        };
 
-    // Scroll to the top when the button is clicked
-    scrollToTopBtn.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth' // Smooth scroll effect
+        // Scroll to the top when the button is clicked
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth' // Smooth scroll effect
+            });
         });
-    });
+    } else {
+        console.log('Scroll to top button not found on this page, skipping scroll functionality');
+    }
 });
 
 // Update the autocomplete logic
-document.getElementById('stockSymbolInput').addEventListener('input', function() {
-    const input = this.value.toLowerCase();
-    const autocompleteList = document.getElementById('autocomplete-list');
-    autocompleteList.innerHTML = ''; // Clear previous suggestions
+const stockSymbolInput = document.getElementById('stockSymbolInput');
+if (stockSymbolInput) {
+    stockSymbolInput.addEventListener('input', function() {
+        const input = this.value.toLowerCase();
+        const autocompleteList = document.getElementById('autocomplete-list');
+        if (!autocompleteList) return;
+        autocompleteList.innerHTML = ''; // Clear previous suggestions
 
     if (!input) return; // Exit if input is empty
 
@@ -425,12 +449,16 @@ document.getElementById('stockSymbolInput').addEventListener('input', function()
         });
         autocompleteList.appendChild(item);
     });
-});
+    });
+}
 
 // Close the autocomplete list when clicking outside
 document.addEventListener('click', function(e) {
     if (!e.target.matches('#stockSymbolInput')) {
-        document.getElementById('autocomplete-list').innerHTML = '';
+        const autocompleteList = document.getElementById('autocomplete-list');
+        if (autocompleteList) {
+            autocompleteList.innerHTML = '';
+        }
     }
 });
 
@@ -463,8 +491,11 @@ document.onfullscreenchange = function ( event ) {
   document.querySelectorAll('[data-stock-symbol]').forEach(button => {
     button.addEventListener('click', (e) => {
         const symbol = e.currentTarget.dataset.stockSymbol;
-        document.getElementById('stockSymbolInput').value = symbol;
-        handleFinanceUpdate('1d', '1m');
+        const stockSymbolInput = document.getElementById('stockSymbolInput');
+        if (stockSymbolInput) {
+            stockSymbolInput.value = symbol;
+            handleFinanceUpdate('1d', '1m');
+        }
     });
 });
 
@@ -496,7 +527,7 @@ window.handleDateRangeChange = async function() {
     const dateRangeSelect = document.getElementById('dateRangeSelect');
     
     if (!countrySelect || !languageSelect || !dateRangeSelect) {
-        console.error('Required elements not found');
+        console.log('Date range controls not found on this page, skipping date range change');
         return;
     }
 

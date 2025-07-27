@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfoDash - Finance</title>
+    
+    <!-- Fonts and Stylesheets -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/yahoo-finance2@2.0.0/dist/yahooFinance.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="js/sidebar.js"></script>
+    <script type="module" src="js/userPreferences.js"></script>
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/finance.js"></script>
+</head>
+<body class="dark-theme">
+    <header class="container">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <h4 class="center-align" style="margin: 0;">InfoDash - Finance</h4>
+            <button class="theme-toggle" id="themeToggle">🌓</button>
+        </div>
+    </header>
+    
+    <main class="container">
+        <div class="row">
+            <div class="col s12">
+                <section id="finance" class="section">
+                    <div class="section-header">
+                        <h4>📈 Financial Markets</h4>
+                        <div class="section-toggle" onclick="toggleSection('finance-content')" title="Show/Hide Section">
+                            <span class="toggle-icon">−</span>
+                        </div>
+                    </div>
+                    <div id="finance-content" class="section-content">
+                        <!-- Stock Symbol Input -->
+                        <div class="row">
+                            <div class="col s12 m6">
+                                <div class="input-field">
+                                    <input type="text" id="stockSymbolInput" placeholder="Enter stock symbol (e.g., AAPL, TSLA)">
+                                    <label for="stockSymbolInput">Stock Symbol</label>
+                                    <div id="autocomplete-list" class="autocomplete-list"></div>
+                                </div>
+                            </div>
+                            <div class="col s12 m6">
+                                <button class="btn waves-effect waves-light" onclick="handleFinanceUpdate('1d', '1m')">
+                                    <i class="material-icons left">search</i>Search
+                                </button>
+                                <button class="btn waves-effect waves-light" onclick="togglePauseFinance()" id="pauseResumeBtn">
+                                    <i class="material-icons left">pause</i>Pause
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Time Range Controls -->
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="time-range-controls">
+                                    <button class="btn-small waves-effect waves-light" onclick="handleFinanceUpdate('1d', '1m')" id="realtimeButton">1D</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleFinanceUpdate('5d', '5m')">5D</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleFinanceUpdate('1mo', '1h')">1M</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleFinanceUpdate('3mo', '1d')">3M</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleFinanceUpdate('6mo', '1d')">6M</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleFinanceUpdate('1y', '1d')">1Y</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleFinanceUpdate('2y', '1wk')">2Y</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleFinanceUpdate('5y', '1mo')">5Y</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleFinanceUpdate('10y', '3mo')">10Y</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleFinanceUpdate('max', '3mo')">MAX</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Chart Container -->
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="card chart-container">
+                                    <div class="card-content">
+                                        <div class="chart-header">
+                                            <span class="card-title" id="chartTitle">Stock Chart</span>
+                                            <button id="chartFullscreenBtn" class="btn-small waves-effect waves-light">
+                                                <i class="material-icons">fullscreen</i>
+                                            </button>
+                                        </div>
+                                        <canvas id="stockChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Watchlist -->
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="card">
+                                    <div class="card-content">
+                                        <span class="card-title">📊 Watchlist</span>
+                                        <div id="watchlist-container">
+                                            <!-- Watchlist items will be populated here -->
+                                        </div>
+                                        <div class="watchlist-controls">
+                                            <button class="btn-small waves-effect waves-light" onclick="clearWatchlist()">Clear All</button>
+                                            <button class="btn-small waves-effect waves-light" onclick="resetToDefaultWatchlist()">Reset to Default</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { showNotification, toggleSection } from './js/uiUtils.js';
+        import { handleFinanceUpdate, togglePauseFinance, clearWatchlist, resetToDefaultWatchlist } from './js/finance.js';
+        
+        window.showNotification = showNotification;
+        window.toggleSection = toggleSection;
+        window.handleFinanceUpdate = handleFinanceUpdate;
+        window.togglePauseFinance = togglePauseFinance;
+        window.clearWatchlist = clearWatchlist;
+        window.resetToDefaultWatchlist = resetToDefaultWatchlist;
+        
+        // Initialize Materialize components
+        document.addEventListener('DOMContentLoaded', function() {
+            M.AutoInit();
+        });
+    </script>
+</body>
+</html>

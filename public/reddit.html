@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfoDash - Reddit</title>
+    
+    <!-- Fonts and Stylesheets -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="js/sidebar.js"></script>
+    <script type="module" src="js/userPreferences.js"></script>
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/reddit.js"></script>
+</head>
+<body class="dark-theme">
+    <header class="container">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <h4 class="center-align" style="margin: 0;">InfoDash - Reddit</h4>
+            <button class="theme-toggle" id="themeToggle">🌓</button>
+        </div>
+    </header>
+    
+    <main class="container">
+        <div class="row">
+            <div class="col s12">
+                <section id="reddit" class="section">
+                    <div class="section-header">
+                        <h4>🔴 Reddit Highlights</h4>
+                        <div class="section-toggle" onclick="toggleSection('reddit-content')" title="Show/Hide Section">
+                            <span class="toggle-icon">−</span>
+                        </div>
+                    </div>
+                    <div id="reddit-content" class="section-content">
+                        <!-- Subreddit Controls -->
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="reddit-controls">
+                                    <div class="input-field col s12 m6">
+                                        <input type="text" id="subredditInput" placeholder="Enter subreddit name (e.g., worldnews, technology)">
+                                        <label for="subredditInput">Subreddit</label>
+                                    </div>
+                                    <div class="col s12 m6">
+                                        <button class="btn waves-effect waves-light" onclick="handleButtonClick('reddit', 'custom')">
+                                            <i class="material-icons left">search</i>Search Subreddit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Popular Subreddits -->
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="reddit-category-group">
+                                    <h6>🔥 Popular Subreddits</h6>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleButtonClick('reddit', 'worldnews')">World News</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleButtonClick('reddit', 'technology')">Technology</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleButtonClick('reddit', 'science')">Science</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleButtonClick('reddit', 'business')">Business</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleButtonClick('reddit', 'sports')">Sports</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleButtonClick('reddit', 'entertainment')">Entertainment</button>
+                                </div>
+                                
+                                <div class="reddit-category-group">
+                                    <h6>💰 Finance & Investing</h6>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleButtonClick('reddit', 'investing')">Investing</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleButtonClick('reddit', 'stocks')">Stocks</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleButtonClick('reddit', 'cryptocurrency')">Cryptocurrency</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleButtonClick('reddit', 'wallstreetbets')">WallStreetBets</button>
+                                </div>
+                                
+                                <div class="reddit-category-group">
+                                    <h6>🎮 Gaming & Tech</h6>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleButtonClick('reddit', 'gaming')">Gaming</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleButtonClick('reddit', 'programming')">Programming</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="handleButtonClick('reddit', 'artificial')">AI</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sort Options -->
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="input-field col s12 m4">
+                                    <select id="redditSortSelect">
+                                        <option value="hot">Hot</option>
+                                        <option value="new">New</option>
+                                        <option value="top">Top</option>
+                                        <option value="rising">Rising</option>
+                                    </select>
+                                    <label>Sort By</label>
+                                </div>
+                                <div class="col s12 m4">
+                                    <button class="btn waves-effect waves-light" onclick="refreshReddit()">
+                                        <i class="material-icons left">refresh</i>Refresh
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Reddit Data Container -->
+                        <div class="data-container">
+                            <!-- Reddit posts will be populated here -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { showNotification, toggleSection } from './js/uiUtils.js';
+        
+        window.showNotification = showNotification;
+        window.toggleSection = toggleSection;
+        
+        // Reddit-specific functions
+        window.refreshReddit = function() {
+            // Refresh reddit data
+            handleButtonClick('reddit', 'worldnews');
+        };
+        
+        // Initialize Materialize components
+        document.addEventListener('DOMContentLoaded', function() {
+            M.AutoInit();
+        });
+    </script>
+</body>
+</html>

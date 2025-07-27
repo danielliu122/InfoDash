@@ -36,13 +36,27 @@ export const fetchTrendsData = async (type = 'daily', category = 'all', language
     }
 };
 // Add event listeners for the dropdowns
-document.getElementById('trendsCountrySelect').addEventListener('change', refreshTrends);
-document.getElementById('trendsLanguageSelect').addEventListener('change', refreshTrends);
+const trendsCountrySelect = document.getElementById('trendsCountrySelect');
+const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
+
+if (trendsCountrySelect) {
+    trendsCountrySelect.addEventListener('change', refreshTrends);
+}
+if (trendsLanguageSelect) {
+    trendsLanguageSelect.addEventListener('change', refreshTrends);
+}
 
 // Function to refresh trends data
 async function refreshTrends() {
     const trendsCountrySelect = document.getElementById('trendsCountrySelect');
     const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
+    
+    // Check if elements exist (only on trends page)
+    if (!trendsCountrySelect || !trendsLanguageSelect) {
+        console.log('Trends controls not found on this page, skipping trends refresh');
+        return;
+    }
+    
     const country = trendsCountrySelect.value;
     
     // Update language options based on the selected country
@@ -120,7 +134,10 @@ function updateLanguageOptions(country) {
 
 export const updateTrends = (data, category) => {
     const trendsSection = document.querySelector('#trends .data-container');
-    if (!trendsSection) return;
+    if (!trendsSection) {
+        console.log('Trends container not found on this page, skipping update');
+        return;
+    }
 
     // Clear previous data
     trendsSection.innerHTML = '';
@@ -202,6 +219,10 @@ function displayNoTrendsMessage() {
 function processRealtimeTrends(data) {
     //console.log('Processing real-time trends data');
     const trendsSection = document.querySelector('#trends .data-container');
+    if (!trendsSection) {
+        console.log('Trends container not found on this page, skipping processRealtimeTrends');
+        return;
+    }
     trendsSection.innerHTML = ''; // Clear previous data
 
     const topics = data.storySummaries.trendingStories || [];
@@ -214,6 +235,10 @@ function processRealtimeTrends(data) {
 function processDailyTrends(data) {
     //console.log('Processing daily trends data');
     const trendsSection = document.querySelector('#trends .data-container');
+    if (!trendsSection) {
+        console.log('Trends container not found on this page, skipping processDailyTrends');
+        return;
+    }
     trendsSection.innerHTML = ''; // Clear previous data
 
     const trendingSearchesDays = data.default.trendingSearchesDays || [];
