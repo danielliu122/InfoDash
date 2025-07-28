@@ -5,7 +5,8 @@
 /* === CSS Variables === */
 
 :root {
-  --secondary-bg: #f1fffb;
+  --primary-bg: #f1fffb;
+  --secondary-bg: #c1d5d0;
   --primary-text: #212529;
   --secondary-text: #6c757d;
   --accent-color: #26a69a;
@@ -23,13 +24,12 @@
   --hover-bg: #e9ecef;
   --sidebar-width: 200px;
   --sidebar-collapsed-width: 70px;
-  --header-height: 60px;
   --primary-color: #667eea;
   --secondary-color: #764ba2;
   --success-color: #4CAF50;
   --warning-color: #FF9800;
   --danger-color: #f44336;
-  --text-primary: #ffffff;
+  --text-primary: black;
   --text-secondary: #b0b0b0;
   --bg-primary: #1a1a1a;
   --bg-secondary: #2d2d2d;
@@ -38,6 +38,7 @@
 }
 
 body.dark-theme {
+  margin:0;
   scrollbar-color: #2f343a #181b1f;
   --primary-bg: #181b1f;
   --secondary-bg: rgb(39, 48, 62);
@@ -155,6 +156,7 @@ main {
 
 /* === Sidebar Layout === */
 .sidebar {
+    background-color:#c1d5d0;
     position: absolute;
     left: 0;
     top: 0;
@@ -214,15 +216,11 @@ main {
     margin: 0;
 }
 
-.nav-item {
-    margin-bottom: 8px;
-}
 
 .nav-link {
     display: flex;
     align-items: center;
     padding: 12px;
-    color: var(--text-primary);
     text-decoration: none;
     border-radius: 6px;
     transition: all 0.3s ease;
@@ -234,7 +232,6 @@ main {
 
 .nav-link.active {
     background: var(--accent-color);
-    color: white;
 }
 
 .nav-link i {
@@ -375,6 +372,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
 
 /* Top Header */
 .top-header {
+  flex-direction: row;
   background: var(--secondary-bg);
   border-bottom: 1px solid var(--border-color);
   padding: 16px 24px;
@@ -382,6 +380,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  height:fit-content;
 }
 
 @media (max-width: 600px) {
@@ -406,6 +405,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   gap: 16px;
 }
 
+
 .menu-toggle {
   background: none;
   border: none;
@@ -413,7 +413,6 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   cursor: pointer;
   padding: 8px;
   border-radius: 4px;
-  display: none;
 }
 
 .menu-toggle:hover {
@@ -504,7 +503,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
 }
 
 .card-header {
-  background: var(--bg-primary);
+  background: var(--primary-bg);
   border-bottom: 1px solid var(--border-color);
   padding: 16px 20px;
   display: flex;
@@ -592,7 +591,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   }
   
   .page-title {
-    font-size: 1.3em;
+    font-size: 1em;
   }
   
   .weather-widget {
@@ -614,6 +613,9 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   }
 }
 
+.news-card{
+  color: var(--primary-bg);
+}
 /* Legacy responsive styles */
 @media (max-width: 768px) {
   .container {
@@ -653,7 +655,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
     min-width: 0 !important;
     box-sizing: border-box !important;
     overflow-x: auto !important;
-    background: lab(90.06% -5.3 -4.59)!important;
+    background: #c1d5d0;
   }
   #financeChart, .card.chart-container canvas {
     width: 100% !important;
@@ -777,6 +779,7 @@ body.dark-theme .collapsible-header:hover {
 /* Ensure all borders are dark in dark mode */
 body.dark-theme * {
   border-color: #333 !important;
+  color:white;
 }
 
 /* Specific overrides for better contrast */
@@ -1715,8 +1718,7 @@ body:not(.dark-theme) * {
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
+    background: var(--primary-bg);
     overflow-x: hidden;
 }
 
@@ -1727,9 +1729,8 @@ body {
     justify-content: space-between;
     align-items: center;
 }
-
 .sidebar-title {
-    font-size: 1.5rem;
+    font-size: 1.2em;
     font-weight: 600;
     margin: 0;
 }
@@ -1753,6 +1754,24 @@ body {
     padding: 20px 0;
 }
 
+/* Desktop by default */
+.mobile-nav {
+  display: none;
+}
+
+#desktop-nav {
+  display: block;
+}
+@media (max-width: 768px) {
+  .mobile-nav {
+    display: block; /* Show mobile nav */
+  }
+
+  #desktop-nav {
+    display: none;  /* Hide desktop nav */
+  }
+}
+
 .nav-menu {
     list-style: none;
     padding: 0;
@@ -1767,7 +1786,6 @@ body {
     display: flex;
     align-items: center;
     padding: 15px 20px;
-    color: white;
     text-decoration: none;
     transition: all 0.3s ease;
     border-radius: 0 25px 25px 0;
@@ -1839,7 +1857,6 @@ body {
 
 /* Top Header */
 .top-header {
-    height: var(--header-height);
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
@@ -1848,12 +1865,6 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 15px;
 }
 
 .menu-toggle {
@@ -1874,12 +1885,13 @@ body {
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
+    text-align: left;
 }
 
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+@media (max-width: 768px) {
+    .page-title {
+        display: none;
+    }
 }
 
 .weather-widget {
@@ -1893,7 +1905,6 @@ body {
 }
 
 .language-selector select {
-    background: var(--bg-card);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
     border-radius: 5px;
@@ -2169,6 +2180,10 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
+
+.news-content{
+  background:var(--primary-bg);
+}
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .finance-content,
@@ -2441,12 +2456,13 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 15px;
+    padding: 5px 5px;
     height: 60px;
     min-height: 60px;
   }
 
   .sidebar-title {
+    display:none;
     font-size: 16px;
     margin: 0;
   }
@@ -2461,25 +2477,14 @@ body {
     padding: 5px;
   }
 
-  
-
   .nav-menu {
     display: flex;
     flex-direction: row;
-    gap: 5px;
-  }
-  #desktop-nav {
-    display: none !important;
-  }
-
-  .nav-item {
-    margin: 0;
   }
 
   .nav-link {
     display: flex;
     align-items: center;
-    padding: 8px 12px;
     border-radius: 6px;
     font-size: 14px;
   }
