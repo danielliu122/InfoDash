@@ -5,7 +5,6 @@
 /* === CSS Variables === */
 
 :root {
-  --primary-bg: #f1fffb;
   --secondary-bg: #c1d5d0;
   --primary-text: #212529;
   --secondary-text: #6c757d;
@@ -1718,7 +1717,7 @@ body:not(.dark-theme) * {
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--primary-bg);
+    background: rgb(208, 222, 219);
     overflow-x: hidden;
 }
 
