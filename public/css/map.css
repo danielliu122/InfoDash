@@ -1,0 +1,1148 @@
+#traffic-content, #map-card {
+  position: relative;
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  padding: 0;
+  min-height: 350px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+#map-card {
+  min-height: 350px;
+  width: 100%;
+  position: relative;
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  overflow: hidden;
+}
+
+/* --- Map container adjustments for better zoom and size --- */
+#map {
+  width: 100%;
+  height: 400px;
+  min-height: 300px;
+  border-radius: 8px;
+  transition: height 0.3s, width 0.3s;
+  resize: both;
+  overflow: auto;
+  background: #e3eafc;
+}
+@media (max-width: 768px) {
+  #map {
+    max-width: 100vw;
+    height: 220px;
+    min-height: 120px;
+  }
+}
+
+/* --- Google Maps Info Window Text Color Fix --- */
+.gm-style-iw, .gm-style-iw-d {
+  color: #222 !important;
+  background: #fff !important;
+  border-radius: 8px !important;
+  border: 1px solid #bdbdbd !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18) !important;
+}
+body.dark-theme .gm-style-iw, body.dark-theme .gm-style-iw-d {
+  color: #fff !important;
+  background: #23272e !important;
+  border: 1px solid #444 !important;
+}
+
+.map-search-bar {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 80px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  padding: 2px 8px;
+  max-width: 400px;
+  border: 1px solid var(--border-color, #bdbdbd);
+}
+.map-search-bar input {
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+  flex: 1;
+  padding: 8px 0;
+  color: var(--primary-text, #222);
+}
+.map-search-bar .clear-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #888;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: color 0.2s;
+}
+.map-search-bar .clear-btn:hover {
+  color: #f44336;
+}
+.map-search-bar .locate-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--primary-color, #2196F3);
+  cursor: pointer;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.map-search-bar .locate-btn:hover {
+  color: #1565c0;
+}
+
+body.dark-theme .map-search-bar {
+  background: #23272e;
+  border: 1px solid #444;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+}
+body.dark-theme .map-search-bar input {
+  color: #fff;
+}
+body.dark-theme .map-search-bar .clear-btn {
+  color: #bbb;
+}
+body.dark-theme .map-search-bar .clear-btn:hover {
+  color: #ff5252;
+}
+body.dark-theme .map-search-bar .locate-btn {
+  color: #64B5F6;
+}
+body.dark-theme .map-search-bar .locate-btn:hover {
+  color: #2196F3;
+}
+
+.map-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.map-controls button {
+  background: var(--button-bg, #f5f5f5);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--primary-text, #333);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.map-controls button:hover {
+  background: var(--button-hover-bg, #e0e0e0);
+}
+
+@media (max-width: 768px) {
+  #map-card, #traffic-content {
+    min-height: 220px;
+  }
+  #map {
+    height: 220px;
+    min-height: 120px;
+  }
+  .map-search-bar {
+    left: 8px;
+    right: 8px;
+    max-width: 98vw;
+    font-size: 14px;
+  }
+  .map-controls {
+    top: 8px;
+    right: 8px;
+  }
+  .map-controls button {
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+  }
+}
+
+/* --- Google Maps Official Search Box Styling (Material/Google.com style) --- */
+.searchbox {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #bdbdbd;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  padding: 0 12px;
+  height: 48px;
+  z-index: 10;
+  min-width: 280px;
+  max-width: 400px;
+}
+.searchbox input[type='search'] {
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+  flex: 1;
+  padding: 12px 0 12px 36px;
+  color: #222;
+  height: 48px;
+  min-width: 0;
+}
+.searchbox .search-icon {
+  position: absolute;
+  left: 24px;
+  width: 20px;
+  height: 20px;
+  fill: #888;
+  pointer-events: none;
+}
+.searchbox input[type='search']::placeholder {
+  color: #888;
+  opacity: 1;
+}
+.searchbox input[type='search']:focus {
+  border-color: #45a0bd;
+  box-shadow: 0px 0px 5px #45a0bd;
+  outline: 1px solid transparent;
+}
+body.dark-theme .searchbox {
+  background: #23272e;
+  border: 1px solid #444;
+}
+body.dark-theme .searchbox input[type='search'] {
+  color: #fff;
+}
+body.dark-theme .searchbox .search-icon {
+  fill: #bbb;
+}
+body.dark-theme .searchbox input[type='search']::placeholder {
+  color: #bbb;
+}
+@media (max-width: 768px) {
+  .searchbox {
+    left: 8px;
+    min-width: 0;
+    max-width: 98vw;
+    font-size: 14px;
+    height: 40px;
+    padding: 0 8px;
+  }
+  .searchbox input[type='search'] {
+    height: 40px;
+    padding: 8px 0 8px 32px;
+    font-size: 14px;
+  }
+  .searchbox .search-icon {
+    left: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+
+
+/* Make Google Maps controls larger */
+.gm-control-active, .gm-style-mtc, .gm-fullscreen-control, .gm-svpc, .gm-bundled-control, .gm-style .gm-style-mtc, .gm-style .gm-fullscreen-control, .gm-style .gm-svpc, .gm-style .gm-bundled-control {
+  font-size: 1.3em !important;
+}
+
+/* Optionally, increase the size of map type and zoom controls */
+.gm-style .gm-control-active button, .gm-style .gm-fullscreen-control button, .gm-style .gm-style-mtc button {
+  font-size: 1.2em !important;
+  padding: 8px 16px !important;
+}
+
+/* Make sure the map container font-size is normal */
+#map {
+  font-size: 20px !important;
+}
+
+
+
+/* --- Directions Panel Styling --- */
+#directions-panel {
+  margin-top: 1em;
+  background: #fafafa;
+  padding: 1em;
+  border-radius: 8px;
+  min-height: 60px;
+  direction: ltr;
+  color: #222;
+  font-size: 1em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 1px solid #e0e0e0;
+}
+#directions-panel .adp, #directions-panel .adp-text, #directions-panel .adp-summary, #directions-panel .adp-directions, #directions-panel .adp-distance, #directions-panel .adp-legal {
+  color: #222;
+}
+#directions-panel .adp-summary {
+  font-weight: 500;
+  margin-bottom: 0.5em;
+}
+#directions-panel .adp-directions {
+  width: 100%;
+  border-collapse: collapse;
+}
+#directions-panel .adp-directions td {
+  padding: 0.3em 0.5em;
+  vertical-align: middle;
+}
+#directions-panel .adp-marker2 {
+  filter: none;
+}
+#directions-panel .adp-legal {
+  font-size: 0.9em;
+  color: #888;
+  margin-top: 0.5em;
+}
+
+body.dark-theme #directions-panel {
+  background: #23272e !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+body.dark-theme #directions-panel .adp, 
+body.dark-theme #directions-panel .adp-text, 
+body.dark-theme #directions-panel .adp-summary, 
+body.dark-theme #directions-panel .adp-directions, 
+body.dark-theme #directions-panel .adp-distance, 
+body.dark-theme #directions-panel .adp-legal {
+  color: #fff !important;
+}
+body.dark-theme #directions-panel .adp-legal {
+  color: #bbb !important;
+}
+body.dark-theme #directions-panel .adp-marker2 {
+  filter: brightness(1.2) contrast(1.2) drop-shadow(0 0 2px #23272e);
+}
+
+
+
+/* --- Custom Map Button Styling for Light/Dark Mode --- */
+.styled-map-btn, .map-theme-toggle, .map-locate-btn {
+  background: #fff;
+  color: #222;
+  border: 1px solid #bdbdbd;
+  border-radius: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  padding: 10px 18px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, color 0.2s, border 0.2s;
+  margin: 8px;
+  outline: none;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.styled-map-btn:hover, .styled-map-btn:focus,
+.map-theme-toggle:hover, .map-theme-toggle:focus,
+.map-locate-btn:hover, .map-locate-btn:focus {
+  background: #f5f5f5;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  color: #1976d2;
+  border-color: #1976d2;
+}
+
+body.dark-theme .styled-map-btn,
+body.dark-theme .map-theme-toggle,
+body.dark-theme .map-locate-btn {
+  background: #23272e !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.32) !important;
+}
+body.dark-theme .styled-map-btn:hover,
+body.dark-theme .styled-map-btn:focus,
+body.dark-theme .map-theme-toggle:hover,
+body.dark-theme .map-theme-toggle:focus,
+body.dark-theme .map-locate-btn:hover,
+body.dark-theme .map-locate-btn:focus {
+  background: #30343a !important;
+  color: #64B5F6 !important;
+  border-color: #64B5F6 !important;
+}
+
+/* --- Map Search Bar Styling for Light/Dark Mode --- */
+#map .search-bar-form, .map-search-bar, form[role="search"] {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  padding: 0 12px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #bdbdbd;
+  position: relative;
+}
+#map .search-bar-form input[type="search"],
+.map-search-bar input[type="search"],
+form[role="search"] input[type="search"] {
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+  height: 38px;
+  width: 220px;
+  color: #222;
+  padding: 0 0 0 32px;
+}
+#map .search-bar-form span,
+.map-search-bar span,
+form[role="search"] span {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  pointer-events: none;
+}
+#map .search-bar-form span svg,
+.map-search-bar span svg,
+form[role="search"] span svg {
+  stroke: #888;
+}
+body.dark-theme #map .search-bar-form,
+body.dark-theme .map-search-bar,
+body.dark-theme form[role="search"] {
+  background: #23272e !important;
+  border: 1px solid #444 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.32) !important;
+}
+body.dark-theme #map .search-bar-form input[type="search"],
+body.dark-theme .map-search-bar input[type="search"],
+body.dark-theme form[role="search"] input[type="search"] {
+  color: #fff !important;
+}
+body.dark-theme #map .search-bar-form span svg,
+body.dark-theme .map-search-bar span svg,
+body.dark-theme form[role="search"] span svg {
+  stroke: #bbb !important;
+}
+
+/* Override Google Maps default search box styling for dark mode */
+body.dark-theme .pac-container {
+  background: #23272e !important;
+  border: 1px solid #2f343a !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.32) !important;
+}
+
+body.dark-theme .pac-item {
+  background: #23272e !important;
+  color: #fff !important;
+  border-top: 1px solid #2f343a !important;
+}
+
+body.dark-theme .pac-item:hover {
+  background: #2f343a !important;
+}
+
+body.dark-theme .pac-item-selected {
+  background: #2f343a !important;
+}
+
+/* Fix autocomplete text color in dark mode */
+body.dark-theme .pac-item span {
+  color: #fff !important;
+}
+
+body.dark-theme .pac-item .pac-item-query {
+  color: #fff !important;
+}
+
+body.dark-theme .pac-item .pac-matched {
+  color: #64B5F6 !important;
+  font-weight: bold;
+}
+
+/* Ensure all text in autocomplete is visible */
+body.dark-theme .pac-container * {
+  color: #fff !important;
+}
+
+body.dark-theme .pac-container .pac-item-query {
+  color: #fff !important;
+}
+
+body.dark-theme .pac-container .pac-secondary-text {
+  color: #b0b0b0 !important;
+}
+
+/* Override Google Maps search input styling */
+body.dark-theme input[type="text"][placeholder*="Search"],
+body.dark-theme input[type="search"][placeholder*="Search"],
+body.dark-theme .gmnoprint input[type="text"],
+body.dark-theme .gmnoprint input[type="search"] {
+  background: #23272e !important;
+  color: #fff !important;
+  border: 1px solid #2f343a !important;
+}
+
+/* Override Google Maps search box container */
+body.dark-theme .gmnoprint .gm-style-moc,
+body.dark-theme .gmnoprint .gm-style-mtc,
+body.dark-theme .gmnoprint .gm-style-mcc {
+  background: #23272e !important;
+  border: 1px solid #2f343a !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.32) !important;
+}
+
+
+
+/* --- Default Google Maps Controls Styling for Dark Mode --- */
+body.dark-theme .gm-control-active,
+body.dark-theme .gm-style-mtc,
+body.dark-theme .gm-fullscreen-control,
+body.dark-theme .gm-svpc,
+body.dark-theme .gm-bundled-control {
+  background: #23272e !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.32) !important;
+}
+body.dark-theme .gm-control-active button,
+body.dark-theme .gm-style-mtc button,
+body.dark-theme .gm-fullscreen-control button,
+body.dark-theme .gm-svpc button,
+body.dark-theme .gm-bundled-control button {
+  background: #23272e !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+body.dark-theme .gm-control-active button:hover,
+body.dark-theme .gm-style-mtc button:hover,
+body.dark-theme .gm-fullscreen-control button:hover,
+body.dark-theme .gm-svpc button:hover,
+body.dark-theme .gm-bundled-control button:hover {
+  background: #30343a !important;
+  color: #64B5F6 !important;
+  border-color: #64B5F6 !important;
+}
+
+
+
+/* Traffic Section Height */
+#traffic {
+    min-height: 600px !important;
+}
+
+#traffic-content {
+    min-height: 550px !important;
+}
+
+/* === Google Maps API Generated Elements - Simplified Fix === */
+/* Simplified approach for Google Maps generated elements */
+
+/* Specific Google Maps generated elements */
+div[jstcache],
+div[jsinstance],
+div[jsan] {
+  color: var(--primary-text) !important;
+}
+
+/* Force override for any Google Maps elements with inline white text */
+div[style*="color: rgb(255, 255, 255)"],
+div[style*="color: white"],
+div[style*="color: #ffffff"],
+div[style*="color: #fff"] {
+  color: var(--primary-text) !important;
+}
+
+/* Override any Google Maps elements with white backgrounds in light mode */
+body:not(.dark-theme) div[style*="background: rgb(255, 255, 255)"],
+body:not(.dark-theme) div[style*="background: white"],
+body:not(.dark-theme) div[style*="background: #ffffff"],
+body:not(.dark-theme) div[style*="background: #fff"] {
+  background: var(--card-bg) !important;
+}
+
+/* Ensure Google Maps text is always visible */
+.gm-style *,
+div[jstcache] *,
+div[jsinstance] *,
+div[jsan] * {
+  color: inherit !important;
+}
+
+/* Specific fix for the address-line element you mentioned */
+div[jstcache="128"][jsinstance="0"].address-line.full-width[jsan*="address-line"] {
+  color: var(--primary-text) !important;
+  background: transparent !important;
+}
+
+/* Dark theme specific overrides for Google Maps generated elements */
+body.dark-theme .address-line,
+body.dark-theme div[class*="address-line"],
+body.dark-theme div[jstcache*="address-line"],
+body.dark-theme div[jsinstance*="address-line"],
+body.dark-theme div[class*="full-width"][jstcache*="address-line"],
+body.dark-theme div[jsan*="address-line"] {
+  color: #e0e6e4 !important;
+  background: transparent !important;
+}
+
+body.dark-theme div[jstcache],
+body.dark-theme div[jsinstance],
+body.dark-theme div[jsan] {
+  color: #e0e6e4 !important;
+}
+
+body.dark-theme div[style*="color: rgb(255, 255, 255)"],
+body.dark-theme div[style*="color: white"],
+body.dark-theme div[style*="color: #ffffff"],
+body.dark-theme div[style*="color: #fff"] {
+  color: #e0e6e4 !important;
+}
+
+body.dark-theme div[jstcache="128"][jsinstance="0"].address-line.full-width[jsan*="address-line"] {
+  color: #e0e6e4 !important;
+  background: transparent !important;
+}
+
+/* Map Page Styles */
+.map-content {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.map-search-bar {
+    margin-bottom: 20px;
+}
+
+.search-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 15px;
+    align-items: end;
+}
+
+.search-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.map-container {
+    min-height: 500px;
+}
+
+.map-container .card-content {
+    padding: 0;
+}
+.directions-panel {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.directions-panel .card-content {
+    padding: 15px;
+}
+
+@media (max-width: 768px) {
+    .search-container {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .search-buttons {
+        justify-content: center;
+    }
+    
+    .map-container {
+        min-height: 300px;
+    }
+}
+
+/* Google Maps Places Autocomplete styling */
+.pac-container {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    margin-top: 4px !important;
+  }
+  
+  .pac-item {
+    background: var(--card-bg) !important;
+    color: var(--primary-text) !important;
+    padding: 8px 12px !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+  
+  .pac-item:hover {
+    background: var(--hover-bg) !important;
+  }
+  
+  .pac-item:last-child {
+    border-bottom: none !important;
+  }
+  
+  .pac-item-query {
+    color: var(--primary-text) !important;
+    font-weight: 500 !important;
+  }
+  
+  .pac-matched {
+    color: var(--accent-color) !important;
+    font-weight: bold !important;
+  }
+  
+  /* Dark theme overrides for Google Maps */
+  body.dark-theme .pac-container {
+    background: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+  }
+  
+  body.dark-theme .pac-item {
+    background: var(--card-bg) !important;
+    color: var(--primary-text) !important;
+    border-color: var(--border-color) !important;
+  }
+  
+  body.dark-theme .pac-item:hover {
+    background: var(--hover-bg) !important;
+  }
+  
+  /* Dark mode styling for Google Maps search input container */
+  body.dark-theme .pac-target-input {
+    background: var(--card-bg) !important;
+    color: var(--primary-text) !important;
+  }
+  
+  /* Target the search container div that Google Maps generates - dark mode only */
+  body.dark-theme div[style*="background: rgb(255, 255, 255)"] {
+    background: var(--card-bg) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  /* Light mode: ensure Google Maps search container stays light */
+  body:not(.dark-theme) div[style*="background: rgb(255, 255, 255)"] {
+    background: rgb(255, 255, 255) !important;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 2px 8px !important;
+  }
+  
+  /* Google Maps theme toggle button styling */
+  .map-theme-toggle.styled-map-btn {
+    background: var(--card-bg) !important;
+    color: var(--primary-text) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .map-theme-toggle.styled-map-btn:hover {
+    background: var(--hover-bg) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  .map-theme-toggle.styled-map-btn:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* === Google Maps Tile Border Fix === */
+  /* Fix grey box borders and tile rendering artifacts */
+  .gm-style img,
+  .gm-style-moc img,
+  .gm-style-mtc img,
+  .gm-style-mcc img,
+  .gm-style .gm-style-moc img,
+  .gm-style .gm-style-mtc img,
+  .gm-style .gm-style-mcc img {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Remove borders from map tile containers */
+  .gm-style > div,
+  .gm-style-moc > div,
+  .gm-style-mtc > div,
+  .gm-style-mcc > div,
+  .gm-style .gm-style-moc > div,
+  .gm-style .gm-style-mtc > div,
+  .gm-style .gm-style-mcc > div {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Fix tile grid lines and borders */
+  .gm-style canvas,
+  .gm-style-moc canvas,
+  .gm-style-mtc canvas,
+  .gm-style-mcc canvas {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Remove any grid lines or borders from map overlays */
+  .gm-style .gm-style-moc,
+  .gm-style .gm-style-mtc,
+  .gm-style .gm-style-mcc,
+  .gm-style-moc,
+  .gm-style-mtc,
+  .gm-style-mcc {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+  
+  /* Fix specific tile rendering issues */
+  .gm-style img[src*="maps.googleapis.com"],
+  .gm-style img[src*="maps.gstatic.com"] {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+  
+  /* Remove any grey borders from map containers */
+  #map > div,
+  #map > div > div,
+  #map > div > div > div {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Fix dark mode specific tile rendering */
+  body.dark-theme .gm-style img,
+  body.dark-theme .gm-style-moc img,
+  body.dark-theme .gm-style-mtc img,
+  body.dark-theme .gm-style-mcc img {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    filter: brightness(0.8) contrast(1.1);
+  }
+  
+  /* Ensure seamless tile blending */
+  .gm-style,
+  .gm-style-moc,
+  .gm-style-mtc,
+  .gm-style-mcc {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Fix any remaining grid artifacts */
+  .gm-style *,
+  .gm-style-moc *,
+  .gm-style-mtc *,
+  .gm-style-mcc * {
+    border-color: transparent !important;
+  }
+  
+  /* === End Google Maps Tile Border Fix === */
+  
+  /* === Google Maps InfoWindow Button Fix === */
+  /* Ensure InfoWindow   is always visible */
+  .gm-style-iw-tc,
+  .gm-style-iw-t,
+  .gm-style-iw-t::after,
+  .gm-style-iw-c,
+  .gm-style-iw-d {
+    background: var(--card-bg) !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Fix button specifically */
+  .gm-style-iw-tc .gm-style-iw-t,
+  .gm-style-iw-tc .gm-style-iw-t::after,
+  .gm-style-iw-tc .gm-style-iw-c,
+  .gm-style-iw-tc .gm-style-iw-d {
+    background: var(--card-bg) !important;
+  }
+  
+  /* Ensure button has proper contrast */
+  .gm-style-iw-tc button,
+  .gm-style-iw-t button,
+  .gm-style-iw-c button,
+  .gm-style-iw-d button,
+  .gm-style-iw-tc .gm-style-iw-t button,
+  .gm-style-iw-tc .gm-style-iw-c button,
+  .gm-style-iw-tc .gm-style-iw-d button {
+    background: #ffffff !important;
+    color: #333333 !important;
+    border: 1px solid #cccccc !important;
+    border-radius: 50% !important;
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+    z-index: 1000 !important;
+    position: relative !important;
+  }
+  
+  /* button hover state */
+  .gm-style-iw-tc button:hover,
+  .gm-style-iw-t button:hover,
+  .gm-style-iw-c button:hover,
+  .gm-style-iw-d button:hover,
+  .gm-style-iw-tc .gm-style-iw-t button:hover,
+  .gm-style-iw-tc .gm-style-iw-c button:hover,
+  .gm-style-iw-tc .gm-style-iw-d button:hover {
+    background: #f0f0f0 !important;
+    color: #000000 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  }
+  
+  /* Dark mode button styling */
+  body.dark-theme .gm-style-iw-tc button,
+  body.dark-theme .gm-style-iw-t button,
+  body.dark-theme .gm-style-iw-c button,
+  body.dark-theme .gm-style-iw-d button,
+  body.dark-theme .gm-style-iw-tc .gm-style-iw-t button,
+  body.dark-theme .gm-style-iw-tc .gm-style-iw-c button,
+  body.dark-theme .gm-style-iw-tc .gm-style-iw-d button {
+    background: #ffffff !important;
+    color: #333333 !important;
+    border: 1px solid #666666 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+  }
+  
+  body.dark-theme .gm-style-iw-tc button:hover,
+  body.dark-theme .gm-style-iw-t button:hover,
+  body.dark-theme .gm-style-iw-c button:hover,
+  body.dark-theme .gm-style-iw-d button:hover,
+  body.dark-theme .gm-style-iw-tc .gm-style-iw-t button:hover,
+  body.dark-theme .gm-style-iw-tc .gm-style-iw-c button:hover,
+  body.dark-theme .gm-style-iw-tc .gm-style-iw-d button:hover {
+    background: #f0f0f0 !important;
+    color: #000000 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+  }
+  
+  /* Map theme specific button fixes */
+  #map[data-map-theme="light"] .gm-style-iw-tc button,
+  #map[data-map-theme="light"] .gm-style-iw-t button,
+  #map[data-map-theme="light"] .gm-style-iw-c button,
+  #map[data-map-theme="light"] .gm-style-iw-d button {
+    background: #ffffff !important;
+    color: #333333 !important;
+    border: 1px solid #cccccc !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+  }
+  
+  #map[data-map-theme="dark"] .gm-style-iw-tc button,
+  #map[data-map-theme="dark"] .gm-style-iw-t button,
+  #map[data-map-theme="dark"] .gm-style-iw-c button,
+  #map[data-map-theme="dark"] .gm-style-iw-d button {
+    background: #ffffff !important;
+    color: #333333 !important;
+    border: 1px solid #666666 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+  }
+  
+  /* Ensure button text/content is visible */
+  .gm-style-iw-tc button *,
+  .gm-style-iw-t button *,
+  .gm-style-iw-c button *,
+  .gm-style-iw-d button * {
+    color: inherit !important;
+    background: transparent !important;
+  }
+  
+  /* Fix any Google Maps generated button elements */
+  .gm-style-iw-tc .gm-style-iw-tc,
+  .gm-style-iw-tc .gm-style-iw-t,
+  .gm-style-iw-tc .gm-style-iw-c,
+  .gm-style-iw-tc .gm-style-iw-d {
+    background: transparent !important;
+  }
+  
+  /* Ensure button container is properly positioned */
+  .gm-style-iw-tc {
+    position: relative !important;
+    z-index: 1000 !important;
+  }
+  
+  /* === End Google Maps InfoWindow button Fix === */
+  
+  /* === Google Maps InfoWindow Text Fix - Modern Solution === */
+  /* Based on https://gist.github.com/SimonEast/16b5bf3d56c0e5035b31 */
+  
+  /* Fix InfoWindow scrollbars and text visibility */
+  .gm-style .gm-style-iw.gm-style-iw-c {
+    box-shadow: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    overflow: auto !important;
+    background: var(--card-bg) !important;
+  }
+  
+  .gm-style .gm-style-iw.gm-style-iw-c .gm-style-iw-d {
+    overflow: visible !important;
+    background: var(--card-bg) !important;
+    color: var(--primary-text) !important;
+  }
+  
+  /* Ensure InfoWindow content is properly styled */
+  .gm-style-iw,
+  .gm-style-iw-d,
+  .gm-style-iw-c,
+  .gm-style-iw-t {
+    background: var(--card-bg) !important;
+    color: var(--primary-text) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  /* Fix text color for all InfoWindow elements */
+  .gm-style-iw *,
+  .gm-style-iw-d *,
+  .gm-style-iw-c *,
+  .gm-style-iw-t * {
+    color: var(--primary-text) !important;
+    background: transparent !important;
+  }
+  
+  /* Light mode specific styling */
+  body:not(.dark-theme) .gm-style-iw,
+  body:not(.dark-theme) .gm-style-iw-d,
+  body:not(.dark-theme) .gm-style-iw-c,
+  body:not(.dark-theme) .gm-style-iw-t {
+    background: #ffffff !important;
+    color: #212529 !important;
+  }
+  
+  body:not(.dark-theme) .gm-style-iw *,
+  body:not(.dark-theme) .gm-style-iw-d *,
+  body:not(.dark-theme) .gm-style-iw-c *,
+  body:not(.dark-theme) .gm-style-iw-t * {
+    color: #212529 !important;
+  }
+  
+  /* Dark mode specific styling */
+  body.dark-theme .gm-style-iw,
+  body.dark-theme .gm-style-iw-d,
+  body.dark-theme .gm-style-iw-c,
+  body.dark-theme .gm-style-iw-t {
+    background: #1a1d21 !important;
+    color: #e0e6e4 !important;
+  }
+  
+  body.dark-theme .gm-style-iw *,
+  body.dark-theme .gm-style-iw-d *,
+  body.dark-theme .gm-style-iw-c *,
+  body.dark-theme .gm-style-iw-t * {
+    color: #e0e6e4 !important;
+  }
+  
+  /* Map theme specific overrides */
+  #map[data-map-theme="light"] .gm-style-iw,
+  #map[data-map-theme="light"] .gm-style-iw-d,
+  #map[data-map-theme="light"] .gm-style-iw-c,
+  #map[data-map-theme="light"] .gm-style-iw-t {
+    background: #ffffff !important;
+    color: #212529 !important;
+  }
+  
+  #map[data-map-theme="light"] .gm-style-iw *,
+  #map[data-map-theme="light"] .gm-style-iw-d *,
+  #map[data-map-theme="light"] .gm-style-iw-c *,
+  #map[data-map-theme="light"] .gm-style-iw-t * {
+    color: #212529 !important;
+  }
+  
+  #map[data-map-theme="dark"] .gm-style-iw,
+  #map[data-map-theme="dark"] .gm-style-iw-d,
+  #map[data-map-theme="dark"] .gm-style-iw-c,
+  #map[data-map-theme="dark"] .gm-style-iw-t {
+    background: #1a1d21 !important;
+    color: #e0e6e4 !important;
+  }
+  
+  #map[data-map-theme="dark"] .gm-style-iw *,
+  #map[data-map-theme="dark"] .gm-style-iw-d *,
+  #map[data-map-theme="dark"] .gm-style-iw-c *,
+  #map[data-map-theme="dark"] .gm-style-iw-t * {
+    color: #e0e6e4 !important;
+  }
+  
+  /* Fix for Google Maps generated elements with inline styles */
+  div[style*="color: rgb(255, 255, 255)"],
+  div[style*="color: white"],
+  div[style*="color: #ffffff"],
+  div[style*="color: #fff"] {
+    color: var(--primary-text) !important;
+  }
+  
+  /* Address line specific fix */
+  .address-line,
+  div[class*="address-line"],
+  div[jstcache*="address-line"],
+  div[jsinstance*="address-line"],
+  div[jsan*="address-line"] {
+    color: var(--primary-text) !important;
+    background: transparent !important;
+  }
+  
+  /* === End Google Maps InfoWindow Text Fix === */
+
+  /* === Hide Google Maps InfoWindow button === */
+/* Hide the InfoWindow button container */
+#map > div > div.gm-style > div:nth-child(1) > div:nth-child(2) > div > div:nth-child(4) > div > div > div > div.gm-style-iw-tc {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  
+  /* Alternative selectors to ensure the button is hidden */
+  .gm-style-iw-tc {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  
+  /* Hide any button elements within InfoWindows */
+  .gm-style-iw-tc button,
+  .gm-style-iw-tc .gm-style-iw-t,
+  .gm-style-iw-tc .gm-style-iw-c,
+  .gm-style-iw-tc .gm-style-iw-d {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  
+  /* === End Hide Google Maps InfoWindow button === */

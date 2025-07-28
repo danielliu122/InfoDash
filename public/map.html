@@ -1,26 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Traffic & Maps - InfoDash</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/map.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-</head>
-<body class="dark-theme">
-    <!-- Sidebar Navigation -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-title">
-                <i class="fas fa-rocket" style="color: #f44336;"></i>
-                <span>InfoDash</span>
+    </head>
+        <body class="dark-theme">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <!-- Nav for mobile: placed between toggle and title, hidden on desktop via CSS -->
+                <nav class="sidebar-nav mobile-nav" id="mobile-nav">
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="index.html" class="nav-link active">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="finance.html" class="nav-link">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Finance</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="news.html" class="nav-link">
+                                <i class="fas fa-newspaper"></i>
+                                <span>News</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="map.html" class="nav-link">
+                                <i class="fas fa-map"></i>
+                                <span>Traffic</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="sidebar-title" id="sidebar-title">
+                    <i class="fas fa-rocket" style="color: #f44336;"></i>
+                    <span>InfoDash</span>
+                </div>
             </div>
-            <button class="sidebar-toggle" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
         
-        <nav class="sidebar-nav">
+        <!-- Nav for desktop: hidden on mobile via CSS -->
+        <nav class="sidebar-nav" id="desktop-nav">
             <ul class="nav-menu">
                 <li class="nav-item">
                     <a href="index.html" class="nav-link">
@@ -259,5 +290,5 @@
     
     <!-- Google Maps API -->
     <script async defer src="/api/googlemaps/script"></script>
-</body>
+    </body>
 </html>

@@ -1,0 +1,125 @@
+/* Fortune Teller Predictions Styling */
+.fortune-teller {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.fortune-teller::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: sparkle 3s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { transform: rotate(0deg); opacity: 0.3; }
+    50% { transform: rotate(180deg); opacity: 0.7; }
+}
+
+.fortune-teller h4 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.predictions-container {
+    display: grid;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.prediction-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.prediction-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.prediction-item h5 {
+    color: #fff;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.prediction-item p {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.market-prediction {
+    border-left: 4px solid #4CAF50;
+}
+
+.sector-predictions {
+    border-left: 4px solid #2196F3;
+}
+
+.global-predictions {
+    border-left: 4px solid #FF9800;
+}
+
+.trump-insights {
+    border-left: 4px solid #E91E63;
+}
+
+.fortune-disclaimer {
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.fortune-disclaimer small {
+    color: rgba(255, 255, 255, 0.8);
+    font-style: italic;
+}
+
+/* Enhanced summary section for predictions */
+.summary-section.fortune-teller {
+    margin: 20px 0;
+}
+
+.summary-section.fortune-teller .section-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+}
+
+@media (max-width: 768px) {
+    .predictions-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .fortune-teller {
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .fortune-teller h4 {
+        font-size: 1.3rem;
+    }
+}
