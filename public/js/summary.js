@@ -470,13 +470,31 @@ async function collectFinanceData() {
 
 // Function to generate summary using AI
 async function generateSummary(sectionData) {
+    // Add beforeunload event listener to warn user about leaving during generation
+    const beforeUnloadHandler = (event) => {
+        event.preventDefault();
+        // Chrome requires returnValue to be set
+        event.returnValue = 'Your summary is still being generated. Are you sure you want to leave?';
+        return event.returnValue;
+    };
+
+    // Add the event listener when generation starts
+    window.addEventListener('beforeunload', beforeUnloadHandler);
+
+    // Function to clean up the event listener
+    const cleanupBeforeUnload = () => {
+        window.removeEventListener('beforeunload', beforeUnloadHandler);
+    };
+
+    // Show a notification to inform user about the warning
+    showNotification('Please do not leave the page while your summary is being generated.', 5000);
     const maxRetries = 3;
     let retryCount = 0;
     
     while (retryCount < maxRetries && !summaryGenerated) {
         try {
             console.log('generateSummary: Starting AI generation...');
-            //console.log('Generating summary with data:', sectionData);
+            console.log('Generating summary with data:', sectionData);
             
             const selectedModel = document.getElementById('model-select')?.value || 'deepseek/deepseek-chat-v3-0324:free';
             //console.log('generateSummary: Using model:', selectedModel);
@@ -499,6 +517,7 @@ async function generateSummary(sectionData) {
                             content: `You are a data analyst specializing in creating clear, concise summaries of current news, trends, and market data.
                             CRITICAL INSTRUCTIONS:
                                 - Only report the specific data provided. Do **not** infer, speculate, or add context from outside knowledge.
+                                - Except for the Info Genie section, you will act as a market predictor and future current events predictor.
                                 - For percentage changes:
                                 - If the change is positive, describe it as "up," "gaining," or "rose."
                                 - If the change is negative, describe it as "down," "declining," or "fell."
@@ -639,18 +658,18 @@ function createAnalysisPrompt(sectionData) {
     
     prompt += ' Please provide a structured summary with the following sections. Use the exact headers shown and format your response professionally with clear section breaks.';
 
-    prompt += ' NEWS HIGHLIGHTS: Summarize the key news stories. Place each distinct story in its own paragraph for readability. MAXIMUM 300 WORDS.';
+    prompt += ' NEWS HIGHLIGHTS: Summarize the key news stories. Separate each  story in its own paragraph for readability. MAXIMUM 300 WORDS.';
     prompt += ' TRENDING TOPICS: Group the top trending topics by category (Sports, Technology, Entertainment, Other). For each category, list the topics. If a topic\'s category is unclear, place it under \'Other\'. MAXIMUM 300 WORDS.';
 
     if (isWeekend) {
         prompt += ' MARKET OVERVIEW: Provide insights on cryptocurrency performance. Note that traditional stock markets are closed. MAXIMUM 300 WORDS.';
-        prompt += ' KEY INSIGHTS: Overall analysis and what users should pay attention to. MAXIMUM 300 WORDS.';
+        prompt += ' Info Genie: Pretend to be a fortune teller and try and predict the future. MAXIMUM 300 WORDS.';
     } else {
         prompt += ' MARKET OVERVIEW: Provide insights on today\'s trading session including tech stocks and crypto performance. MAXIMUM 300 WORDS.';
-        prompt += ' KEY INSIGHTS: Overall analysis and what users should pay attention to. MAXIMUM 300 WORDS.';
+        prompt += ' Info Genie: Pretend to be a fortune teller and try and predict the future. MAXIMUM 300 WORDS.';
     }
 
-    prompt += ' IMPORTANT: Format your response professionally with clear section headers (NEWS HIGHLIGHTS:, TRENDING TOPICS:, MARKET OVERVIEW:, KEY INSIGHTS:). Use proper paragraph breaks between sections and within sections. Keep each section concise and focused. Do not exceed 300 words per section. Use a professional but accessible tone.';
+    prompt += ' IMPORTANT: Format your response professionally with clear section headers (NEWS HIGHLIGHTS:, TRENDING TOPICS:, MARKET OVERVIEW:, INFO GENIE:). Use proper paragraph breaks between sections and within sections. Keep each section concise and focused. Do not exceed 300 words per section. Use a professional but accessible tone.';
 
     return prompt;
 }
@@ -767,7 +786,7 @@ function parseSummarySections(summaryText) {
     }
     
     // Extract market overview - handle markdown format with ** and --- separators
-    const financeMatch = summaryText.match(/(?:\*\*MARKET OVERVIEW\*\*|MARKET OVERVIEW:?)(.*?)(?=\*\*KEY INSIGHTS\*\*|KEY INSIGHTS:?|---)/s);
+    const financeMatch = summaryText.match(/(?:\*\*MARKET OVERVIEW\*\*|MARKET OVERVIEW:?)(.*?)(?=\*\*INFO GENIE\*\*|INFO GENIE:?|---)/s);
     if (financeMatch) {
         sections.finance = financeMatch[1].trim();
         console.log('parseSummarySections: Found finance section, length:', sections.finance.length);
@@ -775,8 +794,8 @@ function parseSummarySections(summaryText) {
         console.warn('parseSummarySections: No finance section found');
     }
     
-    // Extract key insights - handle markdown format with **
-    const insightsMatch = summaryText.match(/(?:\*\*KEY INSIGHTS\*\*|KEY INSIGHTS:?)(.*?)$/s);
+    // Extract INFO GENIE - handle markdown format with **
+    const insightsMatch = summaryText.match(/(?:\*\*INFO GENIE\*\*|INFO GENIE:?)(.*?)$/s);
     if (insightsMatch) {
         sections.insights = insightsMatch[1].trim();
         console.log('parseSummarySections: Found insights section, length:', sections.insights.length);

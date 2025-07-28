@@ -6,30 +6,115 @@
     <title>InfoDash - Trends</title>
     
     <!-- Fonts and Stylesheets -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/sidebar.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     
     <!-- Application Scripts -->
-    <script src="js/sidebar.js"></script>
     <script type="module" src="js/userPreferences.js"></script>
     <script type="module" src="js/app.js"></script>
     <script type="module" src="js/trends.js"></script>
 </head>
 <body class="dark-theme">
-    <header class="container">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <h4 class="center-align" style="margin: 0;">InfoDash - Trends</h4>
-            <button class="theme-toggle" id="themeToggle">🌓</button>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h5 class="sidebar-title">🚀 InfoDash</h5>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <i class="material-icons">menu</i>
+            </button>
         </div>
-    </header>
-    
+        
+        <nav class="sidebar-nav">
+            <ul class="nav-menu">
+                <li class="nav-item active">
+                    <a href="index.html" class="nav-link">
+                        <i class="material-icons">dashboard</i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="finance.html" class="nav-link">
+                        <i class="material-icons">trending_up</i>
+                        <span>Finance</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="news.html" class="nav-link">
+                        <i class="material-icons">article</i>
+                        <span>News</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="weather.html" class="nav-link">
+                        <i class="material-icons">wb_sunny</i>
+                        <span>Weather</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="map.html" class="nav-link">
+                        <i class="material-icons">map</i>
+                        <span>Traffic</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="community.html" class="nav-link">
+                        <i class="material-icons">forum</i>
+                        <span>Community</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="tools.html" class="nav-link">
+                        <i class="material-icons">build</i>
+                        <span>Tools</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="material-icons">person</i>
+                </div>
+                <div class="user-details">
+                    <span class="user-name">Guest User</span>
+                    <span class="user-status">Free Plan</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content" id="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="material-icons">menu</i>
+                </button>
+                <h4 class="page-title">Dashboard</h4>
+            </div>
+            <div class="header-right">
+                <div class="weather-widget" id="weather-widget">
+                    <i class="material-icons">wb_sunny</i>
+                    <span id="weather-temp">--°F</span>
+                    <span id="weather-location">Loading...</span>
+                </div>
+                <div class="language-selector">
+                    <select id="languageSelect" onchange="changeLanguage(this.value)">
+                        <option value="en">🇺🇸 English</option>
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="fr">🇫🇷 Français</option>
+                    </select>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Theme">
+                    <i class="material-icons" id="theme-icon">dark_mode</i>
+                </button>
+            </div>
+        </header>
     <main class="container">
         <div class="row">
             <div class="col s12">
@@ -120,11 +205,6 @@
         window.showNotification = showNotification;
         window.toggleSection = toggleSection;
         window.refreshTrends = refreshTrends;
-        
-        // Initialize Materialize components
-        document.addEventListener('DOMContentLoaded', function() {
-            M.AutoInit();
-        });
     </script>
 </body>
 </html>

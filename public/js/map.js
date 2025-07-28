@@ -34,12 +34,12 @@ const darkModeStyle = [
 ];
 
 // Function to check current app theme
-function getCurrentAppTheme() {
+export function getCurrentAppTheme() {
   return document.body.classList.contains('dark-theme') ? 'dark' : 'light';
 }
 
 // Function to apply theme to map
-function applyThemeToMap() {
+export function applyThemeToMap() {
   const appTheme = getCurrentAppTheme();
   const shouldBeDark = appTheme === 'dark';
   
@@ -65,7 +65,7 @@ function initializeMapTheme() {
 }
 
 // Define the real initMap function
-function initMapReal() {
+export function initMapReal() {
   // Try to use user's geolocation for default center
   let defaultCenter = { lat: 40.7128, lng: -74.0060 }; // Fallback: New York City
   let defaultZoom = 15;

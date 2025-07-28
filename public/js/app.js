@@ -313,8 +313,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Scroll to the top of the page on reload
     window.scrollTo(0, 0);
 
-    // Initialize Materialize components
-    M.AutoInit();
 
     // Initialize the news mode indicator
     updateNewsModeIndicator();
@@ -347,6 +345,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Add event listeners for country and language select to update news data and save preferences
     countrySelect.addEventListener('change', () => {
+        console.log("COUNTRY SELECTED CHANGED");
         refreshNews();
         userPrefs.saveCurrentState();
     });

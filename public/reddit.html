@@ -9,15 +9,11 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/sidebar.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     
     <!-- Application Scripts -->
-    <script src="js/sidebar.js"></script>
     <script type="module" src="js/userPreferences.js"></script>
     <script type="module" src="js/app.js"></script>
     <script type="module" src="js/reddit.js"></script>
@@ -129,11 +125,7 @@
             // Refresh reddit data
             handleButtonClick('reddit', 'worldnews');
         };
-        
-        // Initialize Materialize components
-        document.addEventListener('DOMContentLoaded', function() {
-            M.AutoInit();
-        });
+
     </script>
 </body>
 </html>

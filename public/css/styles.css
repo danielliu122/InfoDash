@@ -3,8 +3,8 @@
    ===================== */
 
 /* === CSS Variables === */
+
 :root {
-  --primary-bg: #d3eae4;
   --secondary-bg: #f1fffb;
   --primary-text: #212529;
   --secondary-text: #6c757d;
@@ -137,7 +137,7 @@ body.dark-theme .card[data-section="daily-summary"] {
 }
 
 /* === Reset & Base === */
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {box-sizing: border-box; }
 body, html {
   font-family: 'Google Sans Text', 'Google Sans', 'Roboto', 'Noto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif !important;
     line-height: 1.6;
@@ -263,13 +263,6 @@ main {
     width: calc(100% - var(--sidebar-collapsed-width));
 }
 
-/* Ensure main element and its children span full width */
-.main-content main {
-    width: 100%;
-    padding: 0;
-    margin: 0;
-}
-
 .main-content main > * {
     width: 100%;
     box-sizing: border-box;
@@ -323,9 +316,7 @@ section, .section, .summary-card, #finance, #finance .card, .news-item, .trend-c
 section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   padding: 20px;
 }
-#finance, #finance .card {
-  padding: 20px;
-}
+
 
 /* === Summary Cards === */
 .summary-card {
@@ -449,19 +440,6 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
 
 .news-card-time {
   opacity: 0.7;
-}
-
-/* === News Controls Full Width === */
-.news-controls-container {
-  display: flex;
-  gap: 20px;
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.news-controls-container .input-field {
-  flex: 1;
-  min-width: 0;
 }
 
 /* === Controls Header === */
@@ -638,7 +616,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
 }
 
 .card-content {
-  padding: 20px;
+  padding: 10px;
 }
 
 .btn-small {
@@ -926,7 +904,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
 }
 
 /* === DARK MODE TEXT COLOR FIXES === */
-body.dark-theme, body.dark-theme section, body.dark-theme .summary-card, body.dark-theme .stock-card, body.dark-theme .news-item, body.dark-theme .trend-card, body.dark-theme .chart-container {
+body.dark-theme section, body.dark-theme .summary-card, body.dark-theme .stock-card, body.dark-theme .news-item, body.dark-theme .trend-card, body.dark-theme .chart-container {
   color: #fff !important;
 }
 body.dark-theme .card.chart-container {
@@ -1028,25 +1006,6 @@ body:not(.dark-theme) #summary-content-container .archive-row ul li .collapsible
   }
 }
 
-@media (min-width: 1000px) {
-  .stock-dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 10px;
-  }
-  .stock-dashboard-grid .stock-card {
-    background: lab(90.06% -5.3 -4.59)!important;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    vertical-align: initial;
-  }
-}
 
 body.dark-theme input,
 body.dark-theme select,
@@ -1223,19 +1182,6 @@ body.dark-theme .stock-dashboard-grid::-webkit-scrollbar-corner {
 #finance .cards-container .card.watchlist {
   flex: 1 1 calc(50% - 8px);
   min-width: 300px;
-}
-
-/* Ensure the finance section itself has proper layout */
-#finance {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-#finance .section-content {
-  width: 100%;
-  margin: 0;
-  padding: 0;
 }
 
 .news-item {
@@ -2820,7 +2766,7 @@ body.dark-theme div[jstcache="128"][jsinstance="0"].address-line.full-width[jsan
     background: lab(90.06% -5.3 -4.59)!important;
     border-radius: 6px;
     padding: 12px;
-    margin-bottom: 8px;
+    margin: 18px;
 }
 
 
@@ -3667,13 +3613,9 @@ body:not(.dark-theme) {
     --bg-secondary: #f5f5f5;
     --bg-card: #ffffff;
     --border-color: #e0e0e0;
+    background: #d3eae4;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3787,7 +3729,7 @@ body {
     border-top: 1px solid rgba(255,255,255,0.1);
     position: absolute;
     bottom: 0;
-    width: 100%;
+    width: 90%;
 }
 
 .user-info {
@@ -3839,7 +3781,6 @@ body {
 /* Top Header */
 .top-header {
     height: var(--header-height);
-    background: var(--bg-secondary);
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
@@ -4183,21 +4124,6 @@ body {
     overflow: hidden;
 }
 
-.stock-dashboard-section {
-    background: var(--bg-card);
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.stock-dashboard {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
-
 .stock-card {
     background: var(--bg-secondary);
     border-radius: 8px;
@@ -4397,7 +4323,7 @@ body {
 }
 
 .weather-temp {
-    font-size: 3rem;
+    font-size: 1rem;
     font-weight: 700;
     margin-bottom: 10px;
 }
@@ -4635,63 +4561,54 @@ body {
 /* Additional Styles for New Pages */
 
 /* News Page Specific Styles */
-.news-controls {
-    background: var(--card-bg);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border: 1px solid var(--border-color);
-}
-
 .news-filters {
     display: flex;
-    gap: 20px;
+    gap: 19.2px;
     align-items: center;
     flex-wrap: wrap;
 }
 
 .news-filters .input-field {
-    min-width: 200px;
+    min-width: 192px;
 }
 
 .news-filters select {
-    border-radius: 8px;
+    border-radius: 7.68px;
     border: 1px solid var(--border-color);
-    padding: 8px 12px;
+    padding: 7.68px 11.52px;
     background: var(--bg-secondary);
     color: var(--text-color);
-    font-size: 14px;
+    font-size: 13.44px;
 }
 
 .news-filters select:focus {
     border-color: var(--accent-color);
     outline: none;
-    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
+    box-shadow: 0 0 0 1.92px rgba(100, 181, 246, 0.2);
 }
 
 .news-filters .btn {
     background: var(--accent-color);
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 9.6px 19.2px;
+    border-radius: 7.68px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7.68px;
 }
 
 .news-filters .btn:hover {
     background: #1976d2;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transform: translateY(-0.96px);
+    box-shadow: 0 3.84px 11.52px rgba(0,0,0,0.2);
 }
 
 .news-filters .btn i {
-    font-size: 14px;
+    font-size: 13.44px;
 }
 
 .card-controls .btn-small {
@@ -4878,7 +4795,7 @@ body {
 }
 
 .weather-temp {
-    font-size: 3em;
+    font-size: 1em;
     font-weight: bold;
     margin-bottom: 10px;
 }
@@ -5409,9 +5326,9 @@ body {
     }
 }
 
-/* Enhanced News Card Styles */
 .news-card {
     display: flex;
+    flex-direction: column;
     gap: 16px;
     align-items: flex-start;
     background: var(--card-bg);
@@ -5422,7 +5339,11 @@ body {
     transition: all 0.3s ease;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    flex: 1 1 300px;
+    min-width: 260px;
+    max-width: 100%;
 }
+
 
 .news-card:hover {
     transform: translateY(-2px);
@@ -5595,3 +5516,32 @@ body.dark-theme .headline-description {
         min-height: 300px;
     }
 }
+.news-filters{
+  display: flex;
+}
+
+.finance-controls-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow-x: auto;
+}
+
+.time-range-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.finance-content{
+  padding: 10px;
+  margin: 30px;
+}
+
+.summary-container{
+  margin:20px;
+}
+
