@@ -10,8 +10,7 @@ body.dark-theme .chart-container canvas {
 .stock-dashboard,
 .stock-dashboard-grid,
 .card.chart-container {
-        width: 100% !important;
-  max-width: 100% !important;
+  width: 100% !important;
   min-width: 0;
   box-sizing: border-box;
   display: inline-block;
@@ -64,16 +63,6 @@ body.dark-theme .chart-container canvas {
   font-size: 16px;
   font-weight: bold;
   text-align: center;
-}
-
-
-.card.chart-container {
-  overflow: auto;
-  min-width: 320px;
-  min-height: 240px;
-  max-width: 1200px !important;
-  max-height: 90vh;
-    position: relative;
 }
 
 #finance .cards-container {
@@ -135,8 +124,9 @@ body.dark-theme .chart-container canvas {
 }
 
 #financeChart{
-  height: 100%;
-  width: 100%;
+  min-height:500px;
+  height: 100% !important;
+  width: 100% !important;
 }
 
 /* === Responsive Chart Buttons === */
@@ -709,6 +699,9 @@ body:not(.dark-theme) #finance .card.chart-container canvas {
   gap: 10px;
 }
 
+#watchlist-container{
+  overflow-y: scroll;
+}
 .watchlist-container {
   margin-top: 20px;
   max-height: 300px;

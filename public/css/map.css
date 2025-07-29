@@ -268,44 +268,6 @@ body.dark-theme .searchbox input[type='search']::placeholder {
 }
 
 
-
-/* --- Directions Panel Styling --- */
-#directions-panel {
-  margin-top: 1em;
-  background: #fafafa;
-  padding: 1em;
-  border-radius: 8px;
-  min-height: 60px;
-  direction: ltr;
-  color: #222;
-  font-size: 1em;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  border: 1px solid #e0e0e0;
-}
-#directions-panel .adp, #directions-panel .adp-text, #directions-panel .adp-summary, #directions-panel .adp-directions, #directions-panel .adp-distance, #directions-panel .adp-legal {
-  color: #222;
-}
-#directions-panel .adp-summary {
-  font-weight: 500;
-  margin-bottom: 0.5em;
-}
-#directions-panel .adp-directions {
-  width: 100%;
-  border-collapse: collapse;
-}
-#directions-panel .adp-directions td {
-  padding: 0.3em 0.5em;
-  vertical-align: middle;
-}
-#directions-panel .adp-marker2 {
-  filter: none;
-}
-#directions-panel .adp-legal {
-  font-size: 0.9em;
-  color: #888;
-  margin-top: 0.5em;
-}
-
 body.dark-theme #directions-panel {
   background: #23272e !important;
   color: #fff !important;
@@ -529,20 +491,6 @@ body.dark-theme .gm-bundled-control button:hover {
   border-color: #64B5F6 !important;
 }
 
-
-
-/* Traffic Section Height */
-#traffic {
-  min-height: 600px;
-  height:100%;
-  transform:none;
-}
-
-.traffic-content {
-  height:100%;
-  min-height: 550px;
-}
-
 .traffic-container {
   height:auto;
 }
@@ -571,14 +519,6 @@ body:not(.dark-theme) div[style*="background: white"],
 body:not(.dark-theme) div[style*="background: #ffffff"],
 body:not(.dark-theme) div[style*="background: #fff"] {
   background: var(--card-bg) !important;
-}
-
-/* Ensure Google Maps text is always visible */
-.gm-style *,
-div[jstcache] *,
-div[jsinstance] *,
-div[jsan] * {
-  color: inherit !important;
 }
 
 /* Specific fix for the address-line element you mentioned */
@@ -649,14 +589,7 @@ body.dark-theme div[jstcache="128"][jsinstance="0"].address-line.full-width[jsan
 .map-container .card-content {
     padding: 0;
 }
-.directions-panel {
-    max-height: 400px;
-    overflow-y: auto;
-}
 
-.directions-panel .card-content {
-    padding: 15px;
-}
 
 @media (max-width: 768px) {
     .search-container {

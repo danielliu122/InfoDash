@@ -144,7 +144,7 @@
                 </div>
               </div>
           
-              <div class="card-content">
+              <div class="card-content" id="watchlist2">
                 <!-- Stock Symbol Input -->
                 <div class="card input-card">
                   <div class="card-content">
@@ -167,11 +167,7 @@
                         <button id="maxButton" class="btn-small waves-effect waves-light time-range-button" data-time-range="max" data-interval="1mo">Max</button>
                     </div>
                   </div>
-                   
                 </div>
-
- 
-          
                 <!-- Chart Container -->
                 <div class="card chart-container">
                   <div class="card-content">
@@ -205,10 +201,25 @@
                     <div id="watchlist-container">
                       <!-- Watchlist items will be populated here -->
                     </div>
-                    <div class="watchlist-controls" style="margin-top: 10px;">
-                      <button class="btn-small waves-effect waves-light" onclick="clearWatchlist()">Clear All</button>
-                      <button class="btn-small waves-effect waves-light" onclick="resetToDefaultWatchlist()">Reset to Default</button>
+                    
+                    <!-- Stock Search -->
+                    <div class="card stock-info">
+                    <div class="card-header">
+                        <span class="card-title">Stock Search</span>
                     </div>
+                    <div class="card-content">
+                      <button onclick="searchAndAddStock()">Search</button>
+                      <div class="input-field">
+                        <input type="text" id="stockSymbolInput" placeholder="Enter stock symbol (e.g., AAPL, TSLA)">
+                        <div id="autocomplete-list" class="autocomplete-list"></div>
+                      </div>
+                        <div id="stock-info-card-container"></div>
+                        <div class="quick-actions">
+                            <button class="btn-small waves-effect waves-light" onclick="searchAndAddStock()">Search</button>
+                            <button class="btn-small waves-effect waves-light" onclick="clearWatchlist()">Clear Watchlist</button>
+                        </div>
+                    </div>
+                </div>
                   </div>
                 </div>
           
@@ -256,4 +267,15 @@
         window.handleRegionChange = handleRegionChange;
     </script>
   </body>
+  <footer class="container center-align">
+    <div class="footer-content">
+        <p>&copy; 2025 InfoDash. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="terms-of-service.html" target="_blank" class="footer-link">Terms of Service</a>
+            <span class="footer-separator">•</span>
+            <a href="privacy-policy.html" target="_blank" class="footer-link">Privacy Policy</a>
+        </div>
+        <p class="footer-disclaimer">The content provided on this website is for informational purposes only and does not constitute financial, investment, legal, or other professional advice. While we strive to provide accurate and up-to-date information, we make no guarantees about the completeness, reliability, or suitability of the content for any specific purpose.</p>
+    </div>
+</footer>
 </html>

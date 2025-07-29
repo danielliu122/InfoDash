@@ -43,22 +43,24 @@
     color: var(--primary-text);
     margin-bottom: 8px;
     line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    /* Show full title, no clamping */
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    -webkit-box-orient: unset;
   }
   
   .news-card-description {
     font-size: 0.9em;
     line-height: 1.5;
     margin-bottom: 12px;
-    display: -webkit-box;
-    -webkit-line-clamp: 5;
-    line-clamp: 5;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    /* Show full description, no clamping */
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    -webkit-box-orient: unset;
   }
   
   .news-card-meta {

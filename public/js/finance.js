@@ -1171,10 +1171,6 @@ export function selectStock(symbol) {
     handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
 }
 
-// Update autocomplete click handler (if any) to set userSelectedSymbol = true
-// If you have a function for autocomplete selection, add:
-// userSelectedSymbol = true;
-
 // Update startAutoRefresh to respect pause and user selection
 export function startAutoRefresh() {
     stopAutoRefresh(); 

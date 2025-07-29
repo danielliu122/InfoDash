@@ -167,26 +167,24 @@
               <span class="toggle-icon">−</span>
             </div>
           </div>
-      
           <div id="traffic-container" class="traffic-container">
-            <form id="directions-form" style="margin-bottom: 1em; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
-              <input id="origin-input" class="controls" type="text" placeholder="Enter origin" style="flex: 1; min-width: 180px;" required>
-              <input id="destination-input" class="controls" type="text" placeholder="Enter destination" style="flex: 1; min-width: 180px;" required>
-              <select id="travel-mode" class="controls" style="min-width: 120px;">
-                <option value="DRIVING">Driving</option>
-                <option value="WALKING">Walking</option>
-                <option value="BICYCLING">Bicycling</option>
-                <option value="TRANSIT">Transit</option>
-              </select>
-              <button type="submit" class="btn waves-effect waves-light">Get Directions</button>
-            </form>
-      
             <div class="map-container" style="position: relative; width: 100%; height: 100%; min-height: 400px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color);">
                 <div id="map" style="position: absolute"></div>
             </div>
-
-            <div id="directions-panel" style="margin-top: 1em; background: #fafafa; padding: 1em; border-radius: 8px; min-height: 60px;"></div>
           </div>
+          <div id="directions-panel" style="margin-top: 1em; background: #fafafa; padding: 1em; border-radius: 8px; min-height: 60px;">
+        </div>
+        <form id="directions-form" style="margin-bottom: 1em; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+            <input id="origin-input" class="controls" type="text" placeholder="Enter origin" style="flex: 1; min-width: 180px;" required>
+            <input id="destination-input" class="controls" type="text" placeholder="Enter destination" style="flex: 1; min-width: 180px;" required>
+            <select id="travel-mode" class="controls" style="min-width: 120px;">
+              <option value="DRIVING">Driving</option>
+              <option value="WALKING">Walking</option>
+              <option value="BICYCLING">Bicycling</option>
+              <option value="TRANSIT">Transit</option>
+            </select>
+            <button type="submit" class="btn waves-effect waves-light">Get Directions</button>
+          </form>
         </section>
       </div>
       
@@ -291,4 +289,15 @@
     <!-- Google Maps API -->
     <script async defer src="/api/googlemaps/script"></script>
     </body>
+    <footer class="container center-align">
+        <div class="footer-content">
+            <p>&copy; 2025 InfoDash. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="terms-of-service.html" target="_blank" class="footer-link">Terms of Service</a>
+                <span class="footer-separator">•</span>
+                <a href="privacy-policy.html" target="_blank" class="footer-link">Privacy Policy</a>
+            </div>
+            <p class="footer-disclaimer">The content provided on this website is for informational purposes only and does not constitute financial, investment, legal, or other professional advice. While we strive to provide accurate and up-to-date information, we make no guarantees about the completeness, reliability, or suitability of the content for any specific purpose.</p>
+        </div>
+    </footer>
 </html>
