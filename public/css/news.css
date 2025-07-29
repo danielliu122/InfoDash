@@ -8,7 +8,7 @@
   }
   
   .news-card {
-    background: var(--[secondary]-bg);
+    background: lab(90.06% -5.3 -4.59);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 0;
@@ -52,7 +52,6 @@
   
   .news-card-description {
     font-size: 0.9em;
-    color: var(--secondary-text);
     line-height: 1.5;
     margin-bottom: 12px;
     display: -webkit-box;
@@ -143,7 +142,6 @@ width: 100%;
 }
 
 .news-card {
-    background: var(--bg-card);
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -194,7 +192,6 @@ width: 100%;
     border-radius: 7.68px;
     border: 1px solid var(--border-color);
     padding: 7.68px 11.52px;
-    background: var(--bg-secondary);
     color: var(--text-color);
     font-size: 13.44px;
 }
@@ -255,7 +252,6 @@ width: 100%;
 }
 
 .news-card {
-    background: var(--bg-secondary);
     border-radius: 8px;
     padding: 15px;
     transition: transform 0.2s ease;
@@ -290,7 +286,6 @@ width: 100%;
     flex-direction: column;
     gap: 16px;
     align-items: flex-start;
-    background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 16px;

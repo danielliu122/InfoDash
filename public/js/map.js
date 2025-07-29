@@ -289,44 +289,9 @@ window.initMap = function() {
   }
 };
 
-// Add styles for the map buttons
-(function() {
-  const style = document.createElement('style');
-  style.textContent = `
-    .styled-map-btn {
-      background: #fff;
-      border: none;
-      border-radius: 24px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-      padding: 10px 18px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-      margin: 8px;
-      outline: none;
-      color: #222;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .styled-map-btn:hover, .styled-map-btn:focus {
-      background: #f5f5f5;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-      color: #1976d2;
-    }
-    .map-theme-toggle {
-      min-width: 110px;
-    }
-    .map-locate-btn {
-      font-size: 22px;
-      min-width: 48px;
-      justify-content: center;
-    }
-  `;
-  document.head.appendChild(style);
-})();
 
 // Make functions globally available
 window.applyThemeToMap = applyThemeToMap;
 window.getCurrentAppTheme = getCurrentAppTheme;
+
+style="width: 100%; height: 100%"

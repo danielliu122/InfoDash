@@ -5,17 +5,17 @@
 /* === CSS Variables === */
 
 :root {
-  --secondary-bg: #c1d5d0;
+  --primary-bg: #c9efdc;
+  --secondary-bg: #bcdad3;
   --primary-text: #212529;
   --secondary-text: #6c757d;
   --accent-color: #26a69a;
   --button-bg: #26a69a;
   --button-hover-bg: #2bbbad;
-  --border-color: #dee2e6;
   --input-bg: #ffffff;
   --input-border: #ced4da;
   --text-color: #212529;
-  --text-secondary: #6c757d;
+  --text-secondary: #000000;
   --background-color: #ffffff;
   --card-bg: #lab(90.06% -5.3 -4.59);
   --summary-card-bg: #e9ecef;
@@ -29,12 +29,16 @@
   --warning-color: #FF9800;
   --danger-color: #f44336;
   --text-primary: black;
-  --text-secondary: #b0b0b0;
   --bg-primary: #1a1a1a;
   --bg-secondary: #2d2d2d;
   --bg-card: #333333;
-  --border-color: #404040;
 }
+
+body{
+  margin:0;
+  display:flex;
+}
+
 
 body.dark-theme {
   margin:0;
@@ -73,6 +77,7 @@ body.dark-theme .stock-card .stock-change {
 
 body.dark-theme .watchlist-item {
   color: #e0e6e4 !important;
+  background-color: #121729;
 }
 
 body.dark-theme .watchlist-item .symbol,
@@ -132,7 +137,6 @@ body.dark-theme .card[data-section="daily-summary"] {
 body, html {
   font-family: 'Google Sans Text', 'Google Sans', 'Roboto', 'Noto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif !important;
     line-height: 1.6;
-  background: var(--primary-bg);
     color: var(--primary-text);
   min-height: 100vh;
   font-size: 20px;
@@ -156,13 +160,9 @@ main {
 /* === Sidebar Layout === */
 .sidebar {
     background-color:#c1d5d0;
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: var(--sidebar-width); /* e.g., 240px or 60px when collapsed */
+    width: var(--sidebar-width);
     transition: width 0.3s ease;
-    z-index: 1000;
+    background: #c1d5d0;
 }
 
 .sidebar.collapsed {
@@ -174,7 +174,6 @@ main {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
     max-height: 100px;
 }
 
@@ -239,20 +238,15 @@ main {
 }
 
 .main-content {
-    margin-left: var(--sidebar-width); /* dynamically shifts */
-    transition: margin-left 0.3s ease;
-    min-height: 100vh;
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
 }
 
 .main-content.collapsed {
     margin-left: var(--sidebar-collapsed-width);
-    width: calc(100% - var(--sidebar-collapsed-width));
 }
 
-.main-content main > * {
-    width: 100%;
-    box-sizing: border-box;
-}
+
 
 /* Dark theme adjustments */
 body.dark-theme .sidebar {
@@ -278,7 +272,6 @@ body.dark-theme .sidebar-toggle:hover {
 /* === Header & Footer === */
 header {
     text-align: center;
-    margin-bottom: 20px;
     color: var(--primary-text);
   padding: 20px 20px 0 20px;
 }
@@ -292,8 +285,7 @@ footer {
 /* === Section & Card === */
 section, .section, .summary-card, #finance, #finance .card, .news-item, .trend-card, .chart-container {
   background: var(--secondary-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+  border-radius: 8px;
   margin-bottom: 20px;
   box-sizing: border-box;
   max-height: 240px;
@@ -373,12 +365,10 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
 .top-header {
   flex-direction: row;
   background: var(--secondary-bg);
-  border-bottom: 1px solid var(--border-color);
   padding: 16px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
   height:fit-content;
 }
 
@@ -446,7 +436,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
 /* Enhanced Sidebar */
 .sidebar-footer {
   margin-top: auto;
-  padding: 16px 0;
+  padding: 5px;
   border-top: 1px solid var(--border-color);
 }
 
@@ -490,11 +480,13 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
 /* Modern Card System */
 .card {
   background: var(--secondary-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  margin-bottom: 24px;
+  border: none;
+  border-radius: 16px;
+  margin-bottom: 28px;
   overflow: hidden;
-  transition: box-shadow 0.3s ease;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1.5px 6px rgba(0,0,0,0.08);
+  transition: box-shadow 0.3s cubic-bezier(.4,0,.2,1), transform 0.2s cubic-bezier(.4,0,.2,1);
+  will-change: box-shadow, transform;
 }
 
 .card:hover {
@@ -612,9 +604,6 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   }
 }
 
-.news-card{
-  color: var(--primary-bg);
-}
 /* Legacy responsive styles */
 @media (max-width: 768px) {
   .container {
@@ -811,47 +800,6 @@ body:not(.dark-theme) #summary-content-container .archive-row ul li .collapsible
 
 
 
-/* === DESKTOP: LIVE STOCK DASHBOARD MODULES HALF WIDTH === */
-@media (min-width: 1000px) {
-  #finance .cards-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-
-  #finance .cards-container .card {
-    margin: 0;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  /* Make specific cards span both columns if needed */
-  #finance .cards-container .card.chart-container,
-  #finance .cards-container .finance-bottom-row {
-    grid-column: span 2;
-  }
-
-  body:not(.dark-theme) #finance .cards-container .card.chart-container,
-  #finance .cards-container .finance-bottom-row {
-    background: lab(90.06% -5.3 -4.59)!important;
-  }
-
-  .section {
-    max-height: 600px;
-  }
-
-  .summary-card,
-  .news-item,
-  .trend-card,
-  #finance .card {
-    padding: 16px !important;
-    margin-bottom: 0 !important; /* Let the gap handle spacing */
-    border: 1px solid #333 !important;
-    border-radius: 8px !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  }
-}
-
 
 body.dark-theme input,
 body.dark-theme select,
@@ -894,7 +842,6 @@ body.dark-theme .stock-card {
     position: relative;
 }
 .card .card-controls {
-    position: absolute;
   top: 8px;
   right: 12px;
     display: flex;
@@ -916,7 +863,6 @@ body.dark-theme .stock-card {
 
 #autocomplete-list {
   background: #f5f7fa;
-  border: 1px solid #bdbdbd;
   border-radius: 0 0 8px 8px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
   z-index: 10;
@@ -1522,7 +1468,6 @@ body:not(.dark-theme) ::-webkit-scrollbar-track {
 body:not(.dark-theme) ::-webkit-scrollbar-thumb {
   background: #c1d5d0;
   border-radius: 6px;
-  border: 2px solid lab(90.06% -5.3 -4.59);
 }
 
 body:not(.dark-theme) ::-webkit-scrollbar-thumb:hover {
@@ -1599,7 +1544,6 @@ body:not(.dark-theme) * {
 .stock-card {
     transition: all 0.3s ease;
     border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .stock-card:hover {
@@ -1673,7 +1617,6 @@ body:not(.dark-theme) * {
 /* Dark theme enhancements */
 .dark-theme .card {
     background: rgba(30, 30, 30, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .dark-theme .btn {
@@ -1719,38 +1662,6 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: rgb(208, 222, 219);
     overflow-x: hidden;
-}
-
-.sidebar-header {
-    padding: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.sidebar-title {
-    font-size: 1.2em;
-    font-weight: 600;
-    margin: 0;
-}
-
-.sidebar-toggle {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 5px;
-    transition: background 0.3s ease;
-}
-
-.sidebar-toggle:hover {
-    background: rgba(255,255,255,0.1);
-}
-
-.sidebar-nav {
-    flex: 1;
-    padding: 20px 0;
 }
 
 /* Desktop by default */
@@ -1812,11 +1723,9 @@ body {
 }
 
 .sidebar-footer {
-    padding: 20px;
     border-top: 1px solid rgba(255,255,255,0.1);
     position: absolute;
     bottom: 0;
-    width: 90%;
 }
 
 .user-info {
@@ -1856,14 +1765,11 @@ body {
 
 /* Top Header */
 .top-header {
-    border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
     position: sticky;
-    top: 0;
-    z-index: 100;
 }
 
 .menu-toggle {
@@ -2042,7 +1948,6 @@ body {
     color: var(--text-primary);
     text-decoration: none;
     transition: all 0.3s ease;
-    border: 1px solid var(--border-color);
 }
 
 .action-btn:hover {
@@ -2097,12 +2002,6 @@ body {
     100% { opacity: 1; }
 }
 
-/* Enhanced card styling */
-.card {
-    transition: all 0.3s ease;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
 
 .card:hover {
     transform: translateY(-2px);
@@ -2224,7 +2123,6 @@ body {
 .card-controls .btn-small {
     background: var(--bg-secondary);
     color: var(--text-color);
-    border: 1px solid var(--border-color);
     padding: 6px 12px;
     border-radius: 6px;
     font-size: 12px;
@@ -2242,7 +2140,6 @@ body {
     transform: translateY(-1px);
 }
 
-.news-headlines,
 .trending-topics,
 .reddit-section {
     background: var(--card-bg);
@@ -2250,7 +2147,6 @@ body {
     padding: 24px;
     margin-bottom: 24px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border: 1px solid var(--border-color);
 }
 
 .news-headlines .card-header,
@@ -2425,8 +2321,9 @@ body {
   margin-top: 10px;
 }
 
-.summary-container{
-  margin:20px;
+.summary-container {
+  margin: 20px;
+  margin-top: 0;
 }
 
 /* Mobile sidebar as horizontal bar */
@@ -2556,4 +2453,3 @@ body {
     color: white;
   }
 }
-

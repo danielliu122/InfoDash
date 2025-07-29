@@ -159,7 +159,7 @@
         </div>
     </header>
         
-    <div class="card traffic-content">
+    <div class="traffic-content">
         <section id="traffic" class="section card">
           <div class="section-header card-header">
             <h4>Google Maps Traffic</h4>
@@ -168,7 +168,7 @@
             </div>
           </div>
       
-          <div id="traffic-content" class="section-content card-content">
+          <div id="traffic-content" class="section-content">
             <form id="directions-form" style="margin-bottom: 1em; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
               <input id="origin-input" class="controls" type="text" placeholder="Enter origin" style="flex: 1; min-width: 180px;" required>
               <input id="destination-input" class="controls" type="text" placeholder="Enter destination" style="flex: 1; min-width: 180px;" required>
@@ -181,7 +181,8 @@
               <button type="submit" class="btn waves-effect waves-light">Get Directions</button>
             </form>
       
-            <div id="map" style="height: 400px; width: 100%;"></div>
+            <div id="map" style="width: auto; height: auto;"></div>
+
             <div id="directions-panel" style="margin-top: 1em; background: #fafafa; padding: 1em; border-radius: 8px; min-height: 60px;"></div>
           </div>
         </section>

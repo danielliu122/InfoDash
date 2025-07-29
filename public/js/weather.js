@@ -93,13 +93,43 @@ export async function updateSummaryWeather() {
     }
     const now = new Date();
     const timestamp = now.toLocaleTimeString('en-US', { hour12: true, hour: 'numeric', minute: '2-digit', second: '2-digit' });
-    weatherSummaryContainer.querySelector('.weather-location').innerHTML = `<h4>📍 ${locationDisplay}</h4>`;
-    weatherSummaryContainer.querySelector('.weather-updated').innerHTML = `<div style="font-size: 0.8em; color: var(--text-secondary); text-align: right;">🕐 Updated: ${timestamp}</div>`;
-    weatherSummaryContainer.querySelector('.weather-condition').textContent = current.condition;
-    weatherSummaryContainer.querySelector('.weather-temp').textContent = `Temperature: ${current.temperature}°${current.temperatureUnit}`;
-    weatherSummaryContainer.querySelector('.weather-feelslike').textContent = `Feels like: ${current.feelslike}°${current.temperatureUnit}`;
-    weatherSummaryContainer.querySelector('.weather-humidity').textContent = `Humidity: ${current.humidity}%`;
-    weatherSummaryContainer.querySelector('.weather-wind').textContent = `Wind: ${wind} ${windUnit}`;
+
+    // --- FIX: Add icon element for weather condition in summary ---
+    // The markup in index.html does not include a dedicated icon element in .weather-info.
+    // We'll inject the icon as the first child, or as part of the .weather-condition element.
+
+    // Option 1: Add a .weather-icon span before the condition text
+    const weatherConditionElem = weatherSummaryContainer.querySelector('.weather-condition');
+    if (weatherConditionElem) {
+        const icon = getWeatherIcon(current.condition || current.skytext);
+        weatherConditionElem.innerHTML = `<span class="weather-icon" style="font-size:2em;vertical-align:middle;">${icon}</span> <span>${current.condition}</span>`;
+    }
+
+    // The rest of the fields
+    const weatherLocationElem = weatherSummaryContainer.querySelector('.weather-location');
+    if (weatherLocationElem) {
+        weatherLocationElem.innerHTML = `<h4>📍 ${locationDisplay}</h4>`;
+    }
+    const weatherUpdatedElem = weatherSummaryContainer.querySelector('.weather-updated');
+    if (weatherUpdatedElem) {
+        weatherUpdatedElem.innerHTML = `<div style="font-size: 0.8em; color: var(--text-secondary); text-align: right;">🕐 Updated: ${timestamp}</div>`;
+    }
+    const weatherTempElem = weatherSummaryContainer.querySelector('.weather-temp');
+    if (weatherTempElem) {
+        weatherTempElem.textContent = `Temperature: ${current.temperature}°${current.temperatureUnit}`;
+    }
+    const weatherFeelslikeElem = weatherSummaryContainer.querySelector('.weather-feelslike');
+    if (weatherFeelslikeElem) {
+        weatherFeelslikeElem.textContent = `Feels like: ${current.feelslike}°${current.temperatureUnit}`;
+    }
+    const weatherHumidityElem = weatherSummaryContainer.querySelector('.weather-humidity');
+    if (weatherHumidityElem) {
+        weatherHumidityElem.textContent = `Humidity: ${current.humidity}%`;
+    }
+    const weatherWindElem = weatherSummaryContainer.querySelector('.weather-wind');
+    if (weatherWindElem) {
+        weatherWindElem.textContent = `Wind: ${wind} ${windUnit}`;
+    }
 }
 
 export async function initializeWeatherAutoRefresh() {

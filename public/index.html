@@ -35,15 +35,51 @@
     <script type="module" src="js/summary.js"></script>
     <script type="module" src="js/weather.js"></script>
     </head>
-        <body class="dark-theme">
-    <!-- Sidebar Navigation -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <button class="sidebar-toggle" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <!-- Nav for mobile: placed between toggle and title, hidden on desktop via CSS -->
-            <nav class="sidebar-nav mobile-nav" id="mobile-nav">
+
+    <body class="dark-theme">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <!-- Nav for mobile: placed between toggle and title, hidden on desktop via CSS -->
+                <nav class="sidebar-nav mobile-nav" id="mobile-nav">
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="index.html" class="nav-link active">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="finance.html" class="nav-link">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Finance</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="news.html" class="nav-link">
+                                <i class="fas fa-newspaper"></i>
+                                <span>News</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="map.html" class="nav-link">
+                                <i class="fas fa-map"></i>
+                                <span>Traffic</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="sidebar-title" id="sidebar-title">
+                    <i class="fas fa-rocket" style="color: #f44336;"></i>
+                    <span>InfoDash</span>
+                </div>
+            </div>
+            
+            <!-- Nav for desktop: hidden on mobile via CSS -->
+            <nav class="sidebar-nav" id="desktop-nav">
                 <ul class="nav-menu">
                     <li class="nav-item">
                         <a href="index.html" class="nav-link active">
@@ -71,371 +107,412 @@
                     </li>
                 </ul>
             </nav>
-            <div class="sidebar-title" id="sidebar-title">
-                <i class="fas fa-rocket" style="color: #f44336;"></i>
-                <span>InfoDash</span>
-            </div>
-        </div>
-        
-        <!-- Nav for desktop: hidden on mobile via CSS -->
-        <nav class="sidebar-nav" id="desktop-nav">
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="index.html" class="nav-link active">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="finance.html" class="nav-link">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Finance</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="news.html" class="nav-link">
-                        <i class="fas fa-newspaper"></i>
-                        <span>News</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="map.html" class="nav-link">
-                        <i class="fas fa-map"></i>
-                        <span>Traffic</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-        
-        <div class="sidebar-footer">
-            <div class="user-info">
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">Guest User</div>
+                        <div class="user-status">Free Plan</div>
+                    </div>
                 </div>
-                <div class="user-details">
-                    <div class="user-name">Guest User</div>
-                    <div class="user-status">Free Plan</div>
+            </div>  
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main class="main-content" id="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h4 class="page-title">Dashboard</h4>
                 </div>
-            </div>
-        </div>  
-    </div>
+                <div class="header-right">
+                    <!-- Weather Display -->
+                    <div id="header-weather" class="weather-display" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color); min-width: 120px; justify-content: center;" onclick="handleWeatherClick()" title="Click to change location">
+                        <span id="weather-icon" style="font-size: 1.2em;">🌤️</span>
+                            <span id="weather-temp" style="font-weight: 600; font-size: 0.9em;">--°F</span>
+                            <span id="weather-location" style="font-size: 0.7em; color: var(--text-secondary);">Loading...</span>
+                    </div>
+                    <div class="language-selector">
+                        <select id="regionSelect" onchange="handleRegionChange()">
+                            <option value="en-US" data-language="en" data-country="US">🇺🇸 United States (English)</option>
+                            <option value="en-GB" data-language="en" data-country="GB">🇬🇧 United Kingdom (English)</option>
+                            <option value="en-CA" data-language="en" data-country="CA">🇨🇦 Canada (English)</option>
+                            <option value="en-AU" data-language="en" data-country="AU">🇦🇺 Australia (English)</option>
+                            <option value="es-ES" data-language="es" data-country="ES">🇪🇸 España (Español)</option>
+                            <option value="es-MX" data-language="es" data-country="MX">🇲🇽 México (Español)</option>
+                            <option value="fr-FR" data-language="fr" data-country="FR">🇫🇷 France (Français)</option>
+                            <option value="de-DE" data-language="de" data-country="DE">🇩🇪 Deutschland (Deutsch)</option>
+                            <option value="pt-BR" data-language="pt" data-country="BR">🇧🇷 Brasil (Português)</option>
+                            <option value="it-IT" data-language="it" data-country="IT">🇮🇹 Italia (Italiano)</option>
+                            <option value="ru-RU" data-language="ru" data-country="RU">🇷🇺 Россия (Русский)</option>
+                            <option value="jp-JP" data-language="jp" data-country="JP">🇯🇵 日本 (日本語)</option>
+                            <option value="ko-KR" data-language="ko" data-country="KR">🇰🇷 한국 (한국어)</option>
+                            <option value="zh-CN" data-language="zh" data-country="CN">🇨🇳 中国 (中文)</option>
+                            <option value="ar-SA" data-language="ar" data-country="SA">🇸🇦 السعودية (العربية)</option>
+                            <option value="hi-IN" data-language="hi" data-country="IN">🇮🇳 भारत (हिन्दी)</option>
+                            <option value="vi-VN" data-language="vi" data-country="VN">🇻🇳 Việt Nam (Tiếng Việt)</option>
+                            <option value="th-TH" data-language="th" data-country="TH">🇹🇭 ไทย (ไทย)</option>
+                            <option value="id-ID" data-language="id" data-country="ID">🇮🇩 Indonesia (Bahasa Indonesia)</option>
+                            <option value="tr-TR" data-language="tr" data-country="TR">🇹🇷 Türkiye (Türkçe)</option>
+                            <option value="pl-PL" data-language="pl" data-country="PL">🇵🇱 Polska (Polski)</option>
+                            <option value="nl-NL" data-language="nl" data-country="NL">🇳🇱 Nederland (Nederlands)</option>
+                            <option value="sv-SE" data-language="sv" data-country="SE">🇸🇪 Sverige (Svenska)</option>
+                            <option value="no-NO" data-language="no" data-country="NO">🇳🇴 Norge (Norsk)</option>
+                            <option value="fi-FI" data-language="fi" data-country="FI">🇫🇮 Suomi (Suomi)</option>
+                            <option value="da-DK" data-language="da" data-country="DK">🇩🇰 Danmark (Dansk)</option>
+                            <option value="cs-CZ" data-language="cs" data-country="CZ">🇨🇿 Česko (Čeština)</option>
+                            <option value="hu-HU" data-language="hu" data-country="HU">🇭🇺 Magyarország (Magyar)</option>
+                            <option value="el-GR" data-language="el" data-country="GR">🇬🇷 Ελλάδα (Ελληνικά)</option>
+                            <option value="ro-RO" data-language="ro" data-country="RO">🇷🇴 România (Română)</option>
+                            <option value="uk-UA" data-language="uk" data-country="UA">🇺🇦 Україна (Українська)</option>
+                            <option value="he-IL" data-language="he" data-country="IL">🇮🇱 ישראל (עברית)</option>
+                            <option value="fa-IR" data-language="fa" data-country="IR">🇮🇷 ایران (فارسی)</option>
+                            <option value="bn-BD" data-language="bn" data-country="BD">🇧🇩 বাংলাদেশ (বাংলা)</option>
+                            <option value="ml-IN" data-language="ml" data-country="IN">🇮🇳 കേരളം (മലയാളം)</option>
+                            <option value="ne-NP" data-language="ne" data-country="NP">🇳🇵 नेपाल (नेपाली)</option>
+                            <option value="az-AZ" data-language="az" data-country="AZ">🇦🇿 Azərbaycan (Azərbaycan dili)</option>
+                            <option value="ka-GE" data-language="ka" data-country="GE">🇬🇪 საქართველო (ქართული)</option>
+                            <option value="sr-RS" data-language="sr" data-country="RS">🇷🇸 Србија (Српски)</option>
+                            <option value="mk-MK" data-language="mk" data-country="MK">🇲🇰 Македонија (Македонски)</option>
+                            <option value="sl-SI" data-language="sl" data-country="SI">🇸🇮 Slovenija (Slovenščina)</option>
+                            <option value="sk-SK" data-language="sk" data-country="SK">🇸🇰 Slovensko (Slovenčina)</option>
+                            <option value="et-EE" data-language="et" data-country="EE">🇪🇪 Eesti (Eesti)</option>
+                            <option value="is-IS" data-language="is" data-country="IS">🇮🇸 Ísland (Íslenska)</option>
+                        </select>
+                    </div>
+                    <button class="theme-toggle" id="themeToggle">🌓</button>
+                </div>
+            </header>
+        <div class="summary-container" >
+            <!-- Unified Summary Section -->
+            <div class="row">
+                <div class="col s12">
+                    <div id="summary-section" class="card sumary-content">
+                        <div class="card-header">
+                            <h4>📊Summary Date: <span id="titleDate"></span></h4>
+                            <div class="right">
+                                <div class="section-controls">
+                                    <button id="summary-refresh-btn" class="btn-small waves-effect waves-light" onclick="refreshSummary()">🔄 Refresh</button>
+                                </div>
+                            </div>
+                            <div class="section-toggle" onclick="toggleSection('summary-content-container')" title="Show/Hide Section">
+                                <span class="toggle-icon">−</span>
+                            </div>
+                        </div>
 
-    <!-- Main Content Area -->
-    <div class="main-content" id="main-content">
-        <!-- Top Header -->
-        <header class="top-header">
-            <div class="header-left">
-                <h4 class="page-title">Dashboard</h4>
-            </div>
-            <div class="header-right">
-                <!-- Weather Display -->
-                <div id="header-weather" class="weather-display" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color); min-width: 120px; justify-content: center;" onclick="handleWeatherClick()" title="Click to change location">
-                    <span id="weather-icon" style="font-size: 1.2em;">🌤️</span>
-                        <span id="weather-temp" style="font-weight: 600; font-size: 0.9em;">--°F</span>
-                        <span id="weather-location" style="font-size: 0.7em; color: var(--text-secondary);">Loading...</span>
+                        <div id="summary-content-container" class="section-content">
+                            <!-- Summary Display -->
+                            <div class="summary-loading">
+                                <div class="progress">
+                                    <div class="indeterminate"></div>
+                                </div>
+                                <p class="center-align" id="summary-loading-text">Loading today's summary...</p>
+                            </div>
+                            <div class="summary-content" style="display: none;">
+                                <!-- Summary cards will be here -->
+                                <div class="row">
+                                    <div class="col s12 m4">
+                                        <div class="summary-card news-summary">
+                                            <h5 style="margin-top: 5px;">📰 Top Headlines</h5>
+                                            <div class="summary-text"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col s12 m4">
+                                        <div class="summary-card trends-summary">
+                                            <h5 style="margin-top: 5px;">🔥 Trending Topics</h5>
+                                            <div class="summary-text"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col s12 m4">
+                                        <div class="summary-card finance-summary">
+                                            <h5 style="margin-top: 5px;">📈 Market Overview</h5>
+                                            <div class="summary-text"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s12 m6">
+                                        <div class="summary-card overall-summary">
+                                            <h5 style="margin-top: 5px;">🧞 Info Genie</h5>
+                                            <div class="summary-text"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Archive List (Collapsible) -->
+                            <div class="row archive-row">
+                                <div class="col s12">
+                                    <div class="collapsible-header"><i class="material-icons">archive</i>Summary Archive</div>
+                                    <div class="card summary-archive">
+                                        <div class="card-controls">
+                                            <div class="input-field col s12 m4">
+                                                <input type="date" id="summaryDate" onchange="loadSummaryForDate()">
+                                                <label for="summaryDate" class="active">Select Date</label>
+                                            </div>
+                                            <div class="input-field col s12 m4">
+                                                <select id="summaryRegionSelect" onchange="loadSummaryForDate()">
+                                                    <option value="en-US" data-language="en" data-country="US">🇺🇸 United States (English)</option>
+                                                    <option value="en-GB" data-language="en" data-country="GB">🇬🇧 United Kingdom (English)</option>
+                                                    <option value="en-CA" data-language="en" data-country="CA">🇨🇦 Canada (English)</option>
+                                                    <option value="en-AU" data-language="en" data-country="AU">🇦🇺 Australia (English)</option>
+                                                    <option value="es-ES" data-language="es" data-country="ES">🇪🇸 España (Español)</option>
+                                                    <option value="es-MX" data-language="es" data-country="MX">🇲🇽 México (Español)</option>
+                                                    <option value="fr-FR" data-language="fr" data-country="FR">🇫🇷 France (Français)</option>
+                                                    <option value="de-DE" data-language="de" data-country="DE">🇩🇪 Deutschland (Deutsch)</option>
+                                                    <option value="pt-BR" data-language="pt" data-country="BR">🇧🇷 Brasil (Português)</option>
+                                                    <option value="it-IT" data-language="it" data-country="IT">🇮🇹 Italia (Italiano)</option>
+                                                    <option value="ru-RU" data-language="ru" data-country="RU">🇷🇺 Россия (Русский)</option>
+                                                    <option value="jp-JP" data-language="jp" data-country="JP">🇯�� 日本 (日本語)</option>
+                                                    <option value="ko-KR" data-language="ko" data-country="KR">🇰🇷 한국 (한국어)</option>
+                                                    <option value="zh-CN" data-language="zh" data-country="CN">🇨🇳 中国 (中文)</option>
+                                                    <option value="ar-SA" data-language="ar" data-country="SA">🇸🇦 السعودية (العربية)</option>
+                                                    <option value="hi-IN" data-language="hi" data-country="IN">🇮🇳 भारत (हिन्दी)</option>
+                                                    <option value="vi-VN" data-language="vi" data-country="VN">🇻🇳 Việt Nam (Tiếng Việt)</option>
+                                                    <option value="th-TH" data-language="th" data-country="TH">🇹🇭 ไทย (ไทย)</option>
+                                                    <option value="id-ID" data-language="id" data-country="ID">🇮🇩 Indonesia (Bahasa Indonesia)</option>
+                                                    <option value="tr-TR" data-language="tr" data-country="TR">🇹🇷 Türkiye (Türkçe)</option>
+                                                    <option value="pl-PL" data-language="pl" data-country="PL">🇵🇱 Polska (Polski)</option>
+                                                    <option value="nl-NL" data-language="nl" data-country="NL">🇳🇱 Nederland (Nederlands)</option>
+                                                    <option value="sv-SE" data-language="sv" data-country="SE">🇸🇪 Sverige (Svenska)</option>
+                                                    <option value="no-NO" data-language="no" data-country="NO">🇳🇴 Norge (Norsk)</option>
+                                                    <option value="fi-FI" data-language="fi" data-country="FI">🇫🇮 Suomi (Suomi)</option>
+                                                    <option value="da-DK" data-language="da" data-country="DK">🇩🇰 Danmark (Dansk)</option>
+                                                    <option value="cs-CZ" data-language="cs" data-country="CZ">🇨🇿 Česko (Čeština)</option>
+                                                    <option value="hu-HU" data-language="hu" data-country="HU">🇭🇺 Magyarország (Magyar)</option>
+                                                    <option value="el-GR" data-language="el" data-country="GR">🇬🇷 Ελλάδα (Ελληνικά)</option>
+                                                    <option value="ro-RO" data-language="ro" data-country="RO">🇷🇴 România (Română)</option>
+                                                    <option value="uk-UA" data-language="uk" data-country="UA">🇺🇦 Україна (Українська)</option>
+                                                    <option value="he-IL" data-language="he" data-country="IL">🇮🇱 ישראל (עברית)</option>
+                                                    <option value="fa-IR" data-language="fa" data-country="IR">🇮🇷 ایران (فارسی)</option>
+                                                    <option value="bn-BD" data-language="bn" data-country="BD">🇧🇩 বাংলাদেশ (বাংলা)</option>
+                                                    <option value="ml-IN" data-language="ml" data-country="IN">🇮🇳 കേരളം (മലയാളം)</option>
+                                                    <option value="ne-NP" data-language="ne" data-country="NP">🇳🇵 नेपाल (नेपाली)</option>
+                                                    <option value="az-AZ" data-language="az" data-country="AZ">🇦🇿 Azərbaycan (Azərbaycan dili)</option>
+                                                    <option value="ka-GE" data-language="ka" data-country="GE">🇬🇪 საქართველო (ქართული)</option>
+                                                    <option value="sr-RS" data-language="sr" data-country="RS">🇷🇸 Србија (Српски)</option>
+                                                    <option value="mk-MK" data-language="mk" data-country="MK">🇲🇰 Македонија (Македонски)</option>
+                                                    <option value="sl-SI" data-language="sl" data-country="SI">🇸🇮 Slovenija (Slovenščina)</option>
+                                                    <option value="sk-SK" data-language="sk" data-country="SK">🇸🇰 Slovensko (Slovenčina)</option>
+                                                    <option value="et-EE" data-language="et" data-country="EE">🇪🇪 Eesti (Eesti)</option>
+                                                    <option value="is-IS" data-language="is" data-country="IS">🇮🇸 Ísland (Íslenska)</option>
+                                                </select>
+                                                Select Region
+                                            </div>
+                                            <div class="input-field col s12 m4">
+                                                <button class="btn-small waves-effect waves-light" onclick="loadSummaryForDate()">
+                                                    <i class="material-icons">search</i> Load Summary
+                                                </button>
+                                                <button class="btn-small waves-effect waves-light" onclick="refreshSummaryArchive()" style="margin-left: 10px;">
+                                                    <i class="material-icons">refresh</i> Refresh List
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="saved-summaries-list" class="saved-summaries-container">
+                                            <p class="empty-state">No past summaries found.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- AI Disclaimer -->
+                            <div class="row">
+                                <div class="col s12">
+                                    <p style="font-style: italic; color: #9e9e9e; font-size: 0.85em; text-align: center; margin-top: 20px; margin-bottom: 0;">
+                                        ⚠️ This summary is AI-generated for informational purposes only and should not be considered as financial, legal, or professional advice.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
                 </div>
-                <div class="language-selector">
-                    <select id="regionSelect" onchange="handleRegionChange()">
-                        <option value="en-US" data-language="en" data-country="US">🇺🇸 United States (English)</option>
-                        <option value="en-GB" data-language="en" data-country="GB">🇬🇧 United Kingdom (English)</option>
-                        <option value="en-CA" data-language="en" data-country="CA">🇨🇦 Canada (English)</option>
-                        <option value="en-AU" data-language="en" data-country="AU">🇦🇺 Australia (English)</option>
-                        <option value="es-ES" data-language="es" data-country="ES">🇪🇸 España (Español)</option>
-                        <option value="es-MX" data-language="es" data-country="MX">🇲🇽 México (Español)</option>
-                        <option value="fr-FR" data-language="fr" data-country="FR">🇫🇷 France (Français)</option>
-                        <option value="de-DE" data-language="de" data-country="DE">🇩🇪 Deutschland (Deutsch)</option>
-                        <option value="pt-BR" data-language="pt" data-country="BR">🇧🇷 Brasil (Português)</option>
-                        <option value="it-IT" data-language="it" data-country="IT">🇮🇹 Italia (Italiano)</option>
-                        <option value="ru-RU" data-language="ru" data-country="RU">🇷🇺 Россия (Русский)</option>
-                        <option value="jp-JP" data-language="jp" data-country="JP">🇯🇵 日本 (日本語)</option>
-                        <option value="ko-KR" data-language="ko" data-country="KR">🇰🇷 한국 (한국어)</option>
-                        <option value="zh-CN" data-language="zh" data-country="CN">🇨🇳 中国 (中文)</option>
-                        <option value="ar-SA" data-language="ar" data-country="SA">🇸🇦 السعودية (العربية)</option>
-                        <option value="hi-IN" data-language="hi" data-country="IN">🇮🇳 भारत (हिन्दी)</option>
-                        <option value="vi-VN" data-language="vi" data-country="VN">🇻🇳 Việt Nam (Tiếng Việt)</option>
-                        <option value="th-TH" data-language="th" data-country="TH">🇹🇭 ไทย (ไทย)</option>
-                        <option value="id-ID" data-language="id" data-country="ID">🇮🇩 Indonesia (Bahasa Indonesia)</option>
-                        <option value="tr-TR" data-language="tr" data-country="TR">🇹🇷 Türkiye (Türkçe)</option>
-                        <option value="pl-PL" data-language="pl" data-country="PL">🇵🇱 Polska (Polski)</option>
-                        <option value="nl-NL" data-language="nl" data-country="NL">🇳🇱 Nederland (Nederlands)</option>
-                        <option value="sv-SE" data-language="sv" data-country="SE">🇸🇪 Sverige (Svenska)</option>
-                        <option value="no-NO" data-language="no" data-country="NO">🇳🇴 Norge (Norsk)</option>
-                        <option value="fi-FI" data-language="fi" data-country="FI">🇫🇮 Suomi (Suomi)</option>
-                        <option value="da-DK" data-language="da" data-country="DK">🇩🇰 Danmark (Dansk)</option>
-                        <option value="cs-CZ" data-language="cs" data-country="CZ">🇨🇿 Česko (Čeština)</option>
-                        <option value="hu-HU" data-language="hu" data-country="HU">🇭🇺 Magyarország (Magyar)</option>
-                        <option value="el-GR" data-language="el" data-country="GR">🇬🇷 Ελλάδα (Ελληνικά)</option>
-                        <option value="ro-RO" data-language="ro" data-country="RO">🇷🇴 România (Română)</option>
-                        <option value="uk-UA" data-language="uk" data-country="UA">🇺🇦 Україна (Українська)</option>
-                        <option value="he-IL" data-language="he" data-country="IL">🇮🇱 ישראל (עברית)</option>
-                        <option value="fa-IR" data-language="fa" data-country="IR">🇮🇷 ایران (فارسی)</option>
-                        <option value="bn-BD" data-language="bn" data-country="BD">🇧🇩 বাংলাদেশ (বাংলা)</option>
-                        <option value="ml-IN" data-language="ml" data-country="IN">🇮🇳 കേരളം (മലയാളം)</option>
-                        <option value="ne-NP" data-language="ne" data-country="NP">🇳🇵 नेपाल (नेपाली)</option>
-                        <option value="az-AZ" data-language="az" data-country="AZ">🇦🇿 Azərbaycan (Azərbaycan dili)</option>
-                        <option value="ka-GE" data-language="ka" data-country="GE">🇬🇪 საქართველო (ქართული)</option>
-                        <option value="sr-RS" data-language="sr" data-country="RS">🇷🇸 Србија (Српски)</option>
-                        <option value="mk-MK" data-language="mk" data-country="MK">🇲🇰 Македонија (Македонски)</option>
-                        <option value="sl-SI" data-language="sl" data-country="SI">🇸🇮 Slovenija (Slovenščina)</option>
-                        <option value="sk-SK" data-language="sk" data-country="SK">🇸🇰 Slovensko (Slovenčina)</option>
-                        <option value="et-EE" data-language="et" data-country="EE">🇪🇪 Eesti (Eesti)</option>
-                        <option value="is-IS" data-language="is" data-country="IS">🇮🇸 Ísland (Íslenska)</option>
-                    </select>
+                <div class="card weather-summary">
+                    <h5>🌤️ Weather Update
+                        <button onclick="showLocationModal()" class="btn-small waves-effect waves-light" style="margin-left: 10px; font-size: 0.8em;">📍 Set Location</button>
+                        <button onclick="updateHeaderWeather(); updateSummaryWeather();" class="btn-small waves-effect waves-light" style="margin-left: 10px; font-size: 0.8em;">🔄 Update Weather</button>
+                    </h5>
+                    <div class="weather-info">
+                        <div class="weather-location"></div>
+                        <div class="weather-updated"></div>
+                        <p class="weather-condition"></p>
+                        <p class="weather-temp"></p>
+                        <p class="weather-feelslike"></p>
+                        <p class="weather-humidity"></p>
+                        <p class="weather-wind"></p>
+                    </div>
                 </div>
-                <button class="theme-toggle" id="themeToggle">🌓</button>
             </div>
-        </header>
-    
-    <main class="summary-container" >
-        <!-- Unified Summary Section -->
-        <div class="row">
-            <div class="col s12">
-                <div id="summary-section" class="card sumary-content">
+
+            <!-- Hidden sections for data generation (not visible to users) -->
+            <div style="display: none;">
+                <!-- News Section (Hidden) -->
+                <section id="news" class="section">
                     <div class="section-header">
-                        <h4>📊Summary Date: <span id="titleDate"></span></h4>
-                        <div class="right">
-                            <div class="section-controls">
-                                <button id="summary-refresh-btn" class="btn-small waves-effect waves-light" onclick="refreshSummary()">🔄 Refresh</button>
-                            </div>
+                        <h4>📰 News</h4>
+                    </div>
+                    <div id="news-controls" class="row">
+                        <div class="input-field col s6">
+                            <select id="countrySelect">
+                                <option value="US">United States</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="CA">Canada</option>
+                                <option value="AU">Australia</option>
+                                <option value="DE">Germany</option>
+                                <option value="FR">France</option>
+                                <option value="JP">Japan</option>
+                                <option value="IN">India</option>
+                                <option value="BR">Brazil</option>
+                                <option value="KR">South Korea</option>
+                                <option value="IT">Italy</option>
+                                <option value="ES">Spain</option>
+                                <option value="MX">Mexico</option>
+                                <option value="RU">Russia</option>
+                            </select>
+                            <label for="countrySelect">Country</label>
                         </div>
-                        <div class="section-toggle" onclick="toggleSection('summary-content-container')" title="Show/Hide Section">
-                            <span class="toggle-icon">−</span>
+                        <div class="input-field col s6">
+                            <select id="languageSelect">
+                                <option value="en">English</option>
+                                <option value="es">Español</option>
+                                <option value="fr">Français</option>
+                                <option value="de">Deutsch</option>
+                                <option value="ru">Русский</option>
+                                <option value="zh">中文</option>
+                                <option value="jp">日本語</option>
+                                <option value="ko">한국어</option>
+                                <option value="pt">Português</option>
+                                <option value="ar">العربية</option>
+                                <option value="hi">हिन्दी</option>
+                                <option value="it">Italiano</option>
+                            </select>
+                            <label for="languageSelect">Language</label>
                         </div>
                     </div>
+                    <div class="data-container"></div>
+                </section>
 
-                    <div id="summary-content-container" class="section-content">
-                        <!-- Summary Display -->
-                        <div class="summary-loading">
-                            <div class="progress">
-                                <div class="indeterminate"></div>
-                            </div>
-                            <p class="center-align" id="summary-loading-text">Loading today's summary...</p>
+                <!-- Finance Section (Hidden) -->
+                <section id="finance" class="section">
+                    <div class="section-header">
+                        <h4>📈 Finance</h4>
+                    </div>
+                    <div class="input-field">
+                        <input type="text" id="stockSymbolInput" placeholder="Enter stock symbol (e.g., AAPL)">
+                        <label for="stockSymbolInput">Stock Symbol</label>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="stockChart"></canvas>
+                    </div>
+                    <div class="data-container"></div>
+                    <div id="stock-dashboard" class="stock-dashboard"></div>
+                </section>
+
+                <!-- Trends Section (Hidden) -->
+                <section id="trends" class="section">
+                    <div class="section-header">
+                        <h4>🔥 Trends</h4>
+                    </div>
+                    <div id="trends-controls" class="row">
+                        <div class="input-field col s6">
+                            <select id="trendsCountrySelect">
+                                <option value="US">United States</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="CA">Canada</option>
+                                <option value="AU">Australia</option>
+                                <option value="DE">Germany</option>
+                                <option value="FR">France</option>
+                                <option value="JP">Japan</option>
+                                <option value="IN">India</option>
+                                <option value="BR">Brazil</option>
+                                <option value="KR">South Korea</option>
+                                <option value="IT">Italy</option>
+                                <option value="ES">Spain</option>
+                            </select>
+                            <label for="trendsCountrySelect">Country</label>
                         </div>
-                        <div class="summary-content" style="display: none;">
-                            <!-- Summary cards will be here -->
-                            <div class="row">
-                                <div class="col s12 m4">
-                                    <div class="summary-card news-summary">
-                                        <h5>📰 Top Headlines</h5>
-                                        <div class="summary-text"></div>
-                                    </div>
-                                </div>
-                                <div class="col s12 m4">
-                                    <div class="summary-card trends-summary">
-                                        <h5>🔥 Trending Topics</h5>
-                                        <div class="summary-text"></div>
-                                    </div>
-                                </div>
-                                <div class="col s12 m4">
-                                    <div class="summary-card finance-summary">
-                                        <h5>📈 Market Overview</h5>
-                                        <div class="summary-text"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col s12 m6">
-                                    <div class="summary-card overall-summary">
-                                        <h5>🧞 Info Genie</h5>
-                                        <div class="summary-text"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- AI Disclaimer -->
-                        <div class="row">
-                            <div class="col s12">
-                                <p style="font-style: italic; color: #9e9e9e; font-size: 0.85em; text-align: center; margin-top: 20px; margin-bottom: 0;">
-                                    ⚠️ This summary is AI-generated for informational purposes only and should not be considered as financial, legal, or professional advice.
-                                </p>
-                            </div>
+                        <div class="input-field col s6">
+                            <select id="trendsLanguageSelect">
+                                <option value="en">English</option>
+                                <option value="es">Español</option>
+                                <option value="fr">Français</option>
+                                <option value="de">Deutsch</option>
+                                <option value="ru">Русский</option>
+                                <option value="zh">中文</option>
+                                <option value="jp">日本語</option>
+                                <option value="ko">한국어</option>
+                                <option value="pt">Português</option>
+                            </select>
+                            <label for="trendsLanguageSelect">Language</label>
                         </div>
                     </div>
-                    
-                </div>
+                    <div class="data-container"></div>
+                </section>
+
+                <!-- Reddit Section (Hidden) -->
+                <section id="reddit" class="section">
+                    <div class="section-header">
+                        <h4>🔴 Reddit</h4>
+                    </div>
+                    <div class="data-container"></div>
+                </section>
             </div>
-            <div class="card weather-summary">
-                <h5>🌤️ Weather Update
-                    <button onclick="showLocationModal()" class="btn-small waves-effect waves-light" style="margin-left: 10px; font-size: 0.8em;">📍 Set Location</button>
-                </h5>
-                <div class="weather-info">
-                    <div class="weather-location"></div>
-                    <div class="weather-updated"></div>
-                    <p class="weather-condition"></p>
-                    <p class="weather-temp"></p>
-                    <p class="weather-feelslike"></p>
-                    <p class="weather-humidity"></p>
-                    <p class="weather-wind"></p>
+        </div>
+
+        <!-- Cookie/Privacy Notification Banner -->
+        <div id="cookie-notification" class="cookie-banner" style="display: none;">
+            <div class="cookie-content">
+                <div class="cookie-text">
+                    <h6>Privacy & Cookie Usage</h6>
+                    <p>This website uses cookies to remember your preferences (location, watchlist, theme, etc.) and improve your experience. No personal data is collected or shared with third parties. By continuing to use this site, you consent to our use of cookies for these purposes.</p>
+                </div>
+                <div class="cookie-actions">
+                    <button class="btn-small waves-effect waves-light" onclick="acceptCookies()">Accept</button>
+                    <button class="btn-small waves-effect waves-light grey" onclick="declineCookies()">Decline</button>
+                    <a href="privacy-policy.html" target="_blank" class="btn-small waves-effect waves-light blue">Privacy Policy</a>
                 </div>
             </div>
         </div>
-
-        <!-- Hidden sections for data generation (not visible to users) -->
-        <div style="display: none;">
-            <!-- News Section (Hidden) -->
-            <section id="news" class="section">
-                <div class="section-header">
-                    <h4>📰 News</h4>
-                </div>
-                <div id="news-controls" class="row">
-                    <div class="input-field col s6">
-                        <select id="countrySelect">
-                            <option value="US">United States</option>
-                            <option value="GB">United Kingdom</option>
-                            <option value="CA">Canada</option>
-                            <option value="AU">Australia</option>
-                            <option value="DE">Germany</option>
-                            <option value="FR">France</option>
-                            <option value="JP">Japan</option>
-                            <option value="IN">India</option>
-                            <option value="BR">Brazil</option>
-                            <option value="KR">South Korea</option>
-                            <option value="IT">Italy</option>
-                            <option value="ES">Spain</option>
-                            <option value="MX">Mexico</option>
-                            <option value="RU">Russia</option>
-                        </select>
-                        <label for="countrySelect">Country</label>
-                    </div>
-                    <div class="input-field col s6">
-                        <select id="languageSelect">
-                            <option value="en">English</option>
-                            <option value="es">Español</option>
-                            <option value="fr">Français</option>
-                            <option value="de">Deutsch</option>
-                            <option value="ru">Русский</option>
-                            <option value="zh">中文</option>
-                            <option value="jp">日本語</option>
-                            <option value="ko">한국어</option>
-                            <option value="pt">Português</option>
-                            <option value="ar">العربية</option>
-                            <option value="hi">हिन्दी</option>
-                            <option value="it">Italiano</option>
-                        </select>
-                        <label for="languageSelect">Language</label>
-                    </div>
-                </div>
-                <div class="data-container"></div>
-            </section>
-
-            <!-- Finance Section (Hidden) -->
-            <section id="finance" class="section">
-                <div class="section-header">
-                    <h4>📈 Finance</h4>
-                </div>
-                <div class="input-field">
-                    <input type="text" id="stockSymbolInput" placeholder="Enter stock symbol (e.g., AAPL)">
-                    <label for="stockSymbolInput">Stock Symbol</label>
-                </div>
-                <div class="chart-container">
-                    <canvas id="stockChart"></canvas>
-                </div>
-                <div class="data-container"></div>
-                <div id="stock-dashboard" class="stock-dashboard"></div>
-            </section>
-
-            <!-- Trends Section (Hidden) -->
-            <section id="trends" class="section">
-                <div class="section-header">
-                    <h4>🔥 Trends</h4>
-                </div>
-                <div id="trends-controls" class="row">
-                    <div class="input-field col s6">
-                        <select id="trendsCountrySelect">
-                            <option value="US">United States</option>
-                            <option value="GB">United Kingdom</option>
-                            <option value="CA">Canada</option>
-                            <option value="AU">Australia</option>
-                            <option value="DE">Germany</option>
-                            <option value="FR">France</option>
-                            <option value="JP">Japan</option>
-                            <option value="IN">India</option>
-                            <option value="BR">Brazil</option>
-                            <option value="KR">South Korea</option>
-                            <option value="IT">Italy</option>
-                            <option value="ES">Spain</option>
-                        </select>
-                        <label for="trendsCountrySelect">Country</label>
-                    </div>
-                    <div class="input-field col s6">
-                        <select id="trendsLanguageSelect">
-                            <option value="en">English</option>
-                            <option value="es">Español</option>
-                            <option value="fr">Français</option>
-                            <option value="de">Deutsch</option>
-                            <option value="ru">Русский</option>
-                            <option value="zh">中文</option>
-                            <option value="jp">日本語</option>
-                            <option value="ko">한국어</option>
-                            <option value="pt">Português</option>
-                        </select>
-                        <label for="trendsLanguageSelect">Language</label>
-                    </div>
-                </div>
-                <div class="data-container"></div>
-            </section>
-
-            <!-- Reddit Section (Hidden) -->
-            <section id="reddit" class="section">
-                <div class="section-header">
-                    <h4>🔴 Reddit</h4>
-                </div>
-                <div class="data-container"></div>
-            </section>
-        </div>
-    </main>
-
-    <!-- Cookie/Privacy Notification Banner -->
-    <div id="cookie-notification" class="cookie-banner" style="display: none;">
-        <div class="cookie-content">
-            <div class="cookie-text">
-                <h6>Privacy & Cookie Usage</h6>
-                <p>This website uses cookies to remember your preferences (location, watchlist, theme, etc.) and improve your experience. No personal data is collected or shared with third parties. By continuing to use this site, you consent to our use of cookies for these purposes.</p>
-            </div>
-            <div class="cookie-actions">
-                <button class="btn-small waves-effect waves-light" onclick="acceptCookies()">Accept</button>
-                <button class="btn-small waves-effect waves-light grey" onclick="declineCookies()">Decline</button>
-                <a href="privacy-policy.html" target="_blank" class="btn-small waves-effect waves-light blue">Privacy Policy</a>
-            </div>
-        </div>
-    </div>
-    
-    <footer class="container center-align">
-        <div class="footer-content">
-            <p>&copy; 2025 InfoDash. All rights reserved.</p>
-            <div class="footer-links">
-                <a href="terms-of-service.html" target="_blank" class="footer-link">Terms of Service</a>
-                <span class="footer-separator">•</span>
-                <a href="privacy-policy.html" target="_blank" class="footer-link">Privacy Policy</a>
-            </div>
-            <p class="footer-disclaimer">The content provided on this website is for informational purposes only and does not constitute financial, investment, legal, or other professional advice. While we strive to provide accurate and up-to-date information, we make no guarantees about the completeness, reliability, or suitability of the content for any specific purpose.</p>
-        </div>
-    </footer>
-    <script type="module">
-        import { showNotification, toggleSection, showLocationModal, closeLocationModal } from './js/uiUtils.js';
-        import { acceptCookies, declineCookies, resetCookieConsent, checkCookieConsent, showCookieBanner, hideCookieBanner, clearAllPreferences, updatePreferencesDisplay } from './js/userPreferences.js';
-        import { initializeGeolocation, setRegion, getCurrentRegion, handleRegionChange } from './js/geolocation.js';
         
-        window.showNotification = showNotification;
-        window.toggleSection = toggleSection;
-        window.showLocationModal = showLocationModal;
-        window.closeLocationModal = closeLocationModal;
-        window.acceptCookies = acceptCookies;
-        window.declineCookies = declineCookies;
-        window.resetCookieConsent = resetCookieConsent;
-        window.checkCookieConsent = checkCookieConsent;
-        window.showCookieBanner = showCookieBanner;
-        window.hideCookieBanner = hideCookieBanner;
-        window.clearAllPreferences = clearAllPreferences;
-        window.updatePreferencesDisplay = updatePreferencesDisplay;
-        window.handleRegionChange = handleRegionChange;
-        window.setRegion = setRegion;
-        window.getCurrentRegion = getCurrentRegion;
-        // Remove all inline definitions of these functions
-    </script>
-    <button id="scrollToTopBtn" class="scroll-to-top">↑</button>
+        <footer class="container center-align">
+            <div class="footer-content">
+                <p>&copy; 2025 InfoDash. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="terms-of-service.html" target="_blank" class="footer-link">Terms of Service</a>
+                    <span class="footer-separator">•</span>
+                    <a href="privacy-policy.html" target="_blank" class="footer-link">Privacy Policy</a>
+                </div>
+                <p class="footer-disclaimer">The content provided on this website is for informational purposes only and does not constitute financial, investment, legal, or other professional advice. While we strive to provide accurate and up-to-date information, we make no guarantees about the completeness, reliability, or suitability of the content for any specific purpose.</p>
+            </div>
+        </footer>
+        <script type="module">
+            import { showNotification, toggleSection, showLocationModal, closeLocationModal } from './js/uiUtils.js';
+            import { acceptCookies, declineCookies, resetCookieConsent, checkCookieConsent, showCookieBanner, hideCookieBanner, clearAllPreferences, updatePreferencesDisplay } from './js/userPreferences.js';
+            import { initializeGeolocation, setRegion, getCurrentRegion, handleRegionChange } from './js/geolocation.js';
+            
+            window.showNotification = showNotification;
+            window.toggleSection = toggleSection;
+            window.showLocationModal = showLocationModal;
+            window.closeLocationModal = closeLocationModal;
+            window.acceptCookies = acceptCookies;
+            window.declineCookies = declineCookies;
+            window.resetCookieConsent = resetCookieConsent;
+            window.checkCookieConsent = checkCookieConsent;
+            window.showCookieBanner = showCookieBanner;
+            window.hideCookieBanner = hideCookieBanner;
+            window.clearAllPreferences = clearAllPreferences;
+            window.updatePreferencesDisplay = updatePreferencesDisplay;
+            window.handleRegionChange = handleRegionChange;
+            window.setRegion = setRegion;
+            window.getCurrentRegion = getCurrentRegion;
+            // Remove all inline definitions of these functions
+        </script>
+        <button id="scrollToTopBtn" class="scroll-to-top">↑</button>
 
-    <!-- Notification Bar -->
-    <div id="notification-bar"></div>
-        </body>
+        <!-- Notification Bar -->
+        <div id="notification-bar"></div>
+    </body>
 </html>
