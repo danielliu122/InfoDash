@@ -63,10 +63,11 @@ body.dark-theme .chart-container canvas {
 .stock-change {
   font-size: 16px;
   font-weight: bold;
-        text-align: center;
-    }
+  text-align: center;
+}
+
+
 .card.chart-container {
-  resize: both;
   overflow: auto;
   min-width: 320px;
   min-height: 240px;
@@ -116,7 +117,6 @@ body.dark-theme .chart-container canvas {
 }
 
 #finance .card.chart-container {
-  max-height: 250px !important;
   overflow: hidden !important;
 }
 
@@ -132,6 +132,11 @@ body.dark-theme .chart-container canvas {
 
 #finance .cards-container .card:last-child {
   margin-right: 0 !important;
+}
+
+#financeChart{
+  height: 100%;
+  width: 100%;
 }
 
 /* === Responsive Chart Buttons === */
@@ -424,23 +429,6 @@ body.dark-theme .time-range-button.active {
   color: white !important;
 }
 
-@media (min-width: 1000px) {
-  .card.chart-container {
-    max-width: 1200px !important;
-    min-height: 500px !important;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .card.chart-container canvas,
-  #financeChart {
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100%;
-    max-height: 100%;
-    display: block;
-  }
-}
-
 /* Hide scrollbar for Stock Search card */
 .card.stock-info {
   overflow: auto;
@@ -669,7 +657,6 @@ body:not(.dark-theme) #finance .card.chart-container canvas {
 .chart-container {
   margin-top: 20px;
   position: relative;
-  height: 400px;
   overflow: hidden;
 }
 
@@ -729,13 +716,10 @@ body:not(.dark-theme) #finance .card.chart-container canvas {
 }
 
 .watchlist-item {
-  display: flex;
-  flex-direction: row;
-  padding: 10px 15px;
-  background: rgb(120, 201, 252);
-  border-radius: 6px;
-  margin-bottom: 8px;
-  transition: all 0.3s ease;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .watchlist-item:hover {

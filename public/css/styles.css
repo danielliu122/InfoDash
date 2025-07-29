@@ -135,6 +135,8 @@ body.dark-theme .card[data-section="daily-summary"] {
 /* === Reset & Base === */
 * {box-sizing: border-box; }
 body, html {
+  height:100%;
+  width:100%;
   font-family: 'Google Sans Text', 'Google Sans', 'Roboto', 'Noto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif !important;
     line-height: 1.6;
     color: var(--primary-text);
@@ -239,7 +241,7 @@ main {
 
 .main-content {
   transition: margin-left 0.3s ease;
-  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .main-content.collapsed {
@@ -288,7 +290,6 @@ section, .section, .summary-card, #finance, #finance .card, .news-item, .trend-c
   border-radius: 8px;
   margin-bottom: 20px;
   box-sizing: border-box;
-  max-height: 240px;
   overflow-y: auto;
 }
 section, .section, .summary-card, .trend-card, .news-item, .chart-container {
@@ -930,7 +931,6 @@ body.dark-theme .stock-dashboard-grid::-webkit-scrollbar-corner {
 #finance,
 #finance .row,
 #finance .card {
-  max-height: none !important;
   overflow-y: visible !important;
 }
 
@@ -1907,8 +1907,10 @@ body {
     margin: 0;
 }
 
-.summary-content {
+#summary-content {
     min-height: 100px;
+    transition: none;
+    transform:none;
 }
 
 .summary-placeholder {

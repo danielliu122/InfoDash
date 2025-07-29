@@ -941,18 +941,15 @@ export function updateFinance(data) {
 
     // Clear the inner HTML and rebuild the chart structure
     chartContainer.innerHTML = `
-        <div style="position: relative; width: 100%; height: 100%;">
-            <div class="zoom-controls">
-                <button class="zoom-button" id="zoomIn">+</button>
-                <button class="zoom-button" id="zoomOut">-</button>
-                <button class="zoom-button" id="resetZoom">↺</button>
-                <button class="fullscreenButton" id="fullscreenButton" >⤢</button>
-                <button class="pause-button" id="pause-finance-button" onclick="togglePauseFinance()">⏸</button>
-            </div>
-            <canvas id="financeChart"></canvas>
-            <input type="range" id="chartSlider" min="0" max="100" value="0" class="chart-slider">
-            <div class="chart-resize-handle chart-resize-handle-se" title="Drag to resize"></div>
-        </div>
+ 
+    <div class="zoom-controls">
+        <button class="zoom-button" id="zoomIn">+</button>
+        <button class="zoom-button" id="zoomOut">-</button>
+        <button class="zoom-button" id="resetZoom">↺</button>
+        <button class="fullscreenButton" id="fullscreenButton" >⤢</button>
+        <button class="pause-button" id="pause-finance-button" onclick="togglePauseFinance()">⏸</button>
+    </div>
+    <canvas id="financeChart"></canvas>
     `;
 
     const canvas = document.getElementById('financeChart');
@@ -992,10 +989,8 @@ export function updateFinance(data) {
     const processedData = processChartData(data.dates, data.prices, data.symbol);
     processedData.timeRange = data.timeRange; 
     
-    // canvas/chart.js resizing/rendering issues requires slightly delayed initialization
-    setTimeout(() => {
-        window.financeChart = initializeChart(ctx, processedData);
-    }, 50); 
+    window.financeChart = initializeChart(ctx, processedData);
+
         
         // Force a resize and update to ensure proper rendering
         if (window.financeChart) {
@@ -1113,59 +1108,7 @@ export function updateFinance(data) {
             });
         }
     }
-
     document.body.addEventListener('click', handleFullscreen);
-
-    const slider = document.getElementById('chartSlider');
-    slider.addEventListener('input', function(e) {
-        if (!window.financeChart) return;
-        const chart = window.financeChart;
-        const totalPoints = chart.data.labels.length;
-        if (totalPoints < 2) return;
-        const visiblePoints = Math.floor(totalPoints * 0.1); 
-        const maxStartIndex = totalPoints - visiblePoints;
-        const startIndex = Math.floor((e.target.value / 100) * maxStartIndex);
-        chart.options.scales.x.min = chart.data.labels[startIndex];
-        chart.options.scales.x.max = chart.data.labels[startIndex + visiblePoints - 1];
-        chart.update('none');
-    });
-
-    setupChartResize(chartContainer);
-}
-
-// Function to setup chart resize functionality
-function setupChartResize(chartContainer) {
-    const resizeHandle = chartContainer.querySelector('.chart-resize-handle-se');
-    let isResizing = false;
-
-    resizeHandle.addEventListener('mousedown', function(e) {
-        e.preventDefault();
-        isResizing = true;
-        let startX = e.clientX;
-        let startY = e.clientY;
-        let startWidth = chartContainer.offsetWidth;
-        let startHeight = chartContainer.offsetHeight;
-
-        function doDrag(e) {
-            if (!isResizing) return;
-            const newWidth = startWidth + e.clientX - startX;
-            const newHeight = startHeight + e.clientY - startY;
-            chartContainer.style.width = `${newWidth}px`;
-            chartContainer.style.height = `${newHeight}px`;
-            if (window.financeChart) {
-                window.financeChart.resize();
-            }
-        }
-
-        function stopDrag() {
-            isResizing = false;
-            window.removeEventListener('mousemove', doDrag);
-            window.removeEventListener('mouseup', stopDrag);
-        }
-
-        window.addEventListener('mousemove', doDrag);
-        window.addEventListener('mouseup', stopDrag);
-    });
 }
 
 // This function handles fetching data and deciding how to update the chart.
@@ -1406,7 +1349,7 @@ function initializeChart(ctx, data, maintainAspectRatio = true) {
                     pinch: {
                       enabled: true
                     },
-                    mode: 'xy',
+                    mode: 'x',
                     onZoom: function(ctx) {
                         // If trying to zoom out, reset to previous state
                         if (ctx.chart.getZoomLevel() < 1) {
@@ -1416,9 +1359,9 @@ function initializeChart(ctx, data, maintainAspectRatio = true) {
                   }
                 }
             },
-            animation: false,
-            responsive: false,
-            maintainAspectRatio: maintainAspectRatio,
+            animation: true,
+            responsive: true,
+            maintainAspectRatio: false,
             backgroundColor: backgroundColor,
             scales: {
                 y: {

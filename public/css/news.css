@@ -130,8 +130,6 @@ width: 100%;
 /* News Page Styles */
 .news-content {
     padding: 30px;
-    max-width: 1400px;
-    margin: 0 auto;
 }
 
 .news-grid {
@@ -327,6 +325,8 @@ width: 100%;
 }
 
 .news-content {
+    transform:none;
+    transition: none;
     flex: 1;
     min-width: 0;
     display: flex;
@@ -337,6 +337,12 @@ width: 100%;
 .news-headline {
     margin-bottom: 12px;
 }
+
+.card.news-headlines {
+    transition: none;
+    transform: none;
+  }
+  
 
 .headline-title {
     font-size: 1.1rem;
