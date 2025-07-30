@@ -63,6 +63,10 @@ class UserPreferences {
             const stored = this.getCookie(this.storageKey);
             if (stored) {
                 const parsed = JSON.parse(stored);
+                // Ensure financeWatchlist is always an array, even if cleared
+                if (parsed.financeWatchlist === undefined) {
+                    parsed.financeWatchlist = [];
+                }
                 return { ...this.defaultPreferences, ...parsed };
             }
         } catch (error) {
@@ -105,8 +109,16 @@ class UserPreferences {
 
     // Clear all preferences
     clear() {
+        // Only reset financeWatchlist if it is not already an empty array
+        // This allows external code (like clearWatchlist in finance.js) to clear just the watchlist
+        // without it being reset to default on next load
         this.preferences = { ...this.defaultPreferences };
         this.savePreferences();
+    }
+
+    // Explicitly clear only the finance watchlist
+    clearFinanceWatchlist() {
+        this.setFinanceWatchlist([]);
     }
 
     // Weather location methods
@@ -127,10 +139,12 @@ class UserPreferences {
 
     // Finance watchlist methods
     setFinanceWatchlist(watchlist) {
-        this.set('financeWatchlist', watchlist);
+        // Always set the financeWatchlist, even if it's an empty array
+        this.preferences['financeWatchlist'] = Array.isArray(watchlist) ? watchlist : [];
+        this.savePreferences();
         // Only save to cookie if cookies are accepted
         if (this.isCookiesAccepted()) {
-            this.setCookie('financeWatchlist', JSON.stringify(watchlist)); // Keep for backward compatibility
+            this.setCookie('financeWatchlist', JSON.stringify(this.preferences['financeWatchlist'])); // Keep for backward compatibility
         }
     }
 
@@ -138,9 +152,10 @@ class UserPreferences {
         if (this.isCookiesDeclined()) {
             return [];
         }
-        
+
+        // Always return the financeWatchlist, even if it's an empty array
         const stored = this.get('financeWatchlist');
-        if (stored && stored.length > 0) {
+        if (Array.isArray(stored)) {
             return stored;
         }
         // Fallback to old storage method

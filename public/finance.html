@@ -149,10 +149,10 @@
                 <div class="card input-card">
                   <div class="card-content">
                     <span class="card-title">Stock Symbol</span>
-                    <button onclick="searchAndAddStock()">Search</button>
                     <div class="input-field">
-                      <input type="text" id="stockSymbolInput" placeholder="Enter stock symbol (e.g., AAPL, TSLA)">
-                      <div id="autocomplete-list" class="autocomplete-list"></div>
+                        <input type="text" id="stockSymbolInput" placeholder="Enter stock symbol (e.g., AAPL, TSLA)">
+                        <button onclick="searchAndAddStock()">Search</button>
+                        <div id="autocomplete-list" class="autocomplete-list"></div>
                     </div>
                      <!-- Time Range Buttons -->
                     <span class="card-title">Time Range</span>
@@ -193,22 +193,11 @@
                     </div>
                   </div>
                 </div>
-          
-                <!-- Watchlist -->
-                <div class="card watchlist-section">
-                  <div class="card-content">
-                    <span class="card-title">📊 Watchlist</span>
-                    <div id="watchlist-container">
-                      <!-- Watchlist items will be populated here -->
-                    </div>
-                    
-                    <!-- Clear/Reset buttons -->
-                    <div id="stock-info-card-container"></div>
-                    <div class="quick-actions">
-                        <button class="btn-small waves-effect waves-light" onclick="resetToDefaultWatchlist()">Reset Watchlist</button>
-                        <button class="btn-small waves-effect waves-light" onclick="clearWatchlist()">Clear Watchlist</button>
-                    </div>
-                  </div>
+                <!-- Clear/Reset buttons -->
+                <div id="stock-info-card-container"></div>
+                <div class="quick-actions">
+                    <button class="btn-small waves-effect waves-light" onclick="resetToDefaultWatchlist()">Reset Watchlist</button>
+                    <button class="btn-small waves-effect waves-light" onclick="clearWatchlist()">Clear Watchlist</button>
                 </div>
               </div>
             </div>
