@@ -173,10 +173,11 @@ main {
 }
 
 .sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    max-height: 100px;
+  padding: 5px 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-height: 100px;
 }
 
 .sidebar-title {
@@ -194,7 +195,7 @@ main {
 .sidebar-toggle {
     background: none;
     border: none;
-    color: var(--text-primary);
+    color: grey;
     cursor: pointer;
     padding: 8px;
     border-radius: 4px;
@@ -202,7 +203,7 @@ main {
 }
 
 .sidebar-toggle:hover {
-    background: rgba(255,255,255,0.1);
+    color: cyan;
 }
 
 .sidebar-nav {
@@ -218,6 +219,7 @@ main {
 
 
 .nav-link {
+    color:var(--primary-text);
     display: flex;
     align-items: center;
     padding: 12px;
@@ -264,9 +266,11 @@ body.dark-theme .nav-link.active {
     background: var(--accent-color);
     color: white;
 }
-
+body.dark-theme .sidebar-toggle{
+  color:white;
+}
 body.dark-theme .sidebar-toggle:hover {
-    background: rgba(255,255,255,0.05);
+  color:cyan;
 }
 
 /* Legacy column layout styles removed - sections now on individual pages */
@@ -786,14 +790,13 @@ body.dark-theme .trend-card {
   border-color: #444 !important;
 }
 
-/* Light mode: Archive row elements should use the light green background */
-body:not(.dark-theme) #summary-content-container .archive-row ul li {
+#summary-content-container .archive-row ul li {
   background: lab(90.06% -5.3 -4.59) !important;
   border-radius: 6px !important;
   margin-bottom: 8px !important;
 }
 
-body:not(.dark-theme) #summary-content-container .archive-row ul li .collapsible-header {
+#summary-content-container .archive-row ul li .collapsible-header {
   background: lab(90.06% -5.3 -4.59) !important;
   border: none !important;
   border-bottom: 1px solid #c1d5d0 !important;
@@ -1455,31 +1458,31 @@ body.dark-theme label {
 }
 
 /* Light mode scrollbar styling */
-body:not(.dark-theme) ::-webkit-scrollbar {
+::-webkit-scrollbar {
   width: 12px;
   height: 12px;
 }
 
-body:not(.dark-theme) ::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: lab(90.06% -5.3 -4.59);
   border-radius: 6px;
 }
 
-body:not(.dark-theme) ::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background: #c1d5d0;
   border-radius: 6px;
 }
 
-body:not(.dark-theme) ::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
   background: #a8c4bc;
 }
 
-body:not(.dark-theme) ::-webkit-scrollbar-corner {
+::-webkit-scrollbar-corner {
   background: lab(90.06% -5.3 -4.59);
 }
 
 /* Firefox scrollbar styling - light mode only */
-body:not(.dark-theme) * {
+.body {
   scrollbar-width: thin;
   scrollbar-color: #c1d5d0 lab(90.06% -5.3 -4.59);
 }
@@ -2332,18 +2335,13 @@ body {
 /* Mobile sidebar as horizontal bar */
 @media (max-width: 768px) {
   .sidebar {
+    display:flex;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     width: 100%;
-    height: auto;
-    min-height: 60px;
-    max-height: 60px;
-    z-index: 1000;
-    background: var(--bg-color);
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+   
   }
 
   .sidebar.mobile-open {
@@ -2378,7 +2376,6 @@ body {
 
   .nav-menu {
     display: flex;
-    flex-direction: row;
   }
 
   .nav-link {
