@@ -893,40 +893,6 @@ body.dark-theme #autocomplete-list .autocomplete-suggestion:hover {
   background: #2d323b;
 }
 
-
-body.dark-theme .section::-webkit-scrollbar,
-body.dark-theme .summary-card::-webkit-scrollbar,
-body.dark-theme .news-item::-webkit-scrollbar,
-body.dark-theme .trend-card::-webkit-scrollbar,
-body.dark-theme #finance .card::-webkit-scrollbar,
-body.dark-theme .card.chart-container::-webkit-scrollbar,
-body.dark-theme .stock-dashboard::-webkit-scrollbar,
-body.dark-theme .stock-dashboard-grid::-webkit-scrollbar {
-  width: 10px;
-  background: #181818;
-}
-body.dark-theme .section::-webkit-scrollbar-thumb,
-body.dark-theme .summary-card::-webkit-scrollbar-thumb,
-body.dark-theme .news-item::-webkit-scrollbar-thumb,
-body.dark-theme .trend-card::-webkit-scrollbar-thumb,
-body.dark-theme #finance .card::-webkit-scrollbar-thumb,
-body.dark-theme .card.chart-container::-webkit-scrollbar-thumb,
-body.dark-theme .stock-dashboard::-webkit-scrollbar-thumb,
-body.dark-theme .stock-dashboard-grid::-webkit-scrollbar-thumb {
-  background: #333;
-    border-radius: 8px;
-}
-body.dark-theme .section::-webkit-scrollbar-corner,
-body.dark-theme .summary-card::-webkit-scrollbar-corner,
-body.dark-theme .news-item::-webkit-scrollbar-corner,
-body.dark-theme .trend-card::-webkit-scrollbar-corner,
-body.dark-theme #finance .card::-webkit-scrollbar-corner,
-body.dark-theme .card.chart-container::-webkit-scrollbar-corner,
-body.dark-theme .stock-dashboard::-webkit-scrollbar-corner,
-body.dark-theme .stock-dashboard-grid::-webkit-scrollbar-corner {
-  background: #181818;
-}
-
 .summary-section,
 #summary-section,
 #summary-section .row,
@@ -948,10 +914,6 @@ body.dark-theme .dropdown-content li > span {
 #finance .section-header h4 {
   padding-right: 0;
   padding-left: 20px;
-}
-#finance .cards-container .card.stock-info {
-  /* margin-left: 16px !important; */
-  /* margin-right: 16px !important; */
 }
 
 body.dark-theme #reddit-content > .data-container {
@@ -1457,29 +1419,6 @@ body.dark-theme label {
   background: lab(90.06% -5.3 -4.59)!important;
 }
 
-/* Light mode scrollbar styling */
-::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-
-::-webkit-scrollbar-track {
-  background: lab(90.06% -5.3 -4.59);
-  border-radius: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c1d5d0;
-  border-radius: 6px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a8c4bc;
-}
-
-::-webkit-scrollbar-corner {
-  background: lab(90.06% -5.3 -4.59);
-}
 
 /* Firefox scrollbar styling - light mode only */
 .body {
@@ -2354,6 +2293,7 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 5px 5px;
+    width:100%;
     height: 60px;
     min-height: 60px;
   }
@@ -2452,4 +2392,25 @@ body {
     background: var(--primary-color);
     color: white;
   }
+}
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    height: 4px;
+  }
+}
+::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+  padding:5px;
+
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+  padding:5px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+  padding:5px;
+
 }
