@@ -766,7 +766,7 @@ body.dark-theme .collapsible-header:hover {
 }
 
 /* Ensure all borders are dark in dark mode */
-body.dark-theme * {
+body.dark-theme {
   border-color: #333 !important;
   color:white;
 }
