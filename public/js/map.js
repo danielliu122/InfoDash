@@ -293,5 +293,3 @@ window.initMap = function() {
 // Make functions globally available
 window.applyThemeToMap = applyThemeToMap;
 window.getCurrentAppTheme = getCurrentAppTheme;
-
-style="width: 100%; height: 100%"

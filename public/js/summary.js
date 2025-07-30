@@ -470,19 +470,27 @@ async function collectFinanceData() {
 
 // Function to generate summary using AI
 async function generateSummary(sectionData) {
-    // Add beforeunload event listener to warn user about leaving during generation
+    // If summary is already done, don't show any warning or add event listener
+    if (summaryGenerated) {
+        return null;
+    }
+
+    let summaryDone = false;
     const beforeUnloadHandler = (event) => {
-        event.preventDefault();
-        // Chrome requires returnValue to be set
-        event.returnValue = 'Your summary is still being generated. Are you sure you want to leave?';
-        return event.returnValue;
+        if (!summaryDone) {
+            event.preventDefault();
+            // Chrome requires returnValue to be set
+            event.returnValue = 'Your summary is still being generated. Are you sure you want to leave?';
+            return event.returnValue;
+        }
     };
 
     // Add the event listener when generation starts
     window.addEventListener('beforeunload', beforeUnloadHandler);
 
-    // Function to clean up the event listener
+    // Function to clean up the event listener and mark summary as done
     const cleanupBeforeUnload = () => {
+        summaryDone = true;
         window.removeEventListener('beforeunload', beforeUnloadHandler);
     };
 
@@ -490,120 +498,127 @@ async function generateSummary(sectionData) {
     showNotification('Please do not leave the page while your summary is being generated.', 5000);
     const maxRetries = 3;
     let retryCount = 0;
-    
-    while (retryCount < maxRetries && !summaryGenerated) {
-        try {
-            console.log('generateSummary: Starting AI generation...');
-            console.log('Generating summary with data:', sectionData);
-            
-            const selectedModel = document.getElementById('model-select')?.value || 'deepseek/deepseek-chat-v3-0324:free';
-            //console.log('generateSummary: Using model:', selectedModel);
-            
-            // Prepare the data for AI analysis
-            const analysisPrompt = createAnalysisPrompt(sectionData);
-            //console.log('generateSummary: Analysis prompt created, length:', analysisPrompt.length);
-            //console.log('Analysis prompt:', analysisPrompt);
-            
-            console.log('generateSummary: Making API call to /api/chat...');
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    messages: [
-                        {
-                            role: 'system',
-                            content: `You are a data analyst specializing in creating clear, concise summaries of current news, trends, and market data.
-                            CRITICAL INSTRUCTIONS:
-                                - Only report the specific data provided. Do **not** infer, speculate, or add context from outside knowledge.
-                                - Except for the Info Genie section, you will act as a market predictor and future current events predictor.
-                                - For percentage changes:
-                                - If the change is positive, describe it as "up," "gaining," or "rose."
-                                - If the change is negative, describe it as "down," "declining," or "fell."
-                                - If the change is between -1% and +1%, refer to it as a "slight movement" or "minimal change."
-                                - Only use dramatic terms like "surged," "plunged," or "soared" for percentage changes greater than ±10%.
-                                - Do not interpret sentiment or market trends unless explicitly stated in the data.
-                                - For cryptocurrency, follow the same rules—do not infer excitement, volatility, or interest unless shown by large percentage changes.
-                                - Always refer to performance as part of "today's trading" or the "current session" (not longer timeframes) unless otherwise specified.
-                            Ensure your tone remains professional, neutral, and fact-based at all times.`
-                        },
-                        {
-                            role: 'user',
-                            content: analysisPrompt
-                        }
-                    ],
-                    model: selectedModel
-                }),
-            });
-            
-            console.log('generateSummary: API response received, status:', response.status);
-            console.log('API response status:', response.status);
-            
-            if (!response.ok) {
-                console.error('generateSummary: API response not ok:', response.status, response.statusText);
-                
-                // Try to get more details about the error
-                let errorDetails = '';
-                try {
-                    const errorResponse = await response.text();
-                    errorDetails = errorResponse;
-                    console.error('generateSummary: Error response body:', errorResponse);
-                } catch (e) {
-                    console.error('generateSummary: Could not read error response body');
-                }
-                
-                // If it's a 404 or 503 error, retry after a delay
-                if (response.status === 404 || response.status === 503) {
-                    retryCount++;
-                    if (retryCount < maxRetries) {
-                        const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff: 2s, 4s, 8s
-                        console.log(`generateSummary: Retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        continue;
+    let lastError = null;
+
+    try {
+        while (retryCount < maxRetries && !summaryGenerated) {
+            try {
+                console.log('generateSummary: Starting AI generation...');
+                console.log('Generating summary with data:', sectionData);
+
+                const selectedModel = document.getElementById('model-select')?.value || 'deepseek/deepseek-chat-v3-0324:free';
+
+                // Prepare the data for AI analysis
+                const analysisPrompt = createAnalysisPrompt(sectionData);
+
+                console.log('generateSummary: Making API call to /api/chat...');
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: 'system',
+                                content: `You are a data analyst specializing in creating clear, concise summaries of current news, trends, and market data.
+                                CRITICAL INSTRUCTIONS:
+                                    - Only report the specific data provided. Do **not** infer, speculate, or add context from outside knowledge.
+                                    - Except for the Info Genie section, you will act as a market predictor and future current events predictor.
+                                    - For percentage changes:
+                                    - If the change is positive, describe it as "up," "gaining," or "rose."
+                                    - If the change is negative, describe it as "down," "declining," or "fell."
+                                    - If the change is between -1% and +1%, refer to it as a "slight movement" or "minimal change."
+                                    - Only use dramatic terms like "surged," "plunged," or "soared" for percentage changes greater than ±10%.
+                                    - Do not interpret sentiment or market trends unless explicitly stated in the data.
+                                    - For cryptocurrency, follow the same rules—do not infer excitement, volatility, or interest unless shown by large percentage changes.
+                                    - Always refer to performance as part of "today's trading" or the "current session" (not longer timeframes) unless otherwise specified.
+                                Ensure your tone remains professional, neutral, and fact-based at all times.`
+                            },
+                            {
+                                role: 'user',
+                                content: analysisPrompt
+                            }
+                        ],
+                        model: selectedModel
+                    }),
+                });
+
+                console.log('generateSummary: API response received, status:', response.status);
+                console.log('API response status:', response.status);
+
+                if (!response.ok) {
+                    console.error('generateSummary: API response not ok:', response.status, response.statusText);
+
+                    // Try to get more details about the error
+                    let errorDetails = '';
+                    try {
+                        const errorResponse = await response.text();
+                        errorDetails = errorResponse;
+                        console.error('generateSummary: Error response body:', errorResponse);
+                    } catch (e) {
+                        console.error('generateSummary: Could not read error response body');
                     }
+
+                    // If it's a 404 or 503 error, retry after a delay
+                    if (response.status === 404 || response.status === 503) {
+                        retryCount++;
+                        if (retryCount < maxRetries) {
+                            const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff: 2s, 4s, 8s
+                            console.log(`generateSummary: Retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            continue;
+                        }
+                    }
+
+                    throw new Error(`HTTP error! status: ${response.status}${errorDetails ? ` - ${errorDetails}` : ''}`);
                 }
-                
-                throw new Error(`HTTP error! status: ${response.status}${errorDetails ? ` - ${errorDetails}` : ''}`);
-            }
-            
-            //console.log('generateSummary: Parsing JSON response...');
-            const data = await response.json();
-            //console.log('generateSummary: JSON parsed successfully');
-            console.log('API response data:', data);
-            
-            const result = data.reply || 'Unable to generate summary at this time.';
-            console.log('generateSummary: Returning result, length:', result.length);
-            
-            if (result && !result.includes('Error:') && !result.includes('Unable to generate')) {
-                await updateSummaryDisplay(result);  // CALL #1: Called when AI generation succeeds
-                await saveCurrentSummary();
-                await updateSavedSummariesList();
-                summaryGenerated = true;
-                return result; // Return the result to the calling function
-            } else {
-                await updateSummaryDisplay(result);  // CALL #2: Called when AI generation returns error
-                return result; // Return the result even if it's an error
-            }
-        } catch (error) {
-            console.error('generateSummary: Error in AI generation:', error);
-            console.error('generateSummary: Error details:', {
-                message: error.message,
-                stack: error.stack
-            });
-            
-            retryCount++;
-            if (retryCount < maxRetries) {
-                const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff: 2s, 4s, 8s
-                console.log(`generateSummary: Retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
-                await new Promise(resolve => setTimeout(resolve, delay));
+
+                const data = await response.json();
+                console.log('API response data:', data);
+
+                const result = data.reply || 'Unable to generate summary at this time.';
+                console.log('generateSummary: Returning result, length:', result.length);
+
+                if (result && !result.includes('Error:') && !result.includes('Unable to generate')) {
+                    await updateSummaryDisplay(result);  // CALL #1: Called when AI generation succeeds
+                    await saveCurrentSummary();
+                    await updateSavedSummariesList();
+                    summaryGenerated = true;
+                    cleanupBeforeUnload();
+                    return result; // Return the result to the calling function
+                } else {
+                    await updateSummaryDisplay(result);  // CALL #2: Called when AI generation returns error
+                    cleanupBeforeUnload();
+                    return result; // Return the result even if it's an error
+                }
+            } catch (error) {
+                lastError = error;
+                console.error('generateSummary: Error in AI generation:', error);
+                console.error('generateSummary: Error details:', {
+                    message: error.message,
+                    stack: error.stack
+                });
+
+                retryCount++;
+                if (retryCount < maxRetries) {
+                    const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff: 2s, 4s, 8s
+                    console.log(`generateSummary: Retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
             }
         }
-    }
-    if (!summaryGenerated) {
-        const errorMessage = lastError?.message || 'Error: Unable to generate summary after multiple attempts.';
-        await updateSummaryDisplay(errorMessage);  // CALL #3: Called when all retries fail
-        return errorMessage;
+        if (!summaryGenerated) {
+            const errorMessage = lastError?.message || 'Error: Unable to generate summary after multiple attempts.';
+            await updateSummaryDisplay(errorMessage);  // CALL #3: Called when all retries fail
+            cleanupBeforeUnload();
+            return errorMessage;
+        }
+    } finally {
+        // Always clean up if we exit the function for any reason
+        if (!summaryDone) {
+            cleanupBeforeUnload();
+        }
     }
     return null; // Return null if no summary was generated
 }
@@ -677,9 +692,6 @@ function createAnalysisPrompt(sectionData) {
 // Function to update summary display
 async function updateSummaryDisplay(summaryText) {
     console.log('updateSummaryDisplay: Starting with summary text length:', summaryText?.length || 0);
-    
-    // Add a small delay to ensure DOM elements are ready
-    await new Promise(resolve => setTimeout(resolve, 2000));
     
     // Debug: Check if summary elements exist
     const newsSummary = document.querySelector('.news-summary .summary-text');
@@ -1363,8 +1375,6 @@ async function initializeSummarySection() {
         }
     }
     
-    // Add a slight delay before loading or generating today's summary
-    await new Promise(resolve => setTimeout(resolve, 3000));
     await loadOrGenerateTodaySummary();
     
     // Update saved summaries list

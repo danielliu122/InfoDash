@@ -268,9 +268,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.updatePreferencesDisplay();
     }
 
-    // Show cookie notification if consent not given
-    if (window.showCookieNotification) {
-        window.showCookieNotification();
+    // Show cookie consent banner if needed (from userPreferences.js)
+    if (window.checkCookieConsent) {
+        window.checkCookieConsent();
     }
 
     // Initialize the summary section (this will load or generate today's summary)

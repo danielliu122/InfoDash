@@ -474,7 +474,7 @@ export function updatePreferencesDisplay() {
 } 
 
 // Ultra-early theme application to prevent flicker
-export function injectTheme()
+function injectTheme()
     {
     // Helper to get cookie value
     function getCookie(name) {
