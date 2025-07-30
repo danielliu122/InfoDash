@@ -16,14 +16,14 @@
     </url>
 
     <url>
-        <loc>https://infodash.app/news.html</loc>
+        <loc>https://infodash.app/finance.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>daily</changefreq>
         <priority>.9</priority>
     </url>
 
     <url>
-        <loc>https://infodash.app/finance.html</loc>
+        <loc>https://infodash.app/map.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>daily</changefreq>
         <priority>.8</priority>
