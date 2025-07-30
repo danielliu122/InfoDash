@@ -1556,11 +1556,6 @@ body.dark-theme label {
     }
 }
 
-/* Dark theme enhancements */
-.dark-theme .card {
-    background: rgba(30, 30, 30, 0.9);
-}
-
 .dark-theme .btn {
     background: rgba(255, 255, 255, 0.1);
     color: white;

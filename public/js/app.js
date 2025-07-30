@@ -244,37 +244,10 @@ function initializeTheme() {
     if (themeToggleButton) {
         themeToggleButton.textContent = savedTheme === 'light' ? '🌞' : '🌙';
     }
-    
-    // Set up theme change observer
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                // Check if theme changed
-                const isDark = document.body.classList.contains('dark-theme');
-                const wasDark = mutation.oldValue && mutation.oldValue.includes('dark-theme');
-                
-                if (isDark !== wasDark) {
-                    // Theme changed, update map if available
-                    if (window.applyThemeToMap && typeof window.applyThemeToMap === 'function') {
-                        window.applyThemeToMap();
-                    }
-                }
-            }
-        });
-    });
-    
-    // Start observing the body element for class changes
-    observer.observe(document.body, {
-        attributes: true,
-        attributeOldValue: true,
-        attributeFilter: ['class']
-    });
+
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Initialize theme
-    initializeTheme();
-
     // Initialize geolocation and region dropdown
     await initializeGeolocation();
 
@@ -419,6 +392,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
         console.log('Scroll to top button not found on this page, skipping scroll functionality');
     }
+    // Initialize theme
+    initializeTheme();
 });
 
 // Update the autocomplete logic
