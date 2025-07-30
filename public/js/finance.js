@@ -1368,14 +1368,14 @@ function initializeChart(ctx, data, maintainAspectRatio = true) {
             backgroundColor: backgroundColor,
             scales: {
                 y: {
+                    grid: {
+                        display: false
+                    },
                     ticks: {
                         callback: function(value) {
                             return '$' + Number(value).toFixed(2);
                         },
                         color: textColor
-                    },
-                    grid: {
-                        color: gridColor
                     },
                     border: {
                         color: borderColor
@@ -1384,12 +1384,12 @@ function initializeChart(ctx, data, maintainAspectRatio = true) {
                     beginAtZero: false
                 },
                 x: {
+                    grid: {
+                        display: false
+                    },
                     type: 'time',
                     ticks: {
                         color: textColor
-                    },
-                    grid: {
-                        color: gridColor
                     },
                     border: {
                         color: borderColor
