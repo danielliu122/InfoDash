@@ -144,7 +144,7 @@
                 </div>
               </div>
           
-              <div class="card-content" id="watchlist2">
+              <div class="card-content" id="watchlist">
                 <!-- Stock Symbol Input -->
                 <div class="card input-card">
                   <div class="card-content">
@@ -202,27 +202,14 @@
                       <!-- Watchlist items will be populated here -->
                     </div>
                     
-                    <!-- Stock Search -->
-                    <div class="card stock-info">
-                    <div class="card-header">
-                        <span class="card-title">Stock Search</span>
+                    <!-- Clear/Reset buttons -->
+                    <div id="stock-info-card-container"></div>
+                    <div class="quick-actions">
+                        <button class="btn-small waves-effect waves-light" onclick="resetToDefaultWatchlist()">Reset Watchlist</button>
+                        <button class="btn-small waves-effect waves-light" onclick="clearWatchlist()">Clear Watchlist</button>
                     </div>
-                    <div class="card-content">
-                      <button onclick="searchAndAddStock()">Search</button>
-                      <div class="input-field">
-                        <input type="text" id="stockSymbolInput" placeholder="Enter stock symbol (e.g., AAPL, TSLA)">
-                        <div id="autocomplete-list" class="autocomplete-list"></div>
-                      </div>
-                        <div id="stock-info-card-container"></div>
-                        <div class="quick-actions">
-                            <button class="btn-small waves-effect waves-light" onclick="searchAndAddStock()">Search</button>
-                            <button class="btn-small waves-effect waves-light" onclick="clearWatchlist()">Clear Watchlist</button>
-                        </div>
-                    </div>
-                </div>
                   </div>
                 </div>
-          
               </div>
             </div>
 

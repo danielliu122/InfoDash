@@ -1,7 +1,6 @@
 import { 
     updateInterval,
     fetchFinancialData, 
-    updateFinance, 
     startAutoRefresh, 
     stopAutoRefresh,
     handleFinanceUpdate, 

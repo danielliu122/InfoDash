@@ -24,19 +24,17 @@ body.dark-theme .chart-container canvas {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 12px;
-  margin-bottom: 10px;
 }
 .stock-card {
   background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
   padding: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-        text-align: center;
-  min-height: 90px;
+  text-align: center;
   display: flex;
-        flex-direction: column;
+  flex-direction: column;
   justify-content: center;
 }
 .stock-symbol {
@@ -652,7 +650,6 @@ body:not(.dark-theme) #finance .card.chart-container canvas {
 
 .stock-card {
   border-radius: 8px;
-  padding: 15px;
   border-left: 4px solid var(--primary-color);
   transition: all 0.3s ease;
 }
@@ -700,20 +697,12 @@ body:not(.dark-theme) #finance .card.chart-container canvas {
 }
 
 #watchlist-container{
-  overflow-y: scroll;
-}
-.watchlist-container {
-  margin-top: 20px;
-  max-height: 300px;
-  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 5px;
+  border-radius: 8px;
 }
 
-.watchlist-item {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 12px;
-  margin-bottom: 10px;
-}
 
 .watchlist-item:hover {
   background: var(--primary-color);

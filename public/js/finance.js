@@ -354,6 +354,13 @@ export function addToWatchlist(symbol) {
                     }
                 }
                 
+                // Update the finance chart to show the newly added stock
+                userSelectedSymbol = true;
+                window.userSelectedSymbol = true;
+                document.getElementById('stockSymbolInput').value = symbol;
+                updateFinanceData(symbol, DEFAULT_TIME_RANGE, DEFAULT_INTERVAL, false);
+                fetchStockInfo(symbol);
+                
                 // Show notification
                 if (window.showNotification) {
                     window.showNotification(`${symbol} added to watchlist`, 3000);
@@ -923,7 +930,7 @@ export const fetchRealTimeYahooFinanceData = async (symbol = '^IXIC') => {
 };
 
 // Function to update UI with financial data
-export function updateFinance(data) {
+export function updateFinance2(data) {
     const chartContainer = document.querySelector('#finance .chart-container');
     if (!chartContainer) {
         console.log('Finance chart container not found on this page, skipping update');
@@ -1128,7 +1135,7 @@ export async function updateFinanceData(symbol, timeRange = DEFAULT_TIME_RANGE, 
         } else {
             // For a new symbol or initial load, fetch historical data and do a full redraw.
             const historicalData = await fetchFinancialData(symbol, timeRange, interval);
-            updateFinance(historicalData);
+            updateFinance2(historicalData);
         }
         updateWatchlistUI(); // Keep watchlist UI in sync
     } catch (error) {
@@ -1477,6 +1484,9 @@ export function clearWatchlist() {
 
 // Reset watchlist to default selection
 export function resetToDefaultWatchlist() {
+    if (!window.confirm('Are you sure you want to reset your entire watchlist? This action cannot be undone.')) {
+        return;
+    }
     watchlist = [...DEFAULT_WATCHLIST];
     userPrefs.setFinanceWatchlist(watchlist);
     updateWatchlistUI();
@@ -1746,6 +1756,7 @@ export async function addCurrentSymbolToWatchlist() {
         if (window.showNotification) {
             window.showNotification(`${symbol} is already in your watchlist`, 3000);
         }
+        updateFinanceData(symbol, undefined, undefined, false);
         return;
     }
     
@@ -1765,8 +1776,6 @@ export async function addCurrentSymbolToWatchlist() {
     
     // Add to watchlist
     addToWatchlist(symbol);
-    
-    // Success notification will be shown by addToWatchlist function
 }
 
 // Function to search and add stock from the search button
