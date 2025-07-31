@@ -581,6 +581,7 @@ body.dark-theme div[jstcache="128"][jsinstance="0"].address-line.full-width[jsan
 }
 
 .map-container {
+  max-width: 100%;
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
