@@ -19,7 +19,8 @@
 
 /* --- Map container adjustments for better zoom and size --- */
 #map {
-  width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
   height: 100%;
   border-radius: 8px;
 }
@@ -581,8 +582,8 @@ body.dark-theme div[jstcache="128"][jsinstance="0"].address-line.full-width[jsan
 }
 
 .map-container {
-  max-width: 100%;
-  width: 100%;
+  max-width: 100% !important;
+  width: 100% !important;
   border-radius: 8px;
   overflow: hidden;
 }
