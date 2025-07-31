@@ -2432,3 +2432,10 @@ body {
   padding:5px;
 
 }
+
+.trends-controls-container{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}

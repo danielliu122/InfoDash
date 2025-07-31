@@ -201,7 +201,6 @@ export function updateNews(data) {
         pageData.forEach(article => {
             const card = document.createElement('div');
             card.classList.add('news-card');
-            card.onclick = () => window.open(article.url, '_blank');
 
             // Image section
             const imageDiv = document.createElement('div');
@@ -240,8 +239,10 @@ export function updateNews(data) {
             const source = document.createElement('span');
             source.classList.add('news-card-source');
             source.textContent = article.source.name || 'Unknown Source';
+            source.onclick = () => window.open(article.url, '_blank');
             
             const time = document.createElement('span');
+            time.onclick = () => window.open(article.url, '_blank');
             time.classList.add('news-card-time');
             const publishedDate = new Date(article.publishedAt);
             const now = new Date();

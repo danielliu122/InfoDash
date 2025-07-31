@@ -133,7 +133,7 @@ function updateLanguageOptions(country) {
 }
 
 export const updateTrends = (data, category) => {
-    const trendsSection = document.querySelector('#trends .data-container');
+    const trendsSection = document.querySelector('.trends-container');
     if (!trendsSection) {
         console.log('Trends container not found on this page, skipping update');
         return;
@@ -212,13 +212,13 @@ export const updateTrends = (data, category) => {
 };
 
 function displayNoTrendsMessage() {
-    const trendsSection = document.querySelector('#trends .data-container');
+    const trendsSection = document.querySelector('.trends-container');
     trendsSection.innerHTML = '<p>No trending searches available at this time.</p>';
 }
 
 function processRealtimeTrends(data) {
     //console.log('Processing real-time trends data');
-    const trendsSection = document.querySelector('#trends .data-container');
+    const trendsSection = document.querySelector('.trends-container');
     if (!trendsSection) {
         console.log('Trends container not found on this page, skipping processRealtimeTrends');
         return;
@@ -234,7 +234,7 @@ function processRealtimeTrends(data) {
 
 function processDailyTrends(data) {
     //console.log('Processing daily trends data');
-    const trendsSection = document.querySelector('#trends .data-container');
+    const trendsSection = document.querySelector('.trends-container');
     if (!trendsSection) {
         console.log('Trends container not found on this page, skipping processDailyTrends');
         return;
