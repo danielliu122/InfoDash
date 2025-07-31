@@ -711,6 +711,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   section, .section {
     max-height: 800px !important;
     overflow-y: auto; /* Ensure scrolling is enabled */
+    padding:0;
   }
 
   /* Custom minimum section heights for mobile */
@@ -900,6 +901,13 @@ body.dark-theme #autocomplete-list .autocomplete-suggestion:hover {
 #finance .card {
   overflow-y: visible !important;
 }
+
+@media (max-width: 768px) {
+  .summary-card {
+    margin: 0 !important;
+  }
+}
+
 
 body.dark-theme .dropdown-content {
   background: #23272e !important;
@@ -1627,6 +1635,15 @@ body {
     margin: 5px 0;
 }
 
+@media (max-width: 767px) {
+  .nav-item {
+    max-width: 75px;
+  }
+}
+.nav-item {
+  margin: 5px 0;
+
+} 
 .nav-link {
     display: flex;
     align-items: center;
@@ -2026,8 +2043,11 @@ body {
     .news-content,
     .weather-content,
     .community-content,
-    .tools-content {
-        padding: 15px;
+    .tools-content, 
+    .card-content,
+    .news-card,
+    .news-grid {
+        padding: 0px !important;
     }
     
     .chart-controls,
@@ -2263,7 +2283,12 @@ body {
   margin: 20px;
   margin-top: 0;
 }
-
+@media (max-width: 768px) {
+  .summary-container {
+    margin: 0;
+    margin-top: 0;
+  }
+}
 /* Mobile sidebar as horizontal bar */
 @media (max-width: 768px) {
   .sidebar {

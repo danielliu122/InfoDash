@@ -24,13 +24,7 @@
   height: 100%;
   border-radius: 8px;
 }
-@media (max-width: 768px) {
-  #map {
-    max-width: 100vw;
-    height: 220px;
-    min-height: 120px;
-  }
-}
+
 
 /* --- Google Maps Info Window Text Color Fix --- */
 .gm-style-iw, .gm-style-iw-d {
@@ -146,30 +140,6 @@ body.dark-theme .map-search-bar .locate-btn:hover {
   background: var(--button-hover-bg, #e0e0e0);
 }
 
-@media (max-width: 768px) {
-  #map-card, #traffic-content {
-    min-height: 220px;
-  }
-  #map {
-    height: 220px;
-    min-height: 120px;
-  }
-  .map-search-bar {
-    left: 8px;
-    right: 8px;
-    max-width: 98vw;
-    font-size: 14px;
-  }
-  .map-controls {
-    top: 8px;
-    right: 8px;
-  }
-  .map-controls button {
-    width: 30px;
-    height: 30px;
-    font-size: 15px;
-  }
-}
 
 /* --- Google Maps Official Search Box Styling (Material/Google.com style) --- */
 .searchbox {
@@ -266,6 +236,7 @@ body.dark-theme .searchbox input[type='search']::placeholder {
 /* Make sure the map container font-size is normal */
 #map {
   font-size: 20px !important;
+  height:100%;
 }
 
 

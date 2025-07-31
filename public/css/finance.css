@@ -284,7 +284,11 @@ body.dark-theme .fullscreenButton:hover {
   
   /* Ensure proper spacing between finance and dashboard sections */
   #finance {
-    margin-bottom: 20px !important;
+    margin:0;
+    margin-bottom: 20px;
+  }
+  .card-content{
+    padding:5px;
   }
   
   #stock-dashboard {
