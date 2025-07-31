@@ -471,122 +471,64 @@ export function loadWatchlistFromPreferences() {
     updateWatchlistUI();
 }
 
-// Function to validate a stock symbol by attempting to fetch its data
+// Simplified stock symbol validation function
 async function validateStockSymbol(symbol) {
-    // Basic validation first
-    if (!symbol || symbol.trim().length === 0) {
+    symbol = (symbol || '').trim().toUpperCase();
+    if (!symbol) {
         return { valid: false, error: 'Symbol cannot be empty' };
     }
-    
-    // Check for common invalid patterns
-    const invalidPatterns = [
-        /^[0-9]+$/, // Just numbers
-        /^[^A-Z0-9.-]+$/i, // No alphanumeric characters
-        /^[A-Z]{1}$/i, // Single character
-        /^[A-Z]{20,}$/i, // Too long (most symbols are 1-5 chars)
-    ];
-    
-    for (const pattern of invalidPatterns) {
-        if (pattern.test(symbol)) {
-            return { valid: false, error: 'Invalid symbol format' };
-        }
+    // Most stock symbols are 1-5 alphanumerics, with some exceptions for indices/crypto
+    if (!/^[A-Z0-9.^=-]{1,15}$/.test(symbol)) {
+        return { valid: false, error: 'Invalid symbol format' };
     }
-    
+
+    const input = document.getElementById('stockSymbolInput');
+    if (input) {
+        input.style.borderColor = '#FFC107';
+        input.title = `Validating ${symbol}...`;
+    }
+
     try {
-        // Show loading state
-        const input = document.getElementById('stockSymbolInput');
-        if (input) {
-            input.style.borderColor = '#FFC107'; // Yellow for loading
-            input.title = `Validating ${symbol}...`;
-        }
-        
         const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`, {
             headers: {
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache'
             }
         });
-        
+
         if (!response.ok) {
-            if (response.status === 404) {
-                return { valid: false, error: 'Symbol not found' };
-            } else if (response.status === 429) {
-                return { valid: false, error: 'Rate limit exceeded. Please try again later.' };
-            } else if (response.status >= 500) {
-                return { valid: false, error: 'Server error. Please try again later.' };
-            } else {
-                return { valid: false, error: `HTTP ${response.status}: ${response.statusText}` };
-            }
+            let msg = 'Unknown error';
+            if (response.status === 404) msg = 'Symbol not found';
+            else if (response.status === 429) msg = 'Rate limit exceeded. Please try again later.';
+            else if (response.status >= 500) msg = 'Server error. Please try again later.';
+            else msg = `HTTP ${response.status}: ${response.statusText}`;
+            return { valid: false, error: msg };
         }
-        
+
         const data = await response.json();
-        
-        // Check for various error conditions in the response
-        if (!data.chart) {
-            return { valid: false, error: 'Invalid response format' };
-        }
-        
-        if (data.chart.error) {
-            const error = data.chart.error;
-            if (error.code === 'Not Found') {
-                return { valid: false, error: 'Symbol not found' };
-            } else if (error.code === 'Unauthorized') {
-                return { valid: false, error: 'Access denied' };
-            } else {
-                return { valid: false, error: error.description || 'Unknown error' };
-            }
-        }
-        
-        if (!data.chart.result || !data.chart.result[0]) {
-            return { valid: false, error: 'No data available for this symbol' };
-        }
-        
-        const result = data.chart.result[0];
-        const meta = result.meta;
-        
-        if (!meta) {
-            return { valid: false, error: 'No metadata available' };
-        }
-        
-        if (!meta.symbol) {
-            return { valid: false, error: 'Invalid symbol data' };
-        }
-        
-        // Check if the symbol has any price data
-        const quotes = result.indicators?.quote?.[0];
-        if (!quotes || !quotes.close) {
-            return { valid: false, error: 'No price data available for this symbol' };
-        }
-        
-        // Check if there's at least one valid price (not all null/undefined)
-        const hasValidPrice = quotes.close.some(price => price !== null && price !== undefined);
-        if (!hasValidPrice) {
+        const result = data?.chart?.result?.[0];
+        const meta = result?.meta;
+        const closes = result?.indicators?.quote?.[0]?.close;
+
+        if (!meta?.symbol || !Array.isArray(closes) || closes.every(v => v == null)) {
             return { valid: false, error: 'No valid price data available for this symbol' };
         }
-        
-        // Success - return validated data
-        return { 
-            valid: true, 
+
+        return {
+            valid: true,
             name: meta.shortName || meta.longName || meta.symbol || symbol,
             symbol: meta.symbol,
             price: meta.regularMarketPrice,
             marketCap: meta.marketCap,
             volume: meta.volume
         };
-        
     } catch (error) {
         console.error(`Error validating symbol ${symbol}:`, error);
-        
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
             return { valid: false, error: 'Network error. Please check your connection.' };
-        } else if (error.name === 'SyntaxError') {
-            return { valid: false, error: 'Invalid response from server' };
-        } else {
-            return { valid: false, error: 'Validation failed. Please try again.' };
         }
+        return { valid: false, error: 'Validation failed. Please try again.' };
     } finally {
-        // Reset input styling
-        const input = document.getElementById('stockSymbolInput');
         if (input) {
             input.style.borderColor = '';
             input.title = 'Enter a stock symbol';
@@ -856,12 +798,7 @@ function processChartData(dates, prices, symbol) {
 // Function to fetch financial data
 export const fetchFinancialData = async (symbol = '^IXIC', timeRange = '5m', interval = '1m') => {
     try {
-        const response = await fetch(`/api/finance/${symbol}?range=${timeRange}&interval=${interval}`, {
-            headers: {
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache'
-            }
-        });
+        const response = await fetch(`/api/finance/${symbol}?range=${timeRange}&interval=${interval}`)
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -1027,8 +964,6 @@ export function updateFinance2(data) {
         const canvas = chartContainer.querySelector('canvas');
         if (!canvas) return;
     
-        const existingData = window.financeChart?.data || {};
-        const ctx = canvas.getContext('2d');
         const isMobile = isMobileDevice();
         
         // Store the current timeframe when entering fullscreen
@@ -1046,10 +981,8 @@ export function updateFinance2(data) {
                 // Wait for the fullscreen state to be fully established
                 const checkFullscreen = () => {
                     if (document.fullscreenElement === chartContainer) {
-                        // DOM is ready, now manipulate the chart
+                        // DOM is ready, now resize the chart
                         setTimeout(() => {
-                            if (window.financeChart) window.financeChart.destroy();
-                            
                             // Use dynamic viewport units for mobile
                             if (isMobile) {
                                 // For mobile, use dynamic viewport units
@@ -1062,14 +995,9 @@ export function updateFinance2(data) {
                                 canvas.height = chartContainer.clientHeight;
                             }
                             
-                            window.financeChart = initializeChart(ctx, {
-                                dates: existingData.labels || [],
-                                prices: existingData.datasets?.[0]?.data || [],
-                                symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
-                            }, false); // Disable maintainAspectRatio when entering fullscreen
-                            
-                            // Ensure chart is properly sized and coordinate system is recalculated
+                            // Update chart options for fullscreen
                             if (window.financeChart) {
+                                window.financeChart.options.maintainAspectRatio = false;
                                 window.financeChart.resize();
                                 window.financeChart.update('none'); // Force coordinate recalculation
                             }
@@ -1084,25 +1012,16 @@ export function updateFinance2(data) {
         } else {
             // Exiting fullscreen
             document.exitFullscreen().then(() => {
-                // Wait for fullscreen to fully exit before reinitializing
+                // Wait for fullscreen to fully exit before resizing
                 const checkExit = () => {
                     if (!document.fullscreenElement) {
-                        // Fullscreen has exited, destroy and recreate chart
-                        if (window.financeChart) window.financeChart.destroy();
-                        
-                        // Reset canvas dimensions to container size
+                        // Fullscreen has exited, resize chart back to normal
                         canvas.width = chartContainer.clientWidth;
                         canvas.height = chartContainer.clientHeight;
                         
-                        // Reinitialize chart with original dimensions
-                        window.financeChart = initializeChart(ctx, {
-                            dates: existingData.labels || [],
-                            prices: existingData.datasets?.[0]?.data || [],
-                            symbol: document.getElementById('stockSymbolInput').value || '^IXIC'
-                        }, true); // Re-enable maintainAspectRatio when exiting fullscreen
-                        
-                        // Force chart resize and update
+                        // Update chart options back to normal
                         if (window.financeChart) {
+                            window.financeChart.options.maintainAspectRatio = true;
                             window.financeChart.resize();
                             window.financeChart.update('none');
                         }
