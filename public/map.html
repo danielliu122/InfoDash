@@ -7,7 +7,16 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/map.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-        <!--
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Scripts -->
+    <script type="module" src="js/uiUtils.js"></script>
+    <script type="module" src="js/logger.js"></script>
+    <script type="module" src="js/map.js"></script>
+    <script type="module" src="js/app.js"></script>
+    <!--
     Prevent theme flicker by applying the theme class to <html> immediately, before <body> is parsed.
     This ensures the correct theme is set before any content is rendered.
     This script is placed as the very first element in <head> to run before any paint.
@@ -269,103 +278,6 @@
         </section>
       </div>
       
-
-
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Scripts -->
-    <script type="module" src="js/uiUtils.js"></script>
-    <script type="module" src="js/logger.js"></script>
-    <script type="module" src="js/map.js"></script>
-    <script type="module" src="js/app.js"></script>
-    
-    <script type="module">
-    import {
-        initMapReal,
-        applyThemeToMap,
-        getCurrentAppTheme
-    } from './js/map.js';
-        
-        // Global functions for onclick handlers
-        window.toggleSidebar = function() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('main-content');
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-        };
-        
-        window.toggleTheme = function() {
-            const body = document.body;
-            const isDark = body.classList.contains('dark-theme');
-            
-            if (isDark) {
-                body.classList.remove('dark-theme');
-                body.classList.add('light-theme');
-                localStorage.setItem('theme', 'light');
-            } else {
-                body.classList.remove('light-theme');
-                body.classList.add('dark-theme');
-                localStorage.setItem('theme', 'dark');
-            }
-        };
-        
-        // Map-specific functions
-        window.calculateRoute = function() {
-            const origin = document.getElementById('origin').value.trim();
-            const destination = document.getElementById('destination').value.trim();
-            
-            if (origin && destination) {
-                calculateDirections(origin, destination);
-            } else {
-                alert('Please enter both origin and destination.');
-            }
-        };
-        
-        window.locateMe = function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        getCurrentLocation(lat, lon);
-                    },
-                    function(error) {
-                        console.error('Error getting location:', error);
-                        alert('Unable to get your location. Please check your browser settings.');
-                    }
-                );
-            } else {
-                alert('Geolocation is not supported by this browser.');
-            }
-        };
-        
-        window.toggleTraffic = function() {
-            toggleTrafficLayer();
-        };
-        
-        window.toggleMapTheme = function() {
-            mapThemeToggle();
-        };
-        
-        window.clearDirections = function() {
-            clearMapDirections();
-            document.getElementById('origin').value = '';
-            document.getElementById('destination').value = '';
-        };
-        
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize theme
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.body.className = savedTheme + '-theme';
-            
-            // Initialize map when Google Maps API is loaded
-            window.initMapReal = function() {
-                initMapReal();
-            };
-        });
-    </script>
     
     <!-- Google Maps API -->
     <script async defer src="/api/googlemaps/script"></script>
