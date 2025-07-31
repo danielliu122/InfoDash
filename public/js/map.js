@@ -296,6 +296,7 @@ window.getCurrentAppTheme = getCurrentAppTheme;
 
 // JS: Resize Fix After Map Loads
 // Ensures Google Maps renders correctly after delayed layout or load order
+// Also triggers a window resize event to help main content expand full width if needed
 google.maps.event.addListenerOnce(map, 'idle', function() {
   setTimeout(function() {
     google.maps.event.trigger(map, 'resize');
@@ -303,5 +304,7 @@ google.maps.event.addListenerOnce(map, 'idle', function() {
     if (map && map.getCenter) {
       map.setCenter(map.getCenter());
     }
+    // Trigger a window resize event to help layout recalculate
+    window.dispatchEvent(new Event('resize'));
   }, 100); // slight delay to allow layout to settle
 });
