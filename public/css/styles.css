@@ -135,8 +135,6 @@ body.dark-theme .card[data-section="daily-summary"] {
 /* === Reset & Base === */
 * {box-sizing: border-box; }
 body, html {
-  height:100%;
-  width:100%;
   font-family: 'Google Sans Text', 'Google Sans', 'Roboto', 'Noto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif !important;
     line-height: 1.6;
     color: var(--primary-text);
