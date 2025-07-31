@@ -718,7 +718,7 @@ app.post('/api/lookup', async (req, res) => {
         }
 
         // Use DuckDuckGo Instant Answer API
-        const ddgUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json`;
+        const ddgUrl = `https://api.duckduckgo.com/?q=${(query)}&format=json`;
         const ddgResponse = await fetch(ddgUrl);
         if (!ddgResponse.ok) {
             return res.json({ result: null });
@@ -803,116 +803,20 @@ app.get('/api/weather', async (req, res) => {
     }
 });
 
-// Enhanced lookup endpoint for real-time information
-app.post('/api/enhanced-lookup', async (req, res) => {
+// Reddit API proxy endpoint
+app.get('/api/reddit/top', async (req, res) => {
+    const timePeriod = req.query.timePeriod || 'day';
+    
     try {
-        const { query, model = 'deepseek/deepseek-r1:free' } = req.body;
-        if (!query) {
-            return res.status(400).json({ error: 'Query is required' });
-        }
-
-        const queryLower = query.toLowerCase();
-        let result = null;
-
-        // Check if it's a weather query
-        if (queryLower.includes('weather') || queryLower.includes('temperature') || queryLower.includes('forecast')) {
-            // Extract location from query
-            const locationMatch = query.match(/(?:weather|temperature|forecast)\s+(?:in\s+)?([^?]+)/i);
-            const location = locationMatch ? locationMatch[1].trim() : 'New York';
-            
-            try {
-                const weatherResponse = await fetch(`${req.protocol}://${req.get('host')}/api/weather?location=${encodeURIComponent(location)}`);
-                if (weatherResponse.ok) {
-                    const weatherData = await weatherResponse.json();
-                    result = weatherData.description || `Weather in ${location}: ${weatherData.temperature || 'N/A'} ${weatherData.condition || ''}`;
-                }
-            } catch (weatherError) {
-                console.error('Weather lookup error:', weatherError);
-            }
-        }
-        
-        // Check if it's a stock query
-        else if (queryLower.includes('stock') || queryLower.includes('price') || queryLower.includes('market') || 
-                 queryLower.includes('nasdaq') || queryLower.includes('dow') || queryLower.includes('s&p')) {
-            try {
-                // Extract stock symbol from query
-                const stockMatch = query.match(/\$?([A-Z]{1,5})/);
-                if (stockMatch) {
-                    const symbol = stockMatch[1];
-                    const stockResponse = await fetch(`${req.protocol}://${req.get('host')}/api/finance/${symbol}?range=1d&interval=1m`);
-                    if (stockResponse.ok) {
-                        const stockData = await stockResponse.json();
-                        if (stockData.chart && stockData.chart.result && stockData.chart.result[0]) {
-                            const meta = stockData.chart.result[0].meta;
-                            const price = meta.regularMarketPrice;
-                            const change = meta.regularMarketPrice - meta.previousClose;
-                            const changePercent = (change / meta.previousClose) * 100;
-                            result = `${symbol} stock: $${price.toFixed(2)} (${change >= 0 ? '+' : ''}${change.toFixed(2)}, ${changePercent.toFixed(2)}%)`;
-                        }
-                    }
-                }
-            } catch (stockError) {
-                console.error('Stock lookup error:', stockError);
-            }
-        }
-
-        // If no specific data found, use DuckDuckGo Instant Answer API
-        if (!result) {
-            const ddgUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json`;
-            const ddgResponse = await fetch(ddgUrl);
-            if (ddgResponse.ok) {
-                const ddgData = await ddgResponse.json();
-                if (ddgData.AbstractText) {
-                    result = ddgData.AbstractText;
-                } else if (ddgData.RelatedTopics && ddgData.RelatedTopics.length > 0) {
-                    const topic = ddgData.RelatedTopics[0];
-                    result = topic.Text || topic.Name || null;
-                } else if (ddgData.Results && ddgData.Results.length > 0) {
-                    result = ddgData.Results[0].Text || null;
-                }
-            }
-        }
-
-        // If we have a result, optionally enhance it with AI
-        if (result) {
-            try {
-                const enhancedResponse = await openai.chat.completions.create({
-                    model,
-                    messages: [{
-                        role: 'user',
-                        content: `Based on this information: "${result}", provide a clear and concise answer to: ${query}`
-                    }],
-                    max_tokens: 200
-                });
-
-                result = enhancedResponse.choices[0].message.content;
-            } catch (aiError) {
-                console.error('Error enhancing result:', aiError);
-                // Return the raw result if AI enhancement fails
-            }
-        }
-
-        res.json({ result });
+        const redditUrl = `https://www.reddit.com/r/all/top.json?t=${timePeriod}&limit=25`;
+        const response = await fetch(redditUrl);
+        const data = await response.json();
+        res.json(data);
     } catch (error) {
-        console.error('Error performing enhanced lookup:', error);
-        res.status(500).json({ error: 'Error performing lookup' });
+        console.error('Error fetching Reddit data:', error);
+        res.status(500).json({ error: 'Error fetching Reddit data' });
     }
 });
-
-    // Reddit API proxy endpoint
-    app.get('/api/reddit/top', async (req, res) => {
-        const timePeriod = req.query.timePeriod || 'day';
-        
-        try {
-            const redditUrl = `https://www.reddit.com/r/all/top.json?t=${timePeriod}&limit=25`;
-            const response = await fetch(redditUrl);
-            const data = await response.json();
-            res.json(data);
-        } catch (error) {
-            console.error('Error fetching Reddit data:', error);
-            res.status(500).json({ error: 'Error fetching Reddit data' });
-        }
-    });
 
 
 // Daily Summary API endpoints

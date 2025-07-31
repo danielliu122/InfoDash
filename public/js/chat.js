@@ -104,57 +104,61 @@ async function fetchAIResponse(history, attempt = 0) {
     try {
         const selectedModel = document.getElementById('model-select').value;
         const lastMessage = history[history.length - 1];
+        
+        // Always try lookup first since it's free
         const lookupResult = await performOnlineLookup(lastMessage);
-        console.log('Enhanced lookup result:', lookupResult);
+        console.log('lookup result:', lookupResult);
 
-        // If it's a simple query and we have a lookup result, use it directly
-        if (isSimpleQuery(lastMessage) && lookupResult) {
+        // If we have a lookup result, use it directly (free option)
+        if (lookupResult) {
             return lookupResult;
         }
 
-        // Otherwise, proceed with AI as before
-        const messages = [
-            {
-                role: 'system',
-                content: 'This is a conversation between a user and an AI engine. Please determine the next appropriate response to the current user query. Each user query is independent unless explicitly related to previous queries.'
-            },
-            ...history.slice(0, -1).map((message, index) => ({
-                role: index % 2 === 0 ? 'user' : 'assistant',
-                content: message
-            })),
-            {
-                role: 'user',
-                content: lookupResult
-                    ? `Based on this information: "${lookupResult}", answer: ${lastMessage}`
-                    : lastMessage
-            }
-        ];
-
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                messages,
-                model: selectedModel 
-            }),
-        });
-        if (!response.ok) {
-            let errorMsg = 'Sorry, the AI service is temporarily unavailable.';
-            try {
-                const errorData = await response.json();
-                if (errorData && errorData.error) {
-                    errorMsg = errorData.error;
+        // Only use AI chat if lookup failed and the query is complex enough to warrant AI
+        if (!isSimpleQuery(lastMessage)) {
+            const messages = [
+                {
+                    role: 'system',
+                    content: 'This is a conversation between a user and an AI engine. Please determine the next appropriate response to the current user query. Each user query is independent unless explicitly related to previous queries.'
+                },
+                ...history.slice(0, -1).map((message, index) => ({
+                    role: index % 2 === 0 ? 'user' : 'assistant',
+                    content: message
+                })),
+                {
+                    role: 'user',
+                    content: lastMessage
                 }
-            } catch (e) {}
-            if (lookupResult) {
-                return lookupResult;
+            ];
+
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    messages,
+                    model: selectedModel 
+                }),
+            });
+            
+            if (!response.ok) {
+                let errorMsg = 'Sorry, the AI service is temporarily unavailable.';
+                try {
+                    const errorData = await response.json();
+                    if (errorData && errorData.error) {
+                        errorMsg = errorData.error;
+                    }
+                } catch (e) {}
+                return errorMsg;
             }
-            return errorMsg;
+            
+            const data = await response.json();
+            return data.reply || 'Sorry, I did not understand that.';
+        } else {
+            // For simple queries that didn't get a lookup result, provide a helpful response
+            return "I couldn't find specific information for that query. Could you try rephrasing your question or ask something more specific?";
         }
-        const data = await response.json();
-        return data.reply || 'Sorry, I did not understand that.';
     } catch (error) {
         console.error('Error fetching AI response:', error);
         return 'Error: Unable to get response.';
@@ -163,7 +167,7 @@ async function fetchAIResponse(history, attempt = 0) {
 
 async function performOnlineLookup(query) {
     try {
-        const response = await fetch('/api/enhanced-lookup', {
+        const response = await fetch('/api/lookup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
