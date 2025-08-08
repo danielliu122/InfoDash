@@ -54,17 +54,15 @@ deploy.sh
 # === DATA FILES ===
 
 # ignore files inside unless whitelisted
-# Useful for keeping directory structure for dev + prod
-data/
-data/local/
-data/production/
+/public/data/local/
+/public/data/production/
 
-# Ignore all json data files by default
-data/*.json
-data/local/*.json
-data/production/*.json
+# Always keep the base folders (so Git tracks the structure)
+!/public/data/
+!/public/data/local/
+!/public/data/production/
 
-# Allow sample test data if needed (uncomment if you want to track these)
-# !data/local/sample-summary.json
-# !data/production/sample-prod-config.json
+# Ignore all JSON files in these folders
+/public/data/local/*.json
+/public/data/production/*.json
 
