@@ -53,11 +53,11 @@ deploy.sh
 
 # === DATA FILES ===
 
-# Keep folders but ignore files inside unless whitelisted
+# ignore files inside unless whitelisted
 # Useful for keeping directory structure for dev + prod
-!data/
-!data/local/
-!data/production/
+data/
+data/local/
+data/production/
 
 # Ignore all json data files by default
 data/*.json

@@ -81,7 +81,7 @@ currentSymbol = getDefaultSymbol();
 // Load stock symbols for autocomplete
 async function loadStockSymbols() {
     try {
-        const response = await fetch('/stockSymbols.json');
+        const response = await fetch('/data/stockSymbols.json');
         stockSymbols = await response.json();
     } catch (error) {
         console.error('Error loading stock symbols:', error);
