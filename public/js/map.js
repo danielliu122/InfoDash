@@ -205,27 +205,9 @@ export function initMapReal() {
 
   // --- Search Bar (Google Places Autocomplete) ---
   const searchForm = document.createElement('div');
-  searchForm.style.display = 'flex';
-  searchForm.style.alignItems = 'center';
-  searchForm.style.background = '#fff';
-  searchForm.style.borderRadius = '24px';
-  searchForm.style.boxShadow = '0 2px 8px rgba(0,0,0,0.12)';
-  searchForm.style.padding = '0 12px';
-  searchForm.style.height = '40px';
-  searchForm.style.gap = '8px';
-
+  
   const searchInput = document.createElement('input');
-  searchInput.type = 'search';
-  searchInput.placeholder = 'Search location...';
-  searchInput.style.border = 'none';
-  searchInput.style.outline = 'none';
-  searchInput.style.fontSize = '16px';
-  searchInput.style.background = 'transparent';
-  searchInput.style.height = '38px';
-  searchInput.style.width = '220px';
-  searchInput.style.padding = '0 0 0 32px';
-  searchInput.setAttribute('aria-label', 'Search location');
-
+  
   // Search icon
   const searchIcon = document.createElement('span');
   searchIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;

@@ -1054,3 +1054,48 @@ body.dark-theme div[jstcache="128"][jsinstance="0"].address-line.full-width[jsan
   }
   
   /* === End Hide Google Maps InfoWindow button === */
+
+  /* --- Search Bar (Google Places Autocomplete) --- */
+  .map-search-bar {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    padding: 0 12px;
+    height: 40px;
+    gap: 8px;
+  }
+
+  .map-search-bar input[type="search"] {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background: transparent;
+    height: 38px;
+    width: 220px;
+    padding: 0 0 0 32px;
+  }
+
+  .map-search-bar input[type="search"]::placeholder {
+    color: #888;
+  }
+
+  .map-search-bar .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 10px;
+    pointer-events: none;
+    width: 20px;
+    height: 20px;
+    color: #888;
+  }
+
+  .map-search-bar .search-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+  
+  #directions-panel, .pac-target-input, .controls{
+    background: var(--primary-bg) !important;
+  }
