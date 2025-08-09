@@ -2,9 +2,9 @@
 const blogContainer = document.getElementById('blog-container');
 
 // Function to create and append a blog post
-function createBlogPost(title, content, date, thumbnail, href) {
+function createBlogPost(title, content, date, href) {
     const postDiv = document.createElement('div');
-    postDiv.className = 'blog-post';
+    postDiv.className = 'card blog-post';
 
     const postTitle = document.createElement('h2');
     postTitle.textContent = title;
@@ -13,20 +13,20 @@ function createBlogPost(title, content, date, thumbnail, href) {
     postDate.className = 'post-date';
     postDate.textContent = date;
     
-    const postContent = document.createElement('div');
+    const postContent = document.createElement('post-content');
+    postDate.className = 'video-container';
     postContent.innerHTML = content;
 
-    // Add thumbnail if provided
-    if (thumbnail) {
-        const thumbnailLink = document.createElement('a');
-        thumbnailLink.href = href || '#';
-        const thumbnailImg = document.createElement('img');
-        thumbnailImg.src = thumbnail;
-        thumbnailImg.alt = title;
-        thumbnailImg.className = 'zoom';
-        thumbnailImg.style.display = 'block';
-        thumbnailLink.appendChild(thumbnailImg);
-        postContent.insertBefore(thumbnailLink, postContent.firstChild);
+    // Handle YouTube embeds
+    if (href && href.includes('youtube.com/watch?v=')) {
+        // Extract video ID
+        const videoId = href.split('v=')[1].split('&')[0];
+        // Create iframe for YouTube embed
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube.com/embed/${videoId}`;
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.allowFullscreen = true;
+        postContent.insertBefore(iframe, postContent.firstChild);
     }
 
     postDiv.appendChild(postTitle);
@@ -50,7 +50,6 @@ window.addEventListener('load', async () => {
                 post.title, 
                 post.content, 
                 post.date,
-                post.thumbnail,
                 post.href
             );
         });
