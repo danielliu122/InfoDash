@@ -32,8 +32,8 @@
     <url>
         <loc>https://infodash.app/blog.html</loc>
         <lastmod>2025-01-27</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>.4</priority>
+        <changefreq>weekly</changefreq>
+        <priority>.6</priority>
     </url>
 
     <!-- Legal Pages -->
