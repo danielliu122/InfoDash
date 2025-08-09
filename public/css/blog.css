@@ -1,16 +1,23 @@
 .video-container {
-    width: 80%;
-    height: 100%;
+    width: 80% ;
+    height: 45% ; /* Maintain 16:9 aspect ratio for video container */
 }
 
 iframe, img  {
     display: flex;
     align-items: center;
-    width:80%;
+    width:80% !important;
     padding:10px;
     margin-left: auto;
     margin-right: auto;
     min-height:600px;
     border:0;
+}
+
+@media (max-width: 768px) {
+    iframe, img{
+        min-height:400px;
+        width:100% !important;
+    }
 }
 
