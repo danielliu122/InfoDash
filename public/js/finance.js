@@ -997,7 +997,6 @@ export function updateFinance2(data) {
                             
                             // Update chart options for fullscreen
                             if (window.financeChart) {
-                                window.financeChart.options.maintainAspectRatio = true;
                                 window.financeChart.resize();
                                 window.financeChart.update('none'); // Force coordinate recalculation
                             }
@@ -1016,7 +1015,6 @@ export function updateFinance2(data) {
                 const checkExit = () => {
                     if (!document.fullscreenElement) {
                         // Fullscreen has exited, resize chart back to normal
-                        window.financeChart.options.maintainAspectRatio = false;
                         canvas.width = chartContainer.clientWidth;
                         canvas.height = chartContainer.clientHeight;
                         
