@@ -1027,83 +1027,6 @@ app.post('/api/news/clear-cache', async (req, res) => {
     }
 });
 
-// Endpoint to get cache status (for debugging)
-app.get('/api/news/cache-status', async (req, res) => {
-    try {
-        const fileCache = await loadNewsCache();
-        const cacheKeys = Object.keys(fileCache);
-        const cacheInfo = cacheKeys.map(key => ({
-            key,
-            timestamp: fileCache[key].timestamp,
-            age: Date.now() - fileCache[key].timestamp,
-            stale: isCacheStale(fileCache[key].timestamp),
-            articleCount: fileCache[key].data.articles?.length || 0
-        }));
-        
-        res.json({
-            totalEntries: cacheKeys.length,
-            entries: cacheInfo
-        });
-    } catch (error) {
-        console.error('Error getting cache status:', error);
-        res.status(500).json({ error: 'Error getting cache status' });
-    }
-});
-
-// Endpoint to test News API key status
-app.get('/api/news/test-key', async (req, res) => {
-    const newsApiKey = process.env.NEWS_API_KEY;
-    
-    if (!newsApiKey) {
-        return res.status(500).json({ 
-            error: 'News API key is not set in environment variables',
-            status: 'missing_key'
-        });
-    }
-    
-    try {
-        // Test with a simple request
-        const testUrl = `https://newsapi.org/v2/top-headlines?country=us&category=general&apiKey=${newsApiKey}`;
-        const response = await axios.get(testUrl);
-        
-        if (response.status === 200) {
-            res.json({ 
-                status: 'working',
-                message: 'News API key is working correctly',
-                articlesCount: response.data.articles?.length || 0
-            });
-        } else {
-            res.json({ 
-                status: 'error',
-                message: 'News API returned unexpected status',
-                statusCode: response.status
-            });
-        }
-    } catch (error) {
-        console.error('News API key test error:', error);
-        
-        if (error.response?.status === 401) {
-            res.status(401).json({ 
-                status: 'invalid_key',
-                message: 'News API key is invalid or expired',
-                error: error.response.data
-            });
-        } else if (error.response?.status === 429) {
-            res.status(429).json({ 
-                status: 'rate_limited',
-                message: 'News API rate limit reached',
-                error: error.response.data
-            });
-        } else {
-            res.status(500).json({ 
-                status: 'error',
-                message: 'Error testing News API key',
-                error: error.message
-            });
-        }
-    }
-});
-
 // --- NEW ROBUST BULK FINANCE ENDPOINT ---
 app.post('/api/finance/bulk-real-time', async (req, res) => {
     const { symbols } = req.body;
@@ -1141,6 +1064,74 @@ app.post('/api/finance/bulk-real-time', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch bulk real-time financial data' });
     }
 });
+
+// Get historical data for a symbol
+app.get('/api/finance/history/:symbol', async (req, res) => {
+    const { symbol } = req.params;
+    const { period = '1mo', interval = '1d' } = req.query;
+    
+    try {
+        const historical = await yahooFinance.historical(symbol, {
+            period1: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+            period2: new Date(),
+            interval: interval
+        });
+        
+        res.json({
+            success: true,
+            data: historical.map(day => ({
+                date: day.date,
+                open: day.open,
+                high: day.high,
+                low: day.low,
+                close: day.close,
+                volume: day.volume
+            }))
+        });
+    } catch (error) {
+        console.error(`Error fetching historical data for ${symbol}:`, error);
+        res.status(500).json({ success: false, error: 'Failed to fetch historical data' });
+    }
+});
+
+// Get market summary (major indices)
+app.get('/api/finance/market-summary', async (req, res) => {
+    const majorIndices = ['^GSPC', '^DJI', '^IXIC', '^RUT', '^VIX'];
+    
+    try {
+        const results = {};
+        const promises = majorIndices.map(async (symbol) => {
+            try {
+                const quote = await yahooFinance.quote(symbol);
+                if (quote) {
+                    const name = {
+                        '^GSPC': 'S&P 500',
+                        '^DJI': 'Dow Jones',
+                        '^IXIC': 'NASDAQ',
+                        '^RUT': 'Russell 2000',
+                        '^VIX': 'VIX'
+                    }[symbol] || symbol;
+                    
+                    results[symbol] = {
+                        name,
+                        price: quote.regularMarketPrice,
+                        change: quote.regularMarketChange,
+                        changePercent: quote.regularMarketChangePercent
+                    };
+                }
+            } catch (error) {
+                console.error(`Error fetching ${symbol}:`, error);
+            }
+        });
+        
+        await Promise.all(promises);
+        res.json({ success: true, data: results });
+    } catch (error) {
+        console.error('Error fetching market summary:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch market summary' });
+    }
+});
+
 
 // Geolocation endpoint to detect user's location from IP
 app.get('/api/geolocation', (req, res) => {

@@ -42,7 +42,7 @@ function getSelectedDate() {
 
 // Function to collect data from all sections
 async function collectSectionData() {
-    //console.log('collectSectionData: Starting to collect section data...');
+    console.log('collectSectionData: Starting to collect section data...');
     
     const data = {
         news: null,
@@ -50,24 +50,24 @@ async function collectSectionData() {
         finance: null
     };
     
-    // Collect news data
-    //console.log('collectSectionData: Collecting news data...');
-    data.news = collectNewsData();
+    // Collect news data from API
+    console.log('collectSectionData: Collecting news data from API...');
+    data.news = await collectNewsDataFromAPI();
     console.log('collectSectionData: News data collected:', {
         hasData: !!data.news,
         count: data.news?.length || 0
     });
     
-    // Collect trends data
-    //console.log('collectSectionData: Collecting trends data...');
+    // Collect trends data from API
+    console.log('collectSectionData: Collecting trends data from API...');
     data.trends = await collectTrendsData();
     console.log('collectSectionData: Trends data collected:', {
         hasData: !!data.trends,
         count: data.trends?.length || 0
     });
     
-    // Collect finance data
-    //console.log('collectSectionData: Collecting finance data...');
+    // Collect finance data from API
+    console.log('collectSectionData: Collecting finance data from API...');
     data.finance = await collectFinanceData();
     console.log('collectSectionData: Finance data collected:', {
         hasData: !!data.finance,
@@ -85,84 +85,56 @@ async function collectSectionData() {
     return data;
 }
 
-// Function to collect news data
-function collectNewsData() {
-    console.log('collectNewsData: Starting news data collection...');
+// Function to collect news data from API
+async function collectNewsDataFromAPI() {
+    console.log('collectNewsDataFromAPI: Starting news data collection from API...');
     
-    // First try to find the modern news grid structure
-    let newsContainer = document.querySelector('#news .data-container .news-grid');
-    let newsItems = [];
-    
-    if (newsContainer) {
-        console.log('collectNewsData: Found modern news grid');
-        newsItems = newsContainer.querySelectorAll('.news-card');
-        console.log('collectNewsData: Modern news cards found:', newsItems.length);
-    } else {
-        // Fallback to old structure
-        console.log('collectNewsData: Looking for legacy news structure');
-        newsContainer = document.querySelector('#news .data-container');
-        if (newsContainer) {
-            newsItems = newsContainer.querySelectorAll('li');
-            console.log('collectNewsData: Legacy news items found:', newsItems.length);
+    try {
+        // Get current news settings
+        const newsCountrySelect = document.getElementById('newsCountrySelect');
+        const newsLanguageSelect = document.getElementById('newsLanguageSelect');
+        
+        if (!newsCountrySelect || !newsLanguageSelect) {
+            console.log('News select elements not found, using defaults');
         }
-    }
-    
-    if (!newsContainer) {
-        console.log('collectNewsData: No news container found');
+        
+        const country = newsCountrySelect?.value || 'US';
+        const language = newsLanguageSelect?.value || 'en';
+        
+        console.log(`collectNewsDataFromAPI: Fetching news for country: ${country}, language: ${language}`);
+        
+        // Fetch news data from API
+        const response = await fetch(`/api/news?country=${country}&language=${language}&category=general&pageSize=5`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('collectNewsDataFromAPI: Raw news data received');
+        
+        if (!data || !data.articles || data.articles.length === 0) {
+            console.log('collectNewsDataFromAPI: No news data available');
+            return null;
+        }
+        
+        // Process the top 5 news articles
+        const newsData = data.articles.slice(0, 5).map(article => ({
+            title: article.title || 'Unknown',
+            description: article.description || '',
+            source: article.source?.name || article.author || ''
+        }));
+        
+        console.log('collectNewsDataFromAPI: News data processed:', {
+            totalItems: newsData.length,
+            items: newsData.map(item => item.title.substring(0, 30))
+        });
+        
+        return newsData.length > 0 ? newsData : null;
+        
+    } catch (error) {
+        console.error('collectNewsDataFromAPI: Error collecting news data:', error);
         return null;
     }
-    
-    if (newsItems.length === 0) {
-        console.log('collectNewsData: No news items found');
-        return null;
-    }
-    
-    const newsData = [];
-    newsItems.forEach((item, index) => {
-        if (index < 5) { // Limit to top 5 news items
-            let title, description, source;
-            
-            // Handle modern news card structure
-            if (item.classList.contains('news-card')) {
-                title = item.querySelector('.news-card-title')?.textContent?.trim();
-                description = item.querySelector('.news-card-description')?.textContent?.trim();
-                source = item.querySelector('.news-card-source')?.textContent?.trim();
-            } else {
-                // Handle legacy structure
-                title = item.querySelector('h3')?.textContent?.trim() || 
-                       item.querySelector('h5')?.textContent?.trim() || 
-                       item.querySelector('.article-title')?.textContent?.trim() ||
-                       item.querySelector('h1, h2, h3, h4, h5, h6')?.textContent?.trim();
-                
-                description = item.querySelector('.article-text')?.textContent?.trim();
-                source = item.querySelector('.article-descriptor')?.textContent?.trim();
-            }
-            
-            console.log(`collectNewsData: News item ${index}:`, { 
-                title: title?.substring(0, 50), 
-                hasDescription: !!description, 
-                hasSource: !!source,
-                isModernCard: item.classList.contains('news-card')
-            });
-            
-            if (title) {
-                newsData.push({
-                    title,
-                    description: description || '',
-                    source: source || ''
-                });
-            } else {
-                console.log(`collectNewsData: No title found for item ${index}, skipping`);
-            }
-        }
-    });
-    
-    console.log('collectNewsData: News data collected:', {
-        totalItems: newsData.length,
-        items: newsData.map(item => item.title.substring(0, 30))
-    });
-    
-    return newsData.length > 0 ? newsData : null;
 }
 
 // Function to collect trends data

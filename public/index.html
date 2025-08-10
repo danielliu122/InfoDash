@@ -12,9 +12,13 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <!-- Font Awesome for icons (deferred) -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css">
+    </noscript>
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     
@@ -477,120 +481,6 @@
                             </p>
                         </div>
                     </div>
-                </section>
-            </div>
-            <!-- Hidden sections for data generation (not visible to users) -->
-            <div style="display: none;">
-                <!-- News Section (Hidden) -->
-                <section id="news" class="section">
-                    <div class="section-header">
-                        <h4>📰 News</h4>
-                    </div>
-                    <div id="news-controls" class="row">
-                        <div class="input-field col s6">
-                            <select id="countrySelect">
-                                <option value="US">United States</option>
-                                <option value="GB">United Kingdom</option>
-                                <option value="CA">Canada</option>
-                                <option value="AU">Australia</option>
-                                <option value="DE">Germany</option>
-                                <option value="FR">France</option>
-                                <option value="JP">Japan</option>
-                                <option value="IN">India</option>
-                                <option value="BR">Brazil</option>
-                                <option value="KR">South Korea</option>
-                                <option value="IT">Italy</option>
-                                <option value="ES">Spain</option>
-                                <option value="MX">Mexico</option>
-                                <option value="RU">Russia</option>
-                            </select>
-                            <label for="countrySelect">Country</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <select id="languageSelect">
-                                <option value="en">English</option>
-                                <option value="es">Español</option>
-                                <option value="fr">Français</option>
-                                <option value="de">Deutsch</option>
-                                <option value="ru">Русский</option>
-                                <option value="zh">中文</option>
-                                <option value="jp">日本語</option>
-                                <option value="ko">한국어</option>
-                                <option value="pt">Português</option>
-                                <option value="ar">العربية</option>
-                                <option value="hi">हिन्दी</option>
-                                <option value="it">Italiano</option>
-                            </select>
-                            <label for="languageSelect">Language</label>
-                        </div>
-                    </div>
-                    <div class="data-container"></div>
-                </section>
-                
-
-                <!-- Finance Section (Hidden) -->
-                <section id="finance" class="section">
-                    <div class="section-header">
-                        <h4>📈 Stocks</h4>
-                    </div>
-                    <div class="input-field">
-                        <input type="text" id="stockSymbolInput" placeholder="Enter stock symbol (e.g., AAPL)">
-                        <label for="stockSymbolInput">Stock Symbol</label>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="stockChart"></canvas>
-                    </div>
-                    <div class="data-container"></div>
-                    <div id="stock-dashboard" class="stock-dashboard"></div>
-                </section>
-
-                <!-- Trends Section (Hidden) -->
-                <section id="trends" class="section">
-                    <div class="section-header">
-                        <h4>🔥 Trends</h4>
-                    </div>
-                    <div id="trends-controls" class="row">
-                        <div class="input-field col s6">
-                            <select id="trendsCountrySelect">
-                                <option value="US">United States</option>
-                                <option value="GB">United Kingdom</option>
-                                <option value="CA">Canada</option>
-                                <option value="AU">Australia</option>
-                                <option value="DE">Germany</option>
-                                <option value="FR">France</option>
-                                <option value="JP">Japan</option>
-                                <option value="IN">India</option>
-                                <option value="BR">Brazil</option>
-                                <option value="KR">South Korea</option>
-                                <option value="IT">Italy</option>
-                                <option value="ES">Spain</option>
-                            </select>
-                            <label for="trendsCountrySelect">Country</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <select id="trendsLanguageSelect">
-                                <option value="en">English</option>
-                                <option value="es">Español</option>
-                                <option value="fr">Français</option>
-                                <option value="de">Deutsch</option>
-                                <option value="ru">Русский</option>
-                                <option value="zh">中文</option>
-                                <option value="jp">日本語</option>
-                                <option value="ko">한국어</option>
-                                <option value="pt">Português</option>
-                            </select>
-                            <label for="trendsLanguageSelect">Language</label>
-                        </div>
-                    </div>
-                    <div class="data-container"></div>
-                </section>
-
-                <!-- Reddit Section (Hidden) -->
-                <section id="reddit" class="section">
-                    <div class="section-header">
-                        <h4>🔴 Reddit</h4>
-                    </div>
-                    <div class="data-container"></div>
                 </section>
             </div>
         </div>
