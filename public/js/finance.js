@@ -1780,7 +1780,7 @@ function isMobileDevice() {
 // Listen for fullscreen changes on the chart
 if (typeof document !== 'undefined') {
   document.addEventListener('fullscreenchange', async function () {
-    const chartContainer = document.querySelector('.card.chart-container');
+    const chartContainer = document.querySelector('.chart-container');
     if (!chartContainer) return;
 
     if (document.fullscreenElement === chartContainer && isMobileDevice()) {
