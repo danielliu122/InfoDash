@@ -1791,7 +1791,7 @@ if (typeof document !== 'undefined') {
         } catch (e) {
           if (window.showNotification) {
             window.showNotification('For best experience, rotate your device to landscape.', 4000);
-        } else {
+          } else {
             alert('For best experience, rotate your device to landscape.');
           }
         }
@@ -1844,6 +1844,22 @@ if (typeof document !== 'undefined') {
         window.removeEventListener('orientationchange', chartContainer._mobileResizeHandler);
         delete chartContainer._mobileResizeHandler;
       }
+
+      // Force chart resize and update after exiting fullscreen
+      setTimeout(() => {
+        if (window.financeChart) {
+          const canvas = chartContainer.querySelector('canvas');
+          if (canvas) {
+            // Reset canvas to container dimensions
+            canvas.width = chartContainer.clientWidth;
+            canvas.height = chartContainer.clientHeight;
+            
+            // Resize and update chart
+            window.financeChart.resize();
+            window.financeChart.update('none');
+          }
+        }
+      }, 100); // Small delay to ensure DOM has updated
     }
   });
 }
