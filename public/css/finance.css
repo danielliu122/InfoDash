@@ -103,9 +103,15 @@ body.dark-theme .chart-container canvas {
   overflow-y: auto !important;
 }
 
-#finance .card.chart-container {
+.chart-container {
   overflow: hidden !important;
   min-height: 400px;
+  max-height: 600px;
+}
+
+#financeChart {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* === Finance Section Card Margins === */
@@ -122,10 +128,6 @@ body.dark-theme .chart-container canvas {
   margin-right: 0 !important;
 }
 
-#financeChart{
-  height: 100% !important;
-  width: 100% !important;
-}
 
 /* === Responsive Chart Buttons === */
 @media (max-width: 768px) {

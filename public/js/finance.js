@@ -997,7 +997,6 @@ export function updateFinance2(data) {
                             
                             // Update chart options for fullscreen
                             if (window.financeChart) {
-                                window.financeChart.options.maintainAspectRatio = false;
                                 window.financeChart.resize();
                                 window.financeChart.update('none'); // Force coordinate recalculation
                             }
@@ -1021,7 +1020,6 @@ export function updateFinance2(data) {
                         
                         // Update chart options back to normal
                         if (window.financeChart) {
-                            window.financeChart.options.maintainAspectRatio = true;
                             window.financeChart.resize();
                             window.financeChart.update('none');
                         }
@@ -1211,7 +1209,7 @@ document.querySelectorAll('.time-range-button').forEach(button => {
     });
 });
 
-function initializeChart(ctx, data, maintainAspectRatio = true) {
+function initializeChart(ctx, data) {
     const isMobile = isMobileDevice();
 
     // Check if it's a crypto symbol
