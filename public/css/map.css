@@ -33,15 +33,6 @@ body.dark-theme #traffic {
   overflow: hidden;
 }
 
-/* --- Map container adjustments for better zoom and size --- */
-#map {
-  width: 100% !important;
-  max-width: 100% !important;
-  height: 100%;
-  border-radius: 8px;
-}
-
-
 /* --- Google Maps Info Window Text Color Fix --- */
 .gm-style-iw, .gm-style-iw-d {
   color: #222 !important;
@@ -247,12 +238,6 @@ body.dark-theme .searchbox input[type='search']::placeholder {
 .gm-style .gm-control-active button, .gm-style .gm-fullscreen-control button, .gm-style .gm-style-mtc button {
   font-size: 1.2em !important;
   padding: 8px 16px !important;
-}
-
-/* Make sure the map container font-size is normal */
-#map {
-  font-size: 20px !important;
-  height:100%;
 }
 
 
