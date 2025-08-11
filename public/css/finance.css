@@ -17,8 +17,9 @@ body.dark-theme .chart-container canvas {
   vertical-align: top;
   margin-right: 1%;
 }
-.stock-dashboard {
+body:not(.dark-theme) .stock-dashboard {
   margin-top: 15px;
+  background-color: rgb(207, 243, 237);
 }
 .stock-dashboard-grid {
   display: grid;
@@ -45,7 +46,6 @@ body.dark-theme .chart-container canvas {
 }
 .stock-name {
   font-size: 14px;
-    color: var(--secondary-text);
   display: block;
   white-space: nowrap;
   overflow: hidden;
@@ -103,15 +103,21 @@ body.dark-theme .chart-container canvas {
   overflow-y: auto !important;
 }
 
+.chart-container canvas {
+  background-color: rgb(207, 243, 237) !important;
+}
+
 .chart-container {
   overflow: hidden !important;
   min-height: 400px;
   max-height: 600px;
+  padding: 5px;
 }
 
 #financeChart {
   width: 100% !important;
   height: 100% !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1.5px 6px rgba(0,0,0,0.08);
 }
 
 /* === Finance Section Card Margins === */
@@ -643,6 +649,7 @@ body:not(.dark-theme) #finance .card.chart-container canvas {
 }
 
 .stock-card {
+  background-color: rgb(134, 161, 231);
   border-radius: 8px;
   border-left: 4px solid var(--primary-color);
   transition: all 0.3s ease;
@@ -743,8 +750,7 @@ body:not(.dark-theme) #finance .card.chart-container canvas {
   overflow-x: auto;
 }
 
-.finance-content{
-  padding: 5px;
-  margin: 30px;
-  box-shadow: 0px 4px 5px rgba(0,0,0,0.14), 0px 1px 10px rgba(0,0,0,0.12);
+.card.finance-content{
+  transition:none;
+  transform:none;
 }

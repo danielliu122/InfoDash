@@ -13,6 +13,39 @@ iframe, img  {
     min-height:600px;
     border:0;
 }
+body.dark-theme #blog {
+    background-color: #181b1f;
+}
+
+body.dark-theme .card.blog-post {
+    background: none;
+}
+
+.card.blog-post{
+    background: lab(90.06% -5.3 -4.59);
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    padding: 12px;
+    margin: 10px 0;
+    color: var(--text-color);
+}
+
+.blog-content{
+    transition:none;
+    transform:none;
+}
+
+#blog-container {
+    margin:12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+
+}
+
+@media (max-width: 768px) {
+    #blog-container {
+        margin:5px;
+    }
+}
 
 @media (max-width: 768px) {
     iframe, img{

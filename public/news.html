@@ -116,7 +116,7 @@
                 <nav class="sidebar-nav mobile-nav" id="mobile-nav">
                     <ul class="nav-menu">
                         <li class="nav-item">
-                            <a href="index.html" class="nav-link">
+                            <a href="summary.html" class="nav-link">
                                 <i class="fas fa-tachometer-alt"></i>
                                 <span>Dash</span>
                             </a>
@@ -139,6 +139,12 @@
                                 <span>Traffic</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="blog.html" class="nav-link">
+                                <i class="fas fa-solid fa-blog"></i>
+                                <span>Blog</span>
+                            </a>
+                        </li>
                     </ul>
                 </nav>                    
                 <i class="fas fa-rocket" style="color: #f44336;"></i>
@@ -149,13 +155,13 @@
         
         <!-- Nav for desktop: hidden on mobile via CSS -->
         <nav class="sidebar-nav" id="desktop-nav">
-            <ul class="nav-menu">
+            <ul class="nav-menu">               
                 <li class="nav-item">
-                    <a href="index.html" class="nav-link">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
+                    <a href="news.html" class="nav-link active">
+                        <i class="fas fa-newspaper"></i>
+                        <span>News</span>
                     </a>
-                </li>
+                </li>                
                 <li class="nav-item">
                     <a href="finance.html" class="nav-link">
                         <i class="fas fa-chart-line"></i>
@@ -163,15 +169,21 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="news.html" class="nav-link active">
-                        <i class="fas fa-newspaper"></i>
-                        <span>News</span>
+                    <a href="summary.html" class="nav-link">
+                        <i class="fas fa-regular fa-clipboard"></i>
+                        <span>Summary</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a href="map.html" class="nav-link">
                         <i class="fas fa-map"></i>
                         <span>Traffic</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="blog.html" class="nav-link">
+                        <i class="fas fa-solid fa-blog"></i>
+                        <span>Blog</span>
                     </a>
                 </li>
             </ul>
@@ -184,7 +196,6 @@
                 </div>
                 <div class="user-details">
                     <div class="user-name">Guest User</div>
-                    <div class="user-status">Free Plan</div>
                 </div>
             </div>
         </div>  
@@ -255,7 +266,7 @@
                 <button class="theme-toggle" id="themeToggle">🌓</button>
             </div>
         </header>
-        <div class="news-content">
+        <div class="news">
             <!-- Recent Headlines Section -->
             <div class="card news-headlines">
                 <div class="card-header">

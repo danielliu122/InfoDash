@@ -105,84 +105,97 @@
   <body>
     <!-- Sidebar Navigation -->
     <div class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-          <button class="sidebar-toggle" onclick="toggleSidebar()">
-              <i class="fas fa-bars"></i>
-          </button>
-          <nav class="sidebar-nav mobile-nav" id="mobile-nav">
-              <ul class="nav-menu">
-                  <li class="nav-item">
-                      <a href="index.html" class="nav-link">
-                          <i class="fas fa-tachometer-alt"></i>
-                          <span>Dash</span>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a href="finance.html" class="nav-link">
-                          <i class="fas fa-chart-line"></i>
-                          <span>Stocks</span>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a href="news.html" class="nav-link">
-                          <i class="fas fa-newspaper"></i>
-                          <span>News</span>
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a href="map.html" class="nav-link">
-                          <i class="fas fa-map"></i>
-                          <span>Traffic</span>
-                      </a>
-                  </li>
-              </ul>
-          </nav>              
-          <i class="fas fa-rocket" style="color: #f44336;"></i>
-          <div class="sidebar-title" id="sidebar-title">
-              <span>InfoDash</span>
-          </div>
-      </div>
-      
-      <nav class="sidebar-nav" id="desktop-nav">
-          <ul class="nav-menu">
-              <li class="nav-item">
-                  <a href="index.html" class="nav-link">
-                      <i class="fas fa-tachometer-alt"></i>
-                      <span>Dashboard</span>
-                  </a>
-              </li>
-              <li class="nav-item">
-                  <a href="finance.html" class="nav-link">
-                      <i class="fas fa-chart-line"></i>
-                      <span>Stocks</span>
-                  </a>
-              </li>
-              <li class="nav-item">
-                  <a href="news.html" class="nav-link">
-                      <i class="fas fa-newspaper"></i>
-                      <span>News</span>
-                  </a>
-              </li>
-              <li class="nav-item">
-                  <a href="map.html" class="nav-link">
-                      <i class="fas fa-map"></i>
-                      <span>Traffic</span>
-                  </a>
-              </li>
-          </ul>
-      </nav>
-      
-      <div class="sidebar-footer">
-          <div class="user-info">
-              <div class="user-avatar">
-                  <i class="fas fa-user"></i>
-              </div>
-              <div class="user-details">
-                  <div class="user-name">Guest User</div>
-                  <div class="user-status">Free Plan</div>
-              </div>
-          </div>
-      </div>  
+        <div class="sidebar-header">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <!-- Nav for mobile: placed between toggle and title, hidden on desktop via CSS -->
+            <nav class="sidebar-nav mobile-nav" id="mobile-nav">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="summary.html" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dash</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="finance.html" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Stocks</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="news.html" class="nav-link">
+                            <i class="fas fa-newspaper"></i>
+                            <span>News</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="map.html" class="nav-link">
+                            <i class="fas fa-map"></i>
+                            <span>Traffic</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="blog.html" class="nav-link active">
+                            <i class="fas fa-solid fa-blog"></i>
+                            <span>Blog</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>                    
+            <i class="fas fa-rocket" style="color: #f44336;"></i>
+            <div class="sidebar-title" id="sidebar-title">
+                <span>InfoDash</span>
+            </div>
+        </div>
+        
+        <!-- Nav for desktop: hidden on mobile via CSS -->
+        <nav class="sidebar-nav" id="desktop-nav">
+            <ul class="nav-menu">               
+                <li class="nav-item">
+                    <a href="news.html" class="nav-link">
+                        <i class="fas fa-newspaper"></i>
+                        <span>News</span>
+                    </a>
+                </li>                
+                <li class="nav-item">
+                    <a href="finance.html" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Stocks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="summary.html" class="nav-link">
+                        <i class="fas fa-regular fa-clipboard"></i>
+                        <span>Summary</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="map.html" class="nav-link">
+                        <i class="fas fa-map"></i>
+                        <span>Traffic</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="blog.html" class="nav-link active">
+                        <i class="fas fa-solid fa-blog"></i>
+                        <span>Blog</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <div class="user-name">Guest User</div>
+                </div>
+            </div>
+        </div>  
     </div>
 
     <!-- Main Content Area -->
@@ -210,19 +223,17 @@
             </div>
         </header>
     
-    <body>
         <div class="blog-content">
-            <section id="blog" class="section card">
+            <div id="blog" class="blog">
               <div class="card-header">
                 <h4>Personal Blog</h4>
               </div>
               <div id="blog-container" class="traffic-container">
                 <!-- Blog posts will be dynamically loaded here -->
-
               </div>
-            </section>
-          </div>
-    </body>
+            </div>
+        </div>
+        
           
 
     <script type="module">

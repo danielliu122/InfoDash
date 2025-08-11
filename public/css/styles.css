@@ -147,7 +147,6 @@ body, html {
 main {
     display: flex;
     flex-direction: column;
-    gap: 20px;
     padding: 0 0 20px 0;
 }
 
@@ -227,7 +226,7 @@ main {
 }
 
 .nav-link.active {
-    background: var(--accent-color);
+    background: rgb(84, 160, 148);
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
@@ -263,19 +262,19 @@ body.dark-theme .sidebar {
     color: var(--text-primary);
 }
 
+
 body.dark-theme .nav-link:hover {
-    background: rgba(255,255,255,0.05);
+    color: var(--accent-color);
 }
 
 body.dark-theme .nav-link.active {
-    background: var(--accent-color);
-    color: white;
+    color: #181b1f;
 }
 body.dark-theme .sidebar-toggle{
   color:white;
 }
 body.dark-theme .sidebar-toggle:hover {
-  color:cyan;
+  color: var(--accent-color);
 }
 
 /* Legacy column layout styles removed - sections now on individual pages */
@@ -284,7 +283,6 @@ body.dark-theme .sidebar-toggle:hover {
 header {
     text-align: center;
     color: var(--primary-text);
-  padding: 20px 20px 0 20px;
 }
 footer {
     text-align: center;
@@ -301,7 +299,7 @@ section, .section, .summary-card, #finance, #finance .card, .news-item, .trend-c
   box-sizing: border-box;
   overflow-y: auto;
 }
-section, .section, .summary-card, .trend-card, .news-item, .chart-container {
+section, .section, .summary-card, .trend-card, .news-item {
   padding: 20px;
 }
 
@@ -390,7 +388,7 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   position:sticky;
   flex-direction: row;
   background: var(--secondary-bg);
-  padding: 16px 24px;
+  padding: 2px 2px 2px 6px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -474,11 +472,13 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
 
 
 .theme-toggle {
+  font-size: 1.5rem;   /* Increase size (1rem = default font size) */
   background: none;
   border: none;
   color: var(--primary-text);
   cursor: pointer;
   transition: all 0.3s ease;
+  padding: 8px 12px;
 }
 
 /* Enhanced Sidebar */
@@ -525,7 +525,6 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
   opacity: 0.8;
 }
 
-/* Modern Card System */
 .card {
   background: var(--secondary-bg);
   border: none;
@@ -553,12 +552,6 @@ section, .section, .summary-card, .trend-card, .news-item, .chart-container {
 
 .card-header h4 {
   margin: 0;
-  font-size: 1.1em;
-  font-weight: 600;
-  color: var(--primary-text);
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .card-controls {
@@ -676,20 +669,19 @@ body.dark-theme .trend-card {
   border-bottom: 1px solid #c1d5d0 !important;
 }
 
-
-
+body input,
+body select,
+body textarea {
+  background-color: rgba(var(--accent-color-rgb), 0.2);
+}
 
 body.dark-theme input,
 body.dark-theme select,
 body.dark-theme textarea {
   color: #fff !important;
   background-color: var(--input-bg) !important;
-  border-color: var(--input-border) !important;
 }
 
-body.dark-theme #finance {
-  background: #1E1E1E !important;
-}
 body.dark-theme .summary-card,
 body.dark-theme .news-item,
 body.dark-theme #finance .card,
@@ -1370,6 +1362,7 @@ body.dark-theme label {
 }
 
 .page-title {
+  font-family: helvetica;
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
@@ -1615,9 +1608,7 @@ body.dark-theme label {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.news-headlines .card-header,
-.trending-topics .card-header,
-.reddit-section .card-header {
+.card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1626,18 +1617,16 @@ body.dark-theme label {
     border-bottom: 2px solid var(--accent-color);
 }
 
-.news-headlines .card-header h4,
-.trending-topics .card-header h4,
-.reddit-section .card-header h4 {
+.card-header h4
+ {
     font-size: 1.3rem;
     font-weight: 600;
     color: var(--text-color);
     margin: 0;
 }
 
-.news-headlines .card-header i,
-.trending-topics .card-header i,
-.reddit-section .card-header i {
+.card-header i
+{
     margin-right: 8px;
     color: var(--accent-color);
 }
@@ -1735,17 +1724,15 @@ body.dark-theme label {
   margin-top: 10px;
 }
 
-.summary-container {
-  margin: 20px;
-  margin-top: 0;
-}
-
 ::-webkit-scrollbar {
   width: 8px;
-  background: transparent;
   padding:5px;
-
 }
+
+::-webkit-scrollbar{
+  background-color: rgb(30, 30, 30);
+}
+
 ::-webkit-scrollbar-track {
   background: transparent;
   padding:5px;

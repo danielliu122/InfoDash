@@ -419,9 +419,9 @@ async function cleanupSummaryData() {
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Basic route to serve index.html
+// Basic route to serve summary.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'news.html'));
 });
 
 app.get('/api/news', async (req, res) => {

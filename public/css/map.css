@@ -8,6 +8,22 @@
   overflow: hidden;
 }
 
+#traffic-container {
+  margin:12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+@media (max-width: 768px) {
+  #traffic-container{
+    margin:5px;
+  }
+}
+
+body.dark-theme #traffic {
+  background-color: #181b1f;
+}
+
+
 #map-card {
   width: 100%;
   position: relative;
