@@ -1,3 +1,25 @@
+.traffic-container {
+  width: 100%;
+}
+
+.map-container {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+  height: 100%;
+}
+
+#map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+
+
+
 #traffic-content, #map-card {
   position: relative;
   background: var(--card-bg, #fff);

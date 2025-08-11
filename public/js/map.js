@@ -66,16 +66,36 @@ function initializeMapTheme() {
 
 // Define the real initMap function
 export function initMapReal() {
-  // Try to use user's geolocation for default center
-  let defaultCenter = { lat: 40.7128, lng: -74.0060 }; // Fallback: New York City
-  let defaultZoom = 15;
+   // Initialize default location and zoom
+   let userLoc = { lat: 40.7128, lng: -74.0060 }; // Default to New York City
+   let defaultZoom = 15;
 
-  // Initialize map with current app theme
-  const initialStyles = initializeMapTheme();
+   // Try to get user's location 
+   if (navigator.geolocation) {
+     navigator.geolocation.getCurrentPosition(
+       (position) => {
+         userLoc = {
+           lat: position.coords.latitude,
+           lng: position.coords.longitude
+         };
+         // Re-center map if it's already created
+         if (map) {
+           map.setCenter(userLoc);
+         }
+       },
+       () => {
+         console.log('Geolocation failed, using default center');
+       },
+       { timeout: 5000 } // Timeout after 5 seconds
+     );
+   }
 
-  // Create the map with fallback center
-  map = new google.maps.Map(document.getElementById('map'), {
-    center: defaultCenter,
+   // Initialize map with current app theme
+   const initialStyles = initializeMapTheme();
+
+   // Create map
+   map = new google.maps.Map(document.getElementById('map'), {
+    center: userLoc,
     zoom: defaultZoom,
     mapTypeControl: true,
     streetViewControl: true,
@@ -89,21 +109,6 @@ export function initMapReal() {
   // Add the traffic layer by default
   const trafficLayer = new google.maps.TrafficLayer();
   trafficLayer.setMap(map);
-
-  // Try to get user's location and recenter map
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const pos = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-        map.setCenter(pos);
-        // Don't add a marker, just center the map
-      },
-      () => {/* do nothing, fallback to default center */}
-    );
-  }
 
   // Directions
   directionsService = new google.maps.DirectionsService();
@@ -184,16 +189,6 @@ export function initMapReal() {
                     lng: position.coords.longitude
                 };
                 map.setCenter(pos);
-          if (locationMarker) locationMarker.setMap(null);
-          locationMarker = new google.maps.Marker({
-            map,
-            position: pos,
-            title: 'Your Location',
-            icon: {
-              url: 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png',
-              scaledSize: new google.maps.Size(36, 36)
-            }
-          });
         },
         () => alert('Unable to retrieve your location.')
         );
@@ -270,6 +265,15 @@ window.initMap = function() {
     }, 100);
   }
 };
+
+if (map) {
+  google.maps.event.addListenerOnce(map, 'idle', function() {
+      if (map) {
+          google.maps.event.trigger(map, 'resize');
+          map.setCenter(map.getCenter()); // Force map to recenter after resize
+      }
+  });
+}
 
 
 // Make functions globally available
