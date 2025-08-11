@@ -104,8 +104,10 @@ export function initMapReal() {
     gestureHandling: 'greedy', // Enable mouse wheel zoom control
     scrollwheel: true, // Enable scroll wheel zoom (legacy option for compatibility)
     zoomControl: true // Ensure zoom controls are visible
-  });
-
+    });
+    google.maps.event.addListenerOnce(map, 'idle', function() {
+      google.maps.event.trigger(map, 'resize');
+    });
   // Add the traffic layer by default
   const trafficLayer = new google.maps.TrafficLayer();
   trafficLayer.setMap(map);
@@ -266,14 +268,9 @@ window.initMap = function() {
   }
 };
 
-if (map) {
-  google.maps.event.addListenerOnce(map, 'idle', function() {
-      if (map) {
-          google.maps.event.trigger(map, 'resize');
-          map.setCenter(map.getCenter()); // Force map to recenter after resize
-      }
-  });
-}
+window.addEventListener('resize', () => {
+  google.maps.event.trigger(map, 'resize');
+});
 
 
 // Make functions globally available
