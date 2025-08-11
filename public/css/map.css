@@ -479,9 +479,6 @@ body.dark-theme .gm-bundled-control button:hover {
   border-color: #64B5F6 !important;
 }
 
-.traffic-container {
-  height:auto;
-}
 
 /* === Google Maps API Generated Elements - Simplified Fix === */
 /* Simplified approach for Google Maps generated elements */
@@ -568,12 +565,6 @@ body.dark-theme div[jstcache="128"][jsinstance="0"].address-line.full-width[jsan
     gap: 10px;
 }
 
-.map-container {
-  max-width: 100% !important;
-  width: 100% !important;
-  border-radius: 8px;
-  overflow: hidden;
-}
 
 .map-container .card-content {
     padding: 0;
@@ -588,10 +579,6 @@ body.dark-theme div[jstcache="128"][jsinstance="0"].address-line.full-width[jsan
     
     .search-buttons {
         justify-content: center;
-    }
-    
-    .map-container {
-        min-height: 300px;
     }
 }
 
