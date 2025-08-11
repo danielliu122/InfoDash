@@ -7,33 +7,30 @@
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
-    
-    <url>
-        <loc>https://infodash.app/index.html</loc>
-        <lastmod>2025-01-27</lastmod>
-        <changefreq>daily</changefreq>
-        <priority>1.0</priority>
-    </url>
-
     <url>
         <loc>https://infodash.app/finance.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>daily</changefreq>
         <priority>.9</priority>
     </url>
-
+    <url>
+        <loc>https://infodash.app/summary.html</loc>
+        <lastmod>2025-01-27</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>.8</priority>
+    </url>
     <url>
         <loc>https://infodash.app/map.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>daily</changefreq>
-        <priority>.8</priority>
+        <priority>.7</priority>
     </url>
 
     <url>
         <loc>https://infodash.app/blog.html</loc>
         <lastmod>2025-01-27</lastmod>
         <changefreq>weekly</changefreq>
-        <priority>.6</priority>
+        <priority>.5</priority>
     </url>
 
     <!-- Legal Pages -->
