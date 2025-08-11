@@ -105,7 +105,6 @@ export async function updateSummaryWeather() {
         weatherConditionElem.innerHTML = `<span class="weather-icon" style="font-size:2em;vertical-align:middle;">${icon}</span> <span>${current.condition}</span>`;
     }
 
-    // The rest of the fields
     const weatherLocationElem = weatherSummaryContainer.querySelector('.weather-location');
     if (weatherLocationElem) {
         weatherLocationElem.innerHTML = `<h4>📍 ${locationDisplay}</h4>`;
@@ -133,8 +132,13 @@ export async function updateSummaryWeather() {
 }
 
 export async function initializeWeatherAutoRefresh() {
-    await updateHeaderWeather();
-    setInterval(updateHeaderWeather, 60000); // 1 minute
+    // Update both header and summary weather immediately
+    await Promise.all([updateHeaderWeather(), updateSummaryWeather()]);
+    
+    // Set up interval to update both every minute
+    setInterval(async () => {
+        await Promise.all([updateHeaderWeather(), updateSummaryWeather()]);
+    }, 60000); // 1 minute
 }
 
 // For manual update button

@@ -1,8 +1,6 @@
 // map.js
 // Google Maps JS API: Directions, Dark/Light Mode Toggle, Locate Me
 
-
-
 let map;
 let directionsService;
 let directionsRenderer;
@@ -34,12 +32,12 @@ const darkModeStyle = [
 ];
 
 // Function to check current app theme
-export function getCurrentAppTheme() {
+function getCurrentAppTheme() {
   return document.body.classList.contains('dark-theme') ? 'dark' : 'light';
 }
 
 // Function to apply theme to map
-export function applyThemeToMap() {
+function applyThemeToMap() {
   const appTheme = getCurrentAppTheme();
   const shouldBeDark = appTheme === 'dark';
   
@@ -64,8 +62,8 @@ function initializeMapTheme() {
   return isDarkMode ? darkModeStyle : lightModeStyle;
 }
 
-// Define the real initMap function
-export function initMapReal() {
+// Define the initMap function
+function initMap() {
    // Initialize default location and zoom
    let userLoc = { lat: 40.7128, lng: -74.0060 }; // Default to New York City
    let defaultZoom = 15;
@@ -247,32 +245,17 @@ export function initMapReal() {
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(controlsContainer);
 }
 
-// Make the real initMap function globally available
-window.initMapReal = initMapReal;
-
-// Set up the global initMap function with retry logic
-window.initMap = function() {
-  if (typeof window.initMapReal === 'function') {
-    // The real function is ready, call it
-    window.initMapReal();
-  } else {
-    // Function not ready yet, retry after a short delay
-    console.warn('initMap called before ready, retrying...');
-    setTimeout(() => {
-      if (typeof window.initMapReal === 'function') {
-        window.initMapReal();
-      } else {
-        console.error('initMapReal still not ready after retry');
-      }
-    }, 100);
-  }
-};
-
-window.addEventListener('resize', () => {
-  google.maps.event.trigger(map, 'resize');
-});
+// Make initMap globally available for Google Maps callback
+window.initMap = initMap;
 
 
-// Make functions globally available
+// Make functions globally available for theme control
 window.applyThemeToMap = applyThemeToMap;
 window.getCurrentAppTheme = getCurrentAppTheme;
+
+// Ensure map resizes properly on window resize
+window.addEventListener('resize', () => {
+  if (map) {
+    google.maps.event.trigger(map, 'resize');
+  }
+});

@@ -1494,6 +1494,10 @@ function updateRefreshButtonStatus() {
 // Make functions globally available
 window.resetDailySummaryLimit = resetDailySummaryLimit;
 
+
+// Initialize the summary section (this will load or generate today's summary)
+initializeSummarySection();
+
 // Helper function to get cookie value
 function getCookie(name) {
     const nameEQ = name + "=";

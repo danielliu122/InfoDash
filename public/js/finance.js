@@ -11,7 +11,6 @@ let stockSymbols = {};
 let currentSymbol = '^IXIC';
 let topStocks = [];
 let stockDashboardInterval = null;
-let cryptoDashboardInterval = null; // Dedicated interval for crypto
 let previousStockData = {};
 let isDashboardPaused = false; // Track pause state
 const MAX_POINTS = 50;
@@ -356,7 +355,6 @@ export function addToWatchlist(symbol) {
                 
                 // Update the finance chart to show the newly added stock
                 userSelectedSymbol = true;
-                window.userSelectedSymbol = true;
                 document.getElementById('stockSymbolInput').value = symbol;
                 updateFinanceData(symbol, DEFAULT_TIME_RANGE, DEFAULT_INTERVAL, false);
                 fetchStockInfo(symbol);
@@ -576,7 +574,6 @@ export function setupAutocomplete() {
                         return;
                     }
                     userSelectedSymbol = true; // User manually selected this symbol
-                    window.userSelectedSymbol = true; // Update global variable
                     input.value = symbol;
                     autocompleteList.style.display = 'none';
                     updateFinanceData(symbol);
@@ -629,7 +626,6 @@ export function setupAutocomplete() {
             const symbol = this.value.trim().toUpperCase();
             if (symbol && symbol.length > 0) {
                 userSelectedSymbol = true; // User manually entered this symbol
-                window.userSelectedSymbol = true; // Update global variable
                 
                 // First check if it's already in watchlist
                 if (watchlist.includes(symbol)) {
@@ -1090,7 +1086,7 @@ if (stockSymbolInput) {
 // Update selectStock to set userSelectedSymbol to true
 export function selectStock(symbol) {
     userSelectedSymbol = true;
-    window.userSelectedSymbol = true; // Update global variable
+    userSelectedSymbol = true; // Update global variable
     document.getElementById('stockSymbolInput').value = symbol;
     handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
 }
@@ -1144,7 +1140,7 @@ export function handleMarketCloseTransition() {
         const newSymbol = 'BTC-USD';
         document.getElementById('stockSymbolInput').value = newSymbol;
         userSelectedSymbol = false; // App is now in auto mode
-        window.userSelectedSymbol = false; // Update global variable
+        userSelectedSymbol = false; // Update global variable
         updateFinanceData(newSymbol, DEFAULT_TIME_RANGE, DEFAULT_INTERVAL, false);
         if (updateInterval) {
             stopAutoRefresh();
@@ -1179,7 +1175,7 @@ function getCurrentTheme() {
     return document.body.classList.contains('dark-theme') ? 'dark' : 'light';
 }
 
-export function togglePauseFinance() {
+function togglePauseFinance() {
     let button = document.getElementById('pause-finance-button');
     if (!button) return;
     const isPaused = button.classList.toggle('paused');
@@ -1696,79 +1692,74 @@ export async function addCurrentSymbolToWatchlist() {
 }
 
 // Function to search and add stock from the search button
-export async function searchAndAddStock() {
-    const input = document.getElementById('stockSymbolInput');
-    if (!input) return;
-    
-    const symbol = input.value.trim().toUpperCase();
-    if (!symbol) {
-        if (window.showNotification) {
-            window.showNotification('Please enter a stock symbol first', 3000);
+window.searchAndAddStock = async function() {
+    try {
+        const input = document.getElementById('stockSymbolInput');
+        if (!input) {
+            console.error('Stock symbol input element not found');
+            return;
         }
-        return;
-    }
-    
-    // Check if already in watchlist
-    if (watchlist.includes(symbol)) {
-        updateFinanceData(symbol);
-        fetchStockInfo(symbol);
-        if (window.showNotification) {
-            window.showNotification(`${symbol} is already in your watchlist`, 3000);
+        
+        const symbol = input.value.trim().toUpperCase();
+        if (!symbol) {
+            if (window.showNotification) {
+                window.showNotification('Please enter a stock symbol first', 3000);
+            }
+            return;
         }
-        return;
-    }
-    
-    // Validate the symbol by attempting to fetch data
-    const validation = await validateStockSymbol(symbol);
-    if (validation.valid) {
+        
+        // Check if already in watchlist
+        if (watchlist.includes(symbol)) {
+            console.log(`${symbol} already in watchlist, updating data`);
+            await updateFinanceData(symbol);
+            await fetchStockInfo(symbol);
+            if (window.showNotification) {
+                window.showNotification(`${symbol} is already in your watchlist`, 3000);
+            }
+            return;
+        }
+        
+        // Validate the symbol by attempting to fetch data
+        const validation = await validateStockSymbol(symbol);
+        if (!validation.valid) {
+            const errorMessage = validation.error || 'Unknown error occurred';
+            console.error(`Validation failed for ${symbol}:`, errorMessage);
+            if (window.showNotification) {
+                window.showNotification(`Error: ${errorMessage}`, 5000);
+            } else {
+                alert(`Error: ${errorMessage}`);
+            }
+            return;
+        }
+
         // Add to stockSymbols cache for future use
         stockSymbols[symbol] = validation.name;
-    
-    // Add to watchlist
-    addToWatchlist(symbol);
-    
+        console.log(`Added ${symbol} to stockSymbols cache`);
+        
+        // Add to watchlist
+        await addToWatchlist(symbol);
+        console.log(`Successfully added ${symbol} to watchlist`);
+        
         // Show success notification with company name
-    if (window.showNotification) {
+        if (window.showNotification) {
             window.showNotification(`${symbol} (${validation.name}) added to watchlist!`, 3000);
         }
-    } else {
-        // Show specific error message
-        const errorMessage = validation.error || 'Unknown error occurred';
+    } catch (error) {
+        console.error('Error in searchAndAddStock:', error);
         if (window.showNotification) {
-            window.showNotification(`Error: ${errorMessage}`, 5000);
+            window.showNotification(`Error adding stock: ${error.message}`, 5000);
         } else {
-            alert(`Error: ${errorMessage}`);
+            alert(`Error adding stock: ${error.message}`);
         }
     }
 }
-
-// Make functions available globally for HTML onclick handlers
-window.addToWatchlist = addToWatchlist;
-window.removeFromWatchlist = removeFromWatchlist;
-window.clearWatchlist = clearWatchlist;
-window.addCurrentSymbolToWatchlist = addCurrentSymbolToWatchlist;
-window.searchAndAddStock = searchAndAddStock;
-window.startStockDashboard = startStockDashboard;
-window.stopStockDashboard = stopStockDashboard;
-window.selectStock = selectStock;
-window.resetChartZoom = resetChartZoom;
-window.resetFinanceCardPositions = resetFinanceCardPositions;
-window.togglePauseFinance = togglePauseFinance;
-window.toggleStockDashboard = toggleStockDashboard;
-window.handleMarketCloseTransition = handleMarketCloseTransition;
-
-// Make userSelectedSymbol globally accessible
-window.userSelectedSymbol = userSelectedSymbol;
 
 // Function to reset to auto mode (allow automatic symbol switching)
 export function resetToAutoMode() {
     userSelectedSymbol = false;
-    window.userSelectedSymbol = false;
+    userSelectedSymbol = false;
     logger.info('Reset to auto mode - allowing automatic symbol switching');
 }
-
-// Make resetToAutoMode globally available
-window.resetToAutoMode = resetToAutoMode;
 
 // Utility: Detect if device is mobile
 function isMobileDevice() {
@@ -1869,4 +1860,118 @@ export function stopAutoRefresh() {
     }
 }
 
+// Initialize finance features
+initializeFinance();
 
+// Start the stock dashboard automatically
+startStockDashboard();
+
+// Initialize finance functionality on page load
+try {
+    // Only start finance functionality if finance chart elements exist on this page
+    const stockChart = document.getElementById('stockChart');
+    const stockDashboard = document.getElementById('stock-dashboard');
+    
+    if (stockChart || stockDashboard) {
+        console.log('Finance elements found, initializing finance functionality');
+        // Start auto-refresh with default values (minutely) only if the market is open
+        if (isMarketOpen()) {
+            startAutoRefresh();
+        } else {
+            console.log('Market is closed. Auto-refresh will not start.');
+            // Update the chart once even if the market is closed
+            handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
+        }
+    } else {
+        console.log('No finance chart elements found on this page, skipping finance initialization');
+    }
+} catch (error) {
+    console.error('Error during initial data fetch:', error);
+}
+
+// Set up event listeners for stock symbol buttons
+document.querySelectorAll('[data-stock-symbol]').forEach(button => {
+    button.addEventListener('click', (e) => {
+        const symbol = e.currentTarget.dataset.stockSymbol;
+        const stockSymbolInput = document.getElementById('stockSymbolInput');
+        if (stockSymbolInput) {
+            stockSymbolInput.value = symbol;
+            handleFinanceUpdate('1d', '1m');
+        }
+    });
+});
+
+// Close the autocomplete list when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.matches('#stockSymbolInput')) {
+        const autocompleteList = document.getElementById('autocomplete-list');
+        if (autocompleteList) {
+            autocompleteList.innerHTML = '';
+        }
+    }
+});
+
+// Handle fullscreen changes for pac-container elements
+document.onfullscreenchange = function ( event ) {
+    let target = event.target;
+    let pacContainerElements = document.getElementsByClassName("pac-container");
+    if (pacContainerElements.length > 0) {
+      let pacContainer = document.getElementsByClassName("pac-container")[0];
+      if (pacContainer.parentElement === target) {
+        document.getElementsByTagName("body")[0].appendChild(pacContainer);
+        pacContainer.className += pacContainer.className.replace("fullscreen-pac-container", "");
+      } else {
+        target.appendChild(pacContainer);
+        pacContainer.className += " fullscreen-pac-container";
+      }
+    }
+};
+
+// Initialize on DOM content loaded
+document.addEventListener('DOMContentLoaded', () => {
+    loadStockSymbols();
+    // Set initial active state for time range buttons
+    const realtimeButton = document.getElementById('realtimeButton');
+    if (realtimeButton) {
+        realtimeButton.classList.add('active');
+    }
+    // Theme toggle functionality
+    const themeToggleButton = document.getElementById('themeToggle');
+    if (themeToggleButton) {
+        themeToggleButton.addEventListener('click', toggleTheme);
+    }
+});
+
+// Make functions available globally for HTML onclick handlers
+window.addToWatchlist = addToWatchlist;
+window.removeFromWatchlist = removeFromWatchlist;
+window.clearWatchlist = clearWatchlist;
+window.addCurrentSymbolToWatchlist = addCurrentSymbolToWatchlist;
+window.searchAndAddStock = searchAndAddStock;
+window.startStockDashboard = startStockDashboard;
+window.stopStockDashboard = stopStockDashboard;
+window.selectStock = selectStock;
+window.resetChartZoom = resetChartZoom;
+window.resetFinanceCardPositions = resetFinanceCardPositions;
+window.togglePauseFinance = togglePauseFinance;
+window.toggleStockDashboard = toggleStockDashboard;
+window.handleMarketCloseTransition = handleMarketCloseTransition;
+window.userSelectedSymbol = userSelectedSymbol;
+window.resetToAutoMode = resetToAutoMode;
+window.resetToDefaultWatchlist = resetToDefaultWatchlist;
+window.updateChartTheme = updateChartTheme;
+window.fetchTopStocks = fetchTopStocks;
+window.updateFinanceData = updateFinanceData;
+window.handleFinanceUpdate = handleFinanceUpdate;
+window.fetchStockInfo = fetchStockInfo;
+window.setupAutocomplete = setupAutocomplete;
+window.loadWatchlistFromPreferences = loadWatchlistFromPreferences;
+window.updateWatchlistUI = updateWatchlistUI;
+window.isMarketOpen = isMarketOpen;
+window.updateRealTimeFinance = updateRealTimeFinance;
+window.fetchFinancialData = fetchFinancialData;
+window.fetchRealTimeYahooFinanceData = fetchRealTimeYahooFinanceData;
+window.updateFinance2 = updateFinance2;
+window.startAutoRefresh = startAutoRefresh;
+window.stopAutoRefresh = stopAutoRefresh;
+window.initializeFinance = initializeFinance;

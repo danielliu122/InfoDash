@@ -8,29 +8,19 @@
     <meta name="title" content="InfoDash - Summary Dashboard">
     <meta name="description" content="Your all-in-one dashboard for daily summaries, market trends, weather, and news updates.">
     
-    <!-- Fonts and Stylesheets -->
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+
+    <!-- Stylesheets, must use theme-init script to prevent wrong theme flicker on page load-->
+    <script src="js/themeInit.js"></script>
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Font Awesome for icons (deferred) -->
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css">
-    </noscript>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    
-    <script>
-        // Global functions for onclick handlers
-        window.toggleSidebar = function() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('main-content');
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-        };
-    </script>
     
     <!-- Application Scripts -->
     <script type="module" src="js/userPreferences.js"></script>
@@ -38,88 +28,6 @@
     <script type="module" src="js/summary.js"></script>
     <script type="module" src="js/weather.js"></script>
     <script type="module" src="js/chat.js"></script>
-
-    <!--
-    Prevent theme flicker by applying the theme class to <html> immediately, before <body> is parsed.
-    This ensures the correct theme is set before any content is rendered.
-    This script is placed as the very first element in <head> to run before any paint.
-    -->
-    <script>
-    // Helper to get cookie value
-    function getCookie(name) {
-        const nameEQ = name + "=";
-        const ca = document.cookie.split(';');
-        for (let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) === 0) {
-                return decodeURIComponent(c.substring(nameEQ.length, c.length));
-            }
-        }
-        return null;
-    }
-
-    // Try to get theme from cookie, fallback to light
-    let savedTheme = 'light';
-    let cookieRaw = null;
-    try {
-        cookieRaw = getCookie('infoDash_preferences');
-        if (cookieRaw) {
-            const parsed = JSON.parse(cookieRaw);
-            if (parsed && parsed.theme) savedTheme = parsed.theme;
-        }
-    } catch (e) {
-        // fallback to light
-    }
-
-    // Remove any previous theme classes from <html>
-    document.documentElement.classList.remove('light-theme', 'dark-theme');
-    // Apply theme class to <html> immediately
-    document.documentElement.classList.add(savedTheme + '-theme');
-
-    // Set background and color directly on <html> to prevent flash
-    if (savedTheme === 'dark') {
-        document.documentElement.style.background = '#181a1b';
-        document.documentElement.style.color = '#eee';
-    } else {
-        document.documentElement.style.background = '#f7f8fa';
-        document.documentElement.style.color = '#222';
-    }
-
-    // Preemptively set <body> class and style as soon as possible
-    function applyBodyTheme() {
-        if (!document.body) return;
-        document.body.classList.remove('light-theme', 'dark-theme');
-        document.body.classList.add(savedTheme + '-theme');
-        // Remove inline background/color to let CSS take over after initial paint
-        document.body.style.background = '';
-        document.body.style.color = '';
-        // Remove inline styles from <html> so CSS rules can apply
-        document.documentElement.style.background = '';
-        document.documentElement.style.color = '';
-        // Force a reflow to ensure CSS rules are applied immediately
-        void document.body.offsetWidth;
-    }
-
-    // If body is already available, apply theme class right away
-    if (document.body) {
-        applyBodyTheme();
-    } else {
-        // Otherwise, apply as soon as DOM is interactive (before images/styles load)
-        document.addEventListener('DOMContentLoaded', function() {
-            applyBodyTheme();
-        }, { once: true });
-
-        // Also try to catch body as soon as it appears (for even less flicker)
-        const observer = new MutationObserver(function() {
-            if (document.body) {
-                applyBodyTheme();
-                observer.disconnect();
-            }
-        });
-        observer.observe(document.documentElement, { childList: true, subtree: true });
-    }
-    </script>
 </head>
 
 <body>

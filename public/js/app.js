@@ -1,24 +1,6 @@
-import { 
-    updateInterval,
-    fetchFinancialData, 
-    startAutoRefresh, 
-    stopAutoRefresh,
-    handleFinanceUpdate, 
-    isMarketOpen,
-    initializeFinance,
-    clearWatchlist,
-    resetToDefaultWatchlist,
-    resetChartZoom,
-    updateChartTheme,
-    startStockDashboard,
-    resetFinanceCardPositions,
-    DEFAULT_TIME_RANGE,
-    DEFAULT_INTERVAL
-} from './finance.js';
+import { updateChartTheme} from './finance.js';
 import { fetchNewsData, updateNews, updateNewsModeIndicator } from './news.js';
 import { fetchTrendsData, updateTrends, initializeTrends, setTrendsRegion } from './trends.js'; // Import from trends.js
-import { fetchRedditData, updateReddit } from './reddit.js'; // Import from reddit.js
-import { refreshSummary, initializeSummarySection } from './summary.js'; // Import summary functionality
 import { userPrefs } from './userPreferences.js'; // Import user preferences
 import { initializeGeolocation } from './geolocation.js'; // Import geolocation functionality
 import { initializeWeatherAutoRefresh, updateHeaderWeather } from './weather.js';
@@ -102,10 +84,7 @@ window.handleButtonClick = async function(type, category, subCategory = 'all') {
         } else if (type === 'trends') {
             data = await fetchTrendsData(category, subCategory, language, country);
             updateTrends(data, category);
-        } else if (type === 'reddit') {
-            data = await fetchRedditData(category);
-            updateReddit(data);
-        }
+        } 
     } catch (error) {
         console.error(`Error handling ${type} request:`, error);
         alert(`Failed to load ${type} data. Please try again.`);
@@ -129,30 +108,6 @@ window.handleNewsTypeClick = async function(newsType) {
     }
 };
 
-// Update the togglePauseFinance function in app.js
-export function togglePauseFinance() {
-    const pauseButton = document.querySelector('.pause-button');
-    if (pauseButton.classList.contains('paused')) {
-        // Resume auto-refresh
-        pauseButton.classList.remove('paused');
-        pauseButton.textContent = '⏸';
-        startAutoRefresh('^IXIC', '5m', '1m');
-    } else {
-        // Pause auto-refresh
-        pauseButton.classList.add('paused');
-        pauseButton.textContent = '▶';
-        stopAutoRefresh();
-    }
-}
-
-// Make togglePauseFinance globally available
-window.togglePauseFinance = togglePauseFinance;
-
-// Make resetFinanceCardPositions globally available
-window.resetFinanceCardPositions = resetFinanceCardPositions;
-
-// Make resetToDefaultWatchlist globally available
-window.resetToDefaultWatchlist = resetToDefaultWatchlist;
 
 // Make updateNewsModeIndicator globally available
 window.updateNewsModeIndicator = updateNewsModeIndicator;
@@ -238,13 +193,14 @@ window.toggleTheme = toggleTheme;
 
 // Initialize theme based on user preference
 function initializeTheme() {
-    const savedTheme = userPrefs.getTheme();
+    const savedTheme = userPrefs.getTheme() || 'dark'; // Add fallback to 'dark' if no theme is set
     document.body.classList.add(`${savedTheme}-theme`);
+    
+    // Update theme toggle button if it exists
     const themeToggleButton = document.getElementById('themeToggle');
     if (themeToggleButton) {
         themeToggleButton.textContent = savedTheme === 'light' ? '🌞' : '🌙';
     }
-
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -272,19 +228,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.checkCookieConsent) {
         window.checkCookieConsent();
     }
-
-    // Initialize the summary section (this will load or generate today's summary)
-    initializeSummarySection();
-
-    // Initialize finance features
-    initializeFinance();
-
-    // Start the stock dashboard automatically
-    startStockDashboard();
-
-    // Scroll to the top of the page on reload
-    window.scrollTo(0, 0);
-
 
     // Initialize the news mode indicator
     updateNewsModeIndicator();
@@ -339,35 +282,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Fetch prioritized news data
         const newsData = await fetchNewsData('world', country, language, false, newsType);
         updateNews(newsData);
-
-        // Fetch other default data
-        const redditData = await fetchRedditData('day');
-        updateReddit(redditData);
         
         const trendsData = await fetchTrendsData('daily', 'all', trendsLanguageSelect.value, trendsCountrySelect.value);
         updateTrends(trendsData, 'daily');
-
-        // Only start finance functionality if finance chart elements exist on this page
-        const stockChart = document.getElementById('stockChart');
-        const stockDashboard = document.getElementById('stock-dashboard');
-        
-        if (stockChart || stockDashboard) {
-            console.log('Finance elements found, initializing finance functionality');
-            // Start auto-refresh with default values (minutely) only if the market is open
-            if (isMarketOpen()) {
-                startAutoRefresh('^IXIC', '5m', '1m');
-            } else {
-                console.log('Market is closed. Auto-refresh will not start.');
-                // Update the chart once even if the market is closed
-                handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
-            }
-        } else {
-            console.log('No finance chart elements found on this page, skipping finance initialization');
-        }
-    } catch (error) {
+    } 
+    catch (error) {
         console.error('Error during initial data fetch:', error);
     }
-    // console.log("DOM fully loaded")
+    console.log("DOM fully loaded")
 
     const scrollToTopBtn = document.getElementById('scrollToTopBtn');
 
@@ -396,81 +318,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     initializeTheme();
 });
 
-// Update the autocomplete logic
-const stockSymbolInput = document.getElementById('stockSymbolInput');
-if (stockSymbolInput) {
-    stockSymbolInput.addEventListener('input', function() {
-        const input = this.value.toLowerCase();
-        const autocompleteList = document.getElementById('autocomplete-list');
-        if (!autocompleteList) return;
-        autocompleteList.innerHTML = ''; // Clear previous suggestions
-
-    if (!input) return; // Exit if input is empty
-
-    const filteredSymbols = Object.keys(stockSymbols).filter(symbol => 
-        stockSymbols[symbol].toLowerCase().startsWith(input) || symbol.toLowerCase().startsWith(input)
-    );
-    
-    filteredSymbols.forEach(symbol => {
-        const item = document.createElement('div');
-        item.textContent = `${symbol} - ${stockSymbols[symbol]}`;
-        item.classList.add('autocomplete-item');
-        item.addEventListener('click', function() {
-            document.getElementById('stockSymbolInput').value = symbol;
-            handleFinanceUpdate('5m', '1m'); // Refresh chart with minutely data
-            autocompleteList.innerHTML = ''; // Clear suggestions
-        });
-        autocompleteList.appendChild(item);
-    });
-    });
-}
-
-// Close the autocomplete list when clicking outside
-document.addEventListener('click', function(e) {
-    if (!e.target.matches('#stockSymbolInput')) {
-        const autocompleteList = document.getElementById('autocomplete-list');
-        if (autocompleteList) {
-            autocompleteList.innerHTML = '';
-        }
-    }
-});
-
-let stockSymbols = {};
-
-async function loadStockSymbols() {
-    try {
-        const response = await fetch('/data/stockSymbols.json');
-        stockSymbols = await response.json();
-    } catch (error) {
-        console.error('Error loading stock symbols:', error);
-    }
-}
-
-document.onfullscreenchange = function ( event ) {
-    let target = event.target;
-    let pacContainerElements = document.getElementsByClassName("pac-container");
-    if (pacContainerElements.length > 0) {
-      let pacContainer = document.getElementsByClassName("pac-container")[0];
-      if (pacContainer.parentElement === target) {
-        document.getElementsByTagName("body")[0].appendChild(pacContainer);
-        pacContainer.className += pacContainer.className.replace("fullscreen-pac-container", "");
-      } else {
-        target.appendChild(pacContainer);
-        pacContainer.className += " fullscreen-pac-container";
-      }
-    }
-  };
-
-  document.querySelectorAll('[data-stock-symbol]').forEach(button => {
-    button.addEventListener('click', (e) => {
-        const symbol = e.currentTarget.dataset.stockSymbol;
-        const stockSymbolInput = document.getElementById('stockSymbolInput');
-        if (stockSymbolInput) {
-            stockSymbolInput.value = symbol;
-            handleFinanceUpdate('1d', '1m');
-        }
-    });
-});
 
 function scrollToSection(sectionId) {
     const section = document.getElementById(sectionId);
@@ -479,19 +326,6 @@ function scrollToSection(sectionId) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadStockSymbols();
-    // Set initial active state for time range buttons
-    const realtimeButton = document.getElementById('realtimeButton');
-    if (realtimeButton) {
-        realtimeButton.classList.add('active');
-    }
-    // Theme toggle functionality
-    const themeToggleButton = document.getElementById('themeToggle');
-    if (themeToggleButton) {
-        themeToggleButton.addEventListener('click', toggleTheme);
-    }
-});
 
 // Add handleDateRangeChange function
 window.handleDateRangeChange = async function() {
