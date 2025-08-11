@@ -176,16 +176,11 @@ width: 100%;
     color: var(--text-secondary);
 }
 
-/* News Page Specific Styles */
 .news-filters {
     display: flex;
-    gap: 19.2px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.news-filters .input-field {
-    min-width: 192px;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
 }
 
 .news-filters select {
@@ -224,6 +219,10 @@ width: 100%;
 
 .news-filters .btn i {
     font-size: 13.44px;
+}
+
+.news-category-group > h6 {
+    margin: 2px;
 }
 
 .news-grid {
@@ -418,6 +417,3 @@ body.dark-theme .headline-description {
     }
 }
 
-.news-filters{
-    display: flex;
-  }
