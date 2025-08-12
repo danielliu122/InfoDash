@@ -1272,6 +1272,11 @@ function initializeChart(ctx, data) {
                         }
                     }
                   }
+                },
+                legend: {
+                    labels: {
+                        color: textColor
+                    }
                 }
             },
             animation: true,
@@ -1281,7 +1286,8 @@ function initializeChart(ctx, data) {
             scales: {
                 y: {
                     grid: {
-                        display: false
+                        display: true,
+                        color: gridColor
                     },
                     ticks: {
                         callback: function(value) {
@@ -1297,7 +1303,8 @@ function initializeChart(ctx, data) {
                 },
                 x: {
                     grid: {
-                        display: false
+                        display: true,
+                        color: gridColor
                     },
                     type: 'time',
                     ticks: {
@@ -1446,9 +1453,9 @@ export function updateChartTheme() {
 
     const colors = {
         text: isDark ? '#ffffff' : '#333333',
-        grid: isDark ? '#444444' : '#e0e0e0',
-        background: isDark ? '#1e1e1e' : '#ffffff',
-        border: isDark ? '#666666' : '#cccccc'
+        grid: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+        background: isDark ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+        border: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'
     };
 
     logger.logChart('colors', colors);
@@ -1459,9 +1466,9 @@ export function updateChartTheme() {
     chart.options.scales.x.ticks.color = colors.text;
     chart.options.scales.y.ticks.color = colors.text;
     chart.options.plugins.legend.labels.color = colors.text;
-
-    // Update chart background
-    chart.canvas.style.backgroundColor = colors.background;
+    chart.options.backgroundColor = colors.background;
+    chart.options.scales.x.border.color = colors.border;
+    chart.options.scales.y.border.color = colors.border;
 
     // Update chart
     chart.update('none');
@@ -1937,7 +1944,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Theme toggle functionality
     const themeToggleButton = document.getElementById('themeToggle');
     if (themeToggleButton) {
-        themeToggleButton.addEventListener('click', toggleTheme);
+        themeToggleButton.addEventListener('click', () => {
+            toggleTheme();
+            // Update chart theme after theme toggle
+            setTimeout(() => {
+                updateChartTheme();
+            }, 100);
+        });
     }
 });
 

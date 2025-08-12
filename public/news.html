@@ -66,6 +66,12 @@
                                 <span>Blog</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="user.html" class="nav-link">
+                                <i class="fa-solid fa-wrench"></i>
+                                <span>User</span>
+                            </a>
+                        </li>
                     </ul>
                 </nav>                    
                 <i class="fas fa-rocket" style="color: #f44336;"></i>
@@ -105,6 +111,12 @@
                     <a href="blog.html" class="nav-link">
                         <i class="fas fa-solid fa-blog"></i>
                         <span>Blog</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="user.html" class="nav-link">
+                        <i class="fa-solid fa-wrench"></i>
+                        <span>User</span>
                     </a>
                 </li>
             </ul>
@@ -184,7 +196,7 @@
                         <option value="is-IS" data-language="is" data-country="IS">🇮🇸 Ísland (Íslenska)</option>
                     </select>
                 </div>
-                <button class="theme-toggle" id="themeToggle">🌓</button>
+                <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">🌓</button>
             </div>
         </header>
         <div class="news">
@@ -345,21 +357,6 @@
             if (sidebar && mainContent) {
                 sidebar.classList.toggle('collapsed');
                 mainContent.classList.toggle('expanded');
-            }
-        };
-        
-        window.toggleTheme = function() {
-            const body = document.body;
-            const isDark = body.classList.contains('dark-theme');
-            
-            if (isDark) {
-                body.classList.remove('dark-theme');
-                body.classList.add('light-theme');
-                localStorage.setItem('theme', 'light');
-            } else {
-                body.classList.remove('light-theme');
-                body.classList.add('dark-theme');
-                localStorage.setItem('theme', 'dark');
             }
         };
         

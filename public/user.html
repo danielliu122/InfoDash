@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">   
+    <!-- Primary Meta Tags -->
+    <title>InfoDash - User Preferences</title>
+    <meta name="title" content="InfoDash - Summary Dashboard">
+    <meta name="description" content="Your all-in-one dashboard for daily summaries, market trends, weather, and news updates.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+
+    <!-- Stylesheets, must use theme-init script to prevent wrong theme flicker on page load-->
+    <script src="js/themeInit.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <!-- Application Scripts -->
+    <script type="module" src="js/userPreferences.js"></script>
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/weather.js"></script>
+    <script type="module" src="js/chat.js"></script>
+</head>
+
+<body>
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <!-- Nav for mobile: placed between toggle and title, hidden on desktop via CSS -->
+                <nav class="sidebar-nav mobile-nav" id="mobile-nav">
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="summary.html" class="nav-link">
+                                <i class="fas fa-regular fa-clipboard"></i>
+                                <span>Summary</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="finance.html" class="nav-link">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Stocks</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="news.html" class="nav-link">
+                                <i class="fas fa-newspaper"></i>
+                                <span>News</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="map.html" class="nav-link">
+                                <i class="fas fa-map"></i>
+                                <span>Traffic</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="blog.html" class="nav-link">
+                                <i class="fas fa-solid fa-blog"></i>
+                                <span>Blog</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="user.html" class="nav-link active">
+                                <i class="fa-solid fa-wrench"></i>
+                                <span>User</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <i class="fas fa-rocket" style="color: #f44336;"></i>
+                <div class="sidebar-title" id="sidebar-title">
+                    <span>InfoDash</span>
+                </div>
+            </div>
+            
+            <!-- Nav for desktop: hidden on mobile via CSS -->
+            <nav class="sidebar-nav" id="desktop-nav">
+                <ul class="nav-menu">                    
+                    <li class="nav-item">
+                        <a href="news.html" class="nav-link">
+                            <i class="fas fa-newspaper"></i>
+                            <span>News</span>
+                        </a>
+                    </li>                    
+                    <li class="nav-item">
+                        <a href="finance.html" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Stocks</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="summary.html" class="nav-link">
+                            <i class="fas fa-regular fa-clipboard"></i>
+                            <span>Summary</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="map.html" class="nav-link">
+                            <i class="fas fa-map"></i>
+                            <span>Traffic</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="blog.html" class="nav-link">
+                            <i class="fas fa-solid fa-blog"></i>
+                            <span>Blog</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="user.html" class="nav-link active">
+                            <i class="fa-solid fa-wrench"></i>
+                            <span>User</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">Guest User</div>
+                    </div>
+                </div>
+            </div>  
+        </div>
+        
+        <!-- Main Content Area -->
+        <main class="main-content" id="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h4 class="page-title">Summary</h4>
+                </div>
+                <div class="header-right">
+                    <!-- Weather Display -->
+                    <div id="header-weather" class="weather-display" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color); min-width: 120px; justify-content: center;" onclick="handleWeatherClick()" title="Click to change location">
+                        <span id="weather-icon" style="font-size: 1.2em;">🌤️</span>
+                            <span id="weather-temp" style="font-weight: 600; font-size: 0.9em;">--°F</span>
+                            <span id="weather-location" style="font-size: 0.7em; color: var(--text-secondary);">Loading...</span>
+                    </div>
+                    <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">🌓</button>
+                </div>
+            </header>
+            
+        <!-- User Preferences Section -->
+        <div class="row">
+            <div class="col s12">
+                <section id="preferences" class="section">
+                    <div class="section-header">
+                        <h4>⚙️ User Preferences</h4>
+                        <div class="section-toggle" onclick="toggleSection('preferences-content')" title="Show/Hide Section">
+                            <span class="toggle-icon">−</span>
+                        </div>
+                    </div>
+                    <div id="preferences-content" class="section-content">
+                        <div class="row">
+                            <div class="col s12 m6">
+                                <div class="preference-group">
+                                    <div id="preferences-weather" style="margin-top:10px;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="col s12 m6">
+                                <div class="preference-group">
+                                    <h5>📰 News & Trends</h5>
+                                    <p><strong>Current Settings:</strong></p>
+                                    <p>Country: <span id="currentNewsCountry">US</span></p>
+                                    <p>Language: <span id="currentNewsLanguage">English</span></p>
+                                    <p class="preference-info">These settings are automatically saved when you change them in the News section.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col s12 m6">
+                                <div class="preference-group">
+                                    <h5>📊 Finance Watchlist</h5>
+                                    <p><strong>Current Watchlist:</strong></p>
+                                    <div id="preferencesWatchlist" class="watchlist-display">
+                                        <p>No stocks in watchlist</p>
+                                    </div>
+                                    <p class="preference-info">Your watchlist is automatically saved when you add or remove stocks.</p>
+                                </div>
+                            </div>
+                                
+                            <div class="col s12 m6">
+                                <div class="preference-group">
+                                    <h5>🎨 Theme</h5>
+                                    <p><strong>Current Theme:</strong> <span id="currentTheme">Light</span></p>
+                                    <button class="btn waves-effect waves-light" onclick="toggleTheme()">Toggle Theme</button>
+                                    <p class="preference-info">Your theme preference is automatically saved.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="preference-group">
+                                    <h5>Data Management</h5>
+                                    <button class="btn waves-effect waves-light red" onclick="clearAllPreferences()">Reset All Settings</button>
+                                    <button class="btn-small waves-effect waves-light" onclick="resetCookieConsent()" style="margin-left: 10px;">🍪 Reset Cookies</button>
+                                    <p class="preference-info">This will clear all your saved preferences including location, watchlist, theme, and other settings. This action cannot be undone.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="card weather-summary">
+            <div class="card-header" style="display: flex; align-items: center;">
+                <h5 style="flex: 1 1 auto; margin: 0;">🌤️ Weather Update</h5>
+                <button onclick="showLocationModal()" class="btn-small waves-effect waves-light" style="margin-left: 10px; font-size: 0.8em;">📍 Set Location</button>
+                <button onclick="updateHeaderWeather(); updateSummaryWeather();" class="btn-small waves-effect waves-light" style="margin-left: 10px; font-size: 0.8em;">🔄 Update Weather</button>
+            </div>
+            <div class="weather-info">
+                <div class="weather-location"></div>
+                <div class="weather-updated"></div>
+                <p class="weather-condition"></p>
+                <p class="weather-temp"></p>
+                <p class="weather-feelslike"></p>
+                <p class="weather-humidity"></p>
+                <p class="weather-wind"></p>
+            </div>
+        </div>
+        <!-- Cookie/Privacy Notification Banner -->
+        <div id="cookie-notification" class="cookie-banner" style="display: none;">
+            <div class="cookie-content">
+                <div class="cookie-text">
+                    <h6>Privacy & Cookie Usage</h6>
+                    <p>This website uses cookies to remember your preferences (location, watchlist, theme, etc.) and improve your experience. No personal data is collected or shared with third parties. By continuing to use this site, you consent to our use of cookies for these purposes.</p>
+                </div>
+                <div class="cookie-actions">
+                    <button class="btn-small waves-effect waves-light" onclick="acceptCookies()">Accept</button>
+                    <button class="btn-small waves-effect waves-light grey" onclick="declineCookies()">Decline</button>
+                    <a href="privacy-policy.html" target="_blank" class="btn-small waves-effect waves-light blue">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+         <!-- Cookie/Privacy Notification Banner -->
+         <div id="cookie-notification" class="cookie-banner" style="display: none;">
+            <div class="cookie-content">
+                <div class="cookie-text">
+                    <h6>Privacy & Cookie Usage</h6>
+                    <p>This website uses cookies to remember your preferences (location, watchlist, theme, etc.) and improve your experience. No personal data is collected or shared with third parties. By continuing to use this site, you consent to our use of cookies for these purposes.</p>
+                </div>
+                <div class="cookie-actions">
+                    <button class="btn-small waves-effect waves-light" onclick="acceptCookies()">Accept</button>
+                    <button class="btn-small waves-effect waves-light grey" onclick="declineCookies()">Decline</button>
+                    <a href="privacy-policy.html" target="_blank" class="btn-small waves-effect waves-light blue">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="container center-align">
+            <div class="footer-content">
+                <p>&copy; 2025 InfoDash. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="terms-of-service.html" target="_blank" class="footer-link">Terms of Service</a>
+                    <span class="footer-separator">•</span>
+                    <a href="privacy-policy.html" target="_blank" class="footer-link">Privacy Policy</a>
+                </div>
+                <p class="footer-disclaimer">The content provided on this website is for informational purposes only and does not constitute financial, investment, legal, or other professional advice. While we strive to provide accurate and up-to-date information, we make no guarantees about the completeness, reliability, or suitability of the content for any specific purpose.</p>
+            </div>
+        </footer>
+        <button id="scrollToTopBtn" class="scroll-to-top">↑</button>
+
+        <!-- Notification Bar -->
+        <div id="notification-bar"></div>
+
+        <script type="module">
+            import { showNotification, toggleSection, showLocationModal, closeLocationModal } from './js/uiUtils.js';
+            import { acceptCookies, declineCookies, resetCookieConsent, checkCookieConsent, showCookieBanner, hideCookieBanner, clearAllPreferences, updatePreferencesDisplay } from './js/userPreferences.js';
+            import { initializeGeolocation, setRegion, getCurrentRegion, handleRegionChange } from './js/geolocation.js';
+            
+            window.showNotification = showNotification;
+            window.toggleSection = toggleSection;
+            window.showLocationModal = showLocationModal;
+            window.closeLocationModal = closeLocationModal;
+            window.acceptCookies = acceptCookies;
+            window.declineCookies = declineCookies;
+            window.resetCookieConsent = resetCookieConsent;
+            window.checkCookieConsent = checkCookieConsent;
+            window.showCookieBanner = showCookieBanner;
+            window.hideCookieBanner = hideCookieBanner;
+            window.clearAllPreferences = clearAllPreferences;
+            window.updatePreferencesDisplay = updatePreferencesDisplay;
+            window.handleRegionChange = handleRegionChange;
+            window.setRegion = setRegion;
+            window.getCurrentRegion = getCurrentRegion;
+            window.toggleTheme = toggleTheme;
+        </script>
+    </body>
+    <script>    
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            if (sidebar && mainContent) {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            }
+        };
+    </script>
+    
+</html>

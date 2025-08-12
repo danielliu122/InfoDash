@@ -227,13 +227,13 @@ main {
 }
 
 .nav-link:hover {
-    background: rgba(255,255,255,0.1);
-    transform: translateX(5px);
+  background: rgba(255,255,255,0.1);
+  transform: translateX(5px);
 }
 
 .nav-link.active {
-    background: rgb(84, 160, 148);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .nav-link i {

@@ -5,7 +5,6 @@ import { userPrefs } from './userPreferences.js'; // Import user preferences
 import { initializeGeolocation } from './geolocation.js'; // Import geolocation functionality
 import { initializeWeatherAutoRefresh, updateHeaderWeather } from './weather.js';
 
-// Remove old weather logic (fetchWeatherData, updateHeaderWeather, initializeWeather, getUserLocationForWeather, etc.)
 
 // Function to initialize weather display
 async function initializeWeather() {
@@ -204,6 +203,9 @@ function initializeTheme() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Initialize theme first
+    initializeTheme();
+    
     // Initialize geolocation and region dropdown
     await initializeGeolocation();
 
@@ -325,8 +327,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
         console.log('Scroll to top button not found on this page, skipping scroll functionality');
     }
-    // Initialize theme
-    initializeTheme();
 });
 
 

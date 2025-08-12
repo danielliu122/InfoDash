@@ -70,6 +70,12 @@
                                 <span>Blog</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="user.html" class="nav-link">
+                                <i class="fa-solid fa-wrench"></i>
+                                <span>User</span>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
                 <i class="fas fa-rocket" style="color: #f44336;"></i>
@@ -109,6 +115,12 @@
                         <a href="blog.html" class="nav-link">
                             <i class="fas fa-solid fa-blog"></i>
                             <span>Blog</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="user.html" class="nav-link">
+                            <i class="fa-solid fa-wrench"></i>
+                            <span>User</span>
                         </a>
                     </li>
                 </ul>
@@ -209,7 +221,7 @@
                                 <div class="col s12 m12">
                                     <div class="summary-card archive-card">
                                         <div class="card-header collapsible-header">
-                                            <i class="material-icons">archive</i>Summary Archive
+                                            <h4><i class="material-icons">archive</i> Summary Archive</h4>
                                         </div>
                                         <div class="card-content card-controls">
                                             <div class="input-field col s12 m4">
@@ -229,7 +241,7 @@
                                                     <option value="pt-BR" data-language="pt" data-country="BR">🇧🇷 Brasil (Português)</option>
                                                     <option value="it-IT" data-language="it" data-country="IT">🇮🇹 Italia (Italiano)</option>
                                                     <option value="ru-RU" data-language="ru" data-country="RU">🇷🇺 Россия (Русский)</option>
-                                                    <option value="jp-JP" data-language="jp" data-country="JP">🇯�� 日本 (日本語)</option>
+                                                    <option value="jp-JP" data-language="jp" data-country="JP">🇯🇵 日本 (日本語)</option>
                                                     <option value="ko-KR" data-language="ko" data-country="KR">🇰🇷 한국 (한국어)</option>
                                                     <option value="zh-CN" data-language="zh" data-country="CN">🇨🇳 中国 (中文)</option>
                                                     <option value="ar-SA" data-language="ar" data-country="SA">🇸🇦 السعودية (العربية)</option>
@@ -293,26 +305,6 @@
                         
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col s12">
-                        <div class="card weather-summary">
-                            <div class="card-header" style="display: flex; align-items: center;">
-                                <h5 style="flex: 1 1 auto; margin: 0;">🌤️ Weather Update</h5>
-                                <button onclick="showLocationModal()" class="btn-small waves-effect waves-light" style="margin-left: 10px; font-size: 0.8em;">📍 Set Location</button>
-                                <button onclick="updateHeaderWeather(); updateSummaryWeather();" class="btn-small waves-effect waves-light" style="margin-left: 10px; font-size: 0.8em;">🔄 Update Weather</button>
-                            </div>
-                            <div class="weather-info">
-                                <div class="weather-location"></div>
-                                <div class="weather-updated"></div>
-                                <p class="weather-condition"></p>
-                                <p class="weather-temp"></p>
-                                <p class="weather-feelslike"></p>
-                                <p class="weather-humidity"></p>
-                                <p class="weather-wind"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
             <!-- Chat -->
             <div class="col s12">
@@ -345,21 +337,6 @@
                         </div>
                     </div>
                 </section>
-            </div>
-        </div>
-
-        <!-- Cookie/Privacy Notification Banner -->
-        <div id="cookie-notification" class="cookie-banner" style="display: none;">
-            <div class="cookie-content">
-                <div class="cookie-text">
-                    <h6>Privacy & Cookie Usage</h6>
-                    <p>This website uses cookies to remember your preferences (location, watchlist, theme, etc.) and improve your experience. No personal data is collected or shared with third parties. By continuing to use this site, you consent to our use of cookies for these purposes.</p>
-                </div>
-                <div class="cookie-actions">
-                    <button class="btn-small waves-effect waves-light" onclick="acceptCookies()">Accept</button>
-                    <button class="btn-small waves-effect waves-light grey" onclick="declineCookies()">Decline</button>
-                    <a href="privacy-policy.html" target="_blank" class="btn-small waves-effect waves-light blue">Privacy Policy</a>
-                </div>
             </div>
         </div>
         
@@ -399,7 +376,7 @@
             window.handleRegionChange = handleRegionChange;
             window.setRegion = setRegion;
             window.getCurrentRegion = getCurrentRegion;
-            // Remove all inline definitions of these functions
+            window.toggleTheme = toggleTheme;
         </script>
     </body>
     <script>    

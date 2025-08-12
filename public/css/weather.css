@@ -4,7 +4,10 @@
     max-width: 1400px;
     margin: 0 auto;
 }
-
+.weather-info{
+    display:flex;
+    flex-direction: row;
+}
 .weather-main {
     background: var(--bg-card);
     border-radius: 12px;
