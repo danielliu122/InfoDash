@@ -16,7 +16,7 @@
   --stock-card-bg: #e9ecef;
   --hover-bg: #e9ecef;
   --sidebar-width: 200px;
-  --sidebar-collapsed-width: 70px;
+  --sidebar-collapsed-width: 55px;
   --primary-color: #667eea;
   --secondary-color: #764ba2;
   --success-color: #4CAF50;
@@ -156,11 +156,11 @@ main {
     width: var(--sidebar-width);
     transition: width 0.3s ease;
     background: #c1d5d0;
+    overflow:visible;
 }
 
 .sidebar.collapsed {
     width: var(--sidebar-collapsed-width);
-    padding: 10px;
 }
 
 .sidebar-header {

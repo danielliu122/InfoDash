@@ -402,7 +402,15 @@
             // Remove all inline definitions of these functions
         </script>
     </body>
-
-
-
+    <script>    
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            if (sidebar && mainContent) {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            }
+        };
+    </script>
+    
 </html>
