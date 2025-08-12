@@ -864,8 +864,8 @@ body.dark-theme .topic-button:hover {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 50px;
-  height: 50px;
+  width: 35px;
+  height: 35px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
