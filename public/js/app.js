@@ -243,48 +243,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     const trendsCountrySelect = document.getElementById('trendsCountrySelect');
     const trendsLanguageSelect = document.getElementById('trendsLanguageSelect');
 
-    if (!countrySelect || !languageSelect || !trendsCountrySelect || !trendsLanguageSelect) {
-        console.log('Some controls not found on this page - this is expected in multipage setup');
-        return;
+    // Check if we have any controls on this page
+    const hasNewsControls = countrySelect && languageSelect;
+    const hasTrendsControls = trendsCountrySelect && trendsLanguageSelect;
+
+    if (!hasNewsControls && !hasTrendsControls) {
+        console.log('No controls found on this page - this is expected in multipage setup');
+        // Remove the early return to allow scroll to top button initialization
     }
 
-    // Add event listeners for country and language select to update trends data and save preferences
-    trendsCountrySelect.addEventListener('change', () => {
-        refreshTrends();
-        userPrefs.saveCurrentState();
-    });
-    trendsLanguageSelect.addEventListener('change', () => {
-        refreshTrends();
-        userPrefs.saveCurrentState();
-    });
+    // Add event listeners for trends controls if they exist
+    if (hasTrendsControls) {
+        trendsCountrySelect.addEventListener('change', () => {
+            refreshTrends();
+            userPrefs.saveCurrentState();
+        });
+        trendsLanguageSelect.addEventListener('change', () => {
+            refreshTrends();
+            userPrefs.saveCurrentState();
+        });
+    }
 
-    // Add event listeners for country and language select to update news data and save preferences
-    countrySelect.addEventListener('change', () => {
-        console.log("COUNTRY SELECTED CHANGED");
-        refreshNews();
-        userPrefs.saveCurrentState();
-    });
-    languageSelect.addEventListener('change', () => {
-        console.log(`Language changed to: ${languageSelect.value}`);
-        // Force refresh news data when language changes to ensure proper mode selection
-        refreshNews();
-        userPrefs.saveCurrentState();
-        
-        // Update the news mode indicator
-        updateNewsModeIndicator();
-    });
+    // Add event listeners for news controls if they exist
+    if (hasNewsControls) {
+        countrySelect.addEventListener('change', () => {
+            console.log("COUNTRY SELECTED CHANGED");
+            refreshNews();
+            userPrefs.saveCurrentState();
+        });
+        languageSelect.addEventListener('change', () => {
+            console.log(`Language changed to: ${languageSelect.value}`);
+            // Force refresh news data when language changes to ensure proper mode selection
+            refreshNews();
+            userPrefs.saveCurrentState();
+            
+            // Update the news mode indicator
+            updateNewsModeIndicator();
+        });
+    }
 
-    // Fetch and display world news 
+    // Fetch and display data based on available controls
     try {
-        const country = countrySelect.value;
-        const language = languageSelect.value;
-
-        // Fetch prioritized news data
-        const newsData = await fetchNewsData('world', country, language, false, newsType);
-        updateNews(newsData);
+        if (hasNewsControls) {
+            const country = countrySelect.value;
+            const language = languageSelect.value;
+            // Fetch prioritized news data
+            const newsData = await fetchNewsData('world', country, language, false, newsType);
+            updateNews(newsData);
+        }
         
-        const trendsData = await fetchTrendsData('daily', 'all', trendsLanguageSelect.value, trendsCountrySelect.value);
-        updateTrends(trendsData, 'daily');
+        if (hasTrendsControls) {
+            const trendsData = await fetchTrendsData('daily', 'all', trendsLanguageSelect.value, trendsCountrySelect.value);
+            updateTrends(trendsData, 'daily');
+        }
     } 
     catch (error) {
         console.error('Error during initial data fetch:', error);
@@ -298,7 +309,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Show the button when the user scrolls down 100px from the top of the document
         window.onscroll = function() {
             if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-                scrollToTopBtn.style.display = "flex"; // Use flex to ensure it is centered
+                scrollToTopBtn.style.display = "block"; // Use flex to ensure it is centered
             } else {
                 scrollToTopBtn.style.display = "none";
             }
@@ -352,4 +363,3 @@ window.handleDateRangeChange = async function() {
     }
 };
 
-// Note: Global functions are already assigned at the top of the file

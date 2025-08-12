@@ -130,10 +130,11 @@ body.dark-theme .card[data-section="daily-summary"] {
 * {box-sizing: border-box; }
 body, html {
   font-family: 'Google Sans Text', 'Google Sans', 'Roboto', 'Noto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif !important;
-    line-height: 1.6;
-    color: var(--primary-text);
+  line-height: 1.6;
+  color: var(--primary-text);
   min-height: 100vh;
   font-size: 20px;
+  overflow-y: auto;
 }
 
 /* === Layout === */
@@ -858,30 +859,29 @@ body.dark-theme .topic-button:hover {
   line-height: 1.5;
 }
 
+/* Enhanced scroll to top button */
 .scroll-to-top {
   position: fixed;
-  bottom: 32px;
-  right: 32px;
-  z-index: 1000;
-  background: var(--accent-color, #1976d2);
-  color: #fff;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
   border: none;
   border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  font-size: 2em;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.85;
-  transition: background 0.2s, opacity 0.2s, transform 0.2s;
+  font-size: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  opacity: 1; /* Changed from 0 to 1 to make button visible by default */
+  visibility: visible; /* Changed from hidden to visible to make button appear */
 }
+
 .scroll-to-top:hover {
-  background: var(--primary-color, #1565c0);
-  opacity: 1;
-  transform: scale(1.08);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
 .theme-toggle:hover {
@@ -1299,36 +1299,6 @@ body.dark-theme label {
     background: rgba(255, 255, 255, 0.2);
 }
 
-/* Enhanced scroll to top button */
-.scroll-to-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: all 0.3s ease;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-}
-
-.scroll-to-top:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-}
-
-.scroll-to-top.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
 /* Desktop by default */
 .mobile-nav {
   display: none;
@@ -1549,35 +1519,6 @@ body.dark-theme label {
 /* Gradient backgrounds for sections */
 .gradient-bg {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-}
-
-/* Scroll to top button */
-.scroll-to-top {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 50px;
-    height: 50px;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.scroll-to-top.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-.scroll-to-top:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
 .trending-topics {

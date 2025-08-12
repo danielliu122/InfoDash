@@ -1086,7 +1086,6 @@ if (stockSymbolInput) {
 // Update selectStock to set userSelectedSymbol to true
 export function selectStock(symbol) {
     userSelectedSymbol = true;
-    userSelectedSymbol = true; // Update global variable
     document.getElementById('stockSymbolInput').value = symbol;
     handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
 }
@@ -1528,6 +1527,7 @@ async function fetchStockHistoricalData(symbol) {
 
 // A smarter fetch function for the dashboard
 export async function fetchTopStocks(symbolsOverride = null) {
+    
     const symbolsToFetch = symbolsOverride || userPrefs.getFinanceWatchlist() || DEFAULT_WATCHLIST;
     if (symbolsToFetch.length === 0) {
         topStocks = [];
@@ -1860,11 +1860,10 @@ export function stopAutoRefresh() {
     }
 }
 
-// Initialize finance features
-initializeFinance();
-
-// Start the stock dashboard automatically
-startStockDashboard();
+if (document.getElementById('stock-dashboard') || document.getElementById('stockChart')) {
+    initializeFinance();
+    startStockDashboard();
+}
 
 // Initialize finance functionality on page load
 try {
