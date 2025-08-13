@@ -255,6 +255,9 @@ main {
   box-sizing: border-box;
   background: var(--primary-bg);
   position: relative;
+  width: 100vw;
+  max-width: 100vw;
+  position: relative;
   overflow-y:auto;
 }
 

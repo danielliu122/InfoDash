@@ -5,6 +5,10 @@
   }
 }
 
+.main-content {
+  width:100%;
+}
+
 #map {
   border-radius: 12px;
   background: var(--card-bg, #fff);
