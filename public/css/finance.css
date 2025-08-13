@@ -152,6 +152,13 @@ body:not(.dark-theme) .stock-dashboard {
   min-height: 400px;
   max-height: 600px;
   padding: 5px;
+  border: 1px solid transparent;
+}
+
+.chart-container:hover {
+  border: 1px solid var(--accent-color);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.12);
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s ease;
 }
 
 #financeChart {
@@ -159,6 +166,7 @@ body:not(.dark-theme) .stock-dashboard {
   height: 100% !important;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1.5px 6px rgba(0,0,0,0.08);
 }
+
 
 /* === Finance Section Card Margins === */
 #finance .cards-container .card {
@@ -794,4 +802,20 @@ body:not(.dark-theme) #finance .card.chart-container canvas {
 .card.finance-content{
   transition:none;
   transform:none;
+}
+#stockControls {
+  border: 1px solid transparent;
+}
+
+#stockControls:hover {
+  border: 1px solid var(--accent-color);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.12);
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s ease;
+}
+
+.card.stock-dashboard:hover {
+  transform: translateY(-2px);
+  border: 1px solid var(--accent-color);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.12);
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s ease;
 }

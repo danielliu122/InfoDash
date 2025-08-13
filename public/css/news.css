@@ -9,7 +9,6 @@
   
   .news-card {
     background: lab(90.06% -5.3 -4.59);
-    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 0;
     overflow: hidden;
@@ -19,6 +18,7 @@
   
   .news-card:hover {
     transform: translateY(-2px);
+    border: 1px sold var(--accent-color);
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
   }
   
@@ -285,7 +285,6 @@ width: 100%;
     flex-direction: column;
     gap: 16px;
     align-items: flex-start;
-    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 16px;
@@ -295,13 +294,15 @@ width: 100%;
     flex: 1 1 300px;
     min-width: 260px;
     max-width: 100%;
+    border: 1px solid transparent;
 }
 
 
 .news-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    border-color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.12);
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s ease;
 }
 
 .news-image {
@@ -384,14 +385,9 @@ width: 100%;
 /* Dark theme enhancements */
 body.dark-theme .news-card {
     background: var(--card-bg);
-    border-color: var(--border-color);
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-body.dark-theme .news-card:hover {
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-    border-color: var(--accent-color);
-}
 
 body.dark-theme .headline-title {
     color: #ffffff;

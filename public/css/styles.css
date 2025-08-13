@@ -227,8 +227,10 @@ main {
 }
 
 .nav-link:hover {
-  background: rgba(255,255,255,0.1);
-  transform: translateX(5px);
+  transform: translateX(-1px);
+  border: 1px solid var(--accent-color);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.12);
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s ease;
 }
 
 .nav-link.active {
@@ -309,24 +311,29 @@ section, .section, .summary-card, #finance, #finance .card, .news-item, .trend-c
   margin-bottom: 20px;
   box-sizing: border-box;
   overflow-y: auto;
+  transition: border-color 0.3s ease;
 }
 section, .section, .summary-card, .trend-card, .news-item {
   padding: 20px;
 }
 
+section:hover, .section:hover, .summary-card:hover, #finance:hover, #finance .card:hover, .news-item:hover, .trend-card:hover, .chart-container:hover {
+  border: 1px solid var(--accent-color);
+}
 
 /* === Summary Cards === */
 .summary-card {
   box-shadow: 0 6px 24px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.12);
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s ease;
   display: block !important;
   visibility: visible !important;
+  border: 1px solid transparent;
 }
-
 
 .summary-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 36px rgba(0,0,0,0.22), 0 3px 12px rgba(0,0,0,0.16);
+  border: 1px solid var(--accent-color);
 }
 .summary-card h5 {
   margin-bottom: 15px;
@@ -538,18 +545,20 @@ section, .section, .summary-card, .trend-card, .news-item {
 
 .card {
   background: var(--secondary-bg);
-  border: none;
   border-radius: 16px;
   margin-bottom: 28px;
   overflow: hidden;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1.5px 6px rgba(0,0,0,0.08);
   transition: box-shadow 0.3s cubic-bezier(.4,0,.2,1), transform 0.2s cubic-bezier(.4,0,.2,1);
   will-change: box-shadow, transform;
+  border: 1px solid transparent;
 }
 
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--accent-color);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.12);
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s ease;
 }
 
 .card-header {
@@ -658,15 +667,6 @@ body.dark-theme .collapsible-header {
   border-bottom-color: #444 !important;
 }
 
-body.dark-theme .card {
-  border-color: #444 !important;
-}
-
-body.dark-theme .summary-card,
-body.dark-theme .news-item,
-body.dark-theme .trend-card {
-  border-color: #444 !important;
-}
 
 #summary-content-container .archive-row ul li {
   background: lab(90.06% -5.3 -4.59) !important;
