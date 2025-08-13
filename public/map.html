@@ -155,13 +155,23 @@
           <div class="card-header">
             <h4> <i class="fas fa-map"></i> Traffic Map</h4>
           </div>
-          <div id="traffic-container" class="traffic-container">
-            <div class="map-container"
-                 style="position: relative; width: 100%; height: 100%; min-height: 400px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color);">
-              <div id="map"
-                   style="min-height:400px"></div>
+            <div id="map" style="min-height:400px"></div>
+            <!-- Instructions  -->
+            <div class="row">
+            <div class="col s12">
+                <p style="        
+                text-align: center; 
+                padding: 20px; 
+                color: var(--secondary-text); 
+                font-style: italic;
+                background: var(--card-bg);
+                border-radius: 8px;
+                margin-top: 16px;
+                border: 1px solid var(--border-color);">
+                    Allow location services on mobile or web browser permissions on desktop to center map and allow the location button to function.
+                </p>
             </div>
-          </div>
+                    </div>
           <div id="directions-panel" style="margin-top: 1em; background: #fafafa; padding: 1em; border-radius: 8px; min-height: 60px;">
         </div>
         <form id="directions-form" style="margin-bottom: 1em; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">

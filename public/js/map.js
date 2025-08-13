@@ -46,12 +46,6 @@ function applyThemeToMap() {
     if (map) {
       map.setOptions({ styles: isDarkMode ? darkModeStyle : lightModeStyle });
     }
-    
-    // Update theme toggle button text
-    const themeToggleBtn = document.querySelector('.map-theme-toggle');
-    if (themeToggleBtn) {
-      themeToggleBtn.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
-    }
   }
 }
 
@@ -153,19 +147,6 @@ function initMap() {
       }
     });
   }
-
-  // --- Dark/Light Mode Toggle ---
-  const themeToggleBtn = document.createElement('button');
-  themeToggleBtn.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
-  themeToggleBtn.className = 'map-theme-toggle styled-map-btn';
-  themeToggleBtn.setAttribute('aria-label', 'Toggle dark/light mode');
-  themeToggleBtn.style.margin = '8px';
-  themeToggleBtn.onclick = function() {
-    isDarkMode = !isDarkMode;
-    map.setOptions({ styles: isDarkMode ? darkModeStyle : lightModeStyle });
-    themeToggleBtn.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
-  };
-  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(themeToggleBtn);
 
   // --- Controls container (top left) ---
   const controlsContainer = document.createElement('div');

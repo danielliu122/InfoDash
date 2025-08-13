@@ -25,19 +25,59 @@ body:not(.dark-theme) .stock-dashboard {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 12px;
+  /* Enable drag and drop for grid items */
+  align-items: start;
 }
+
+/* Draggable stock card styles */
 .stock-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 12px;
-  cursor: pointer;
+  cursor: grab;
   transition: all 0.3s ease;
   text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  /* Enable dragging */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
+
+/* Active dragging state */
+.stock-card:active {
+  cursor: grabbing;
+  transform: scale(1.02);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+/* Dragging state */
+.stock-card.dragging {
+  opacity: 0.8;
+  transform: rotate(5deg) scale(1.05);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+  z-index: 1001;
+  position: relative;
+}
+
+/* Drop zone indicator */
+.stock-dashboard-grid.drag-over {
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+/* Drop target indicator */
+.stock-card.drop-target {
+  border: 2px dashed var(--accent-color);
+  background: rgba(63, 81, 181, 0.1);
+}
+
 .stock-symbol {
   font-weight: bold;
   font-size: 20px;
@@ -686,42 +726,43 @@ body:not(.dark-theme) #finance .card.chart-container canvas {
 }
 
 .watchlist-section {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.watchlist-controls {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 4px;
 }
-
-#watchlist-container{
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-  gap: 5px;
-  border-radius: 8px;
+#watchlist-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  border-radius: 4px;
 }
-
-
-.watchlist-item:hover {
-  background: var(--primary-color);
-  color: white;
+.watchlist-item {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-size: 0.95em;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: 1.5px solid var(--border-color);
+  box-shadow: 0 0 0 1px var(--border-color);
+  transition: background 0.15s, box-shadow 0.15s;
 }
-
 .watchlist-item .remove-btn {
   background: none;
   border: none;
-  color: inherit;
+  color: var(--danger-color);
   cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 3px;
-  transition: background 0.3s ease;
+  font-size: 1em;
+  padding: 0 2px;
+  border-radius: 2px;
+  line-height: 1;
 }
-
 .watchlist-item .remove-btn:hover {
-  background: rgba(255,255,255,0.2);
+  background: var(--danger-color);
+  color: #fff;
 }
 
 .search-section {

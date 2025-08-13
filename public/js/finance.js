@@ -1179,7 +1179,7 @@ function togglePauseFinance() {
     if (!button) return;
     const isPaused = button.classList.toggle('paused');
     if (isPaused) {
-        button.textContent = 'Resume';
+        button.innerHTML = '⏵'; // Play icon
         stopAutoRefresh();
     } else {
         button.innerHTML = '⏸'; // Pause icon

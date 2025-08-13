@@ -6,8 +6,16 @@
 }
 
 #map {
-  margin: 5px;
+  border-radius: 12px;
+  background: var(--card-bg, #fff);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  position: relative;
+  min-height: 400px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
+
 
 #traffic-content, #map-card {
   position: relative;
@@ -31,16 +39,6 @@
 
 body.dark-theme #traffic {
   background-color: #181b1f;
-}
-
-
-#map-card {
-  width: 100%;
-  position: relative;
-  background: var(--card-bg, #fff);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-  overflow: hidden;
 }
 
 /* --- Google Maps Info Window Text Color Fix --- */
@@ -274,7 +272,7 @@ body.dark-theme #directions-panel .adp-marker2 {
 
 
 /* --- Custom Map Button Styling for Light/Dark Mode --- */
-.styled-map-btn, .map-theme-toggle, .map-locate-btn {
+.styled-map-btn, .map-locate-btn {
   background: #fff;
   color: #222;
   border: 1px solid #bdbdbd;
@@ -292,7 +290,6 @@ body.dark-theme #directions-panel .adp-marker2 {
   gap: 8px;
 }
 .styled-map-btn:hover, .styled-map-btn:focus,
-.map-theme-toggle:hover, .map-theme-toggle:focus,
 .map-locate-btn:hover, .map-locate-btn:focus {
   background: #f5f5f5;
   box-shadow: 0 4px 16px rgba(0,0,0,0.18);
@@ -301,7 +298,6 @@ body.dark-theme #directions-panel .adp-marker2 {
 }
 
 body.dark-theme .styled-map-btn,
-body.dark-theme .map-theme-toggle,
 body.dark-theme .map-locate-btn {
   background: #23272e !important;
   color: #fff !important;
@@ -310,8 +306,8 @@ body.dark-theme .map-locate-btn {
 }
 body.dark-theme .styled-map-btn:hover,
 body.dark-theme .styled-map-btn:focus,
-body.dark-theme .map-theme-toggle:hover,
-body.dark-theme .map-theme-toggle:focus,
+body.dark-theme,
+body.dark-theme,
 body.dark-theme .map-locate-btn:hover,
 body.dark-theme .map-locate-btn:focus {
   background: #30343a !important;
@@ -644,31 +640,7 @@ body.dark-theme div[jstcache="128"][jsinstance="0"].address-line.full-width[jsan
     background: rgb(255, 255, 255) !important;
     box-shadow: rgba(0, 0, 0, 0.12) 0px 2px 8px !important;
   }
-  
-  /* Google Maps theme toggle button styling */
-  .map-theme-toggle.styled-map-btn {
-    background: var(--card-bg) !important;
-    color: var(--primary-text) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 6px !important;
-    padding: 8px 12px !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-  }
-  
-  .map-theme-toggle.styled-map-btn:hover {
-    background: var(--hover-bg) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
-  }
-  
-  .map-theme-toggle.styled-map-btn:active {
-    transform: translateY(0) !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-  }
+
   
   /* === Google Maps Tile Border Fix === */
   /* Fix grey box borders and tile rendering artifacts */

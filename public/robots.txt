@@ -1,31 +1,19 @@
 User-agent: *
-Allow: /
-
-# Disallow admin and private areas
 Disallow: /admin/
 Disallow: /private/
 Disallow: /api/
 Disallow: /data/
 Disallow: /node_modules/
 
-# Allow important pages
 Allow: /public/
 Allow: /css/
 Allow: /js/
 Allow: /static/
 
-# Crawl delay for respectful crawling
-Crawl-delay: 1
+# Reduce crawl delay for faster indexing, but not too aggressive
+Crawl-delay: 0.5
 
-# Sitemap location
+# Provide sitemap for better site discovery
 Sitemap: https://infodash.app/sitemap.xml
 
-# Additional sitemaps if you have them
-# Sitemap: https://infodash.app/news-sitemap.xml
-# Sitemap: https://infodash.app/finance-sitemap.xml
-
-# Canonical URL for privacy policy
-<link rel="canonical" href="https://infodash.app/privacy-policy.html">
-
-# Canonical URL for terms of service
-<link rel="canonical" href="https://infodash.app/terms-of-service.html">
+# Note: Canonical tags should be placed in HTML <head>, not robots.txt, so they are removed here for SEO best practices.

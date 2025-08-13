@@ -194,21 +194,6 @@ export const updateTrends = (data, category) => {
     });
 
     trendsSection.appendChild(buttonsContainer);
-
-    // Add a styled info message about the simplified display
-    const infoMessage = document.createElement('div');
-    infoMessage.style.cssText = `
-        text-align: center; 
-        padding: 20px; 
-        color: var(--secondary-text); 
-        font-style: italic;
-        background: var(--card-bg);
-        border-radius: 8px;
-        margin-top: 16px;
-        border: 1px solid var(--border-color);
-    `;
-    infoMessage.innerHTML = '<p>📊 Showing trending topics for the selected country. Click on topics to search Google News in a new tab.</p>';
-    trendsSection.appendChild(infoMessage);
 };
 
 function displayNoTrendsMessage() {
