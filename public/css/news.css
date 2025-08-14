@@ -328,7 +328,6 @@ width: 100%;
 
 .news-content {
     transform:none;
-    transition: none;
     flex: 1;
     min-width: 0;
     display: flex;
@@ -341,7 +340,6 @@ width: 100%;
 }
 
 .card.news-headlines {
-    transition: none;
     transform: none;
   }
   

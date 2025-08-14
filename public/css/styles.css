@@ -1,31 +1,31 @@
 :root {
-  --primary-bg: #c9efdc;
-  --secondary-bg: #bcdad3;
-  --primary-text: #212529;
-  --secondary-text: #6c757d;
-  --accent-color: #26a69a;
-  --button-bg: #26a69a;
-  --button-hover-bg: #2bbbad;
-  --input-bg: #ffffff;
-  --input-border: #ced4da;
-  --text-color: #212529;
-  --text-secondary: #000000;
-  --background-color: #ffffff;
-  --card-bg: #lab(90.06% -5.3 -4.59);
-  --summary-card-bg: #e9ecef;
-  --stock-card-bg: #e9ecef;
-  --hover-bg: #e9ecef;
+  --primary-bg: linear-gradient(135deg, #e3eaf6 0%, #cfe3ea 35%, #d6ede2 65%, #e6f5e9 100%);
+  --secondary-bg: linear-gradient(135deg, #e6eaf6 0%, #dbeaf6 50%, #e3f2fd 100%);
+  --primary-text: #2d2d2d;
+  --secondary-text: #6d6d6d;
+  --accent-color: #7ec8e3;
+  --button-bg: rgb(73, 145, 158);
+  --button-hover-bg: #7798f3;
+  --input-bg: #f7fafc;
+  --input-border: #d1d5db;
+  --text-color: #2d2d2d;
+  --text-secondary: #6d6d6d;
+  --background-color: linear-gradient(120deg, #f5f7fa 0%, #e3eaf6 50%, #dbeaf6 100%);
+  --card-bg: linear-gradient(135deg, #e3eaf6 0%, #cfe3ea 50%, #e6f5e9 100%);
+  --summary-card-bg: linear-gradient(135deg, #f5f7fa 0%, #e3eaf6 60%, #dbeaf6 100%);
+  --stock-card-bg: linear-gradient(135deg, #f5f7fa 0%, #e3eaf6 60%, #e6f5e9 100%);
+  --hover-bg: linear-gradient(135deg, #f5f7fa 0%, #e3eaf6 100%);
   --sidebar-width: 200px;
   --sidebar-collapsed-width: 55px;
-  --primary-color: #667eea;
-  --secondary-color: #764ba2;
-  --success-color: #4CAF50;
-  --warning-color: #FF9800;
-  --danger-color: #f44336;
-  --text-primary: black;
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2d2d2d;
-  --bg-card: #333333;
+  --primary-color: rgb(73, 87, 158);
+  --secondary-color: #b2dfdb;
+  --success-color: #b7f082;
+  --warning-color: #ffe082;
+  --danger-color: #f3022a;
+  --text-primary: #2d2d2d;
+  --bg-primary: linear-gradient(135deg, #f5f7fa 0%, #e3eaf6 100%);
+  --bg-secondary: linear-gradient(135deg, #e3eaf6 0%, #dbeaf6 100%);
+  --bg-card: linear-gradient(135deg, #f5f7fa 0%, #e3eaf6 100%);
 }
 
 body {
@@ -120,6 +120,13 @@ body.dark-theme .btn-small.red {
 }
 
 /* Daily Summary card specific styling */
+body.dark-theme .card {
+  background: var(--secondary-bg);
+}
+
+
+
+/* Daily Summary card specific styling */
 body.dark-theme .card.daily-summary,
 body.dark-theme .card[data-section="daily-summary"] {
   background: #436b5a !important;
@@ -131,6 +138,7 @@ body.dark-theme .card[data-section="daily-summary"] {
 body, html {
   font-family: 'Google Sans Text', 'Google Sans', 'Roboto', 'Noto', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif !important;
   line-height: 1.6;
+  background: linear-gradient(120deg, #b399ff 0%, #95c6cc 20%, #609cba 40%);
   color: var(--primary-text);
   min-height: 100vh;
   font-size: 20px;
@@ -153,11 +161,14 @@ main {
 
 /* === Sidebar Layout === */
 .sidebar {
-    background-color:#c1d5d0;
-    width: var(--sidebar-width);
-    transition: width 0.3s ease;
-    background: #c1d5d0;
-    overflow:visible;
+  padding-right: 5px;
+  background: linear-gradient(120deg, #609cba 0%, #95c6cc 20%, #b399ff 40%);
+  width: var(--sidebar-width);
+  transition: width 0.3s ease;
+  overflow: visible;
+  box-shadow: 4px 0 16px 0 rgba(18, 72, 62, 0.22);
+  position: relative;
+  z-index: 2;
 }
 
 .sidebar.collapsed {
@@ -175,8 +186,8 @@ main {
 .sidebar-title {
     font-size: 1.2em;
     font-weight: 600;
-    color: var(--accent-color);
     transition: opacity 0.3s ease, visibility 0.3s ease;
+    color: var(--primary-text);
 }
 
 .sidebar.collapsed .sidebar-title {
@@ -236,6 +247,7 @@ main {
 .nav-link.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  color: #181b1f;
 }
 
 .nav-link i {
@@ -246,6 +258,14 @@ main {
 .nav-link span {
     font-weight: 500;
     font-size: 14px;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+
+.sidebar.collapsed .nav-link span {
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+    pointer-events: none;
 }
 
 .nav-item {
@@ -253,6 +273,7 @@ main {
 }
 
 .main-content {
+  padding-left: 5px;
   transition: margin-left 0.3s ease;
   box-sizing: border-box;
   background: var(--primary-bg);
@@ -271,7 +292,7 @@ main {
 
 /* Dark theme adjustments */
 body.dark-theme .sidebar {
-    background: var(--bg-primary);
+    background: var(--primary-bg);
     color: var(--text-primary);
 }
 
@@ -306,7 +327,6 @@ footer {
 
 /* === Section & Card === */
 section, .section, .summary-card, #finance, #finance .card, .news-item, .trend-card, .chart-container {
-  background: var(--secondary-bg);
   border-radius: 8px;
   margin-bottom: 20px;
   box-sizing: border-box;
@@ -403,9 +423,9 @@ section:hover, .section:hover, .summary-card:hover, #finance:hover, #finance .ca
 
 /* Top Header */
 .top-header {
+  background: var(--primary-bg);
   position:sticky;
   flex-direction: row;
-  background: var(--secondary-bg);
   padding: 2px 2px 2px 6px;
   display: flex;
   justify-content: space-between;
@@ -423,7 +443,7 @@ section:hover, .section:hover, .summary-card:hover, #finance:hover, #finance .ca
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 0 20px;
+    padding-bottom: 5px;
     z-index: 1000;
   }
   .sidebar-toggle, .sidebar-title{
@@ -544,7 +564,6 @@ section:hover, .section:hover, .summary-card:hover, #finance:hover, #finance .ca
 }
 
 .card {
-  background: var(--secondary-bg);
   border-radius: 16px;
   margin-bottom: 28px;
   overflow: hidden;
@@ -553,6 +572,8 @@ section:hover, .section:hover, .summary-card:hover, #finance:hover, #finance .ca
   will-change: box-shadow, transform;
   border: 1px solid transparent;
 }
+
+
 
 .card:hover {
   transform: translateY(-2px);
@@ -580,7 +601,11 @@ section:hover, .section:hover, .summary-card:hover, #finance:hover, #finance .ca
 }
 
 .card-content {
+  background: var(--primary-bg);
   padding: 10px;
+}
+body.dark-theme .card-content {
+  background: unset;
 }
 
 .btn-small:hover {
@@ -1156,7 +1181,7 @@ body.dark-theme label {
 #header-weather:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    background: var(--hover-bg) !important;
+    background: var(--button-hover-bg) !important;
 }
 
 #header-weather:active {
@@ -1241,36 +1266,6 @@ body.dark-theme label {
 
 .gradient-bg-alt {
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-/* Enhanced stock cards */
-.stock-card {
-    transition: all 0.3s ease;
-    border-radius: 10px;
-}
-
-.stock-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* Price animation classes */
-.price-up {
-    animation: priceUp 0.5s ease-out;
-}
-
-.price-down {
-    animation: priceDown 0.5s ease-out;
-}
-
-@keyframes priceUp {
-    0% { background-color: rgba(76, 175, 80, 0.1); }
-    100% { background-color: transparent; }
-}
-
-@keyframes priceDown {
-    0% { background-color: rgba(244, 67, 54, 0.1); }
-    100% { background-color: transparent; }
 }
 
 /* Enhanced notification styling */
@@ -1681,8 +1676,8 @@ body.dark-theme label {
 }
 
 ::-webkit-scrollbar{
+  background: linear-gradient(120deg, #7b69b1 0%, #6aa8b2 50%, #44768e 100%);
   height:6px;
-  background-color: rgb(30, 30, 30);
 }
 
 ::-webkit-scrollbar-track {
@@ -1690,7 +1685,8 @@ body.dark-theme label {
   padding:5px;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: #888;
+  background-color: #3d666b;
+
   border-radius: 4px;
   padding:5px;
 

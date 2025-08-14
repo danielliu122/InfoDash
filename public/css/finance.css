@@ -24,14 +24,11 @@ body:not(.dark-theme) .stock-dashboard {
 .stock-dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 12px;
-  /* Enable drag and drop for grid items */
-  align-items: start;
+  gap: 8px;
 }
 
 /* Draggable stock card styles */
 .stock-card {
-  background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 12px;
@@ -143,9 +140,6 @@ body:not(.dark-theme) .stock-dashboard {
   overflow-y: auto !important;
 }
 
-.chart-container canvas {
-  background-color: rgb(207, 243, 237) !important;
-}
 
 .chart-container {
   overflow: hidden !important;
@@ -405,17 +399,6 @@ body.dark-theme .stock-card.price-down {
   border: 1px solid rgba(244, 67, 54, 0.4);
 }
 
-/* Smooth transitions for price updates */
-.stock-price, .stock-change {
-  transition: color 0.3s ease;
-}
-
-/* Ensure stock cards maintain their position */
-.stock-card {
-  transition: all 0.3s ease;
-  position: relative;
-}
-
 /* === Chart Buttons Styling === */
 .time-range-buttons {
   display: flex;
@@ -444,7 +427,6 @@ body.dark-theme .stock-card.price-down {
 }
 
 .time-range-button.active {
-  background: var(--accent-color) !important;
   color: white !important;
   border-color: var(--accent-color) !important;
   box-shadow: 0 2px 8px rgba(63, 81, 181, 0.3) !important;
@@ -733,6 +715,13 @@ body:not(.dark-theme) #finance .card.chart-container canvas {
   color: var(--danger-color);
 }
 
+/* Smooth transitions for price updates */
+.stock-price, .stock-change {
+  transition: color 0.3s ease;
+}
+
+
+
 .watchlist-section {
   display: flex;
   flex-direction: column;
@@ -746,8 +735,7 @@ body:not(.dark-theme) #finance .card.chart-container canvas {
   border-radius: 4px;
 }
 .watchlist-item {
-  background: var(--card-bg);
-  color: var(--text-primary);
+  background-color: rgb(134, 161, 231);
   border-radius: 3px;
   padding: 2px 8px;
   font-size: 0.95em;

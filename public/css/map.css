@@ -26,7 +26,6 @@
   background: var(--card-bg, #fff);
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-  padding: 0;
   margin-bottom: 24px;
 }
 
