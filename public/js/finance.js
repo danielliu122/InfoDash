@@ -1,5 +1,14 @@
 import { userPrefs } from './userPreferences.js';
 import logger from './logger.js';
+import { 
+    addToWatchlist, 
+    removeFromWatchlist, 
+    loadWatchlistFromPreferences,
+    startStockDashboard,
+    getWatchlist,
+    getStockSymbols 
+} from './financeWatchlist.js';
+
 
 // At the top of the file
 export let updateInterval;
@@ -9,43 +18,8 @@ let lastTimestamp = null;
 let watchlist = JSON.parse(localStorage.getItem('financeWatchlist') || '[]');
 let stockSymbols = {};
 let currentSymbol = '^IXIC';
-let topStocks = [];
-let stockDashboardInterval = null;
-let previousStockData = {};
-let isDashboardPaused = false; // Track pause state
 const MAX_POINTS = 50;
 let userSelectedSymbol = false; // Track if user manually selected a symbol
-
-// Default watchlist with popular stocks and cryptocurrencies
-const DEFAULT_WATCHLIST = [
-    'NVDA',    // NVIDIA - AI/GPU leader
-    'AAPL',    // Apple - Tech giant
-    'GOOGL',   // Google (Alphabet) - Tech/Advertising
-    'META',    // Meta (Facebook) - Social media/AI
-    'BTC-USD', // Bitcoin - Leading cryptocurrency
-    'ETH-USD', // Ethereum - Smart contract platform
-    '^IXIC',   // NASDAQ Composite - Tech index
-    'NFLX',    // Netflix - Streaming entertainment
-    'DJT',     // Trump Media & Technology Group
-    'TSLA',    // Tesla - Electric vehicles/AI
-    'MSFT',    // Microsoft - Software/AI
-    'AMZN',    // Amazon - E-commerce/Cloud
-    'SPY',     // S&P 500 ETF - Market benchmark
-    '^DJI',    // Dow Jones Industrial Average
-    '^GSPC',   // S&P 500 Index
-    '^HSI',    // Hang Seng Index - Hong Kong
-    '^N225',   // Nikkei 225 - Japan
-    '^GDAXI',  // DAX - Germany
-    '^FTSE',   // FTSE 100 - UK
-    '^FCHI',   // CAC 40 - France
-    '^STOXX50E', // EURO STOXX 50 - Europe
-    'GC=F',    // Gold Futures
-    'SI=F',    // Silver Futures
-    'EURUSD=X', // Euro to US Dollar
-    'USDJPY=X', // US Dollar to Japanese Yen
-    'GBPUSD=X', // British Pound to US Dollar
-    'USDCNY=X'  // US Dollar to Chinese Yuan
-];
 
 // Set default time range and interval
 export const DEFAULT_TIME_RANGE = '2h';
@@ -162,312 +136,6 @@ function addData(chart, label, newData) {
     }
 }
 
-function updateStockDashboard() {
-    const dashboardContainer = document.getElementById('stock-dashboard');
-    if (!dashboardContainer) {
-        console.log('Stock dashboard container not found on this page, skipping update');
-        return;
-    }
-
-    if (!topStocks || topStocks.length === 0) {
-        dashboardContainer.innerHTML = `<div class="stock-dashboard-error"><p>No stocks in watchlist.</p></div>`;
-        return;
-    }
-
-    // Check if this is the first time rendering the dashboard
-    const existingGrid = dashboardContainer.querySelector('.stock-dashboard-grid');
-    const isFirstRender = !existingGrid;
-
-    if (isFirstRender) {
-        // Initial render - create the full structure
-        const marketStatus = isMarketOpen() ? 'OPEN' : 'CLOSED';
-        const marketColor = isMarketOpen() ? '#4caf50' : '#f44336';
-
-        let html = `
-            <div class="market-status-indicator" style="text-align: center; margin-bottom: 15px; padding: 8px; background: ${marketColor}; color: white; border-radius: 6px; font-weight: bold;">
-                Market: ${marketStatus}
-            </div>
-            <div class="stock-dashboard-grid">
-        `;
-
-        topStocks.forEach(stock => {
-            if (!stock || stock.error) return;
-
-            const change = stock.change || 0;
-            const changePercent = stock.changePercent || 0;
-            const changeColor = change >= 0 ? 'green' : 'red';
-            const changeIcon = change >= 0 ? '↗' : '↘';
-
-            // Format price with commas
-            const priceFormat = formatPriceWithCommas(stock.price || 0);
-
-            html += `
-                <div class="stock-card" data-symbol="${stock.symbol}" onclick="selectStock('${stock.symbol}')">
-                    <div class="stock-header">
-                        <span class="stock-symbol">${stock.symbol}</span>
-                        <span class="stock-name">${stockSymbols[stock.symbol] || stock.symbol}</span>
-                    </div>
-                    <div class="stock-price" style="color: ${changeColor}; font-size: ${priceFormat.fontSize};">$${priceFormat.formatted}</div>
-                    <div class="stock-change">
-                        ${changeIcon} <span style="color: ${changeColor};">${changePercent.toFixed(2)}%</span>
-                    </div>
-                </div>
-            `;
-        });
-
-        html += '</div>';
-        dashboardContainer.innerHTML = html;
-    } else {
-        // Update existing cards in place
-        const marketStatusIndicator = dashboardContainer.querySelector('.market-status-indicator');
-        if (marketStatusIndicator) {
-            const marketStatus = isMarketOpen() ? 'OPEN' : 'CLOSED';
-            const marketColor = isMarketOpen() ? '#4caf50' : '#f44336';
-            marketStatusIndicator.style.background = marketColor;
-            marketStatusIndicator.textContent = `Market: ${marketStatus}`;
-        }
-
-        // Update each stock card individually
-        topStocks.forEach(stock => {
-            if (!stock || stock.error) return;
-
-            const stockCard = dashboardContainer.querySelector(`[data-symbol="${stock.symbol}"]`);
-            if (!stockCard) return;
-
-            const previousData = previousStockData[stock.symbol];
-            let animationClass = '';
-            
-            if (previousData && isMarketOpen()) {
-                if (stock.price > previousData.price) {
-                    animationClass = 'price-up';
-                    stockCard.classList.remove('price-down');
-                    stockCard.classList.add('price-up');
-                } else if (stock.price < previousData.price) {
-                    animationClass = 'price-down';
-                    stockCard.classList.remove('price-up');
-                    stockCard.classList.add('price-down');
-                } else {
-                    stockCard.classList.remove('price-up', 'price-down');
-                }
-            }
-
-            const change = stock.change || 0;
-            const changePercent = stock.changePercent || 0;
-            const changeColor = change >= 0 ? 'green' : 'red';
-            const changeIcon = change >= 0 ? '↗' : '↘';
-
-            // Format price with commas
-            const priceFormat = formatPriceWithCommas(stock.price || 0);
-
-            // Update price
-            const priceElement = stockCard.querySelector('.stock-price');
-            if (priceElement) {
-                priceElement.style.color = changeColor;
-                priceElement.textContent = `$${priceFormat.formatted}`;
-            }
-
-            // Update change
-            const changeElement = stockCard.querySelector('.stock-change');
-            if (changeElement) {
-                changeElement.innerHTML = `${changeIcon} <span style="color: ${changeColor};">${changePercent.toFixed(2)}%</span>`;
-            }
-
-            // Remove animation classes after animation completes
-            if (animationClass) {
-                setTimeout(() => {
-                    stockCard.classList.remove('price-up', 'price-down');
-                }, 1000);
-            }
-        });
-    }
-
-    // Store current data for next comparison
-    topStocks.forEach(stock => {
-        if (stock && !stock.error) {
-            previousStockData[stock.symbol] = { ...stock };
-        }
-    });
-}
-
-// Watchlist management functions
-export function addToWatchlist(symbol) {
-    if (!watchlist.includes(symbol)) {
-        watchlist.push(symbol);
-        userPrefs.setFinanceWatchlist(watchlist);
-        updateWatchlistUI();
-
-        // Fetch real-time data and add to dashboard
-            fetchRealTimeYahooFinanceData(symbol).then(newStockData => {
-                if (newStockData && !newStockData.error) {
-                // Check if already in topStocks to avoid duplicates
-                const existingIndex = topStocks.findIndex(stock => stock.symbol === symbol);
-                if (existingIndex === -1) {
-                    topStocks.push(newStockData);
-                } else {
-                    // Update existing data
-                    topStocks[existingIndex] = newStockData;
-                }
-                    
-                    // Add the new stock card to the existing dashboard
-                    const dashboardContainer = document.getElementById('stock-dashboard');
-                    const grid = dashboardContainer?.querySelector('.stock-dashboard-grid');
-                    
-                    if (grid) {
-                    // Check if card already exists
-                    const existingCard = grid.querySelector(`[data-symbol="${symbol}"]`);
-                    if (!existingCard) {
-                        const change = newStockData.change || 0;
-                        const changePercent = newStockData.changePercent || 0;
-                        const changeColor = change >= 0 ? 'green' : 'red';
-                        const changeIcon = change >= 0 ? '↗' : '↘';
-                        
-                        // Format price with commas
-                        const priceFormat = formatPriceWithCommas(newStockData.price || 0);
-
-                        const newCard = document.createElement('div');
-                        newCard.className = 'stock-card';
-                        newCard.setAttribute('data-symbol', symbol);
-                        newCard.onclick = () => selectStock(symbol);
-                        newCard.innerHTML = `
-                            <div class="stock-header">
-                                <span class="stock-symbol">${symbol}</span>
-                                <span class="stock-name">${stockSymbols[symbol] || symbol}</span>
-                            </div>
-                            <div class="stock-price" style="color: ${changeColor}; font-size: ${priceFormat.fontSize};">$${priceFormat.formatted}</div>
-                            <div class="stock-change">
-                                ${changeIcon} <span style="color: ${changeColor};">${changePercent.toFixed(2)}%</span>
-                            </div>
-                        `;
-                        
-                        // Add with a fade-in effect
-                        newCard.style.opacity = '0';
-                        newCard.style.transform = 'scale(0.8)';
-                        grid.appendChild(newCard);
-                        
-                        // Animate in
-                        setTimeout(() => {
-                            newCard.style.transition = 'all 0.3s ease';
-                            newCard.style.opacity = '1';
-                            newCard.style.transform = 'scale(1)';
-                        }, 10);
-                    }
-                }
-                
-                // Update the finance chart to show the newly added stock
-                userSelectedSymbol = true;
-                document.getElementById('stockSymbolInput').value = symbol;
-                updateFinanceData(symbol, DEFAULT_TIME_RANGE, DEFAULT_INTERVAL, false);
-                fetchStockInfo(symbol);
-                
-                // Show notification
-                if (window.showNotification) {
-                    window.showNotification(`${symbol} added to watchlist`, 3000);
-                }
-            } else {
-                // Show error notification
-                if (window.showNotification) {
-                    window.showNotification(`Failed to fetch data for ${symbol}`, 4000);
-                }
-            }
-        }).catch(error => {
-            console.error(`Error adding ${symbol} to watchlist:`, error);
-            if (window.showNotification) {
-                window.showNotification(`Error adding ${symbol} to watchlist`, 4000);
-            }
-        });
-    } else {
-        // Already in watchlist
-        if (window.showNotification) {
-            window.showNotification(`${symbol} is already in your watchlist`, 3000);
-        }
-    }
-}
-
-export function removeFromWatchlist(symbol) {
-    // Remove from watchlist array
-    watchlist = watchlist.filter(s => s !== symbol);
-    userPrefs.setFinanceWatchlist(watchlist);
-    updateWatchlistUI();
-
-    // Remove from topStocks array
-        topStocks = topStocks.filter(stock => stock.symbol !== symbol);
-        
-        // Remove the stock card from the dashboard with animation
-        const dashboardContainer = document.getElementById('stock-dashboard');
-        const stockCard = dashboardContainer?.querySelector(`[data-symbol="${symbol}"]`);
-        
-        if (stockCard) {
-            stockCard.style.transition = 'all 0.3s ease';
-            stockCard.style.opacity = '0';
-            stockCard.style.transform = 'scale(0.8)';
-            
-            setTimeout(() => {
-                if (stockCard.parentNode) {
-                    stockCard.parentNode.removeChild(stockCard);
-                }
-            }, 300);
-        }
-    
-    // Also remove from previousStockData to prevent memory leaks
-    if (previousStockData[symbol]) {
-        delete previousStockData[symbol];
-    }
-    
-    // Show notification
-    if (window.showNotification) {
-        window.showNotification(`${symbol} removed from watchlist`, 3000);
-    }
-}
-
-export function updateWatchlistUI() {
-    const watchlistContainer = document.getElementById('watchlist-container');
-    if (!watchlistContainer) return;
-
-    watchlistContainer.innerHTML = '';
-    
-    if (watchlist.length === 0) {
-        watchlistContainer.innerHTML = '<p class="no-watchlist">No stocks in watchlist. Add some stocks to get started!</p>';
-    } else {
-        watchlist.forEach(symbol => {
-            const watchlistItem = document.createElement('div');
-            watchlistItem.className = 'watchlist-item';
-            watchlistItem.innerHTML = `
-                <span class="symbol">${symbol}</span>
-                <span class="company-name">${stockSymbols[symbol] || symbol}</span>
-                <button class="btn-small remove-watchlist" onclick="removeFromWatchlist('${symbol}')">×</button>
-            `;
-            
-            // Add click event to the watchlist item (but not the remove button)
-            watchlistItem.addEventListener('click', (e) => {
-                // Don't trigger if clicking the remove button
-                if (e.target.classList.contains('remove-watchlist')) {
-                    return;
-                }
-                document.getElementById('stockSymbolInput').value = symbol;
-                updateFinanceData(symbol);
-            });
-            watchlistContainer.appendChild(watchlistItem);
-        });
-    }
-    
-    // Update preferences display if available
-    if (window.updatePreferencesDisplay) {
-        window.updatePreferencesDisplay();
-    }
-}
-
-// Load watchlist from preferences
-export function loadWatchlistFromPreferences() {
-    const savedWatchlist = userPrefs.getFinanceWatchlist();
-    if (savedWatchlist && savedWatchlist.length > 0) {
-        watchlist = savedWatchlist;
-    } else {
-        // Use default watchlist for new users
-        watchlist = [...DEFAULT_WATCHLIST];
-        userPrefs.setFinanceWatchlist(watchlist);
-    }
-    updateWatchlistUI();
-}
 
 // Simplified stock symbol validation function
 async function validateStockSymbol(symbol) {
@@ -862,8 +530,8 @@ export const fetchRealTimeYahooFinanceData = async (symbol = '^IXIC') => {
     }
 };
 
-// Function to update UI with financial data
-export function updateFinance2(data) {
+// Function to update Chart with financial data
+export function updateChart(data) {
     const chartContainer = document.querySelector('#finance .chart-container');
     if (!chartContainer) {
         console.log('Finance chart container not found on this page, skipping update');
@@ -1031,32 +699,30 @@ export function updateFinance2(data) {
     document.body.addEventListener('click', handleFullscreen);
 }
 
-// This function handles fetching data and deciding how to update the chart.
 export async function updateFinanceData(symbol, timeRange = DEFAULT_TIME_RANGE, interval = DEFAULT_INTERVAL, isRefresh = false) {
     try {
-        currentSymbol = symbol; // Keep track of the current symbol
+        currentSymbol = symbol;
         
-        // Always fetch latest real-time data for the header display
+        // Existing code...
         const realTimeData = await fetchRealTimeYahooFinanceData(symbol);
         updateRealTimeFinance(realTimeData);
 
         if (isRefresh && window.financeChart) {
-            // For a live refresh, just add the new data point to the existing chart.
             if (realTimeData && realTimeData.price && realTimeData.timestamp) {
-                 addData(window.financeChart, realTimeData.timestamp.toISOString(), realTimeData.price);
+                addData(window.financeChart, realTimeData.timestamp.toISOString(), realTimeData.price);
             }
         } else {
-            // For a new symbol or initial load, fetch historical data and do a full redraw.
             const historicalData = await fetchFinancialData(symbol, timeRange, interval);
-            updateFinance2(historicalData);
+            updateChart(historicalData);
+            
+            // Add this line to update parameters when loading new symbol
+            updateStockParameters(symbol);
         }
-        updateWatchlistUI(); // Keep watchlist UI in sync
+        
+        updateWatchlistUI();
     } catch (error) {
         logger.error('Error updating finance data:', error);
-        const chartContainer = document.querySelector('#finance .chart-container');
-        if (chartContainer) {
-            chartContainer.innerHTML = '<p class="error">Error loading stock data. Please try again.</p>';
-        }
+        // Error handling...
     }
 }
 
@@ -1083,13 +749,15 @@ if (stockSymbolInput) {
     });
 }
 
-// Update selectStock to set userSelectedSymbol to true
+// Update your selectStock function:
 export function selectStock(symbol) {
     userSelectedSymbol = true;
     document.getElementById('stockSymbolInput').value = symbol;
     handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
+    
+    // Add this line to update parameters
+    updateStockParameters(symbol);
 }
-
 // Update startAutoRefresh to respect pause and user selection
 export function startAutoRefresh() {
     stopAutoRefresh(); 
@@ -1344,7 +1012,6 @@ export function initializeFinance() {
     if (button) {
         button.textContent = 'Pause';
         button.className = 'btn-small waves-effect waves-light green';
-        isDashboardPaused = false;
     }
     
     setupAutocomplete();
@@ -1380,42 +1047,6 @@ export function initializeFinance() {
     const defaultButton = Array.from(document.querySelectorAll('.time-range-button')).find(btn => btn.getAttribute('data-time-range') === DEFAULT_TIME_RANGE && btn.getAttribute('data-interval') === DEFAULT_INTERVAL);
     if (defaultButton) {
         defaultButton.classList.add('active');
-    }
-}
-
-// Clear entire watchlist
-export function clearWatchlist() {
-    if (!window.confirm('Are you sure you want to clear your entire watchlist? This action cannot be undone.')) {
-        return;
-    }
-    watchlist = [];
-    userPrefs.setFinanceWatchlist(watchlist);
-    updateWatchlistUI();
-    
-    // Refresh the stock dashboard to show empty state
-    if (stockDashboardInterval) {
-        fetchTopStocks();
-        logger.success('Watchlist cleared and dashboard refreshed');
-    } else {
-        logger.success('Watchlist cleared');
-    }
-}
-
-// Reset watchlist to default selection
-export function resetToDefaultWatchlist() {
-    if (!window.confirm('Are you sure you want to reset your entire watchlist? This action cannot be undone.')) {
-        return;
-    }
-    watchlist = [...DEFAULT_WATCHLIST];
-    userPrefs.setFinanceWatchlist(watchlist);
-    updateWatchlistUI();
-    
-    // Refresh the stock dashboard to show the new symbols
-    if (stockDashboardInterval) {
-        fetchTopStocks();
-        logger.success('Watchlist reset to default selection and dashboard refreshed');
-    } else {
-        logger.success('Watchlist reset to default selection');
     }
 }
 
@@ -1532,130 +1163,6 @@ async function fetchStockHistoricalData(symbol) {
     }
 }
 
-// A smarter fetch function for the dashboard
-export async function fetchTopStocks(symbolsOverride = null) {
-    
-    const symbolsToFetch = symbolsOverride || userPrefs.getFinanceWatchlist() || DEFAULT_WATCHLIST;
-    if (symbolsToFetch.length === 0) {
-        topStocks = [];
-        updateStockDashboard();
-        return;
-    }
-
-    try {
-        const startTime = Date.now();
-        const response = await fetch('/api/finance/bulk-real-time', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ symbols: symbolsToFetch }),
-        });
-        
-        const responseTime = Date.now() - startTime;
-        logger.logApiRequest('bulk-real-time', response.status, responseTime);
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            logger.error('Bulk endpoint error response:', errorText);
-            throw new Error('Network response was not ok');
-        }
-        
-        const data = await response.json();
-        logger.logBulkStockUpdate(symbolsToFetch, data);
-
-        let fetchedStocks = Object.values(data).filter(stock => !stock.error);
-
-        // Sort stocks based on market hours
-        const now = new Date();
-        const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-        const day = etNow.getDay();
-        const hours = etNow.getHours();
-        const minutes = etNow.getMinutes();
-        
-        // Check if it's a weekend
-        const isWeekend = day === 0 || day === 6; // Sunday or Saturday
-        
-        // Check if it's a weekday during market hours (9:30AM - 4:00PM ET)
-        const isMarketHours = !isWeekend && 
-                            (hours > 9 || (hours === 9 && minutes >= 30)) && 
-                            (hours < 16);
-        
-        // If outside market hours, sort crypto to the top
-        if (!isMarketHours) {
-            fetchedStocks.sort((a, b) => {
-                const aIsCrypto = a.symbol.endsWith('-USD');
-                const bIsCrypto = b.symbol.endsWith('-USD');
-                if (aIsCrypto && !bIsCrypto) return -1;
-                if (!aIsCrypto && bIsCrypto) return 1;
-                return 0;
-            });
-        }
-
-        topStocks = fetchedStocks;
-        updateStockDashboard();
-        
-        // Check for market close transition during dashboard updates
-        handleMarketCloseTransition();
-    } catch (error) {
-        logger.error("Error fetching top stocks:", error);
-    }
-}
-
-// Toggle stock dashboard pause/resume functionality
-export function toggleStockDashboard() {
-    const button = document.getElementById('dashboardToggle');
-    
-    if (isDashboardPaused) {
-        // Resume the dashboard
-        resumeStockDashboard();
-        button.textContent = 'Pause';
-        button.className = 'btn-small waves-effect waves-light green';
-        isDashboardPaused = false;
-    } else {
-        // Pause the dashboard
-        pauseStockDashboard();
-        button.textContent = 'Resume';
-        button.className = 'btn-small waves-effect waves-light red';
-        isDashboardPaused = true;
-    }
-}
-
-// Pause the stock dashboard
-function pauseStockDashboard() {
-    if (stockDashboardInterval) {
-        clearInterval(stockDashboardInterval);
-        stockDashboardInterval = null;
-        logger.logDashboardStatus('paused');
-    }
-}
-
-// Resume the stock dashboard
-function resumeStockDashboard() {
-    if (!stockDashboardInterval) {
-        // Fetch current data immediately
-        fetchTopStocks();
-        // Start the interval again
-        stockDashboardInterval = setInterval(fetchTopStocks, 5000);
-        logger.logDashboardStatus('resumed');
-    }
-}
-
-// Start stock dashboard auto-refresh (initial start)
-export function startStockDashboard() {
-    if (!stockDashboardInterval && !isDashboardPaused) {
-        fetchTopStocks(); // Initial fetch
-        stockDashboardInterval = setInterval(fetchTopStocks, 5000); // Refresh every 5 seconds
-        logger.logDashboardStatus('started');
-    }
-}
-
-// Stop stock dashboard (for cleanup)
-export function stopStockDashboard() {
-    if (stockDashboardInterval) {
-        clearInterval(stockDashboardInterval);
-        stockDashboardInterval = null;
-        logger.logDashboardStatus('stopped');
-    }
-}
 
 // Function to add current symbol to watchlist
 export async function addCurrentSymbolToWatchlist() {
@@ -1895,6 +1402,223 @@ try {
     console.error('Error during initial data fetch:', error);
 }
 
+// Function to update stock parameters section with historical data
+export async function updateStockParameters(symbol, dateIndex = -1) {
+    const parametersSection = document.getElementById('stock-parameters-section');
+    if (!parametersSection) {
+        console.log('Stock parameters section not found on this page');
+        return;
+    }
+
+    try {
+        // Show loading state
+        const elements = {
+            date: document.getElementById('param-date'),
+            open: document.getElementById('param-open'),
+            high: document.getElementById('param-high'),
+            low: document.getElementById('param-low'),
+            close: document.getElementById('param-close'),
+            volume: document.getElementById('param-volume')
+        };
+
+        // Set loading text
+        Object.values(elements).forEach(element => {
+            if (element) element.textContent = 'Loading...';
+        });
+
+        // Fetch historical data using the corrected function
+        const historyData = await fetchFinanceHistoryArray(symbol);
+        
+        if (!historyData || historyData.length === 0) {
+            // No data available
+            Object.values(elements).forEach(element => {
+                if (element) element.textContent = 'N/A';
+            });
+            
+            // Update card title to show error
+            const cardTitle = parametersSection.querySelector('.card-title');
+            if (cardTitle) {
+                cardTitle.textContent = `Stock Data - No data available for ${symbol}`;
+            }
+            return;
+        }
+
+        // Use the specified index, or default to the last available data point
+        const dataIndex = dateIndex >= 0 && dateIndex < historyData.length ? dateIndex : historyData.length - 1;
+        const stockData = historyData[dataIndex];
+
+        if (!stockData) {
+            throw new Error('No stock data available for the selected date');
+        }
+
+        // Helper function to format numbers with commas
+        const formatNumber = (num) => {
+            if (num === null || num === undefined || isNaN(num)) return 'N/A';
+            return Number(num).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        };
+
+        // Helper function to format volume (in millions/billions)
+        const formatVolume = (volume) => {
+            if (volume === null || volume === undefined || isNaN(volume)) return 'N/A';
+            const num = Number(volume);
+            if (num >= 1000000000) {
+                return (num / 1000000000).toFixed(1) + 'B';
+            } else if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            } else {
+                return num.toLocaleString('en-US');
+            }
+        };
+
+        // Helper function to format date
+        const formatDate = (dateStr) => {
+            try {
+                // Handle both Date objects and string formats
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) {
+                    return dateStr; // Return original if invalid date
+                }
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            } catch (error) {
+                console.error('Error formatting date:', error);
+                return dateStr; // Return original if formatting fails
+            }
+        };
+
+        // Update the HTML elements
+        if (elements.date) elements.date.textContent = formatDate(stockData.date);
+        if (elements.open) elements.open.textContent = `$${formatNumber(stockData.open)}`;
+        if (elements.high) elements.high.textContent = `$${formatNumber(stockData.high)}`;
+        if (elements.low) elements.low.textContent = `$${formatNumber(stockData.low)}`;
+        if (elements.close) elements.close.textContent = `$${formatNumber(stockData.close)}`;
+        if (elements.volume) elements.volume.textContent = formatVolume(stockData.volume);
+
+        // Update card title to show current symbol and date
+        const cardTitle = parametersSection.querySelector('.card-title');
+        if (cardTitle) {
+            cardTitle.textContent = `Stock Data - ${symbol} (${formatDate(stockData.date)})`;
+        }
+
+        // Add visual indicators for price movement
+        if (stockData.close !== null && stockData.open !== null) {
+            const priceChange = stockData.close - stockData.open;
+            const changePercent = ((priceChange / stockData.open) * 100);
+            
+            // Color the close price based on daily performance
+            if (elements.close) {
+                if (priceChange > 0) {
+                    elements.close.style.color = '#4caf50'; // Green for positive
+                    elements.close.title = `+$${formatNumber(Math.abs(priceChange))} (+${changePercent.toFixed(2)}%)`;
+                } else if (priceChange < 0) {
+                    elements.close.style.color = '#f44336'; // Red for negative
+                    elements.close.title = `-$${formatNumber(Math.abs(priceChange))} (${changePercent.toFixed(2)}%)`;
+                } else {
+                    elements.close.style.color = '#757575'; // Gray for unchanged
+                    elements.close.title = 'No change';
+                }
+            }
+        }
+
+        console.log(`Stock parameters updated for ${symbol}:`, stockData);
+
+    } catch (error) {
+        console.error('Error updating stock parameters:', error);
+        
+        // Show error state
+        const elements = {
+            date: document.getElementById('param-date'),
+            open: document.getElementById('param-open'),
+            high: document.getElementById('param-high'),
+            low: document.getElementById('param-low'),
+            close: document.getElementById('param-close'),
+            volume: document.getElementById('param-volume')
+        };
+
+        Object.values(elements).forEach(element => {
+            if (element) element.textContent = 'Error';
+        });
+
+        // Update card title to show error
+        const cardTitle = parametersSection.querySelector('.card-title');
+        if (cardTitle) {
+            cardTitle.textContent = `Stock Data - Error loading ${symbol}`;
+        }
+    }
+}
+
+
+// Function to update parameters when symbol changes
+export function onSymbolChange(newSymbol) {
+    if (newSymbol && newSymbol.trim()) {
+        updateStockParameters(newSymbol.toUpperCase());
+    }
+}
+
+// Enhanced fetchFinanceHistoryArray function (updated version)
+async function fetchFinanceHistoryArray(symbol = 'AAPL') {
+    try {
+        // Use the correct endpoint that matches your server route
+        const response = await fetch(`/api/finance/history/${encodeURIComponent(symbol)}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        
+        // Handle the response structure from your server
+        if (result && result.success && Array.isArray(result.data)) {
+            return result.data;
+        } else {
+            console.error('Unexpected response structure:', result);
+            return [];
+        }
+    } catch (error) {
+        console.error('Error fetching finance history array:', error);
+        return [];
+    }
+}
+// Function to allow user to select a specific date from the historical data
+export async function showDateSelector(symbol) {
+    try {
+        const historyData = await fetchFinanceHistoryArray(symbol);
+        if (!historyData || historyData.length === 0) {
+            if (window.showNotification) {
+                window.showNotification('No historical data available for this symbol', 4000);
+            }
+            return;
+        }
+
+        // Create a simple date selection interface
+        const dates = historyData.map((item, index) => ({
+            display: new Date(item.date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            }),
+            value: index,
+            data: item
+        }));
+
+        // For now, just show the most recent 10 dates in console
+        // You could implement a dropdown or modal here
+        console.log('Available dates for', symbol, ':', dates.slice(-10));
+        
+        // Default to most recent date
+        updateStockParameters(symbol, dates.length - 1);
+        
+    } catch (error) {
+        console.error('Error showing date selector:', error);
+    }
+}
+
 // Set up event listeners for stock symbol buttons
 document.querySelectorAll('[data-stock-symbol]').forEach(button => {
     button.addEventListener('click', (e) => {
@@ -1952,6 +1676,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 100);
         });
     }
+    const stockSymbolInput = document.getElementById('stockSymbolInput');
+    if (stockSymbolInput) {
+        // Update parameters when user changes symbol
+        stockSymbolInput.addEventListener('change', (event) => {
+            const symbol = event.target.value.trim().toUpperCase();
+            if (symbol) {
+                updateStockParameters(symbol);
+            }
+        });
+
+        // Also update when user presses Enter
+        stockSymbolInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                const symbol = event.target.value.trim().toUpperCase();
+                if (symbol) {
+                    updateStockParameters(symbol);
+                }
+            }
+        });
+    }
 });
 
 // Make functions available globally for HTML onclick handlers
@@ -1983,7 +1727,10 @@ window.isMarketOpen = isMarketOpen;
 window.updateRealTimeFinance = updateRealTimeFinance;
 window.fetchFinancialData = fetchFinancialData;
 window.fetchRealTimeYahooFinanceData = fetchRealTimeYahooFinanceData;
-window.updateFinance2 = updateFinance2;
+window.updateChart = updateChart;
 window.startAutoRefresh = startAutoRefresh;
 window.stopAutoRefresh = stopAutoRefresh;
 window.initializeFinance = initializeFinance;
+window.updateStockParameters = updateStockParameters;
+window.onSymbolChange = onSymbolChange;
+window.showDateSelector = showDateSelector;

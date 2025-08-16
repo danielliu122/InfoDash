@@ -28,6 +28,7 @@
         <script type="module" src="js/userPreferences.js"></script>
         <script type="module" src="js/app.js"></script>
         <script type="module" src="js/finance.js"></script>
+        <script type="module" src="js/financeWatchlist.js"></script>
     </head>
     <body>
         <!-- Sidebar Navigation -->
@@ -194,6 +195,43 @@
                     </button>
                 </div>
                 <canvas id="stockChart"></canvas>
+                </div>
+
+                <!-- Stock Data Parameters Section -->
+                <div class="card stock-parameters-section" id="stock-parameters-section" style="margin-top: 18px;">
+                  <div class="card-header">
+                    <span class="card-title">Stock Data (Selected Date)</span>
+                  </div>
+                  <div class="card-content">
+                    <table class="stock-parameters-table">
+                      <tbody>
+                        <tr>
+                          <td><strong>Date</strong></td>
+                          <td id="param-date">2025-07-17</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Open</strong></td>
+                          <td id="param-open">210.57</td>
+                        </tr>
+                        <tr>
+                          <td><strong>High</strong></td>
+                          <td id="param-high">211.80</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Low</strong></td>
+                          <td id="param-low">209.59</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Close</strong></td>
+                          <td id="param-close">210.02</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Volume</strong></td>
+                          <td id="param-volume">48,068,100</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
         
                 <!-- Live Stock Dashboard -->

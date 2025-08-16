@@ -1065,35 +1065,130 @@ app.post('/api/finance/bulk-real-time', async (req, res) => {
     }
 });
 
-// Get historical data for a symbol
+// Fixed endpoint in server.js - replace the existing /api/finance/history/:symbol endpoint
+
+// Suppress the deprecation notice for historical() method
+yahooFinance.suppressNotices(['ripHistorical']);
+
+// Get historical data for a symbol using chart() method instead of historical()
 app.get('/api/finance/history/:symbol', async (req, res) => {
     const { symbol } = req.params;
     const { period = '1mo', interval = '1d' } = req.query;
-    
+
     try {
-        const historical = await yahooFinance.historical(symbol, {
-            period1: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-            period2: new Date(),
-            interval: interval
+        console.log(`Fetching historical data for ${symbol} with period: ${period}, interval: ${interval}`);
+
+        // Use chart() method with proper options instead of historical()
+        const chartData = await yahooFinance.chart(symbol, {
+            period1: getPeriodDate(period), // Calculate start date based on period
+            period2: new Date(), // End date is today
+            interval: interval,
+            includeAdjustedClose: false
         });
-        
+
+        // Extract the historical data from chart response
+        if (!chartData || !chartData.quotes || chartData.quotes.length === 0) {
+            console.log(`No historical data found for ${symbol}`);
+            return res.json({
+                success: false,
+                error: 'No historical data available for this symbol',
+                data: []
+            });
+        }
+
+        // Transform the chart data to match the expected format
+        const historicalData = chartData.quotes.map(quote => ({
+            date: quote.date,
+            open: quote.open,
+            high: quote.high,
+            low: quote.low,
+            close: quote.close,
+            volume: quote.volume
+        })).filter(item => {
+            // Filter out invalid entries where all values are null
+            return item.open !== null || item.high !== null || 
+                   item.low !== null || item.close !== null;
+        });
+
+        console.log(`Successfully fetched ${historicalData.length} data points for ${symbol}`);
+
         res.json({
             success: true,
-            data: historical.map(day => ({
-                date: day.date,
-                open: day.open,
-                high: day.high,
-                low: day.low,
-                close: day.close,
-                volume: day.volume
-            }))
+            data: historicalData,
+            symbol: symbol,
+            period: period,
+            interval: interval
         });
+
     } catch (error) {
         console.error(`Error fetching historical data for ${symbol}:`, error);
-        res.status(500).json({ success: false, error: 'Failed to fetch historical data' });
+        
+        // Provide more specific error messages based on the error type
+        let errorMessage = 'Failed to fetch historical data';
+        if (error.message && error.message.includes('Not Found')) {
+            errorMessage = 'Symbol not found';
+        } else if (error.message && error.message.includes('rate limit')) {
+            errorMessage = 'Rate limit exceeded, please try again later';
+        }
+
+        res.status(500).json({ 
+            success: false, 
+            error: errorMessage,
+            details: error.message 
+        });
     }
 });
 
+// Helper function to calculate start date based on period string
+function getPeriodDate(period) {
+    const now = new Date();
+    const date = new Date(now);
+    
+    switch (period) {
+        case '1d':
+            date.setDate(date.getDate() - 1);
+            break;
+        case '5d':
+            date.setDate(date.getDate() - 5);
+            break;
+        case '1mo':
+            date.setMonth(date.getMonth() - 1);
+            break;
+        case '3mo':
+            date.setMonth(date.getMonth() - 3);
+            break;
+        case '6mo':
+            date.setMonth(date.getMonth() - 6);
+            break;
+        case '1y':
+            date.setFullYear(date.getFullYear() - 1);
+            break;
+        case '2y':
+            date.setFullYear(date.getFullYear() - 2);
+            break;
+        case '5y':
+            date.setFullYear(date.getFullYear() - 5);
+            break;
+        case '10y':
+            date.setFullYear(date.getFullYear() - 10);
+            break;
+        case 'ytd':
+            // Year to date
+            date.setMonth(0);
+            date.setDate(1);
+            break;
+        case 'max':
+            // Maximum available data (go back 20 years as a reasonable limit)
+            date.setFullYear(date.getFullYear() - 20);
+            break;
+        default:
+            // Default to 1 month if period is not recognized
+            date.setMonth(date.getMonth() - 1);
+            break;
+    }
+    
+    return date;
+}
 // Get market summary (major indices)
 app.get('/api/finance/market-summary', async (req, res) => {
     const majorIndices = ['^GSPC', '^DJI', '^IXIC', '^RUT', '^VIX'];
