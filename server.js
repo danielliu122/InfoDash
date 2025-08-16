@@ -1110,7 +1110,7 @@ app.get('/api/finance/history/:symbol', async (req, res) => {
                    item.low !== null || item.close !== null;
         });
 
-        console.log(`Successfully fetched ${historicalData.length} data points for ${symbol}`);
+        //console.log(`Successfully fetched ${historicalData.length} data points for ${symbol}`);
 
         res.json({
             success: true,

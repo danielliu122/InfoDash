@@ -162,13 +162,33 @@ main {
 /* === Sidebar Layout === */
 .sidebar {
   padding-right: 5px;
-  background: linear-gradient(120deg, #609cba 0%, #95c6cc 20%, #b399ff 40%);
+  background: linear-gradient(120deg, #92bbcf 0%, #a6cebf 50%, #a6b0e3 89%);
+  background-size: 400% 400%;
+  animation: sidebarGradientMove 15s ease-in-out infinite;
   width: var(--sidebar-width);
-  transition: width 0.3s ease;
+  transition: width 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
   overflow: visible;
   box-shadow: 4px 0 16px 0 rgba(18, 72, 62, 0.22);
   position: relative;
   z-index: 2;
+}
+
+@keyframes sidebarGradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .sidebar.collapsed {
