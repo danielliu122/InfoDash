@@ -19,6 +19,7 @@ const openai = new OpenAI({
 const fetch = require('node-fetch');
 const weather = require('weather-js');
 const fs = require('fs').promises;
+const cron = require('node-cron');
 
 // Environment-based data paths
 const isProduction = process.env.NODE_ENV === 'production' || process.env.PORT;
@@ -386,6 +387,442 @@ async function cleanupSummaryData() {
     // Then initialize daily summary
     await initializeDailySummary();
 })();
+
+// Automated Summary Generation System
+class AutomatedSummaryGenerator {
+    constructor() {
+        this.isGenerating = false;
+        this.lastGenerationDate = null;
+        this.defaultRegions = [
+            { language: 'en', country: 'US', timezone: 'America/New_York' },
+            { language: 'en', country: 'GB', timezone: 'Europe/London' },
+            { language: 'es', country: 'ES', timezone: 'Europe/Madrid' },
+            { language: 'de', country: 'DE', timezone: 'Europe/Berlin' },
+            { language: 'fr', country: 'FR', timezone: 'Europe/Paris' }
+        ];
+    }
+
+    // Initialize the automated summary generation
+    init() {
+        console.log('Initializing automated summary generation...');
+        
+        // Schedule for 11:00 PM EST every day
+        // '0 23 * * *' = At 23:00 (11:00 PM) every day
+        cron.schedule('0 23 * * *', () => {
+            this.generateDailySummaries();
+        }, {
+            timezone: 'America/New_York'
+        });
+
+        // Optional: Also schedule for other major timezones
+        // 11:00 PM GMT
+        // cron.schedule('0 23 * * *', () => {
+        //     this.generateDailySummaries('Europe/London');
+        // }, {
+        //     timezone: 'Europe/London'
+        // });
+
+        // === TESTING ONLY: Run 1 minute after server starts ===
+        // Uncomment the following block for testing purposes.
+        // setTimeout(() => {
+        //     console.log('TEST: Triggering automated summary generation 1 minute after startup');
+        //     this.generateDailySummaries();
+        // }, 60 * 1000);
+
+
+        console.log('Automated summary generation scheduled for 11:00 PM daily');
+    }
+
+    // Generate summaries for all configured regions
+    async generateDailySummaries(timezone = 'America/New_York') {
+        if (this.isGenerating) {
+            console.log('Summary generation already in progress, skipping...');
+            return;
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Prevent multiple generations on the same day
+        if (this.lastGenerationDate === today) {
+            console.log('Summary already generated today, skipping...');
+            return;
+        }
+
+        try {
+            this.isGenerating = true;
+            console.log(`Starting automated summary generation for ${today}`);
+
+            // Generate summaries for each region
+            for (const region of this.defaultRegions) {
+                if (this.shouldGenerateForRegion(region, timezone)) {
+                    await this.generateSummaryForRegion(region, today);
+                }
+            }
+
+            this.lastGenerationDate = today;
+            console.log('Automated summary generation completed');
+
+        } catch (error) {
+            console.error('Error in automated summary generation:', error);
+        } finally {
+            this.isGenerating = false;
+        }
+    }
+
+    // Check if we should generate for this region based on timezone
+    shouldGenerateForRegion(region, currentTimezone) {
+        // If timezone matches region timezone, or if no specific timezone filter
+        return !currentTimezone || region.timezone === currentTimezone;
+    }
+
+    // Generate summary for a specific region
+    async generateSummaryForRegion(region, date) {
+        try {
+            console.log(`Generating summary for ${region.country} (${region.language}) on ${date}`);
+
+            // Check if summary already exists for this region and date
+            const existingSummary = await loadDailySummary(date, region.language, region.country);
+            if (existingSummary) {
+                console.log(`Summary already exists for ${region.country} (${region.language}) on ${date}, skipping...`);
+                return;
+            }
+
+            // Collect section data (same as manual generation)
+            const sectionData = await this.collectAutomatedSectionData(region);
+
+            if (!sectionData || (!sectionData.news && !sectionData.trends && !sectionData.finance)) {
+                console.log(`No data available for ${region.country} (${region.language}), skipping summary generation`);
+                return;
+            }
+
+            // Generate AI summary
+            const summaryText = await this.generateAutomatedSummary(sectionData);
+
+            if (summaryText && !summaryText.includes('Error:') && !summaryText.includes('Unable to generate')) {
+                // Parse and save the summary
+                const sections = this.parseAutomatedSummarySections(summaryText);
+                
+                const summaryData = {
+                    news: sections.news || '',
+                    trends: sections.trends || '',
+                    finance: sections.finance || '',
+                    overall: sections.insights || '',
+                    generatedAt: new Date().toISOString(),
+                    automated: true
+                };
+
+                // Save the summary
+                const saved = await saveDailySummary(summaryData, date, region.language, region.country);
+                
+                if (saved) {
+                    console.log(`✅ Automated summary saved for ${region.country} (${region.language})`);
+                } else {
+                    console.log(`❌ Failed to save automated summary for ${region.country} (${region.language})`);
+                }
+            } else {
+                console.log(`❌ Failed to generate valid summary for ${region.country} (${region.language})`);
+            }
+
+        } catch (error) {
+            console.error(`Error generating summary for ${region.country} (${region.language}):`, error);
+        }
+    }
+
+    // Collect section data for automated generation
+    async collectAutomatedSectionData(region) {
+        const data = {
+            news: null,
+            trends: null,
+            finance: null
+        };
+
+        try {
+            // Collect news data
+            data.news = await this.collectAutomatedNewsData(region);
+            
+            // Collect trends data
+            data.trends = await this.collectAutomatedTrendsData(region);
+            
+            // Collect finance data (same for all regions)
+            data.finance = await this.collectAutomatedFinanceData();
+
+            return data;
+        } catch (error) {
+            console.error('Error collecting automated section data:', error);
+            return null;
+        }
+    }
+
+    // Collect news data for automated generation
+    async collectAutomatedNewsData(region) {
+        try {
+            const baseUrl = process.env.NODE_ENV === 'production' ? 'https://infodash.app' : `http://localhost:${port}`;
+            const response = await fetch(`${baseUrl}/api/news?country=${region.country}&language=${region.language}&category=general&pageSize=5`);
+            
+            if (!response.ok) return null;
+            
+            const data = await response.json();
+            
+            if (!data || !data.articles || data.articles.length === 0) return null;
+
+            return data.articles.slice(0, 5).map(article => ({
+                title: article.title || 'Unknown',
+                description: article.description || '',
+                source: article.source?.name || article.author || ''
+            }));
+        } catch (error) {
+            console.error('Error collecting automated news data:', error);
+            return null;
+        }
+    }
+
+    // Collect trends data for automated generation
+    async collectAutomatedTrendsData(region) {
+        try {
+            const baseUrl = process.env.NODE_ENV === 'production' ? 'https://infodash.app' : `http://localhost:${port}`;
+            const response = await fetch(`${baseUrl}/api/trends2?type=daily&category=all&language=${region.language}&geo=${region.country}`);
+            
+            if (!response.ok) return null;
+            
+            const data = await response.json();
+            
+            if (!data || !data.default || !data.default.trendingSearchesDays) return null;
+
+            let allTopics = [];
+            const trendingSearchesDays = data.default.trendingSearchesDays || [];
+            
+            trendingSearchesDays.forEach(day => {
+                if (day.trendingSearches) {
+                    allTopics = allTopics.concat(day.trendingSearches);
+                }
+            });
+
+            return allTopics.slice(0, 25).map(topic => ({
+                title: topic.title?.query || topic.title || 'Unknown',
+                traffic: topic.formattedTraffic || 'N/A'
+            }));
+        } catch (error) {
+            console.error('Error collecting automated trends data:', error);
+            return null;
+        }
+    }
+
+    // Collect finance data for automated generation
+    async collectAutomatedFinanceData() {
+        try {
+            // Use the bulk finance endpoint for better performance
+            const symbols = ['^IXIC', 'META', 'AAPL', 'GOOGL', 'AMZN', 'TSLA', 'BTC-USD', 'ETH-USD', 'SOL-USD', 'XRP-USD'];
+            
+            const baseUrl = process.env.NODE_ENV === 'production' ? 'https://infodash.app' : `http://localhost:${port}`;
+            const response = await fetch(`${baseUrl}/api/finance/bulk-real-time`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ symbols })
+            });
+
+            if (!response.ok) return null;
+            
+            const data = await response.json();
+            
+            const financeData = {
+                nasdaq: null,
+                techStocks: {},
+                crypto: {}
+            };
+
+            // Process the bulk response
+            for (const [symbol, stockData] of Object.entries(data)) {
+                if (stockData.error) continue;
+
+                const processedData = {
+                    price: stockData.price?.toFixed(2) || 'N/A',
+                    change: stockData.change?.toFixed(2) || 'N/A',
+                    changePercent: stockData.changePercent?.toFixed(2) || 'N/A',
+                    timeframe: 'Current'
+                };
+
+                if (symbol === '^IXIC') {
+                    financeData.nasdaq = processedData;
+                } else if (symbol.endsWith('-USD')) {
+                    financeData.crypto[symbol] = processedData;
+                } else {
+                    financeData.techStocks[symbol] = processedData;
+                }
+            }
+
+            return financeData;
+        } catch (error) {
+            console.error('Error collecting automated finance data:', error);
+            return null;
+        }
+    }
+
+    // Generate AI summary for automated generation
+    async generateAutomatedSummary(sectionData) {
+        try {
+            const analysisPrompt = this.createAutomatedAnalysisPrompt(sectionData);
+            const selectedModel = 'deepseek/deepseek-chat-v3-0324:free';
+
+            const response = await openai.chat.completions.create({
+                model: selectedModel,
+                messages: [
+                    {
+                        role: 'system',
+                        content: `You are a data analyst specializing in creating clear, concise summaries of current news, trends, and market data.
+                        CRITICAL INSTRUCTIONS:
+                        - Only report the specific data provided. Do not infer, speculate, or add context from outside knowledge.
+                        - Act as a market predictor and future current events predictor (except for Info Genie section).
+                        - For percentage changes: positive = "up/gaining/rose", negative = "down/declining/fell"
+                        - Use "slight movement" for changes between -1% and +1%
+                        - Use dramatic terms like "surged/plunged" only for changes > ±10%
+                        - Refer to performance as "today's trading" or "current session"
+                        - Maintain professional, neutral, fact-based tone.`
+                    },
+                    {
+                        role: 'user',
+                        content: analysisPrompt
+                    }
+                ],
+                max_tokens: 5000
+            });
+
+            return response.choices[0].message.content;
+        } catch (error) {
+            console.error('Error generating automated summary:', error);
+            return null;
+        }
+    }
+
+    // Create analysis prompt for automated generation
+    createAutomatedAnalysisPrompt(sectionData) {
+        let prompt = 'Please analyze the following current data and provide a comprehensive summary:';
+        
+        const selectedDate = new Date();
+        const isWeekend = selectedDate.getDay() === 0 || selectedDate.getDay() === 6;
+        
+        if (sectionData.news && sectionData.news.length > 0) {
+            prompt += ' TOP HEADLINES:';
+            sectionData.news.forEach((item, index) => {
+                prompt += ` ${index + 1}. ${item.title}`;
+                if (item.description) {
+                    prompt += ` ${item.description.substring(0, 100)}...`;
+                }
+            });
+        }
+        
+        if (sectionData.trends && sectionData.trends.length > 0) {
+            prompt += ' TRENDING TOPICS:';
+            prompt += ' Group the top trending topics by category (Sports, Technology, Entertainment, Other). Under each category, list relevant topics.';
+            sectionData.trends.forEach((item, index) => {
+                prompt += ` ${index + 1}. ${item.title} ${item.traffic ? `(${item.traffic})` : ''}`;
+            });
+        }
+        
+        if (sectionData.finance) {
+            prompt += ' MARKET DATA:';
+            if (isWeekend) {
+                prompt += ' Stock markets are closed for the weekend. Here is the latest crypto data:';
+            }
+
+            if (sectionData.finance.nasdaq && !isWeekend) {
+                prompt += ` NASDAQ (^IXIC): $${sectionData.finance.nasdaq.price} (${sectionData.finance.nasdaq.changePercent}%)`;
+            }
+            if (sectionData.finance.techStocks && !isWeekend) {
+                Object.entries(sectionData.finance.techStocks).forEach(([symbol, data]) => {
+                    prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
+                });
+            }
+            if (sectionData.finance.crypto) {
+                Object.entries(sectionData.finance.crypto).forEach(([symbol, data]) => {
+                    prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
+                });
+            }
+        }
+        
+        prompt += ' Please provide a structured summary with the following sections: NEWS HIGHLIGHTS (max 300 words), TRENDING TOPICS (max 300 words), ';
+        prompt += isWeekend ? 'MARKET OVERVIEW focusing on crypto (max 300 words), ' : 'MARKET OVERVIEW including tech stocks and crypto (max 300 words), ';
+        prompt += 'INFO GENIE fortune teller predictions (max 300 words).';
+        
+        return prompt;
+    }
+
+    // Parse summary sections for automated generation
+    parseAutomatedSummarySections(summaryText) {
+        const sections = {};
+        
+        const newsMatch = summaryText.match(/(?:\*\*NEWS HIGHLIGHTS\*\*|NEWS HIGHLIGHTS:?)(.*?)(?=\*\*TRENDING TOPICS\*\*|TRENDING TOPICS:?|---)/s);
+        if (newsMatch) sections.news = newsMatch[1].trim();
+        
+        const trendsMatch = summaryText.match(/(?:\*\*TRENDING TOPICS\*\*|TRENDING TOPICS:?)(.*?)(?=\*\*MARKET OVERVIEW\*\*|MARKET OVERVIEW:?|---)/s);
+        if (trendsMatch) sections.trends = trendsMatch[1].trim();
+        
+        const financeMatch = summaryText.match(/(?:\*\*MARKET OVERVIEW\*\*|MARKET OVERVIEW:?)(.*?)(?=\*\*INFO GENIE\*\*|INFO GENIE:?|---)/s);
+        if (financeMatch) sections.finance = financeMatch[1].trim();
+        
+        const insightsMatch = summaryText.match(/(?:\*\*INFO GENIE\*\*|INFO GENIE:?)(.*?)$/s);
+        if (insightsMatch) sections.insights = insightsMatch[1].trim();
+        
+        return sections;
+    }
+
+    // Manual trigger for testing
+    async triggerManualGeneration() {
+        console.log('Manual trigger for automated summary generation');
+        await this.generateDailySummaries();
+    }
+
+    // Check generation status
+    getStatus() {
+        return {
+            isGenerating: this.isGenerating,
+            lastGenerationDate: this.lastGenerationDate,
+            configuredRegions: this.defaultRegions.length
+        };
+    }
+}
+
+// Create global instance
+const summaryGenerator = new AutomatedSummaryGenerator();
+
+// Initialize when server starts
+summaryGenerator.init();
+
+// Add API endpoint to manually trigger generation (for testing)
+app.post('/api/summary/trigger-automated', async (req, res) => {
+    try {
+        if (summaryGenerator.isGenerating) {
+            return res.json({
+                success: false,
+                message: 'Automated generation already in progress'
+            });
+        }
+
+        // Trigger generation in background
+        summaryGenerator.triggerManualGeneration();
+        
+        res.json({
+            success: true,
+            message: 'Automated summary generation triggered'
+        });
+    } catch (error) {
+        console.error('Error triggering automated generation:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error triggering automated generation'
+        });
+    }
+});
+
+// Add API endpoint to check generation status
+app.get('/api/summary/automation-status', (req, res) => {
+    const status = summaryGenerator.getStatus();
+    res.json({
+        success: true,
+        ...status
+    });
+});
+
+module.exports = { summaryGenerator };
 
 // Rate limiter middleware
 // const limiter = rateLimit({
