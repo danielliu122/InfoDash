@@ -393,73 +393,54 @@ class AutomatedSummaryGenerator {
     constructor() {
         this.isGenerating = false;
         this.lastGenerationDate = null;
-        this.defaultRegions = [
-            { language: 'en', country: 'US', timezone: 'America/New_York' },
-            { language: 'en', country: 'GB', timezone: 'Europe/London' },
-            { language: 'es', country: 'ES', timezone: 'Europe/Madrid' },
-            { language: 'de', country: 'DE', timezone: 'Europe/Berlin' },
-            { language: 'fr', country: 'FR', timezone: 'Europe/Paris' }
-        ];
+        // Only generate for en-US, once per day
+        this.region = { language: 'en', country: 'US', timezone: 'America/New_York' };
     }
 
     // Initialize the automated summary generation
     init() {
-        console.log('Initializing automated summary generation...');
-        
         // Schedule for 11:00 PM EST every day
         // '0 23 * * *' = At 23:00 (11:00 PM) every day
         cron.schedule('0 23 * * *', () => {
-            this.generateDailySummaries();
+            console.log('Initializing automated summary generation...');
+            this.generateDailySummary();
         }, {
             timezone: 'America/New_York'
         });
 
-        // Optional: Also schedule for other major timezones
-        // 11:00 PM GMT
-        // cron.schedule('0 23 * * *', () => {
-        //     this.generateDailySummaries('Europe/London');
-        // }, {
-        //     timezone: 'Europe/London'
-        // });
-
-        // === TESTING ONLY: Run 1 minute after server starts ===
-        // Uncomment the following block for testing purposes.
+        //=== TESTING ONLY: Run 1 minute after server starts ===
+        //Uncomment the following block for testing purposes.
         // setTimeout(() => {
         //     console.log('TEST: Triggering automated summary generation 1 minute after startup');
-        //     this.generateDailySummaries();
+        //     this.generateDailySummary();
         // }, 60 * 1000);
-
-
-        console.log('Automated summary generation scheduled for 11:00 PM daily');
     }
 
-    // Generate summaries for all configured regions
-    async generateDailySummaries(timezone = 'America/New_York') {
+    // Generate summary for en-US at 11:00PM EDT (America/New_York)
+    async generateDailySummary() {
         if (this.isGenerating) {
             console.log('Summary generation already in progress, skipping...');
             return;
         }
 
-        const today = new Date().toISOString().split('T')[0];
-        
-        // Prevent multiple generations on the same day
-        if (this.lastGenerationDate === today) {
-            console.log('Summary already generated today, skipping...');
+        // Always use current date in America/New_York (EDT/EST) for summary date
+        const now = new Date();
+        const nyDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+        const todayEDT = nyDate.toISOString().split('T')[0];
+
+        // Prevent multiple generations on the same EDT day
+        if (this.lastGenerationDate === todayEDT) {
+            console.log('Summary already generated today (EDT), skipping...');
             return;
         }
 
         try {
             this.isGenerating = true;
-            console.log(`Starting automated summary generation for ${today}`);
+            console.log(`Starting automated summary generation for ${todayEDT} (EDT)`);
 
-            // Generate summaries for each region
-            for (const region of this.defaultRegions) {
-                if (this.shouldGenerateForRegion(region, timezone)) {
-                    await this.generateSummaryForRegion(region, today);
-                }
-            }
+            await this.generateSummaryForRegion(this.region, todayEDT);
 
-            this.lastGenerationDate = today;
+            this.lastGenerationDate = todayEDT;
             console.log('Automated summary generation completed');
 
         } catch (error) {
@@ -469,21 +450,15 @@ class AutomatedSummaryGenerator {
         }
     }
 
-    // Check if we should generate for this region based on timezone
-    shouldGenerateForRegion(region, currentTimezone) {
-        // If timezone matches region timezone, or if no specific timezone filter
-        return !currentTimezone || region.timezone === currentTimezone;
-    }
-
-    // Generate summary for a specific region
+    // Generate summary for en-US only
     async generateSummaryForRegion(region, date) {
         try {
-            console.log(`Generating summary for ${region.country} (${region.language}) on ${date}`);
+            console.log(`Generating summary for ${region.country} (${region.language}) on ${date} (EDT)`);
 
             // Check if summary already exists for this region and date
             const existingSummary = await loadDailySummary(date, region.language, region.country);
             if (existingSummary) {
-                console.log(`Summary already exists for ${region.country} (${region.language}) on ${date}, skipping...`);
+                console.log(`Summary already exists for ${region.country} (${region.language}) on ${date} (EDT), skipping...`);
                 return;
             }
 
@@ -501,19 +476,24 @@ class AutomatedSummaryGenerator {
             if (summaryText && !summaryText.includes('Error:') && !summaryText.includes('Unable to generate')) {
                 // Parse and save the summary
                 const sections = this.parseAutomatedSummarySections(summaryText);
-                
+
+                // Use generatedAt in EDT as well
+                const now = new Date();
+                const nyDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+                const generatedAtEDT = nyDate.toISOString();
+
                 const summaryData = {
                     news: sections.news || '',
                     trends: sections.trends || '',
                     finance: sections.finance || '',
                     overall: sections.insights || '',
-                    generatedAt: new Date().toISOString(),
+                    generatedAt: generatedAtEDT,
                     automated: true
                 };
 
                 // Save the summary
                 const saved = await saveDailySummary(summaryData, date, region.language, region.country);
-                
+
                 if (saved) {
                     console.log(`✅ Automated summary saved for ${region.country} (${region.language})`);
                 } else {
