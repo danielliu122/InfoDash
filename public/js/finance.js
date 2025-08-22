@@ -60,7 +60,46 @@ async function loadStockSymbols() {
 
 function addData(chart, label, newData) {
     if (chart && chart.update) {
-        chart.update('none');
+        // Get the current stock parameters to use the same closing data
+        const closeElement = document.getElementById('param-close');
+        if (closeElement && closeElement.textContent && closeElement.textContent !== 'N/A' && closeElement.textContent !== 'Error') {
+            // Extract the numeric value from the formatted price (remove $ and commas)
+            const closePrice = parseFloat(closeElement.textContent.replace(/[$,]/g, ''));
+            if (!isNaN(closePrice)) {
+                // Use the closing price from stock parameters instead of the passed newData
+                const currentTime = new Date();
+                const timeString = currentTime.toISOString();
+                
+                // Add the new data point to the chart
+                chart.data.labels.push(timeString);
+                chart.data.datasets[0].data.push(closePrice);
+                
+                // Keep only the last MAX_POINTS data points
+                if (chart.data.labels.length > MAX_POINTS) {
+                    chart.data.labels.shift();
+                    chart.data.datasets[0].data.shift();
+                }
+                
+                chart.update('none');
+                return;
+            }
+        }
+        
+        // Fallback to original behavior if stock parameters data is not available
+        if (newData !== undefined && !isNaN(newData)) {
+            const currentTime = new Date();
+            const timeString = currentTime.toISOString();
+            
+            chart.data.labels.push(timeString);
+            chart.data.datasets[0].data.push(newData);
+            
+            if (chart.data.labels.length > MAX_POINTS) {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
+            }
+            
+            chart.update('none');
+        }
     }
 }
 
@@ -374,8 +413,12 @@ async function updateFinanceData(symbol, timeRange = DEFAULT_TIME_RANGE, interva
         updateRealTimeFinance(realTimeData);
 
         if (isRefresh && window.financeChart) {
-            if (realTimeData && realTimeData.price && realTimeData.timestamp) {
-                addData(window.financeChart, realTimeData.timestamp.toISOString(), realTimeData.price);
+            // Update stock parameters first to ensure we have the latest closing data
+            await updateStockParameters(symbol);
+            
+            // Then add data to chart using the updated stock parameters
+            if (realTimeData && realTimeData.timestamp) {
+                addData(window.financeChart, realTimeData.timestamp.toISOString());
             }
         } else {
             const historicalData = await fetchFinancialData(symbol, timeRange, interval);
@@ -435,11 +478,14 @@ function startAutoRefresh() {
     }
     
     // Determine if we should start auto-refresh
+    // userSelectedSymbol tracks whether the user has manually changed the stock symbol
+    // vs. the app automatically switching between NASDAQ (market hours) and Bitcoin (off-hours)
     const shouldStartRefresh = isMarketOpen() || isCrypto || userSelectedSymbol;
     
     if (shouldStartRefresh) {
         updateInterval = setInterval(() => {
             // Only check for market close transition if user hasn't manually selected a symbol
+            // This means the app is in "auto mode" and can switch between NASDAQ/Bitcoin based on market hours
             if (!userSelectedSymbol) {
                 const shouldSwitchToCrypto = !isMarketOpen() && !currentSymbol.endsWith('-USD');
                 if (shouldSwitchToCrypto) {
@@ -468,6 +514,7 @@ function startAutoRefresh() {
 function handleMarketCloseTransition() {
     const currentSymbol = document.getElementById('stockSymbolInput')?.value.toUpperCase();
     // If we're currently showing a stock (not crypto) and market just closed, and user hasn't manually selected a symbol
+    // userSelectedSymbol = false means the app is in "auto mode" and can switch between NASDAQ/Bitcoin
     if (currentSymbol && !currentSymbol.endsWith('-USD') && !isMarketOpen() && !userSelectedSymbol) {
         // Switch to BTC-USD only if user hasn't selected a symbol
         const newSymbol = 'BTC-USD';
@@ -642,6 +689,10 @@ function initializeChart(ctx, data) {
                     },
                     type: 'time',
                     ticks: {
+                        min: -1,
+                        max: 8,
+                        stepSize: 1,
+                        fixedStepSize: 1,
                         color: textColor
                     },
                     border: {
