@@ -689,10 +689,6 @@ function initializeChart(ctx, data) {
                     },
                     type: 'time',
                     ticks: {
-                        min: -1,
-                        max: 8,
-                        stepSize: 1,
-                        fixedStepSize: 1,
                         color: textColor
                     },
                     border: {
