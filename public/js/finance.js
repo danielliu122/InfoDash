@@ -5,25 +5,22 @@ import {
     removeFromWatchlist, 
     loadWatchlistFromPreferences,
     startStockDashboard,
-    getWatchlist,
-    getStockSymbols 
+    setupAutocomplete,
 } from './financeWatchlist.js';
 
 
-// At the top of the file
-export let updateInterval;
+// initialization variables and states
+let updateInterval;
 let lastUpdateTime = 0;
 let lastHistoricalUpdate = 0;
 let lastTimestamp = null;
-let watchlist = JSON.parse(localStorage.getItem('financeWatchlist') || '[]');
-let stockSymbols = {};
-let currentSymbol = '^IXIC';
-const MAX_POINTS = 50;
-let userSelectedSymbol = false; // Track if user manually selected a symbol
+let isDashboardPaused = false;
+let userSelectedSymbol = false
+let MAX_POINTS = 50;
+let stockSymbols = loadStockSymbols();
 
-// Set default time range and interval
-export const DEFAULT_TIME_RANGE = '2h';
-export const DEFAULT_INTERVAL = '1m';
+const DEFAULT_TIME_RANGE = '2h';
+const DEFAULT_INTERVAL = '1m';
 
 // Helper function to get default symbol based on market status
 function getDefaultSymbol() {
@@ -49,7 +46,7 @@ function getDefaultSymbol() {
 }
 
 // Initialize with the appropriate default symbol
-currentSymbol = getDefaultSymbol();
+let currentSymbol = getDefaultSymbol();
 
 // Load stock symbols for autocomplete
 async function loadStockSymbols() {
@@ -61,339 +58,14 @@ async function loadStockSymbols() {
     }
 }
 
-// Initialize stock symbols on load
-loadStockSymbols();
-
-// Helper function to format price with commas and determine font size
-function formatPriceWithCommas(price) {
-    if (price === null || price === undefined || price === 'N/A') {
-        return { formatted: 'N/A', fontSize: '1.2em' };
-    }
-    
-    const numPrice = parseFloat(price);
-    if (isNaN(numPrice)) {
-        return { formatted: 'N/A', fontSize: '1.2em' };
-    }
-    
-    // Format with commas
-    const formatted = numPrice.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-    
-    // Determine font size based on number length
-    let fontSize = '1.2em'; // Default size
-    const priceStr = formatted.replace(/[^0-9]/g, ''); // Remove non-digits
-    
-    if (priceStr.length >= 7) { // 1,000,000+
-        fontSize = '0.9em';
-    } else if (priceStr.length >= 5) { // 10,000+
-        fontSize = '1.0em';
-    } else if (priceStr.length >= 3) { // 100+
-        fontSize = '1.1em';
-    }
-    
-    return { formatted, fontSize };
-}
-
-// Helper function to format change values
-function formatChangeValue(value) {
-    if (value === null || value === undefined) {
-        return '0.00';
-    }
-    return parseFloat(value).toFixed(2);
-}
-
 function addData(chart, label, newData) {
-    // Check if chart and required data structure exist
-    if (!chart || !chart.data || !chart.data.labels || !chart.data.datasets || !chart.data.datasets[0]) {
-        console.log('Chart data structure not properly initialized, skipping addData');
-        return;
-    }
-    
-    // Always use ISO string for comparison
-    const labelStr = (typeof label === 'string') ? label : label.toISOString();
-    // Convert all labels in chart to ISO strings for comparison
-    const labelsISO = chart.data.labels.map(l => (typeof l === 'string' ? l : l.toISOString()));
-    const lastLabel = labelsISO.length > 0 ? labelsISO[labelsISO.length - 1] : null;
-
-    if (lastLabel !== labelStr && !labelsISO.includes(labelStr)) {
-        if (chart.data.labels.length >= MAX_POINTS) {
-            chart.data.labels.shift();
-            chart.data.datasets[0].data.shift();
-        }
-        chart.data.labels.push(labelStr);
-        chart.data.datasets[0].data.push(newData);
+    if (chart && chart.update) {
         chart.update('none');
-        lastTimestamp = labelStr;
-    } else {
-        // Optionally update the last point if the price changed
-        const idx = labelsISO.lastIndexOf(labelStr);
-        if (idx !== -1 && chart.data.datasets[0].data[idx] !== newData) {
-            chart.data.datasets[0].data[idx] = newData;
-            chart.update('none');
-        }
-    }
-}
-
-
-// Simplified stock symbol validation function
-async function validateStockSymbol(symbol) {
-    symbol = (symbol || '').trim().toUpperCase();
-    if (!symbol) {
-        return { valid: false, error: 'Symbol cannot be empty' };
-    }
-    // Most stock symbols are 1-5 alphanumerics, with some exceptions for indices/crypto
-    if (!/^[A-Z0-9.^=-]{1,15}$/.test(symbol)) {
-        return { valid: false, error: 'Invalid symbol format' };
-    }
-
-    const input = document.getElementById('stockSymbolInput');
-    if (input) {
-        input.style.borderColor = '#FFC107';
-        input.title = `Validating ${symbol}...`;
-    }
-
-    try {
-        const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`, {
-            headers: {
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache'
-            }
-        });
-
-        if (!response.ok) {
-            let msg = 'Unknown error';
-            if (response.status === 404) msg = 'Symbol not found';
-            else if (response.status === 429) msg = 'Rate limit exceeded. Please try again later.';
-            else if (response.status >= 500) msg = 'Server error. Please try again later.';
-            else msg = `HTTP ${response.status}: ${response.statusText}`;
-            return { valid: false, error: msg };
-        }
-
-        const data = await response.json();
-        const result = data?.chart?.result?.[0];
-        const meta = result?.meta;
-        const closes = result?.indicators?.quote?.[0]?.close;
-
-        if (!meta?.symbol || !Array.isArray(closes) || closes.every(v => v == null)) {
-            return { valid: false, error: 'No valid price data available for this symbol' };
-        }
-
-        return {
-            valid: true,
-            name: meta.shortName || meta.longName || meta.symbol || symbol,
-            symbol: meta.symbol,
-            price: meta.regularMarketPrice,
-            marketCap: meta.marketCap,
-            volume: meta.volume
-        };
-    } catch (error) {
-        console.error(`Error validating symbol ${symbol}:`, error);
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            return { valid: false, error: 'Network error. Please check your connection.' };
-        }
-        return { valid: false, error: 'Validation failed. Please try again.' };
-    } finally {
-        if (input) {
-            input.style.borderColor = '';
-            input.title = 'Enter a stock symbol';
-        }
-    }
-}
-
-// Enhanced autocomplete functionality
-export function setupAutocomplete() {
-    const input = document.getElementById('stockSymbolInput');
-    const autocompleteList = document.getElementById('autocomplete-list');
-    if (!input || !autocompleteList) return;
-
-    function renderSuggestions() {
-        const value = input.value.toUpperCase();
-        autocompleteList.innerHTML = '';
-        
-        if (value.length < 1) {
-            autocompleteList.style.display = 'none';
-            return;
-        }
-        
-        // Always show the autocomplete list when there's input
-        autocompleteList.style.display = 'block';
-        
-        // Show matches from stockSymbols.json
-        const matches = Object.entries(stockSymbols)
-            .filter(([symbol, name]) => symbol.includes(value) || name.toUpperCase().includes(value))
-            .slice(0, 10);
-        let symbolInMatches = false;
-        
-        if (matches.length > 0) {
-            matches.forEach(([symbol, name]) => {
-                if (symbol === value.trim()) symbolInMatches = true;
-                const item = document.createElement('div');
-                item.className = 'autocomplete-item';
-                item.innerHTML = `
-                    <span class="symbol">${symbol}</span>
-                    <span class="name">${name}</span>
-                    <button class="btn-small add-watchlist" onclick="addToWatchlist('${symbol}')">+</button>
-                `;
-                item.addEventListener('click', (e) => {
-                    // Don't trigger if clicking the add button
-                    if (e.target.classList.contains('add-watchlist')) {
-                        return;
-                    }
-                    userSelectedSymbol = true; // User manually selected this symbol
-                    input.value = symbol;
-                    autocompleteList.style.display = 'none';
-                    updateFinanceData(symbol);
-                    fetchStockInfo(symbol);
-                });
-                autocompleteList.appendChild(item);
-            });
-        }
-        
-        // Always show add button for the current input if it's not already in the watchlist
-        const symbol = value.trim();
-        if (symbol && symbol.length > 0 && !watchlist.includes(symbol)) {
-            const addBtn = document.createElement('div');
-            addBtn.className = 'autocomplete-item';
-            const displayName = stockSymbols[symbol] || symbol;
-            addBtn.innerHTML = `<span class="symbol">${symbol}</span><span class="name">${displayName}</span><button class="btn-small add-watchlist" onclick="addToWatchlist('${symbol}')">Add to Watchlist</button>`;
-            addBtn.addEventListener('click', async (e) => {
-                // Don't trigger if clicking the add button
-                if (e.target.classList.contains('add-watchlist')) {
-                    return;
-                }
-                
-                // Validate unknown symbols before adding
-                if (!stockSymbols[symbol]) {
-                    const validation = await validateStockSymbol(symbol);
-                    if (!validation.valid) {
-                        const errorMessage = validation.error || 'Unknown error occurred';
-                        if (window.showNotification) {
-                            window.showNotification(`Error: ${errorMessage}`, 5000);
-                        }
-                        return;
-                    }
-                    // Add to stockSymbols cache for future use
-                    stockSymbols[symbol] = validation.name;
-                }
-                
-                addToWatchlist(symbol);
-                autocompleteList.style.display = 'none';
-            });
-            autocompleteList.appendChild(addBtn);
-        }
-    }
-
-    input.addEventListener('input', renderSuggestions);
-    input.addEventListener('focus', renderSuggestions);
-
-    // Pressing Enter with any symbol - validate and add to watchlist
-    input.addEventListener('keypress', async function(e) {
-        if (e.key === 'Enter') {
-            const symbol = this.value.trim().toUpperCase();
-            if (symbol && symbol.length > 0) {
-                userSelectedSymbol = true; // User manually entered this symbol
-                
-                // First check if it's already in watchlist
-                if (watchlist.includes(symbol)) {
-                    updateFinanceData(symbol);
-                    fetchStockInfo(symbol);
-                    autocompleteList.style.display = 'none';
-                    return;
-                }
-                
-                // Validate the symbol by attempting to fetch data
-                const validation = await validateStockSymbol(symbol);
-                if (validation.valid) {
-                    // Add to stockSymbols cache for future use
-                    stockSymbols[symbol] = validation.name;
-                    
-                    // Add to watchlist
-                    addToWatchlist(symbol);
-                    autocompleteList.style.display = 'none';
-                    
-                    // Show success notification with company name
-                    if (window.showNotification) {
-                        window.showNotification(`${symbol} (${validation.name}) added to watchlist!`, 3000);
-                }
-            } else {
-                    // Show specific error message
-                    const errorMessage = validation.error || 'Unknown error occurred';
-                if (window.showNotification) {
-                        window.showNotification(`Error: ${errorMessage}`, 5000);
-                } else {
-                        alert(`Error: ${errorMessage}`);
-                    }
-                }
-            }
-        }
-    });
-
-    // Add a visual indicator for symbols
-    input.addEventListener('input', function() {
-        const symbol = this.value.trim().toUpperCase();
-        if (symbol && symbol.length > 0) {
-            if (stockSymbols[symbol]) {
-                // Known symbol from our list
-            this.style.borderColor = '#4CAF50';
-                this.title = `Known symbol: ${symbol} - ${stockSymbols[symbol]}`;
-            } else if (watchlist.includes(symbol)) {
-                // Symbol already in watchlist
-                this.style.borderColor = '#2196F3';
-                this.title = `Already in watchlist: ${symbol}`;
-            } else {
-                // Unknown symbol - will be validated when added
-                this.style.borderColor = '#FF9800';
-                this.title = `Unknown symbol: ${symbol} - Will validate when added`;
-            }
-        } else {
-            this.style.borderColor = '';
-            this.title = 'Enter a stock symbol';
-        }
-    });
-
-    // Hide autocomplete when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!input.contains(e.target) && !autocompleteList.contains(e.target)) {
-            autocompleteList.style.display = 'none';
-        }
-    });
-}
-
-// Enhanced stock information display
-export async function fetchStockInfo(symbol) {
-    try {
-        const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
-        if (!response.ok) throw new Error('Failed to fetch stock info');
-        
-        const data = await response.json();
-        const result = data.chart.result[0];
-        const meta = result.meta;
-        
-        return {
-            symbol: meta.symbol,
-            name: meta.shortName || stockSymbols[symbol] || symbol,
-            price: meta.regularMarketPrice,
-            change: meta.regularMarketChange,
-            changePercent: meta.regularMarketChangePercent,
-            marketCap: meta.marketCap,
-            volume: meta.volume,
-            avgVolume: meta.averageVolume,
-            high: meta.regularMarketDayHigh,
-            low: meta.regularMarketDayLow,
-            open: meta.regularMarketOpen,
-            previousClose: meta.previousClose,
-            marketState: meta.marketState
-        };
-    } catch (error) {
-        console.error('Error fetching stock info:', error);
-        return null;
     }
 }
 
 // Enhanced real-time data display
-export function updateRealTimeFinance(data) {
+function updateRealTimeFinance(data) {
     const realTimeContainer = document.querySelector('#finance .real-time-data-container');
     if (data.error) {
         realTimeContainer.innerHTML = '<p>Unable to fetch real-time financial data.</p>';
@@ -407,7 +79,7 @@ export function updateRealTimeFinance(data) {
     }
 }
 
-export function isMarketOpen() {
+function isMarketOpen() {
     const symbol = document.getElementById('stockSymbolInput').value.toUpperCase();
     
     // Check if it's a crypto symbol
@@ -432,10 +104,7 @@ export function isMarketOpen() {
     return false;
 }
 
-// Add this helper function to ensure data points are properly connected
 // Modify the processChartData function to accept symbol as a parameter
-// ... existing code ...
-
 function processChartData(dates, prices, symbol) {
     // Create arrays to store valid data points
     const validDates = [];
@@ -456,12 +125,10 @@ function processChartData(dates, prices, symbol) {
     };
 }
 
-// ... existing code ...
-
-
 // Function to fetch financial data
-export const fetchFinancialData = async (symbol = '^IXIC', timeRange = '5m', interval = '1m') => {
+const fetchFinancialData = async (symbol = '^IXIC', timeRange = '5m', interval = '1m') => {
     try {
+        // Use original endpoint for chart data
         const response = await fetch(`/api/finance/${symbol}?range=${timeRange}&interval=${interval}`)
         
         if (!response.ok) {
@@ -487,11 +154,10 @@ export const fetchFinancialData = async (symbol = '^IXIC', timeRange = '5m', int
 };
 
 // Function to fetch real-time financial data from the server
-export const fetchRealTimeYahooFinanceData = async (symbol = '^IXIC') => {
+const fetchRealTimeYahooFinanceData = async (symbol = '^IXIC') => {
     try {
-        const response = await fetch(`/api/finance/${symbol}?range=5m&interval=1m`, {
-            redirect: 'follow' // Ensure fetch follows redirects
-        });
+        // Use original endpoint for chart data
+        const response = await fetch(`/api/finance/${symbol}?range=5m&interval=1m`)
         
         if (!response.ok) {
             if (response.status === 404) {
@@ -531,7 +197,7 @@ export const fetchRealTimeYahooFinanceData = async (symbol = '^IXIC') => {
 };
 
 // Function to update Chart with financial data
-export function updateChart(data) {
+function updateChart(data) {
     const chartContainer = document.querySelector('#finance .chart-container');
     if (!chartContainer) {
         console.log('Finance chart container not found on this page, skipping update');
@@ -699,7 +365,7 @@ export function updateChart(data) {
     document.body.addEventListener('click', handleFullscreen);
 }
 
-export async function updateFinanceData(symbol, timeRange = DEFAULT_TIME_RANGE, interval = DEFAULT_INTERVAL, isRefresh = false) {
+async function updateFinanceData(symbol, timeRange = DEFAULT_TIME_RANGE, interval = DEFAULT_INTERVAL, isRefresh = false) {
     try {
         currentSymbol = symbol;
         
@@ -714,10 +380,10 @@ export async function updateFinanceData(symbol, timeRange = DEFAULT_TIME_RANGE, 
         } else {
             const historicalData = await fetchFinancialData(symbol, timeRange, interval);
             updateChart(historicalData);
-            
-            // Add this line to update parameters when loading new symbol
-            updateStockParameters(symbol);
         }
+        
+        // Always update stock parameters when finance data is updated
+        updateStockParameters(symbol);
         
         updateWatchlistUI();
     } catch (error) {
@@ -750,7 +416,7 @@ if (stockSymbolInput) {
 }
 
 // Update your selectStock function:
-export function selectStock(symbol) {
+function selectStock(symbol) {
     userSelectedSymbol = true;
     document.getElementById('stockSymbolInput').value = symbol;
     handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
@@ -759,7 +425,7 @@ export function selectStock(symbol) {
     updateStockParameters(symbol);
 }
 // Update startAutoRefresh to respect pause and user selection
-export function startAutoRefresh() {
+function startAutoRefresh() {
     stopAutoRefresh(); 
     if (!currentSymbol) return;
     const isCrypto = currentSymbol.endsWith('-USD');
@@ -799,7 +465,7 @@ export function startAutoRefresh() {
 }
 
 // Update handleMarketCloseTransition to respect userSelectedSymbol
-export function handleMarketCloseTransition() {
+function handleMarketCloseTransition() {
     const currentSymbol = document.getElementById('stockSymbolInput')?.value.toUpperCase();
     // If we're currently showing a stock (not crypto) and market just closed, and user hasn't manually selected a symbol
     if (currentSymbol && !currentSymbol.endsWith('-USD') && !isMarketOpen() && !userSelectedSymbol) {
@@ -818,7 +484,7 @@ export function handleMarketCloseTransition() {
 }
 
 // In handleFinanceUpdate, only start auto-refresh if not paused
-export async function handleFinanceUpdate(timeRange, interval) {
+async function handleFinanceUpdate(timeRange, interval) {
     const symbolInput = document.getElementById('stockSymbolInput');
     if (!symbolInput) {
         console.log('Stock symbol input not found on this page, skipping finance update');
@@ -991,7 +657,7 @@ function initializeChart(ctx, data) {
 }
 
 // Initialize finance features when DOM is loaded
-export function initializeFinance() {
+function initializeFinance() {
     // Set the default symbol based on current day
     currentSymbol = getDefaultSymbol();
     
@@ -1051,7 +717,7 @@ export function initializeFinance() {
 }
 
 // Reset chart zoom
-export function resetChartZoom() {
+function resetChartZoom() {
     const chart = Chart.getChart('financeChart');
     if (chart) {
         chart.resetZoom();
@@ -1059,7 +725,7 @@ export function resetChartZoom() {
 }
 
 // Reset finance card positions to grid layout
-export function resetFinanceCardPositions() {
+function resetFinanceCardPositions() {
     const cards = document.querySelectorAll('#finance .card');
     cards.forEach(card => {
         card.style.position = 'static';
@@ -1069,210 +735,6 @@ export function resetFinanceCardPositions() {
         card.style.transform = '';
     });
     logger.success('Card positions reset to grid layout');
-}
-
-// Update chart theme based on current theme
-export function updateChartTheme() {
-    const chart = window.financeChart;
-    if (!chart) {
-        logger.warn('No chart found to update theme');
-        return;
-    }
-
-    const isDark = document.body.classList.contains('dark-theme');
-    logger.logChart('theme update', { isDark });
-
-    const colors = {
-        text: isDark ? '#ffffff' : '#333333',
-        grid: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-        background: isDark ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-        border: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'
-    };
-
-    logger.logChart('colors', colors);
-
-    // Update chart options
-    chart.options.scales.x.grid.color = colors.grid;
-    chart.options.scales.y.grid.color = colors.grid;
-    chart.options.scales.x.ticks.color = colors.text;
-    chart.options.scales.y.ticks.color = colors.text;
-    chart.options.plugins.legend.labels.color = colors.text;
-    chart.options.backgroundColor = colors.background;
-    chart.options.scales.x.border.color = colors.border;
-    chart.options.scales.y.border.color = colors.border;
-
-    // Update chart
-    chart.update('none');
-
-    logger.success('Chart theme updated successfully');
-}
-
-// Fetch historical data for stocks to calculate open-to-close percentage
-async function fetchStockHistoricalData(symbol) {
-    try {
-        // Fetch 1 day of data with 1-minute intervals to get open and close prices
-        const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
-        if (!response.ok) throw new Error('Failed to fetch historical data');
-        
-        const data = await response.json();
-        const result = data.chart.result[0];
-        
-        if (!result || !result.timestamp || !result.indicators.quote[0].open || !result.indicators.quote[0].close) {
-            return null;
-        }
-        
-        const timestamps = result.timestamp;
-        const opens = result.indicators.quote[0].open;
-        const closes = result.indicators.quote[0].close;
-        
-        // Find the first valid open price (market open)
-        let marketOpen = null;
-        for (let i = 0; i < opens.length; i++) {
-            if (opens[i] !== null && opens[i] !== undefined) {
-                marketOpen = opens[i];
-                break;
-            }
-        }
-        
-        // Find the last valid close price (market close)
-        let marketClose = null;
-        for (let i = closes.length - 1; i >= 0; i--) {
-            if (closes[i] !== null && closes[i] !== undefined) {
-                marketClose = closes[i];
-                break;
-            }
-        }
-        
-        if (marketOpen && marketClose) {
-            const change = marketClose - marketOpen;
-            const changePercent = (change / marketOpen) * 100;
-            
-            return {
-                symbol: symbol,
-                openPrice: marketOpen,
-                closePrice: marketClose,
-                change: change,
-                changePercent: changePercent
-            };
-        }
-        
-        return null;
-    } catch (error) {
-        console.error(`Error fetching historical data for ${symbol}:`, error);
-        return null;
-    }
-}
-
-
-// Function to add current symbol to watchlist
-export async function addCurrentSymbolToWatchlist() {
-    const input = document.getElementById('stockSymbolInput');
-    if (!input) return;
-    
-    const symbol = input.value.trim().toUpperCase();
-    if (!symbol) {
-        if (window.showNotification) {
-            window.showNotification('Please enter a stock symbol first', 3000);
-        }
-        return;
-    }
-    
-    // Check if already in watchlist
-    const currentWatchlist = userPrefs.getFinanceWatchlist();
-    if (currentWatchlist.includes(symbol)) {
-        if (window.showNotification) {
-            window.showNotification(`${symbol} is already in your watchlist`, 3000);
-        }
-        updateFinanceData(symbol, undefined, undefined, false);
-        return;
-    }
-    
-    // If not in stockSymbols, validate it first
-    if (!stockSymbols[symbol]) {
-        const validation = await validateStockSymbol(symbol);
-        if (!validation.valid) {
-            const errorMessage = validation.error || 'Unknown error occurred';
-        if (window.showNotification) {
-                window.showNotification(`Error: ${errorMessage}`, 5000);
-            }
-            return;
-        }
-        // Add to stockSymbols cache for future use
-        stockSymbols[symbol] = validation.name;
-    }
-    
-    // Add to watchlist
-    addToWatchlist(symbol);
-}
-
-// Function to search and add stock from the search button
-window.searchAndAddStock = async function() {
-    try {
-        const input = document.getElementById('stockSymbolInput');
-        if (!input) {
-            console.error('Stock symbol input element not found');
-            return;
-        }
-        
-        const symbol = input.value.trim().toUpperCase();
-        if (!symbol) {
-            if (window.showNotification) {
-                window.showNotification('Please enter a stock symbol first', 3000);
-            }
-            return;
-        }
-        
-        // Check if already in watchlist
-        if (watchlist.includes(symbol)) {
-            console.log(`${symbol} already in watchlist, updating data`);
-            await updateFinanceData(symbol);
-            await fetchStockInfo(symbol);
-            if (window.showNotification) {
-                window.showNotification(`${symbol} is already in your watchlist`, 3000);
-            }
-            return;
-        }
-        
-        // Validate the symbol by attempting to fetch data
-        const validation = await validateStockSymbol(symbol);
-        if (!validation.valid) {
-            const errorMessage = validation.error || 'Unknown error occurred';
-            console.error(`Validation failed for ${symbol}:`, errorMessage);
-            if (window.showNotification) {
-                window.showNotification(`Error: ${errorMessage}`, 5000);
-            } else {
-                alert(`Error: ${errorMessage}`);
-            }
-            return;
-        }
-
-        // Add to stockSymbols cache for future use
-        stockSymbols[symbol] = validation.name;
-        console.log(`Added ${symbol} to stockSymbols cache`);
-        
-        // Add to watchlist
-        await addToWatchlist(symbol);
-        console.log(`Successfully added ${symbol} to watchlist`);
-        
-        // Show success notification with company name
-        if (window.showNotification) {
-            window.showNotification(`${symbol} (${validation.name}) added to watchlist!`, 3000);
-        }
-    } catch (error) {
-        console.error('Error in searchAndAddStock:', error);
-        if (window.showNotification) {
-            window.showNotification(`Error adding stock: ${error.message}`, 5000);
-        } else {
-            alert(`Error adding stock: ${error.message}`);
-        }
-    }
-}
-
-// Function to reset to auto mode (allow automatic symbol switching)
-export function resetToAutoMode() {
-    userSelectedSymbol = false;
-    userSelectedSymbol = false;
-    logger.info('Reset to auto mode - allowing automatic symbol switching');
 }
 
 // Utility: Detect if device is mobile
@@ -1367,7 +829,7 @@ if (typeof document !== 'undefined') {
   });
 }
 
-export function stopAutoRefresh() {
+function stopAutoRefresh() {
     if (updateInterval) {
         clearInterval(updateInterval);
         updateInterval = null;
@@ -1403,7 +865,7 @@ try {
 }
 
 // Function to update stock parameters section with historical data
-export async function updateStockParameters(symbol, dateIndex = -1) {
+async function updateStockParameters(symbol, dateIndex = -1) {
     const parametersSection = document.getElementById('stock-parameters-section');
     if (!parametersSection) {
         console.log('Stock parameters section not found on this page');
@@ -1418,13 +880,9 @@ export async function updateStockParameters(symbol, dateIndex = -1) {
             high: document.getElementById('param-high'),
             low: document.getElementById('param-low'),
             close: document.getElementById('param-close'),
-            volume: document.getElementById('param-volume')
+            volume: document.getElementById('param-volume'),
+            lastUpdated: document.getElementById('param-last-updated')
         };
-
-        // Set loading text
-        Object.values(elements).forEach(element => {
-            if (element) element.textContent = 'Loading...';
-        });
 
         // Fetch historical data using the corrected function
         const historyData = await fetchFinanceHistoryArray(symbol);
@@ -1494,6 +952,19 @@ export async function updateStockParameters(symbol, dateIndex = -1) {
             }
         };
 
+        // Helper function to format last updated time
+        const formatLastUpdated = () => {
+            const now = new Date();
+            return now.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        };
+
         // Update the HTML elements
         if (elements.date) elements.date.textContent = formatDate(stockData.date);
         if (elements.open) elements.open.textContent = `$${formatNumber(stockData.open)}`;
@@ -1501,6 +972,7 @@ export async function updateStockParameters(symbol, dateIndex = -1) {
         if (elements.low) elements.low.textContent = `$${formatNumber(stockData.low)}`;
         if (elements.close) elements.close.textContent = `$${formatNumber(stockData.close)}`;
         if (elements.volume) elements.volume.textContent = formatVolume(stockData.volume);
+        if (elements.lastUpdated) elements.lastUpdated.textContent = formatLastUpdated();
 
         // Update card title to show current symbol and date
         const cardTitle = parametersSection.querySelector('.card-title');
@@ -1528,7 +1000,7 @@ export async function updateStockParameters(symbol, dateIndex = -1) {
             }
         }
 
-        console.log(`Stock parameters updated for ${symbol}:`, stockData);
+        //console.log(`Stock parameters updated for ${symbol}:`, stockData);
 
     } catch (error) {
         console.error('Error updating stock parameters:', error);
@@ -1540,7 +1012,8 @@ export async function updateStockParameters(symbol, dateIndex = -1) {
             high: document.getElementById('param-high'),
             low: document.getElementById('param-low'),
             close: document.getElementById('param-close'),
-            volume: document.getElementById('param-volume')
+            volume: document.getElementById('param-volume'),
+            lastUpdated: document.getElementById('param-last-updated')
         };
 
         Object.values(elements).forEach(element => {
@@ -1557,7 +1030,7 @@ export async function updateStockParameters(symbol, dateIndex = -1) {
 
 
 // Function to update parameters when symbol changes
-export function onSymbolChange(newSymbol) {
+function onSymbolChange(newSymbol) {
     if (newSymbol && newSymbol.trim()) {
         updateStockParameters(newSymbol.toUpperCase());
     }
@@ -1583,39 +1056,6 @@ async function fetchFinanceHistoryArray(symbol = 'AAPL') {
     } catch (error) {
         console.error('Error fetching finance history array:', error);
         return [];
-    }
-}
-// Function to allow user to select a specific date from the historical data
-export async function showDateSelector(symbol) {
-    try {
-        const historyData = await fetchFinanceHistoryArray(symbol);
-        if (!historyData || historyData.length === 0) {
-            if (window.showNotification) {
-                window.showNotification('No historical data available for this symbol', 4000);
-            }
-            return;
-        }
-
-        // Create a simple date selection interface
-        const dates = historyData.map((item, index) => ({
-            display: new Date(item.date).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            }),
-            value: index,
-            data: item
-        }));
-
-        // For now, just show the most recent 10 dates in console
-        // You could implement a dropdown or modal here
-        console.log('Available dates for', symbol, ':', dates.slice(-10));
-        
-        // Default to most recent date
-        updateStockParameters(symbol, dates.length - 1);
-        
-    } catch (error) {
-        console.error('Error showing date selector:', error);
     }
 }
 
@@ -1698,11 +1138,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Export to app.js for light/dark mode theme user prefs
+// Update chart theme based on current theme
+export function updateChartTheme() {
+    const chart = window.financeChart;
+    if (!chart) {
+        logger.warn('No chart found to update theme');
+        return;
+    }
+
+    const isDark = document.body.classList.contains('dark-theme');
+    logger.logChart('theme update', { isDark });
+
+    const colors = {
+        text: isDark ? '#ffffff' : '#333333',
+        grid: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+        background: isDark ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+        border: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'
+    };
+
+    logger.logChart('colors', colors);
+
+    // Update chart options
+    chart.options.scales.x.grid.color = colors.grid;
+    chart.options.scales.y.grid.color = colors.grid;
+    chart.options.scales.x.ticks.color = colors.text;
+    chart.options.scales.y.ticks.color = colors.text;
+    chart.options.plugins.legend.labels.color = colors.text;
+    chart.options.backgroundColor = colors.background;
+    chart.options.scales.x.border.color = colors.border;
+    chart.options.scales.y.border.color = colors.border;
+
+    // Update chart
+    chart.update('none');
+
+    logger.success('Chart theme updated successfully');
+}
+
+
 // Make functions available globally for HTML onclick handlers
 window.addToWatchlist = addToWatchlist;
 window.removeFromWatchlist = removeFromWatchlist;
 window.clearWatchlist = clearWatchlist;
-window.addCurrentSymbolToWatchlist = addCurrentSymbolToWatchlist;
 window.searchAndAddStock = searchAndAddStock;
 window.startStockDashboard = startStockDashboard;
 window.stopStockDashboard = stopStockDashboard;
@@ -1713,13 +1190,11 @@ window.togglePauseFinance = togglePauseFinance;
 window.toggleStockDashboard = toggleStockDashboard;
 window.handleMarketCloseTransition = handleMarketCloseTransition;
 window.userSelectedSymbol = userSelectedSymbol;
-window.resetToAutoMode = resetToAutoMode;
 window.resetToDefaultWatchlist = resetToDefaultWatchlist;
 window.updateChartTheme = updateChartTheme;
 window.fetchTopStocks = fetchTopStocks;
 window.updateFinanceData = updateFinanceData;
 window.handleFinanceUpdate = handleFinanceUpdate;
-window.fetchStockInfo = fetchStockInfo;
 window.setupAutocomplete = setupAutocomplete;
 window.loadWatchlistFromPreferences = loadWatchlistFromPreferences;
 window.updateWatchlistUI = updateWatchlistUI;
@@ -1733,4 +1208,92 @@ window.stopAutoRefresh = stopAutoRefresh;
 window.initializeFinance = initializeFinance;
 window.updateStockParameters = updateStockParameters;
 window.onSymbolChange = onSymbolChange;
-window.showDateSelector = showDateSelector;
+
+//unused
+
+// Enhanced stock information display
+// async function fetchStockInfo(symbol) {
+//     try {
+//         const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
+//         if (!response.ok) throw new Error('Failed to fetch stock info');
+        
+//         const data = await response.json();
+//         const result = data.chart.result[0];
+//         const meta = result.meta;
+        
+//         return {
+//             symbol: meta.symbol,
+//             name: meta.shortName || stockSymbols[symbol] || symbol,
+//             price: meta.regularMarketPrice,
+//             change: meta.regularMarketChange,
+//             changePercent: meta.regularMarketChangePercent,
+//             marketCap: meta.marketCap,
+//             volume: meta.volume,
+//             avgVolume: meta.averageVolume,
+//             high: meta.regularMarketDayHigh,
+//             low: meta.regularMarketDayLow,
+//             open: meta.regularMarketOpen,
+//             previousClose: meta.previousClose,
+//             marketState: meta.marketState
+//         };
+//     } catch (error) {
+//         console.error('Error fetching stock info:', error);
+//         return null;
+//     }
+// }
+
+// Fetch historical data for stocks to calculate open-to-close percentage
+// async function fetchStockHistoricalData(symbol) {
+//     try {
+//         // Fetch 1 day of data with 1-minute intervals to get open and close prices
+//         const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
+//         if (!response.ok) throw new Error('Failed to fetch historical data');
+        
+//         const data = await response.json();
+//         const result = data.chart.result[0];
+        
+//         if (!result || !result.timestamp || !result.indicators.quote[0].open || !result.indicators.quote[0].close) {
+//             return null;
+//         }
+        
+//         const timestamps = result.timestamp;
+//         const opens = result.indicators.quote[0].open;
+//         const closes = result.indicators.quote[0].close;
+        
+//         // Find the first valid open price (market open)
+//         let marketOpen = null;
+//         for (let i = 0; i < opens.length; i++) {
+//             if (opens[i] !== null && opens[i] !== undefined) {
+//                 marketOpen = opens[i];
+//                 break;
+//             }
+//         }
+        
+//         // Find the last valid close price (market close)
+//         let marketClose = null;
+//         for (let i = closes.length - 1; i >= 0; i--) {
+//             if (closes[i] !== null && closes[i] !== undefined) {
+//                 marketClose = closes[i];
+//                 break;
+//             }
+//         }
+        
+//         if (marketOpen && marketClose) {
+//             const change = marketClose - marketOpen;
+//             const changePercent = (change / marketOpen) * 100;
+            
+//             return {
+//                 symbol: symbol,
+//                 openPrice: marketOpen,
+//                 closePrice: marketClose,
+//                 change: change,
+//                 changePercent: changePercent
+//             };
+//         }
+        
+//         return null;
+//     } catch (error) {
+//         console.error(`Error fetching historical data for ${symbol}:`, error);
+//         return null;
+//     }
+// }

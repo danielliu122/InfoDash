@@ -1482,18 +1482,13 @@ app.post('/api/finance/bulk-real-time', async (req, res) => {
     }
 });
 
-// Fixed endpoint in server.js - replace the existing /api/finance/history/:symbol endpoint
-
-// Suppress the deprecation notice for historical() method
-yahooFinance.suppressNotices(['ripHistorical']);
-
 // Get historical data for a symbol using chart() method instead of historical()
 app.get('/api/finance/history/:symbol', async (req, res) => {
     const { symbol } = req.params;
     const { period = '1mo', interval = '1d' } = req.query;
 
     try {
-        console.log(`Fetching historical data for ${symbol} with period: ${period}, interval: ${interval}`);
+        //console.log(`Fetching historical data for ${symbol} with period: ${period}, interval: ${interval}`);
 
         // Use chart() method with proper options instead of historical()
         const chartData = await yahooFinance.chart(symbol, {
