@@ -72,6 +72,7 @@ const port = process.env.PORT || 3000;
 // Middleware to parse JSON requests
 app.use(express.json());
 
+
 // Function to check if market is closed (4:00 PM ET)
 function isMarketClosed() {
     const now = new Date();
@@ -390,6 +391,15 @@ async function cleanupSummaryData() {
 
 // Automated Summary Generation System
 class AutomatedSummaryGenerator {
+    getBaseUrl() {
+        if (process.env.NODE_ENV === 'production') {
+            // Use the actual production URL or detect it
+            return process.env.BASE_URL || 'https://infodash.app';
+        } else {
+            return `http://localhost:${port}`;
+        }
+    }
+    
     constructor() {
         this.isGenerating = false;
         this.lastGenerationDate = null;
@@ -541,7 +551,7 @@ class AutomatedSummaryGenerator {
     // Collect news data for automated generation
     async collectAutomatedNewsData(region) {
         try {
-            const baseUrl = process.env.NODE_ENV === 'production' ? 'https://infodash.app' : `http://localhost:${port}`;
+            const baseUrl = this.getBaseUrl();
             const response = await fetch(`${baseUrl}/api/news?country=${region.country}&language=${region.language}&category=general&pageSize=5`);
             
             if (!response.ok) return null;
@@ -564,7 +574,7 @@ class AutomatedSummaryGenerator {
     // Collect trends data for automated generation
     async collectAutomatedTrendsData(region) {
         try {
-            const baseUrl = process.env.NODE_ENV === 'production' ? 'https://infodash.app' : `http://localhost:${port}`;
+            const baseUrl = this.getBaseUrl();
             const response = await fetch(`${baseUrl}/api/trends2?type=daily&category=all&language=${region.language}&geo=${region.country}`);
             
             if (!response.ok) return null;
@@ -598,7 +608,7 @@ class AutomatedSummaryGenerator {
             // Use the bulk finance endpoint for better performance
             const symbols = ['^IXIC', 'META', 'AAPL', 'GOOGL', 'AMZN', 'TSLA', 'BTC-USD', 'ETH-USD', 'SOL-USD', 'XRP-USD'];
             
-            const baseUrl = process.env.NODE_ENV === 'production' ? 'https://infodash.app' : `http://localhost:${port}`;
+            const baseUrl = this.getBaseUrl();
             const response = await fetch(`${baseUrl}/api/finance/bulk-real-time`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
