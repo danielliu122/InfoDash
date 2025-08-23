@@ -408,12 +408,12 @@ class AutomatedSummaryGenerator {
             timezone: 'America/New_York'
         });
 
-        //=== TESTING ONLY: Run 1 minute after server starts ===
-        //Uncomment the following block for testing purposes.
-        // setTimeout(() => {
-        //     console.log('TEST: Triggering automated summary generation 1 minute after startup');
-        //     this.generateDailySummary();
-        // }, 60 * 1000);
+        // === TESTING ONLY: Run 1 minute after server starts ===
+        setTimeout(() => {
+            console.log('TEST: Triggering automated summary generation 3 minute after startup');
+            this.generateDailySummary();
+        }, 60 * 3000);
+
     }
 
     // Generate summary for en-US at 11:00PM EDT (America/New_York)
@@ -467,6 +467,11 @@ class AutomatedSummaryGenerator {
 
             if (!sectionData || (!sectionData.news && !sectionData.trends && !sectionData.finance)) {
                 console.log(`No data available for ${region.country} (${region.language}), skipping summary generation`);
+                return;
+            }
+            // second check for sectionData
+            if (!sectionData) {
+                console.log(`No section data available for ${region.country} (${region.language}), skipping...`);
                 return;
             }
 
@@ -748,7 +753,7 @@ class AutomatedSummaryGenerator {
     // Manual trigger for testing
     async triggerManualGeneration() {
         console.log('Manual trigger for automated summary generation');
-        await this.generateDailySummaries();
+        await this.generateDailySummary();
     }
 
     // Check generation status
@@ -756,7 +761,7 @@ class AutomatedSummaryGenerator {
         return {
             isGenerating: this.isGenerating,
             lastGenerationDate: this.lastGenerationDate,
-            configuredRegions: this.defaultRegions.length
+            configuredRegions: this.region,
         };
     }
 }
