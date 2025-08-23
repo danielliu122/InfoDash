@@ -642,40 +642,57 @@ class AutomatedSummaryGenerator {
         }
     }
 
-    // Generate AI summary for automated generation
+    // Generate AI summary for automated generation, with retry logic
     async generateAutomatedSummary(sectionData) {
-        try {
-            const analysisPrompt = this.createAutomatedAnalysisPrompt(sectionData);
-            const selectedModel = 'deepseek/deepseek-chat-v3-0324:free';
+        const analysisPrompt = this.createAutomatedAnalysisPrompt(sectionData);
+        const selectedModel = 'deepseek/deepseek-chat-v3-0324:free';
+        const maxRetries = 3;
+        let lastError = null;
 
-            const response = await openai.chat.completions.create({
-                model: selectedModel,
-                messages: [
-                    {
-                        role: 'system',
-                        content: `You are a data analyst specializing in creating clear, concise summaries of current news, trends, and market data.
-                        CRITICAL INSTRUCTIONS:
-                        - Only report the specific data provided. Do not infer, speculate, or add context from outside knowledge.
-                        - Act as a market predictor and future current events predictor (except for Info Genie section).
-                        - For percentage changes: positive = "up/gaining/rose", negative = "down/declining/fell"
-                        - Use "slight movement" for changes between -1% and +1%
-                        - Use dramatic terms like "surged/plunged" only for changes > ±10%
-                        - Refer to performance as "today's trading" or "current session"
-                        - Maintain professional, neutral, fact-based tone.`
-                    },
-                    {
-                        role: 'user',
-                        content: analysisPrompt
-                    }
-                ],
-                max_tokens: 5000
-            });
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                const response = await openai.chat.completions.create({
+                    model: selectedModel,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: `You are a data analyst specializing in creating clear, concise summaries of current news, trends, and market data.
+                            CRITICAL INSTRUCTIONS:
+                            - Only report the specific data provided. Do not infer, speculate, or add context from outside knowledge.
+                            - Act as a market predictor and future current events predictor (except for Info Genie section).
+                            - For percentage changes: positive = "up/gaining/rose", negative = "down/declining/fell"
+                            - Use "slight movement" for changes between -1% and +1%
+                            - Use dramatic terms like "surged/plunged" only for changes > ±10%
+                            - Refer to performance as "today's trading" or "current session"
+                            - Maintain professional, neutral, fact-based tone.`
+                        },
+                        {
+                            role: 'user',
+                            content: analysisPrompt
+                        }
+                    ],
+                    max_tokens: 5000
+                });
 
-            return response.choices[0].message.content;
-        } catch (error) {
-            console.error('Error generating automated summary:', error);
-            return null;
+                if (!response?.choices?.[0]?.message?.content) {
+                    console.error(`AI did not return any content (attempt ${attempt})`, response);
+                    lastError = new Error('AI did not return any content');
+                    // Try again if not last attempt
+                    continue;
+                }
+                
+                return response.choices[0].message.content;
+            } catch (error) {
+                lastError = error;
+                console.error(`Error generating automated summary (attempt ${attempt}):`, error);
+                // Wait a bit before retrying, except after last attempt
+                if (attempt < maxRetries) {
+                    await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+                }
+            }
         }
+        // If we get here, all attempts failed
+        return null;
     }
 
     // Create analysis prompt for automated generation
