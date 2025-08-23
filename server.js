@@ -399,7 +399,7 @@ class AutomatedSummaryGenerator {
             return `http://localhost:${port}`;
         }
     }
-    
+
     constructor() {
         this.isGenerating = false;
         this.lastGenerationDate = null;
@@ -418,7 +418,7 @@ class AutomatedSummaryGenerator {
             timezone: 'America/New_York'
         });
 
-        // === TESTING ONLY: Run 1 minute after server starts ===
+        // === TESTING ONLY: Run 3 minutes after server starts ===
         setTimeout(() => {
             console.log('TEST: Triggering automated summary generation 3 minute after startup');
             this.generateDailySummary();
