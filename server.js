@@ -419,10 +419,10 @@ class AutomatedSummaryGenerator {
         });
 
         // === TESTING ONLY: Run 3 minutes after server starts ===
-        setTimeout(() => {
-            console.log('TEST: Triggering automated summary generation 3 minute after startup');
-            this.generateDailySummary();
-        }, 60 * 3000);
+        // setTimeout(() => {
+        //     console.log('TEST: Triggering automated summary generation 3 minute after startup');
+        //     this.generateDailySummary();
+        // }, 60 * 3000);
 
     }
 
