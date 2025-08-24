@@ -256,128 +256,209 @@ async function initializeDailySummary() {
     }
 }
 
-// Function to clean up malformed summary data
 async function cleanupSummaryData() {
     try {
         console.log('cleanupSummaryData: Starting cleanup of malformed summary data...');
         
+        // Check file size first to prevent memory overload
+        const stats = await fs.stat(SUMMARY_FILE).catch(() => null);
+        if (!stats) {
+            console.log('cleanupSummaryData: No summary file found');
+            return {};
+        }
+        
+        const fileSizeKB = Math.round(stats.size / 1024);
+        console.log(`cleanupSummaryData: File size: ${fileSizeKB}KB`);
+        
+        // Skip cleanup if file is too large (>1MB could crash 512MB instance)
+        if (stats.size > 1024 * 1024) {
+            console.warn('cleanupSummaryData: File too large, skipping cleanup to prevent memory crash');
+            return null;
+        }
+        
         const data = await fs.readFile(SUMMARY_FILE, 'utf8');
-        const summaries = JSON.parse(data);
+        let summaries;
+        
+        try {
+            summaries = JSON.parse(data);
+        } catch (parseError) {
+            console.error('cleanupSummaryData: JSON parse error, creating backup and starting fresh');
+            await fs.writeFile(SUMMARY_FILE + '.backup', data);
+            return {};
+        }
+        
+        // Memory check - if we have too many keys, process in batches
+        const totalKeys = Object.keys(summaries).length;
+        console.log(`cleanupSummaryData: Processing ${totalKeys} keys`);
+        
+        if (totalKeys > 100) {
+            console.warn('cleanupSummaryData: Too many keys, will process in smaller batches');
+            return await cleanupInBatches(summaries);
+        }
         
         let hasChanges = false;
         const cleanedSummaries = {};
+        let processedCount = 0;
         
         for (const [key, value] of Object.entries(summaries)) {
-            console.log(`cleanupSummaryData: Processing key: ${key}`);
+            processedCount++;
             
-            // Skip invalid keys like "2025" (just year)
-            if (key === '2025' || key.length < 8) {
+            // Log progress for large datasets
+            if (processedCount % 20 === 0) {
+                console.log(`cleanupSummaryData: Processed ${processedCount}/${totalKeys} keys`);
+            }
+            
+            // Skip obviously invalid keys early
+            if (!key || typeof key !== 'string') {
                 console.log(`cleanupSummaryData: Skipping invalid key: ${key}`);
                 continue;
             }
             
-            // Handle the corrupted "2025" key that contains an array
-            if (key === '2025' && Array.isArray(value)) {
-                console.log(`cleanupSummaryData: Processing corrupted 2025 array with ${value.length} items`);
-                
-                value.forEach((item, index) => {
-                    // Skip nested objects with numeric keys
-                    if (typeof item === 'object' && item !== null && Object.keys(item).some(k => !isNaN(k))) {
-                        console.log(`cleanupSummaryData: Skipping nested object with numeric keys at index ${index}`);
-                        return;
-                    }
-                    
-                    // Extract date from timestamp if available
-                    if (item.timestamp) {
-                        const date = new Date(item.timestamp).toISOString().split('T')[0];
-                        console.log(`cleanupSummaryData: Extracted date ${date} from timestamp`);
-                        
-                        if (!cleanedSummaries[date]) {
-                            cleanedSummaries[date] = [];
-                        }
-                        
-                        // Fix the language/country values (they're corrupted)
-                        const fixedItem = {
-                            ...item,
-                            language: 'en', // Default to English
-                            country: 'US'   // Default to US
-                        };
-                        
-                        // Remove duplicate language/country properties
-                        delete fixedItem.language;
-                        delete fixedItem.country;
-                        
-                        cleanedSummaries[date].push(fixedItem);
-                        hasChanges = true;
-                    }
-                });
+            // Skip problematic keys that could contain large arrays
+            if (key === '2025' || key.length < 8 || key.length > 20) {
+                console.log(`cleanupSummaryData: Skipping suspicious key: ${key}`);
                 continue;
             }
             
-            // Handle normal date keys
-            if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
-                console.log(`cleanupSummaryData: Valid date key: ${key}`);
+            // Only process valid date format keys
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) {
+                console.log(`cleanupSummaryData: Skipping invalid date format: ${key}`);
+                continue;
+            }
+            
+            // Handle array values (limit processing to prevent memory issues)
+            if (Array.isArray(value)) {
+                // Limit array size to prevent memory overflow
+                const limitedValue = value.slice(0, 10); // Max 10 summaries per date
+                const uniqueSummaries = [];
+                const seen = new Set();
                 
-                if (Array.isArray(value)) {
-                    // Remove duplicates and fix any corrupted entries
-                    const uniqueSummaries = [];
-                    const seen = new Set();
+                for (const summary of limitedValue) {
+                    // Skip invalid objects
+                    if (!summary || typeof summary !== 'object') continue;
                     
-                    value.forEach(summary => {
-                        // Skip nested objects with numeric keys
-                        if (typeof summary === 'object' && summary !== null && Object.keys(summary).some(k => !isNaN(k))) {
-                            console.log(`cleanupSummaryData: Skipping nested object with numeric keys in ${key}`);
-                            return;
-                        }
-                        
-                        // Create a unique identifier for deduplication
-                        const identifier = `${summary.timestamp}-${summary.language || 'en'}-${summary.country || 'US'}`;
-                        
-                        if (!seen.has(identifier)) {
-                            seen.add(identifier);
-                            
-                            // Ensure language and country are properly set
-                            const fixedSummary = {
-                                ...summary,
-                                language: summary.language || 'en',
-                                country: summary.country || 'US'
-                            };
-                            
-                            uniqueSummaries.push(fixedSummary);
-                        }
-                    });
+                    // Skip objects with numeric keys (corrupted data)
+                    const hasNumericKeys = Object.keys(summary).some(k => !isNaN(k) && k !== 'timestamp');
+                    if (hasNumericKeys) continue;
                     
-                    if (uniqueSummaries.length > 0) {
-                        cleanedSummaries[key] = uniqueSummaries;
-                        hasChanges = true;
+                    // Create identifier for deduplication
+                    const timestamp = summary.timestamp || new Date().toISOString();
+                    const language = summary.language || 'en';
+                    const country = summary.country || 'US';
+                    const identifier = `${timestamp}-${language}-${country}`;
+                    
+                    if (!seen.has(identifier)) {
+                        seen.add(identifier);
+                        
+                        // Create clean summary object with only needed fields
+                        const cleanSummary = {
+                            news: summary.news || '',
+                            trends: summary.trends || '',
+                            finance: summary.finance || '',
+                            overall: summary.overall || '',
+                            timestamp: timestamp,
+                            language: language,
+                            country: country,
+                            automated: summary.automated || false
+                        };
+                        
+                        uniqueSummaries.push(cleanSummary);
                     }
-                } else {
-                    // Single object
-                    cleanedSummaries[key] = {
-                        ...value,
-                        language: value.language || 'en',
-                        country: value.country || 'US'
-                    };
+                }
+                
+                if (uniqueSummaries.length > 0) {
+                    cleanedSummaries[key] = uniqueSummaries.length === 1 ? uniqueSummaries[0] : uniqueSummaries;
                     hasChanges = true;
                 }
-            } else {
-                console.log(`cleanupSummaryData: Skipping invalid key format: ${key}`);
+            } else if (value && typeof value === 'object') {
+                // Handle single object
+                const cleanSummary = {
+                    news: value.news || '',
+                    trends: value.trends || '',
+                    finance: value.finance || '',
+                    overall: value.overall || '',
+                    timestamp: value.timestamp || new Date().toISOString(),
+                    language: value.language || 'en',
+                    country: value.country || 'US',
+                    automated: value.automated || false
+                };
+                
+                cleanedSummaries[key] = cleanSummary;
+                hasChanges = true;
             }
         }
         
         if (hasChanges) {
-            // Save the cleaned data
+            // Create backup before saving
+            await fs.writeFile(SUMMARY_FILE + '.backup', data);
+            
+            // Save cleaned data
             await fs.writeFile(SUMMARY_FILE, JSON.stringify(cleanedSummaries, null, 2));
             console.log('cleanupSummaryData: Successfully cleaned up malformed summary data');
+            
+            // Log cleanup results
+            const originalSize = Object.keys(summaries).length;
+            const cleanedSize = Object.keys(cleanedSummaries).length;
+            console.log(`cleanupSummaryData: Reduced from ${originalSize} to ${cleanedSize} entries`);
         } else {
             console.log('cleanupSummaryData: No malformed data found');
         }
         
         return cleanedSummaries;
+        
     } catch (error) {
-        console.error('cleanupSummaryData: Error cleaning up summary data:', error);
+        console.error('cleanupSummaryData: Error during cleanup:', error);
+        
+        // If we crash during cleanup, don't try to recover - just return null
+        if (error.message && error.message.includes('out of memory')) {
+            console.error('cleanupSummaryData: OUT OF MEMORY - Consider deleting summary file manually');
+        }
+        
         return null;
     }
+}
+
+// Helper function to process large datasets in batches
+async function cleanupInBatches(summaries) {
+    console.log('cleanupInBatches: Processing large dataset in batches...');
+    
+    const keys = Object.keys(summaries);
+    const batchSize = 20; // Process 20 keys at a time
+    const cleanedSummaries = {};
+    
+    for (let i = 0; i < keys.length; i += batchSize) {
+        const batch = keys.slice(i, i + batchSize);
+        console.log(`cleanupInBatches: Processing batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(keys.length/batchSize)}`);
+        
+        for (const key of batch) {
+            // Only process valid date keys
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) continue;
+            
+            const value = summaries[key];
+            if (value && typeof value === 'object' && !Array.isArray(value)) {
+                // Keep simple objects only
+                cleanedSummaries[key] = {
+                    news: value.news || '',
+                    trends: value.trends || '',
+                    finance: value.finance || '',
+                    overall: value.overall || '',
+                    timestamp: value.timestamp || new Date().toISOString(),
+                    language: value.language || 'en',
+                    country: value.country || 'US',
+                    automated: value.automated || false
+                };
+            }
+        }
+        
+        // Small delay between batches to prevent overwhelming the system
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    console.log(`cleanupInBatches: Completed processing, kept ${Object.keys(cleanedSummaries).length} valid entries`);
+    
+    // Save the cleaned data
+    await fs.writeFile(SUMMARY_FILE, JSON.stringify(cleanedSummaries, null, 2));
+    return cleanedSummaries;
 }
 
 // Call initialization
