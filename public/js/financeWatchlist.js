@@ -218,6 +218,36 @@ async function fetchRealTimeYahooFinanceData(symbol) {
     }
 }
 
+async function fetchStockInfo(symbol) {
+    try {
+        const response = await fetch(`/api/finance/${symbol}?range=1d&interval=1m`);
+        if (!response.ok) throw new Error('Failed to fetch stock info');
+        
+        const data = await response.json();
+        const result = data.chart.result[0];
+        const meta = result.meta;
+        
+        return {
+            symbol: meta.symbol,
+            name: meta.shortName || stockSymbols[symbol] || symbol,
+            price: meta.regularMarketPrice,
+            change: meta.regularMarketChange,
+            changePercent: meta.regularMarketChangePercent,
+            marketCap: meta.marketCap,
+            volume: meta.volume,
+            avgVolume: meta.averageVolume,
+            high: meta.regularMarketDayHigh,
+            low: meta.regularMarketDayLow,
+            open: meta.regularMarketOpen,
+            previousClose: meta.previousClose,
+            marketState: meta.marketState
+        };
+    } catch (error) {
+        console.error('Error fetching stock info:', error);
+        return null;
+    }
+}
+
 // Update stock dashboard display
 function updateStockDashboard() {
     const dashboardContainer = document.getElementById('stock-dashboard');
