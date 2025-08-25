@@ -15,7 +15,7 @@ let lastUpdateTime = 0;
 let lastHistoricalUpdate = 0;
 let lastTimestamp = null;
 let isDashboardPaused = false;
-let userSelectedSymbol = false
+let userSelectedSymbol = false; // Initialize as false
 let MAX_POINTS = 50;
 let stockSymbols = loadStockSymbols();
 
@@ -24,24 +24,11 @@ const DEFAULT_INTERVAL = '1m';
 
 // Helper function to get default symbol based on market status
 function getDefaultSymbol() {
-    const now = new Date();
-    const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-    const day = etNow.getDay();
-    const hours = etNow.getHours();
-    const minutes = etNow.getMinutes();
-    
-    // Check if it's a weekend
-    const isWeekend = day === 0 || day === 6; // Sunday or Saturday
-    
-    // Check if it's a weekday during market hours (9:30AM - 4:00PM ET)
-    const isMarketHours = !isWeekend && 
-                         (hours > 9 || (hours === 9 && minutes >= 30)) && 
-                         (hours < 16);
-    
-    if (isWeekend || !isMarketHours) {
-        return 'BTC-USD'; // Default to Bitcoin on weekends and outside market hours
-    } else {
+    // Use isMarketOpen() to determine if the market is open
+    if (typeof isMarketOpen === 'function' && isMarketOpen()) {
         return '^IXIC'; // Default to NASDAQ during market hours on weekdays
+    } else {
+        return 'BTC-USD'; // Default to Bitcoin on weekends, holidays, and outside market hours
     }
 }
 
@@ -62,42 +49,61 @@ function addData(chart, label, newData) {
     if (chart && chart.update) {
         // Get the current stock parameters to use the same closing data
         const closeElement = document.getElementById('param-close');
-        if (closeElement && closeElement.textContent && closeElement.textContent !== 'N/A' && closeElement.textContent !== 'Error') {
+        if (
+            closeElement &&
+            closeElement.textContent &&
+            closeElement.textContent !== 'N/A' &&
+            closeElement.textContent !== 'Error'
+        ) {
             // Extract the numeric value from the formatted price (remove $ and commas)
             const closePrice = parseFloat(closeElement.textContent.replace(/[$,]/g, ''));
             if (!isNaN(closePrice)) {
-                // Use the closing price from stock parameters instead of the passed newData
+                // Only add if price is different from previous point
+                const lastPrice = chart.data.datasets[0].data.length > 0
+                    ? chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1]
+                    : undefined;
+                if (lastPrice === closePrice) {
+                    // No change, skip adding redundant point
+                    return;
+                }
                 const currentTime = new Date();
                 const timeString = currentTime.toISOString();
-                
-                // Add the new data point to the chart
+
                 chart.data.labels.push(timeString);
                 chart.data.datasets[0].data.push(closePrice);
-                
+
                 // Keep only the last MAX_POINTS data points
                 if (chart.data.labels.length > MAX_POINTS) {
                     chart.data.labels.shift();
                     chart.data.datasets[0].data.shift();
                 }
-                
+
                 chart.update('none');
                 return;
             }
         }
-        
+
         // Fallback to original behavior if stock parameters data is not available
         if (newData !== undefined && !isNaN(newData)) {
+            // Only add if price is different from previous point
+            const lastPrice = chart.data.datasets[0].data.length > 0
+                ? chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1]
+                : undefined;
+            if (lastPrice === newData) {
+                // No change, skip adding redundant point
+                return;
+            }
             const currentTime = new Date();
             const timeString = currentTime.toISOString();
-            
+
             chart.data.labels.push(timeString);
             chart.data.datasets[0].data.push(newData);
-            
+
             if (chart.data.labels.length > MAX_POINTS) {
                 chart.data.labels.shift();
                 chart.data.datasets[0].data.shift();
             }
-            
+
             chart.update('none');
         }
     }
@@ -119,29 +125,96 @@ function updateRealTimeFinance(data) {
 }
 
 function isMarketOpen() {
-    const symbol = document.getElementById('stockSymbolInput').value.toUpperCase();
-    
-    // Check if it's a crypto symbol
+    const symbolInput = document.getElementById('stockSymbolInput');
+    const symbol = symbolInput ? symbolInput.value.toUpperCase() : '^IXIC';
+
+    // Crypto check
     if (symbol.endsWith('-USD')) {
-        return true; // Crypto markets are always open
+        return true;
     }
 
-    // Use Eastern Time for market hours check
+    // Eastern Time
     const now = new Date();
     const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
     const day = etNow.getDay();
     const hour = etNow.getHours();
     const minute = etNow.getMinutes();
 
-    // Check if it's a weekday (Monday = 1, Friday = 5)
-    if (day >= 1 && day <= 5) {
-        // Check if it's between 9:30 AM and 4:00 PM ET
-        if ((hour === 9 && minute >= 30) || (hour > 9 && hour < 16) || (hour === 16 && minute === 0)) {
+    // Helper to check Good Friday
+    function isGoodFriday(d) {
+        const year = d.getFullYear();
+        // Calculate Easter Sunday using "Computus"
+        const f = Math.floor;
+        const a = year % 19;
+        const b = f(year / 100);
+        const c = year % 100;
+        const d1 = f(b / 4);
+        const e = b % 4;
+        const f1 = f((b + 8) / 25);
+        const g = f((b - f1 + 1) / 3);
+        const h = (19 * a + b - d1 - g + 15) % 30;
+        const i = f(c / 4);
+        const k = c % 4;
+        const l = (32 + 2 * e + 2 * i - h - k) % 7;
+        const m = f((a + 11 * h + 22 * l) / 451);
+        const month = f((h + l - 7 * m + 114) / 31) - 1; // 0-based
+        const day = ((h + l - 7 * m + 114) % 31) + 1;
+        const easter = new Date(year, month, day);
+        const goodFriday = new Date(easter);
+        goodFriday.setDate(easter.getDate() - 2);
+        return d.toDateString() === goodFriday.toDateString();
+    }
+
+    // Holiday checks
+    const isHoliday = (() => {
+        const d = etNow;
+        const month = d.getMonth();
+        const date = d.getDate();
+        const dayOfWeek = d.getDay();
+
+        // Fixed-date holidays + observed
+        if ((month === 0 && date === 1) || // New Year’s
+            (month === 5 && date === 19) || // Juneteenth
+            (month === 6 && ((date === 4) || // July 4
+                             (date === 3 && dayOfWeek === 5) || // observed Fri
+                             (date === 5 && dayOfWeek === 1))) || // observed Mon
+            (month === 11 && ((date === 25) || // Christmas
+                              (date === 24 && dayOfWeek === 5) || // observed Fri
+                              (date === 26 && dayOfWeek === 1)))) { // observed Mon
+            return true;
+        }
+
+        // MLK Day (3rd Mon Jan)
+        if (month === 0 && dayOfWeek === 1 && date >= 15 && date <= 21) return true;
+
+        // Presidents Day (3rd Mon Feb)
+        if (month === 1 && dayOfWeek === 1 && date >= 15 && date <= 21) return true;
+
+        // Memorial Day (last Mon in May)
+        if (month === 4 && dayOfWeek === 1 && date > 24) return true;
+
+        // Labor Day (1st Mon Sep)
+        if (month === 8 && dayOfWeek === 1 && date <= 7) return true;
+
+        // Thanksgiving (4th Thu Nov)
+        if (month === 10 && dayOfWeek === 4 && date >= 22 && date <= 28) return true;
+
+        // Good Friday
+        if (isGoodFriday(d)) return true;
+
+        return false;
+    })();
+
+    // Check if weekday and not holiday
+    if (day >= 1 && day <= 5 && !isHoliday) {
+        // Market hours: 9:30 ≤ time < 16:00
+        if ((hour > 9 || (hour === 9 && minute >= 30)) && hour < 16) {
             return true;
         }
     }
     return false;
 }
+
 
 // Modify the processChartData function to accept symbol as a parameter
 function processChartData(dates, prices, symbol) {
@@ -440,7 +513,8 @@ async function updateFinanceData(symbol, timeRange = DEFAULT_TIME_RANGE, interva
 const stockSymbolInput = document.getElementById('stockSymbolInput');
 if (stockSymbolInput) {
     stockSymbolInput.addEventListener('change', (event) => {
-        userSelectedSymbol = true;
+        userSelectedSymbol = true; // Set to true when user manually changes symbol
+        window.userSelectedSymbol = true; // Update global variable
         const symbol = event.target.value.toUpperCase();
         // ... existing code ...
         // Get the currently active time range button
@@ -460,13 +534,15 @@ if (stockSymbolInput) {
 
 // Update your selectStock function:
 function selectStock(symbol) {
-    userSelectedSymbol = true;
+    userSelectedSymbol = true; // Set to true when user selects a stock
+    window.userSelectedSymbol = true; // Update global variable
     document.getElementById('stockSymbolInput').value = symbol;
     handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
     
     // Add this line to update parameters
     updateStockParameters(symbol);
 }
+
 // Update startAutoRefresh to respect pause and user selection
 function startAutoRefresh() {
     stopAutoRefresh(); 
@@ -474,7 +550,7 @@ function startAutoRefresh() {
     const isCrypto = currentSymbol.endsWith('-USD');
     const pauseButton = document.getElementById('pause-finance-button');
     if (pauseButton && pauseButton.classList.contains('paused')) {
-        return; // Do not start if paused
+        return; // Do not start if pauseopend
     }
     
     // Determine if we should start auto-refresh
@@ -495,8 +571,7 @@ function startAutoRefresh() {
                     if (stockSymbolInput) {
                         stockSymbolInput.value = currentSymbol;
                     }
-                    userSelectedSymbol = false; // App is now in auto mode
-                    window.userSelectedSymbol = false; // Update global variable
+                    // Keep userSelectedSymbol as false since this is automatic switching
                     updateFinanceData(currentSymbol, undefined, undefined, false);
                     return;
                 }
@@ -519,8 +594,7 @@ function handleMarketCloseTransition() {
         // Switch to BTC-USD only if user hasn't selected a symbol
         const newSymbol = 'BTC-USD';
         document.getElementById('stockSymbolInput').value = newSymbol;
-        userSelectedSymbol = false; // App is now in auto mode
-        userSelectedSymbol = false; // Update global variable
+        // Keep userSelectedSymbol as false since this is automatic switching
         updateFinanceData(newSymbol, DEFAULT_TIME_RANGE, DEFAULT_INTERVAL, false);
         if (updateInterval) {
             stopAutoRefresh();
@@ -714,6 +788,10 @@ function initializeFinance() {
         stockSymbolInput.value = currentSymbol;
     }
     
+    // Reset userSelectedSymbol to false on initialization (auto mode)
+    userSelectedSymbol = false;
+    window.userSelectedSymbol = false;
+    
     // Load initial data with the default symbol, time range, and interval
     handleFinanceUpdate(DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
     
@@ -734,6 +812,8 @@ function initializeFinance() {
     document.querySelectorAll('[data-stock-symbol]').forEach(button => {
         button.addEventListener('click', function() {
             const symbol = this.getAttribute('data-stock-symbol');
+            userSelectedSymbol = true; // Set to true when user clicks a stock button
+            window.userSelectedSymbol = true; // Update global variable
             document.getElementById('stockSymbolInput').value = symbol;
             updateFinanceData(symbol, DEFAULT_TIME_RANGE, DEFAULT_INTERVAL);
         });
@@ -1027,23 +1107,49 @@ async function updateStockParameters(symbol, dateIndex = -1) {
             cardTitle.textContent = `Stock Data - ${symbol} (${formatDate(stockData.date)})`;
         }
 
-        // Add visual indicators for price movement
+        // Add visual indicators for price movement and show percentage change from open
         if (stockData.close !== null && stockData.open !== null) {
             const priceChange = stockData.close - stockData.open;
             const changePercent = ((priceChange / stockData.open) * 100);
-            
-            // Color the close price based on daily performance
+
+            // Choose color and icon for visual indicator
+            let changeColor = '#757575'; // Gray for unchanged
+            let changeIcon = '';
+            let changeText = '';
+
+            if (priceChange > 0) {
+                changeColor = '#4caf50'; // Green for positive
+                changeIcon = '▲'; // Up arrow
+                changeText = `+${formatNumber(Math.abs(priceChange))} (+${changePercent.toFixed(2)}%)`;
+            } else if (priceChange < 0) {
+                changeColor = '#f44336'; // Red for negative
+                changeIcon = '▼'; // Down arrow
+                changeText = `-${formatNumber(Math.abs(priceChange))} (${changePercent.toFixed(2)}%)`;
+            } else {
+                changeText = 'No change';
+            }
+
+            // Color the close price and show tooltip
             if (elements.close) {
-                if (priceChange > 0) {
-                    elements.close.style.color = '#4caf50'; // Green for positive
-                    elements.close.title = `+$${formatNumber(Math.abs(priceChange))} (+${changePercent.toFixed(2)}%)`;
-                } else if (priceChange < 0) {
-                    elements.close.style.color = '#f44336'; // Red for negative
-                    elements.close.title = `-$${formatNumber(Math.abs(priceChange))} (${changePercent.toFixed(2)}%)`;
-                } else {
-                    elements.close.style.color = '#757575'; // Gray for unchanged
-                    elements.close.title = 'No change';
-                }
+                elements.close.style.color = changeColor;
+                elements.close.title = changeText;
+            }
+
+            // Show percentage change and icon next to close price
+            // Remove any previous indicator span if present
+            let indicatorSpan = elements.close ? elements.close.parentElement.querySelector('.close-change-indicator') : null;
+            if (indicatorSpan) {
+                indicatorSpan.remove();
+            }
+            if (elements.close && elements.close.parentElement) {
+                const span = document.createElement('span');
+                span.className = 'close-change-indicator';
+                span.style.marginLeft = '8px';
+                span.style.fontWeight = 'bold';
+                span.style.color = changeColor;
+                span.style.fontSize = '0.95em';
+                span.innerHTML = `${changeIcon} ${Math.abs(changePercent).toFixed(2)}%`;
+                elements.close.parentElement.appendChild(span);
             }
         }
 
@@ -1110,6 +1216,8 @@ async function fetchFinanceHistoryArray(symbol = 'AAPL') {
 document.querySelectorAll('[data-stock-symbol]').forEach(button => {
     button.addEventListener('click', (e) => {
         const symbol = e.currentTarget.dataset.stockSymbol;
+        userSelectedSymbol = true; // Set to true when user clicks a stock button
+        window.userSelectedSymbol = true; // Update global variable
         const stockSymbolInput = document.getElementById('stockSymbolInput');
         if (stockSymbolInput) {
             stockSymbolInput.value = symbol;
@@ -1167,6 +1275,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (stockSymbolInput) {
         // Update parameters when user changes symbol
         stockSymbolInput.addEventListener('change', (event) => {
+            userSelectedSymbol = true; // Set to true when user changes symbol
+            window.userSelectedSymbol = true; // Update global variable
             const symbol = event.target.value.trim().toUpperCase();
             if (symbol) {
                 updateStockParameters(symbol);
@@ -1176,6 +1286,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Also update when user presses Enter
         stockSymbolInput.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
+                userSelectedSymbol = true; // Set to true when user presses Enter
+                window.userSelectedSymbol = true; // Update global variable
                 const symbol = event.target.value.trim().toUpperCase();
                 if (symbol) {
                     updateStockParameters(symbol);

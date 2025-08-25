@@ -150,31 +150,97 @@ async function validateStockSymbol(symbol) {
     }
 }
 
-// Check if market is open (needed for dashboard)
 function isMarketOpen() {
-    const symbol = document.getElementById('stockSymbolInput')?.value?.toUpperCase() || '^IXIC';
-    
-    // Check if it's a crypto symbol
+    const symbolInput = document.getElementById('stockSymbolInput');
+    const symbol = symbolInput ? symbolInput.value.toUpperCase() : '^IXIC';
+
+    // Crypto check
     if (symbol.endsWith('-USD')) {
-        return true; // Crypto markets are always open
+        return true;
     }
 
-    // Use Eastern Time for market hours check
+    // Eastern Time
     const now = new Date();
     const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
     const day = etNow.getDay();
     const hour = etNow.getHours();
     const minute = etNow.getMinutes();
 
-    // Check if it's a weekday (Monday = 1, Friday = 5)
-    if (day >= 1 && day <= 5) {
-        // Check if it's between 9:30 AM and 4:00 PM ET
-        if ((hour === 9 && minute >= 30) || (hour > 9 && hour < 16) || (hour === 16 && minute === 0)) {
+    // Helper to check Good Friday
+    function isGoodFriday(d) {
+        const year = d.getFullYear();
+        // Calculate Easter Sunday using "Computus"
+        const f = Math.floor;
+        const a = year % 19;
+        const b = f(year / 100);
+        const c = year % 100;
+        const d1 = f(b / 4);
+        const e = b % 4;
+        const f1 = f((b + 8) / 25);
+        const g = f((b - f1 + 1) / 3);
+        const h = (19 * a + b - d1 - g + 15) % 30;
+        const i = f(c / 4);
+        const k = c % 4;
+        const l = (32 + 2 * e + 2 * i - h - k) % 7;
+        const m = f((a + 11 * h + 22 * l) / 451);
+        const month = f((h + l - 7 * m + 114) / 31) - 1; // 0-based
+        const day = ((h + l - 7 * m + 114) % 31) + 1;
+        const easter = new Date(year, month, day);
+        const goodFriday = new Date(easter);
+        goodFriday.setDate(easter.getDate() - 2);
+        return d.toDateString() === goodFriday.toDateString();
+    }
+
+    // Holiday checks
+    const isHoliday = (() => {
+        const d = etNow;
+        const month = d.getMonth();
+        const date = d.getDate();
+        const dayOfWeek = d.getDay();
+
+        // Fixed-date holidays + observed
+        if ((month === 0 && date === 1) || // New Year’s
+            (month === 5 && date === 19) || // Juneteenth
+            (month === 6 && ((date === 4) || // July 4
+                             (date === 3 && dayOfWeek === 5) || // observed Fri
+                             (date === 5 && dayOfWeek === 1))) || // observed Mon
+            (month === 11 && ((date === 25) || // Christmas
+                              (date === 24 && dayOfWeek === 5) || // observed Fri
+                              (date === 26 && dayOfWeek === 1)))) { // observed Mon
+            return true;
+        }
+
+        // MLK Day (3rd Mon Jan)
+        if (month === 0 && dayOfWeek === 1 && date >= 15 && date <= 21) return true;
+
+        // Presidents Day (3rd Mon Feb)
+        if (month === 1 && dayOfWeek === 1 && date >= 15 && date <= 21) return true;
+
+        // Memorial Day (last Mon in May)
+        if (month === 4 && dayOfWeek === 1 && date > 24) return true;
+
+        // Labor Day (1st Mon Sep)
+        if (month === 8 && dayOfWeek === 1 && date <= 7) return true;
+
+        // Thanksgiving (4th Thu Nov)
+        if (month === 10 && dayOfWeek === 4 && date >= 22 && date <= 28) return true;
+
+        // Good Friday
+        if (isGoodFriday(d)) return true;
+
+        return false;
+    })();
+
+    // Check if weekday and not holiday
+    if (day >= 1 && day <= 5 && !isHoliday) {
+        // Market hours: 9:30 ≤ time < 16:00
+        if ((hour > 9 || (hour === 9 && minute >= 30)) && hour < 16) {
             return true;
         }
     }
     return false;
 }
+
 
 // Fetch real-time data for a single stock
 async function fetchRealTimeYahooFinanceData(symbol) {
@@ -741,23 +807,18 @@ export async function fetchTopStocks(symbolsOverride = null) {
 
         let fetchedStocks = Object.values(data).filter(stock => !stock.error);
 
-        // Sort stocks based on market hours
-        const now = new Date();
-        const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-        const day = etNow.getDay();
-        const hours = etNow.getHours();
-        const minutes = etNow.getMinutes();
-        
-        // Check if it's a weekend
-        const isWeekend = day === 0 || day === 6; // Sunday or Saturday
-        
-        // Check if it's a weekday during market hours (9:30AM - 4:00PM ET)
-        const isMarketHours = !isWeekend && 
-                            (hours > 9 || (hours === 9 && minutes >= 30)) && 
-                            (hours < 16);
-        
-        // If outside market hours, sort crypto to the top
-        if (!isMarketHours) {
+        // Use isMarketOpen() to determine if market is open
+        let isMarketOpenFlag = false;
+        if (typeof isMarketOpen === 'function') {
+            try {
+                isMarketOpenFlag = isMarketOpen();
+            } catch (e) {
+                logger.error("Error calling isMarketOpen():", e);
+            }
+        }
+
+        // If market is closed, sort crypto to the top
+        if (!isMarketOpenFlag) {
             fetchedStocks.sort((a, b) => {
                 const aIsCrypto = a.symbol.endsWith('-USD');
                 const bIsCrypto = b.symbol.endsWith('-USD');

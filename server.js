@@ -73,17 +73,42 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 
-// Function to check if market is closed (4:00 PM ET)
-function isMarketClosed() {
+// Function to check if market is closed (4:00 PM ET or US market holiday)
+function isMarketOpen() {
     const now = new Date();
     const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
     const day = etNow.getDay();
     const hour = etNow.getHours();
     const minute = etNow.getMinutes();
-    
-    // Check if it's a weekday and past 4:00 PM ET
+
+    // List of major US market holidays (month is 0-based)
+    const usMarketHolidays = [
+        // New Year's Day (Jan 1)
+        d => d.getMonth() === 0 && d.getDate() === 1,
+        // Martin Luther King Jr. Day (3rd Monday in January)
+        d => d.getMonth() === 0 && d.getDay() === 1 && d.getDate() >= 15 && d.getDate() <= 21,
+        // Presidents' Day (3rd Monday in February)
+        d => d.getMonth() === 1 && d.getDay() === 1 && d.getDate() >= 15 && d.getDate() <= 21,
+        // Memorial Day (last Monday in May)
+        d => d.getMonth() === 4 && d.getDay() === 1 && d.getDate() >= 25 && d.getDate() <= 31,
+        // Juneteenth (June 19)
+        d => d.getMonth() === 5 && d.getDate() === 19,
+        // Independence Day (July 4)
+        d => d.getMonth() === 6 && d.getDate() === 4,
+        // Labor Day (1st Monday in September)
+        d => d.getMonth() === 8 && d.getDay() === 1 && d.getDate() <= 7,
+        // Thanksgiving Day (4th Thursday in November)
+        d => d.getMonth() === 10 && d.getDay() === 4 && d.getDate() >= 22 && d.getDate() <= 28,
+        // Christmas Day (Dec 25)
+        d => d.getMonth() === 11 && d.getDate() === 25,
+    ];
+
+    // Check if today is a US market holiday
+    const isHoliday = usMarketHolidays.some(fn => fn(etNow));
+
+    // Check if it's a weekday and past 4:00 PM ET, or a holiday
     if (day >= 1 && day <= 5) {
-        return hour >= 16; // 4:00 PM or later
+        return hour >= 16 || isHoliday; // 4:00 PM or later, or holiday
     }
     return true; // Weekend
 }
@@ -120,7 +145,7 @@ async function saveDailySummary(summaryData, date, language = 'en', country = 'U
             language,
             country,
             timestamp: new Date().toISOString(),
-            marketClosed: isMarketClosed()
+            marketOpen: isMarketOpen()
         };
         
         // Check if we already have summaries for this date
@@ -735,7 +760,14 @@ class AutomatedSummaryGenerator {
 
     // Generate AI summary for automated generation, with retry logic
     async generateAutomatedSummary(sectionData) {
-        const analysisPrompt = this.createAutomatedAnalysisPrompt(sectionData);
+        // Use isMarketOpen() to check for US market holidays and after-hours
+        const isMarketOpenFlag = typeof isMarketOpen === 'function' ? isMarketOpen() : false;
+        const today = new Date();
+        // Weekend if Saturday (6) or Sunday (0)
+        const isWeekend = today.getDay() === 0 || today.getDay() === 6;
+        // Market closed if it's a weekend or a holiday/after-hours
+        const isMarketClosed = !isMarketOpenFlag;
+        const analysisPrompt = this.createAutomatedAnalysisPrompt(sectionData, isWeekend, isMarketClosed);
         const selectedModel = 'deepseek/deepseek-chat-v3-0324:free';
         const maxRetries = 3;
         let lastError = null;
@@ -787,12 +819,19 @@ class AutomatedSummaryGenerator {
     }
 
     // Create analysis prompt for automated generation
-    createAutomatedAnalysisPrompt(sectionData) {
+    // Now accepts isWeekend and isMarketClosed as arguments
+    createAutomatedAnalysisPrompt(sectionData, isWeekend = null, isMarketClosed = null) {
         let prompt = 'Please analyze the following current data and provide a comprehensive summary:';
         
         const selectedDate = new Date();
-        const isWeekend = selectedDate.getDay() === 0 || selectedDate.getDay() === 6;
-        
+        // If not provided, fallback to current date logic
+        if (isWeekend === null) {
+            isWeekend = selectedDate.getDay() === 0 || selectedDate.getDay() === 6;
+        }
+        if (isMarketClosed === null && typeof isMarketOpen === 'function') {
+            isMarketClosed = !isMarketOpen();
+        }
+
         if (sectionData.news && sectionData.news.length > 0) {
             prompt += ' TOP HEADLINES:';
             sectionData.news.forEach((item, index) => {
@@ -813,14 +852,16 @@ class AutomatedSummaryGenerator {
         
         if (sectionData.finance) {
             prompt += ' MARKET DATA:';
-            if (isWeekend) {
+            if (isMarketClosed) {
+                prompt += ' Stock markets are closed for a holiday, weekend, or after-hours. Here is the latest crypto data:';
+            } else if (isWeekend) {
                 prompt += ' Stock markets are closed for the weekend. Here is the latest crypto data:';
             }
 
-            if (sectionData.finance.nasdaq && !isWeekend) {
+            if (sectionData.finance.nasdaq && !isMarketClosed && !isWeekend) {
                 prompt += ` NASDAQ (^IXIC): $${sectionData.finance.nasdaq.price} (${sectionData.finance.nasdaq.changePercent}%)`;
             }
-            if (sectionData.finance.techStocks && !isWeekend) {
+            if (sectionData.finance.techStocks && !isMarketClosed && !isWeekend) {
                 Object.entries(sectionData.finance.techStocks).forEach(([symbol, data]) => {
                     prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
                 });
@@ -833,7 +874,11 @@ class AutomatedSummaryGenerator {
         }
         
         prompt += ' Please provide a structured summary with the following sections: NEWS HIGHLIGHTS (max 300 words), TRENDING TOPICS (max 300 words), ';
-        prompt += isWeekend ? 'MARKET OVERVIEW focusing on crypto (max 300 words), ' : 'MARKET OVERVIEW including tech stocks and crypto (max 300 words), ';
+        if (isMarketClosed || isWeekend) {
+            prompt += 'MARKET OVERVIEW focusing on crypto (max 300 words), ';
+        } else {
+            prompt += 'MARKET OVERVIEW including tech stocks and crypto (max 300 words), ';
+        }
         prompt += 'INFO GENIE fortune teller predictions (max 300 words).';
         
         return prompt;
@@ -1503,7 +1548,7 @@ app.get('/api/summary/history', async (req, res) => {
                         summaryArray.push({
                             date,
                             timestamp: singleSummary.timestamp,
-                            marketClosed: singleSummary.marketClosed,
+                            marketOpen: singleSummary.marketOpen,
                             language: singleSummary.language || 'en',
                             country: singleSummary.country || 'US',
                             hasData: !!(singleSummary.news || singleSummary.trends || singleSummary.finance || singleSummary.overall)
@@ -1514,7 +1559,7 @@ app.get('/api/summary/history', async (req, res) => {
                     summaryArray.push({
                         date,
                         timestamp: summary.timestamp,
-                        marketClosed: summary.marketClosed,
+                        marketOpen: summary.marketOpen,
                         language: summary.language || 'en',
                         country: summary.country || 'US',
                         hasData: !!(summary.news || summary.trends || summary.finance || summary.overall)
