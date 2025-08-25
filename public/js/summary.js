@@ -1046,7 +1046,7 @@ async function updateSavedSummariesList() {
         });
         
         const time = new Date(summary.timestamp).toLocaleTimeString();
-        const marketStatus = summary.marketOpen ? '📈 Market Closed' : '📊 Trading Day';
+        const marketStatus = summary.marketOpen ? '📊 Trading Day' : '📈 Market Closed';
         const regionInfo = summary.language && summary.country ? ` (${summary.country}, ${summary.language})` : '';
         
         item.innerHTML = `

@@ -73,7 +73,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 
-// Function to check if market is closed (4:00 PM ET or US market holiday)
+// Function to check if market is open (not closed for time or US market holiday)
 function isMarketOpen() {
     const now = new Date();
     const etNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
@@ -81,36 +81,79 @@ function isMarketOpen() {
     const hour = etNow.getHours();
     const minute = etNow.getMinutes();
 
-    // List of major US market holidays (month is 0-based)
-    const usMarketHolidays = [
-        // New Year's Day (Jan 1)
-        d => d.getMonth() === 0 && d.getDate() === 1,
-        // Martin Luther King Jr. Day (3rd Monday in January)
-        d => d.getMonth() === 0 && d.getDay() === 1 && d.getDate() >= 15 && d.getDate() <= 21,
-        // Presidents' Day (3rd Monday in February)
-        d => d.getMonth() === 1 && d.getDay() === 1 && d.getDate() >= 15 && d.getDate() <= 21,
-        // Memorial Day (last Monday in May)
-        d => d.getMonth() === 4 && d.getDay() === 1 && d.getDate() >= 25 && d.getDate() <= 31,
-        // Juneteenth (June 19)
-        d => d.getMonth() === 5 && d.getDate() === 19,
-        // Independence Day (July 4)
-        d => d.getMonth() === 6 && d.getDate() === 4,
-        // Labor Day (1st Monday in September)
-        d => d.getMonth() === 8 && d.getDay() === 1 && d.getDate() <= 7,
-        // Thanksgiving Day (4th Thursday in November)
-        d => d.getMonth() === 10 && d.getDay() === 4 && d.getDate() >= 22 && d.getDate() <= 28,
-        // Christmas Day (Dec 25)
-        d => d.getMonth() === 11 && d.getDate() === 25,
-    ];
-
-    // Check if today is a US market holiday
-    const isHoliday = usMarketHolidays.some(fn => fn(etNow));
-
-    // Check if it's a weekday and past 4:00 PM ET, or a holiday
-    if (day >= 1 && day <= 5) {
-        return hour >= 16 || isHoliday; // 4:00 PM or later, or holiday
+    // Helper to check Good Friday
+    function isGoodFriday(d) {
+        const year = d.getFullYear();
+        // Calculate Easter Sunday using "Computus"
+        const f = Math.floor;
+        const a = year % 19;
+        const b = f(year / 100);
+        const c = year % 100;
+        const d1 = f(b / 4);
+        const e = b % 4;
+        const f1 = f((b + 8) / 25);
+        const g = f((b - f1 + 1) / 3);
+        const h = (19 * a + b - d1 - g + 15) % 30;
+        const i = f(c / 4);
+        const k = c % 4;
+        const l = (32 + 2 * e + 2 * i - h - k) % 7;
+        const m = f((a + 11 * h + 22 * l) / 451);
+        const month = f((h + l - 7 * m + 114) / 31) - 1; // 0-based
+        const day = ((h + l - 7 * m + 114) % 31) + 1;
+        const easter = new Date(year, month, day);
+        const goodFriday = new Date(easter);
+        goodFriday.setDate(easter.getDate() - 2);
+        return d.toDateString() === goodFriday.toDateString();
     }
-    return true; // Weekend
+
+    // Holiday checks
+    const isHoliday = (() => {
+        const d = etNow;
+        const month = d.getMonth();
+        const date = d.getDate();
+        const dayOfWeek = d.getDay();
+
+        // Fixed-date holidays + observed
+        if ((month === 0 && date === 1) || // New Year’s
+            (month === 5 && date === 19) || // Juneteenth
+            (month === 6 && ((date === 4) || // July 4
+                             (date === 3 && dayOfWeek === 5) || // observed Fri
+                             (date === 5 && dayOfWeek === 1))) || // observed Mon
+            (month === 11 && ((date === 25) || // Christmas
+                              (date === 24 && dayOfWeek === 5) || // observed Fri
+                              (date === 26 && dayOfWeek === 1)))) { // observed Mon
+            return true;
+        }
+
+        // MLK Day (3rd Mon Jan)
+        if (month === 0 && dayOfWeek === 1 && date >= 15 && date <= 21) return true;
+
+        // Presidents Day (3rd Mon Feb)
+        if (month === 1 && dayOfWeek === 1 && date >= 15 && date <= 21) return true;
+
+        // Memorial Day (last Mon in May)
+        if (month === 4 && dayOfWeek === 1 && date > 24) return true;
+
+        // Labor Day (1st Mon Sep)
+        if (month === 8 && dayOfWeek === 1 && date <= 7) return true;
+
+        // Thanksgiving (4th Thu Nov)
+        if (month === 10 && dayOfWeek === 4 && date >= 22 && date <= 28) return true;
+
+        // Good Friday
+        if (isGoodFriday(d)) return true;
+
+        return false;
+    })();
+
+    // Check if weekday and not holiday
+    if (day >= 1 && day <= 5 && !isHoliday) {
+        // Market hours: 9:30 ≤ time < 16:00
+        if ((hour > 9 || (hour === 9 && minute >= 30)) && hour < 16) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // Function to save daily summary to file
