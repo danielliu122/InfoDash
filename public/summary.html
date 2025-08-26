@@ -2,12 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">   
+    <meta name="viewport" content="width=device-width">
     <!-- Primary Meta Tags -->
-    <title>InfoDash - Summary Dashboard</title>
-    <meta name="title" content="InfoDash - Summary Dashboard">
-    <meta name="description" content="Your all-in-one dashboard for daily summaries, market trends, weather, and news updates.">
-    
+    <title>InfoDash Internet Archive: Daily News, Market, and Web Trends Archive</title>
+    <meta name="title" content="InfoDash Internet Archive: Daily News, Market, and Web Trends Archive">
+    <meta name="description" content="InfoDash is your internet archive for daily news, market trends,  and trending topics. Explore, search, and access historical summaries and headlines from around the world.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="InfoDash Internet Archive: Daily News, Market, and Web Trends Archive">
+    <meta property="og:description" content="Explore the InfoDash Internet Archive for daily news, market trends, and trending topics. Search and access historical summaries and headlines from around the world.">
+    <meta property="og:type" content="website">
+    <title>InfoDash Internet Archive: Daily News, Market, and Web Trends Archive</title>
+    <meta name="title" content="InfoDash Internet Archive: Daily News, Market, and Web Trends Archive">
+    <meta name="description" content="InfoDash is your internet archive for daily news, market trends,  and trending topics, with a primary focus on US news. Explore, search, and access historical summaries and headlines for the US and select other regions.">
+    <meta name="keywords" content="internet archive, news archive, market archive, daily summaries, historical news, trending topics, US news, InfoDash, web archive, digital archive, news history, market history, regional archive">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="InfoDash Internet Archive: Daily News, Market, and Web Trends Archive">
+    <meta property="og:description" content="Explore the InfoDash Internet Archive for daily news, market trends, and trending topics. Search and access historical summaries and headlines for the US and select other regions.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://infodash.app/summary.html">
+    <meta property="og:image" content="https://infodash.app/assets/infodash-og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="InfoDash Internet Archive: Daily News, Market, and Web Trends Archive">
+    <meta name="twitter:description" content="InfoDash is your internet archive for daily news, market trends, and trending topics, primarily focused on US news, with support for select other regions.">
+    <meta name="twitter:image" content="https://infodash.app/assets/infodash-og-image.png">
+    <link rel="canonical" href="https://infodash.app/summary.html">
+    <link rel="icon" type="image/x-icon" href="static/favicon.ico">
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "InfoDash Internet Archive",
+      "url": "https://infodash.app/summary.html",
+      "description": "InfoDash is an internet archive for daily news, market trends, and trending topics. Search and access historical summaries and headlines from around the world.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "InfoDash"
+      }
+    }
+    </script>
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
@@ -15,13 +50,15 @@
     <!-- Stylesheets, must use theme-init script to prevent wrong theme flicker on page load-->
     <script src="js/themeInit.js"></script>
     <link rel="stylesheet" href="css/styles.css">
-    
+    <link rel="stylesheet" href="css/summary.css">
+
+
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    
+
     <!-- Application Scripts -->
     <script type="module" src="js/userPreferences.js"></script>
     <script type="module" src="js/app.js"></script>
@@ -31,68 +68,25 @@
 </head>
 
 <body>
-        <!-- Sidebar Navigation -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <button class="sidebar-toggle" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <!-- Nav for mobile: placed between toggle and title, hidden on desktop via CSS -->
-                <nav class="sidebar-nav mobile-nav" id="mobile-nav">
-                    <ul class="nav-menu">
-                        <li class="nav-item">
-                            <a href="summary.html" class="nav-link active">
-                                <i class="fas fa-regular fa-clipboard"></i>
-                                <span>Summary</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="finance.html" class="nav-link">
-                                <i class="fas fa-chart-line"></i>
-                                <span>Stocks</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="news.html" class="nav-link">
-                                <i class="fas fa-newspaper"></i>
-                                <span>News</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="map.html" class="nav-link">
-                                <i class="fas fa-map"></i>
-                                <span>Traffic</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="blog.html" class="nav-link">
-                                <i class="fas fa-solid fa-blog"></i>
-                                <span>Blog</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="user.html" class="nav-link">
-                                <i class="fa-solid fa-wrench"></i>
-                                <span>User</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <i class="fas fa-rocket" style="color: #f44336;"></i>
-                <div class="sidebar-title" id="sidebar-title">
-                    <span>InfoDash</span>
-                </div>
-            </div>
-            
-            <!-- Nav for desktop: hidden on mobile via CSS -->
-            <nav class="sidebar-nav" id="desktop-nav">
-                <ul class="nav-menu">                    
+    <!-- SEO: Add a visually hidden h1 for accessibility and SEO -->
+    <h1 style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
+        InfoDash Internet Archive: Explore Daily News, Market Trends, and Web Summaries
+    </h1>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <!-- Nav for mobile: placed between toggle and title, hidden on desktop via CSS -->
+            <nav class="sidebar-nav mobile-nav" id="mobile-nav">
+                <ul class="nav-menu">
                     <li class="nav-item">
-                        <a href="news.html" class="nav-link">
-                            <i class="fas fa-newspaper"></i>
-                            <span>News</span>
+                        <a href="summary.html" class="nav-link active">
+                            <i class="fas fa-regular fa-clipboard"></i>
+                            <span>Archive Home</span>
                         </a>
-                    </li>                    
+                    </li>
                     <li class="nav-item">
                         <a href="finance.html" class="nav-link">
                             <i class="fas fa-chart-line"></i>
@@ -100,9 +94,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="summary.html" class="nav-link active">
-                            <i class="fas fa-regular fa-clipboard"></i>
-                            <span>Summary</span>
+                        <a href="news.html" class="nav-link">
+                            <i class="fas fa-newspaper"></i>
+                            <span>News</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -125,47 +119,100 @@
                     </li>
                 </ul>
             </nav>
-            
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="user-details">
-                        <div class="user-name">Guest User</div>
-                    </div>
-                </div>
-            </div>  
+            <i class="fas fa-rocket" style="color: #f44336;"></i>
+            <div class="sidebar-title" id="sidebar-title">
+                <span>InfoDash</span>
+            </div>
         </div>
         
-        <!-- Main Content Area -->
-        <main class="main-content" id="main-content">
-            <!-- Top Header -->
-            <header class="top-header">
-                <div class="header-left">
-                    <h4 class="page-title">Summary</h4>
+        <!-- Nav for desktop: hidden on mobile via CSS -->
+        <nav class="sidebar-nav" id="desktop-nav">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="news.html" class="nav-link">
+                        <i class="fas fa-newspaper"></i>
+                        <span>News</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="finance.html" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Stocks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="summary.html" class="nav-link active">
+                        <i class="fas fa-regular fa-clipboard"></i>
+                        <span>Archive</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="map.html" class="nav-link">
+                        <i class="fas fa-map"></i>
+                        <span>Traffic</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="blog.html" class="nav-link">
+                        <i class="fas fa-solid fa-blog"></i>
+                        <span>Blog</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="user.html" class="nav-link">
+                        <i class="fa-solid fa-wrench"></i>
+                        <span>User</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
                 </div>
-                <div class="header-right">
-                    <!-- Weather Display -->
-                    <div id="header-weather" class="weather-display" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color); min-width: 120px; justify-content: center;" onclick="handleWeatherClick()" title="Click to change location">
-                        <span id="weather-icon" style="font-size: 1.2em;">🌤️</span>
-                            <span id="weather-temp" style="font-weight: 600; font-size: 0.9em;">--°F</span>
-                            <span id="weather-location" style="font-size: 0.7em; color: var(--text-secondary);">Loading...</span>
-                    </div>
-                    <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">🌓</button>
+                <div class="user-details">
+                    <div class="user-name">Guest User</div>
                 </div>
-            </header>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content Area -->
+    <main class="main-content" id="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <h2 class="page-title" style="font-size:1.7em;">
+                    Archive
+                </h2>
+            </div>
+            <div class="header-right">
+                <!-- Weather Display -->
+                <div id="header-weather" class="weather-display" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color); min-width: 120px; justify-content: center;" onclick="handleWeatherClick()" title="Click to change location">
+                    <span id="weather-icon" style="font-size: 1.2em;">🌤️</span>
+                    <span id="weather-temp" style="font-weight: 600; font-size: 0.9em;">--°F</span>
+                    <span id="weather-location" style="font-size: 0.7em; color: var(--text-secondary);">Loading...</span>
+                </div>
+                <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">🌓</button>
+            </div>
+        </header>
+        <section class="archive-intro" style="margin: 2em 0 1.5em 0; text-align: center;">
+            <h2 style="font-size:1.3em;margin-bottom:0.5em;">Welcome to the InfoDash Internet Archive</h2>
+            <p style="max-width:700px;margin:0 auto 0.5em auto;font-size:1.05em;">
+                InfoDash is a digital archive for daily news, market data, and trending topics. Search and browse historical summaries, headlines, and stock market data from newsAPI headlines and Yahoo Finance. Whether you're a researcher, journalist, or curious explorer, InfoDash helps keep track of what's going on or has been going on in the past. 
+        </section>
         <div class="summary-container" >
             <!-- Unified Summary Section -->
             <div class="row">
                 <div class="col s12">
                     <div id="summary-content" class="card sumary-content">
                         <div class="card-header">
-                            <h4>
+                            <h3 style="font-size:1.2em;">
                                 <i class="fas fa-solid fa-calendar-days"></i>
-                                Summary Date: 
-                                <span id="titleDate"></span>
-                            </h4>
+                                Archive Summary for <span id="titleDate"></span>
+                            </h3>
                             <div class="right">
                                 <div class="section-controls">
                                     <button id="summary-refresh-btn" class="btn-small waves-effect waves-light" onclick="refreshSummary()">🔄 Refresh</button>
@@ -221,9 +268,11 @@
                                 <div class="col s12 m12">
                                     <div class="summary-card archive-card">
                                         <div class="card-header collapsible-header">
-                                            <h4><i class="material-icons">archive</i> Summary Archive</h4>
+                                            <h4><i class="material-icons">archive</i> Search the Archive</h4>
                                         </div>
+                                        
                                         <div class="card-content card-controls">
+                                                Select the archive tools to access summaries by date and region.
                                             <div class="input-field col s12 m4">
                                                 <input type="date" id="summaryDate" onchange="loadSummaryForDate()">
                                                 <label for="summaryDate" class="active">Select Date</label>
@@ -297,7 +346,7 @@
                             <div class="row">
                                 <div class="col s12">
                                     <p style="font-style: italic; color: #9e9e9e; font-size: 0.85em; text-align: center; margin-top: 20px; margin-bottom: 0;">
-                                        ⚠️ This summary is AI-generated for informational purposes only and should not be considered as financial, legal, or professional advice.
+                                        ⚠️ A summary should automatically generate once every day at 11:00PM EST. Generating a summary before the end of the day may miss later events.
                                     </p>
                                 </div>
                             </div>
@@ -317,8 +366,7 @@
                             <label>Select Model</label>
                             <div class="input-field">
                                 <select id="model-select">
-                                    <option value="deepseek/deepseek-r1:free">DeepSeek (Accurate) [10-60s response time]</option>
-                                    <option value="deepseek/deepseek-chat-v3-0324:free">deepseek-chat-v3-0324</option>
+                                    <option value="deepseek/deepseek-r1:free">DeepSeek R1:free</option>
                                 </select>
                             </div>
                         </div>
@@ -348,7 +396,7 @@
                     <span class="footer-separator">•</span>
                     <a href="privacy-policy.html" target="_blank" class="footer-link">Privacy Policy</a>
                 </div>
-                <p class="footer-disclaimer">The content provided on this website is for informational purposes only and does not constitute financial, investment, legal, or other professional advice. While we strive to provide accurate and up-to-date information, we make no guarantees about the completeness, reliability, or suitability of the content for any specific purpose.</p>
+                <p class="footer-disclaimer">The content provided on this website is for informational and archival purposes only and does not constitute financial, investment, legal, or other professional advice. While we strive to provide accurate and up-to-date information, we make no guarantees about the completeness, reliability, or suitability of the content for any specific purpose.</p>
             </div>
         </footer>
         <button id="scrollToTopBtn" class="scroll-to-top">↑</button>
@@ -378,8 +426,9 @@
             window.getCurrentRegion = getCurrentRegion;
             window.toggleTheme = toggleTheme;
         </script>
+    </main>
     </body>
-    <script>    
+    <script>
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('main-content');
@@ -389,5 +438,4 @@
             }
         };
     </script>
-    
 </html>
