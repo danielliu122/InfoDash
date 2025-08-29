@@ -558,11 +558,61 @@ class AutomatedSummaryGenerator {
 
     // Initialize the automated summary generation
     init() {
-        // Schedule for 11:00 PM EST every day
-        // '0 23 * * *' = At 23:00 (11:00 PM) every day
+        // At 11:00 PM, always generate (overwrite any previous summary for the day)
         cron.schedule('0 23 * * *', () => {
-            console.log('Initializing automated summary generation...');
+            console.log('Automated summary generation (11:00 PM) - always generating and overwriting any previous summary for today.');
             this.generateDailySummary();
+        }, {
+            timezone: 'America/New_York'
+        });
+
+        // At 11:05 PM, 11:30 PM, and 11:59 PM, only generate if a summary has NOT been generated after 11:00 PM
+        const tryGenerateIfNoPost11pmSummary = async (label) => {
+            // Always use current date in America/New_York (EDT/EST) for summary date
+            const now = new Date();
+            const nyDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+            const todayEDT = nyDate.toISOString().split('T')[0];
+            const region = this.region;
+
+            try {
+                const summary = await loadDailySummary(todayEDT, region.language, region.country);
+                if (summary && summary.timestamp) {
+                    // Check if summary was generated after 11:00 PM EDT
+                    const summaryTime = new Date(new Date(summary.timestamp).toLocaleString('en-US', { timeZone: 'America/New_York' }));
+                    if (
+                        summaryTime.getFullYear() === nyDate.getFullYear() &&
+                        summaryTime.getMonth() === nyDate.getMonth() &&
+                        summaryTime.getDate() === nyDate.getDate() &&
+                        summaryTime.getHours() >= 23
+                    ) {
+                        console.log(`[AutomatedSummaryGenerator] ${label}: Summary for ${todayEDT} was already generated after 11:00 PM, skipping.`);
+                        return;
+                    }
+                }
+                console.log(`[AutomatedSummaryGenerator] ${label}: No summary found for ${todayEDT} after 11:00 PM, generating now...`);
+                await this.generateDailySummary();
+            } catch (err) {
+                console.error(`[AutomatedSummaryGenerator] ${label}: Error checking or generating summary:`, err);
+            }
+        };
+
+        // 11:05 PM
+        cron.schedule('5 23 * * *', () => {
+            tryGenerateIfNoPost11pmSummary('11:05 PM check');
+        }, {
+            timezone: 'America/New_York'
+        });
+
+        // 11:30 PM
+        cron.schedule('30 23 * * *', () => {
+            tryGenerateIfNoPost11pmSummary('11:30 PM check');
+        }, {
+            timezone: 'America/New_York'
+        });
+
+        // 11:59 PM
+        cron.schedule('59 23 * * *', () => {
+            tryGenerateIfNoPost11pmSummary('11:59 PM check');
         }, {
             timezone: 'America/New_York'
         });
@@ -572,7 +622,6 @@ class AutomatedSummaryGenerator {
         //     console.log('TEST: Triggering automated summary generation 3 minute after startup');
         //     this.generateDailySummary();
         // }, 60 * 3000);
-
     }
 
     // Generate summary for en-US at 11:00PM EDT (America/New_York)
