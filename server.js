@@ -98,16 +98,13 @@ const summaryGenerationLimiter = rateLimit({
 // Admin IP whitelist for summary generation
 const ADMIN_IPS = process.env.ADMIN_IPS ? process.env.ADMIN_IPS.split(',') : ['127.0.0.1', '::1'];
 
+// Normalize IP to handle IPv4-mapped IPv6 addresses (e.g., ::ffff:127.0.0.1)
+const normalizeIP = (ip) => ip.replace(/^::ffff:/, '');
+
 // Middleware to check if IP is admin
 const adminOnly = (req, res, next) => {
-    const clientIP = req.ip || 
-                    req.connection.remoteAddress || 
-                    req.socket.remoteAddress || 
-                    req.connection.socket?.remoteAddress ||
-                    req.headers['x-forwarded-for']?.split(',')[0] ||
-                    req.headers['x-real-ip'] ||
-                    '127.0.0.1';
-    
+    const clientIP = normalizeIP(req.ip);
+
     if (ADMIN_IPS.includes(clientIP)) {
         next();
     } else {
