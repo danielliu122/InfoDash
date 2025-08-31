@@ -8,7 +8,7 @@ const yahooFinance = require('yahoo-finance2').default;
 const NodeCache = require('node-cache');
 const newsCache = new NodeCache({ stdTTL: 43200, checkperiod: 14400 }); 
 // Cache with TTL of 12 hours (43200 seconds)
-//const rateLimit = require('express-rate-limit');
+const rateLimit = require('express-rate-limit');
 const geoip = require('geoip-lite');
 const OpenAI = require('openai'); // Import OpenAI directly
 // Initialize OpenAI API directly with the API key
@@ -72,6 +72,51 @@ const port = process.env.PORT || 3000;
 // Middleware to parse JSON requests
 app.use(express.json());
 
+// Create rate limiters
+const chatLimiter = rateLimit({
+    windowMs: 24 * 60 * 60 * 1000, // 24 hours
+    max: 3, // limit each IP to 3 requests per day
+    message: {
+        error: 'Daily chat limit exceeded',
+        message: 'You have reached the daily limit of 3 chat requests. Please try again tomorrow.'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const summaryGenerationLimiter = rateLimit({
+    windowMs: 24 * 60 * 60 * 1000, // 24 hours
+    max: 1, // limit each IP to 1 request per day
+    message: {
+        error: 'Daily summary generation limit exceeded',
+        message: 'Summary generation is limited to once per day per IP address.'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Admin IP whitelist for summary generation
+const ADMIN_IPS = process.env.ADMIN_IPS ? process.env.ADMIN_IPS.split(',') : ['127.0.0.1', '::1'];
+
+// Middleware to check if IP is admin
+const adminOnly = (req, res, next) => {
+    const clientIP = req.ip || 
+                    req.connection.remoteAddress || 
+                    req.socket.remoteAddress || 
+                    req.connection.socket?.remoteAddress ||
+                    req.headers['x-forwarded-for']?.split(',')[0] ||
+                    req.headers['x-real-ip'] ||
+                    '127.0.0.1';
+    
+    if (ADMIN_IPS.includes(clientIP)) {
+        next();
+    } else {
+        res.status(403).json({
+            error: 'Access denied',
+            message: 'This endpoint is restricted to admin access only.'
+        });
+    }
+};
 
 // Function to check if market is open (not closed for time or US market holiday)
 function isMarketOpen() {
@@ -114,7 +159,7 @@ function isMarketOpen() {
         const dayOfWeek = d.getDay();
 
         // Fixed-date holidays + observed
-        if ((month === 0 && date === 1) || // New Year’s
+        if ((month === 0 && date === 1) || // New Year's
             (month === 5 && date === 19) || // Juneteenth
             (month === 6 && ((date === 4) || // July 4
                              (date === 3 && dayOfWeek === 5) || // observed Fri
@@ -1017,8 +1062,8 @@ const summaryGenerator = new AutomatedSummaryGenerator();
 // Initialize when server starts
 summaryGenerator.init();
 
-// Add API endpoint to manually trigger generation (for testing)
-app.post('/api/summary/trigger-automated', async (req, res) => {
+// Add API endpoint to manually trigger generation (for testing) - ADMIN ONLY
+app.post('/api/summary/trigger-automated', adminOnly, summaryGenerationLimiter, async (req, res) => {
     try {
         if (summaryGenerator.isGenerating) {
             return res.json({
@@ -1043,8 +1088,8 @@ app.post('/api/summary/trigger-automated', async (req, res) => {
     }
 });
 
-// Add API endpoint to check generation status
-app.get('/api/summary/automation-status', (req, res) => {
+// Add API endpoint to check generation status - ADMIN ONLY
+app.get('/api/summary/automation-status', adminOnly, (req, res) => {
     const status = summaryGenerator.getStatus();
     res.json({
         success: true,
@@ -1053,35 +1098,6 @@ app.get('/api/summary/automation-status', (req, res) => {
 });
 
 module.exports = { summaryGenerator };
-
-// Rate limiter middleware
-// const limiter = rateLimit({
-//     windowMs: 1 * 60 * 1000, // 1 minute
-//     max: 1000, // limit each IP to 100 requests per windowMs
-//     skip: (req) => {
-//         const ip = req.ip;
-//         const devIp = process.env.DEV_IP || '127.0.0.1';
-//         return ip === '127.0.0.1' || ip === '::1' || ip === devIp;
-//     }
-// });
-
-// // Geo-restrictor middleware
-// const restrictedCountries = [
-//     'RU', 'CN', 'KP', 'IR', 'NG', 'UA', 'BR', 'BI', 'AF', 'SD', 'CD', 'VE', 'CU',
-// ];
-
-// const geoRestrictor = (req, res, next) => {
-//     const ip = req.ip;
-//     const geo = geoip.lookup(ip);
-//     if (geo && restrictedCountries.includes(geo.country)) {
-//         return res.status(403).json({ error: 'Access restricted from your location' });
-//     }
-//     next();
-// };
-
-// // Apply rate limiter and geo-restrictor to all routes
-// //app.use(limiter);
-// app.use(geoRestrictor);
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -1324,7 +1340,7 @@ async function callOpenRouterWithRetry(options, retries = 2) {
     }
 }
 
-app.post('/api/chat', async (req, res) => {
+app.post('/api/chat', chatLimiter, async (req, res) => {
     // LLM readiness check (customize as needed)
     if (!process.env.DEEPSEEK_API_KEY) {
         return res.status(503).json({
