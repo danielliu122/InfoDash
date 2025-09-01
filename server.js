@@ -230,7 +230,8 @@ async function saveDailySummary(summaryData, date, language = 'en', country = 'U
             language,
             country,
             timestamp: new Date().toISOString(),
-            marketOpen: isMarketOpen()
+            marketOpen: isMarketOpen(),
+            automated: summaryData.automated || false
         };
         
         // Check if we already have summaries for this date
@@ -1515,25 +1516,8 @@ app.post('/api/summary/save', async (req, res) => {
         const targetLanguage = language || 'en';
         const targetCountry = country || 'US';
 
-        // Determine if the date is today
-        const today = new Date().toISOString().split('T')[0];
-        
-        // Only block overwriting for past dates
-        // Convert both dates to Date objects and compare ISO strings to ensure same format
-        const dateObj = new Date(date);
-        const todayObj = new Date(today);
-        if (dateObj.toISOString().split('T')[0] !== todayObj.toISOString().split('T')[0]) {
-            const existingSummary = await loadDailySummary(date, targetLanguage, targetCountry);
-            if (existingSummary) {
-                // console.log(`Daily summary already exists for ${date} (${targetCountry}, ${targetLanguage})`);
-                return res.json({ 
-                    success: false, 
-                    message: `Daily summary already exists for ${date} (${targetCountry}, ${targetLanguage})`,
-                    summary: existingSummary 
-                });
-            }
-        }
-        
+        // Overwriting is now always allowed, even for past dates
+
         // console.log('Extracted summary data:', { news: !!news, trends: !!trends, finance: !!finance, overall: !!overall });
         
         if (!news && !trends && !finance && !overall) {
@@ -1549,7 +1533,8 @@ app.post('/api/summary/save', async (req, res) => {
             trends,
             finance,
             overall,
-            generatedAt: new Date().toISOString()
+            generatedAt: new Date().toISOString(),
+            automated: false
         };
         
         // console.log('Saving summary data...');
@@ -1656,6 +1641,7 @@ app.get('/api/summary/history', async (req, res) => {
                             marketOpen: singleSummary.marketOpen,
                             language: singleSummary.language || 'en',
                             country: singleSummary.country || 'US',
+                            automated: singleSummary.automated || false,
                             hasData: !!(singleSummary.news || singleSummary.trends || singleSummary.finance || singleSummary.overall)
                         });
                     });
@@ -1667,6 +1653,7 @@ app.get('/api/summary/history', async (req, res) => {
                         marketOpen: summary.marketOpen,
                         language: summary.language || 'en',
                         country: summary.country || 'US',
+                        automated: summary.automated || false,
                         hasData: !!(summary.news || summary.trends || summary.finance || summary.overall)
                     });
                 }

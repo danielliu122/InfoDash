@@ -1047,11 +1047,13 @@ async function updateSavedSummariesList() {
         
         const time = new Date(summary.timestamp).toLocaleTimeString();
         const regionInfo = summary.language && summary.country ? ` (${summary.country}, ${summary.language})` : '';
-        
+        const automatedDiv = summary.automated ? 'Automated' : '';
+
         item.innerHTML = `
             <div>
                 <div class="saved-summary-date">${formattedDate}</div>
                 <div class="saved-summary-time">${time}${regionInfo}</div>
+                <div class="saved-summary-automated">${automatedDiv}</div>
             </div>
         `;
 
