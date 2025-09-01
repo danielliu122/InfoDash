@@ -1041,7 +1041,7 @@ async function updateSavedSummariesList() {
         const item = document.createElement('div');
         item.className = 'saved-summary-item';
         item.dataset.date = summary.date;
-        item.onclick = () => selectSummaryItemWithCalendar(summary.date);
+        item.onclick = () => selectSummaryItem(summary.date);
         
         // Validate date format before parsing
         if (!summary.date || !/^\d{4}-\d{2}-\d{2}$/.test(summary.date)) {
