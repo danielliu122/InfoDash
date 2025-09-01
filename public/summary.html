@@ -198,11 +198,45 @@
                 <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">🌓</button>
             </div>
         </header>
-        <section class="archive-intro" style="margin: 2em 0 1.5em 0; text-align: center;">
-            <h2 style="font-size:1.3em;margin-bottom:0.5em;">Welcome to the InfoDash Internet Archive</h2>
-            <p style="max-width:700px;margin:0 auto 0.5em auto;font-size:1.05em;">
-                InfoDash is a digital archive for daily news, market data, and trending topics. Search and browse historical summaries, headlines, and stock market data from newsAPI headlines and Yahoo Finance. Whether you're a researcher, journalist, or curious explorer, InfoDash helps keep track of what's going on or has been going on in the past. 
-        </section>
+        <div class="row">
+            <div class="col s12 m12">
+                <div class="summary-card archive-card">
+                    <div class="card-header collapsible-header">
+                        <h4><i class="material-icons">archive</i> Welcome to the InfoDash Internet Archive</h4>
+                    </div>
+                    <div class="card-content card-controls">
+                        <!-- Archive Calendar Widget -->
+                        <div class="archive-calendar" id="archiveCalendar">
+                            <div class="calendar-header">
+                                <button class="calendar-nav-btn" id="prevMonth">‹ Previous</button>
+                                <div class="calendar-month-year" id="monthYear"></div>
+                                <button class="calendar-nav-btn" id="nextMonth">Next ›</button>
+                            </div>
+                            
+                            <div class="calendar-grid" id="calendarGrid">
+                                <div class="calendar-loading">Loading calendar...</div>
+                            </div>
+                            
+                            <div class="calendar-legend">
+                                <div class="legend-item">
+                                    <div class="legend-dot has-summary"></div>
+                                    <span>Has Summary</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot today"></div>
+                                    <span>Today</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot selected"></div>
+                                    <span>Selected</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="padding: 12px;">InfoDash is a digital archive for daily news, market data, and trending topics. Search and browse historical summaries, headlines, and stock market data from newsAPI headlines and Yahoo Finance. Whether you're a researcher, journalist, or curious explorer, InfoDash helps keep track of what's going on or has been going on in the past.</p>
+                </div>
+            </div>
+        </div>
         <div class="summary-container" >
             <!-- Unified Summary Section -->
             <div class="row">

@@ -1007,26 +1007,45 @@ async function updateSavedSummariesList() {
     if (!container) return;
     
     const summaries = await loadSummaryHistory();
-    const list = container.querySelector('.collapsible-body') || container; // Handle new structure
+    const list = container.querySelector('.collapsible-body') || container;
     
+    // Extract dates for calendar
+    const summaryDates = summaries.map(summary => summary.date).filter(date => date);
+    
+    // Initialize or update calendar
+    if (!archiveCalendar) {
+        archiveCalendar = new ArchiveCalendar('archiveCalendar', {
+            summaryDates: summaryDates,
+            selectedDate: getSelectedDate(),
+            onDateSelect: function(dateString, hasSummary) {
+                console.log('Calendar date selected:', dateString, 'Has summary:', hasSummary);
+                
+                if (!hasSummary) {
+                    showNotification(`No summary available for ${new Date(dateString + 'T00:00:00').toLocaleDateString()}`, 3000);
+                }
+            }
+        });
+    } else {
+        archiveCalendar.updateSummaryDates(summaryDates);
+    }
+    
+    // Update list display (keep existing list functionality)
     list.innerHTML = '';
     
     if (summaries.length === 0) {
         list.innerHTML = '<p class="empty-state">No past summaries found.</p>';
-        return; 
+        return;
     }
 
-    
-    
     summaries.forEach((summary, index) => {
         const item = document.createElement('div');
         item.className = 'saved-summary-item';
         item.dataset.date = summary.date;
-        item.onclick = () => selectSummaryItem(summary.date);
+        item.onclick = () => selectSummaryItemWithCalendar(summary.date);
         
         // Validate date format before parsing
         if (!summary.date || !/^\d{4}-\d{2}-\d{2}$/.test(summary.date)) {
-            console.warn(`updateSavedSummariesList: Invalid date format: ${summary.date}`);
+            console.warn(`updateSavedSummariesListWithCalendar: Invalid date format: ${summary.date}`);
             return; // Skip this summary
         }
         
@@ -1034,7 +1053,7 @@ async function updateSavedSummariesList() {
         
         // Check if date is valid
         if (isNaN(date.getTime())) {
-            console.warn(`updateSavedSummariesList: Invalid date: ${summary.date}`);
+            console.warn(`updateSavedSummariesListWithCalendar: Invalid date: ${summary.date}`);
             return; // Skip this summary
         }
         
@@ -1056,8 +1075,6 @@ async function updateSavedSummariesList() {
                 <div class="saved-summary-automated">${automatedDiv}</div>
             </div>
         `;
-
-        
         
         list.appendChild(item);
     });
@@ -1065,7 +1082,7 @@ async function updateSavedSummariesList() {
 
 // Function to select a summary item
 async function selectSummaryItem(date) {
-    // Remove previous selection
+    // Remove previous selection from list
     document.querySelectorAll('.saved-summary-item').forEach(item => {
         item.classList.remove('selected');
     });
@@ -1076,9 +1093,14 @@ async function selectSummaryItem(date) {
         selectedItem.classList.add('selected');
     }
     
+    // Update calendar selection
+    if (archiveCalendar) {
+        archiveCalendar.setSelectedDate(date);
+        archiveCalendar.goToDate(date); // Navigate to the month containing this date
+    }
+    
     // Update date input and title date
     document.getElementById('summaryDate').value = date;
-    // Update the title text
     document.getElementById('titleDate').textContent = `${date}`;
     
     // Get current region settings
@@ -1125,8 +1147,8 @@ export async function loadSummaryForDate() {
     
     if (regionSelect) {
         const selectedOption = regionSelect.options[regionSelect.selectedIndex];
-        language = selectedOption.getAttribute('data-language');
-        country = selectedOption.getAttribute('data-country');
+        //language = selectedOption.getAttribute('data-language');
+        //country = selectedOption.getAttribute('data-country');
     }
     const summary = await loadDailySummary(date, language, country);
     
@@ -1261,13 +1283,13 @@ async function loadOrGenerateTodaySummary() {
     let language = 'en';
     let country = 'US';
     
-    if (regionSelect) {
-        const selectedOption = regionSelect.options[regionSelect.selectedIndex];
-        language = selectedOption.getAttribute('data-language');
-        country = selectedOption.getAttribute('data-country');
-    }
+    // if (regionSelect) {
+    //     const selectedOption = regionSelect.options[regionSelect.selectedIndex];
+    //     language = selectedOption.getAttribute('data-language');
+    //     country = selectedOption.getAttribute('data-country');
+    // }
     
-    console.log('loadOrGenerateTodaySummary: Using region:', { language, country });
+    // console.log('loadOrGenerateTodaySummary: Using region:', { language, country });
     
 
     setSummaryLoadingText(`Loading summary for ${new Date(today + 'T00:00:00').toLocaleDateString()} (${country}, ${language})...`);
@@ -1491,6 +1513,197 @@ function updateRefreshButtonStatus() {
         refreshBtn.style.opacity = '1';
     }
 }
+
+class ArchiveCalendar {
+    constructor(containerId, options = {}) {
+        this.container = document.getElementById(containerId);
+        this.options = {
+            onDateSelect: options.onDateSelect || function() {},
+            summaryDates: options.summaryDates || [],
+            selectedDate: options.selectedDate || null,
+            ...options
+        };
+        
+        this.currentDate = new Date();
+        this.today = new Date();
+        this.selectedDate = this.options.selectedDate ? new Date(this.options.selectedDate) : null;
+        this.summaryDates = new Set(this.options.summaryDates);
+        
+        this.init();
+    }
+    
+    init() {
+        this.setupEventListeners();
+        this.render();
+    }
+    
+    setupEventListeners() {
+        const prevBtn = document.getElementById('prevMonth');
+        const nextBtn = document.getElementById('nextMonth');
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => this.previousMonth());
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => this.nextMonth());
+        }
+    }
+    
+    previousMonth() {
+        this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+        this.render();
+    }
+    
+    nextMonth() {
+        this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+        this.render();
+    }
+    
+    render() {
+        this.renderHeader();
+        this.renderCalendar();
+    }
+    
+    renderHeader() {
+        const monthYearElement = document.getElementById('monthYear');
+        if (monthYearElement) {
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            
+            const month = monthNames[this.currentDate.getMonth()];
+            const year = this.currentDate.getFullYear();
+            monthYearElement.textContent = `${month} ${year}`;
+        }
+    }
+    
+    renderCalendar() {
+        const calendarGrid = document.getElementById('calendarGrid');
+        if (!calendarGrid) return;
+        
+        const year = this.currentDate.getFullYear();
+        const month = this.currentDate.getMonth();
+        
+        // Clear existing content
+        calendarGrid.innerHTML = '';
+        
+        // Add day headers
+        const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        dayHeaders.forEach(day => {
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'calendar-day-header';
+            dayHeader.textContent = day;
+            calendarGrid.appendChild(dayHeader);
+        });
+        
+        // Get first day of month and number of days
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startDate = new Date(firstDay);
+        startDate.setDate(startDate.getDate() - firstDay.getDay());
+        
+        // Generate calendar days
+        const totalDays = 42; // 6 weeks * 7 days
+        for (let i = 0; i < totalDays; i++) {
+            const currentDay = new Date(startDate);
+            currentDay.setDate(startDate.getDate() + i);
+            
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            dayElement.textContent = currentDay.getDate();
+            
+            const dateString = this.formatDate(currentDay);
+            
+            // Add classes based on conditions
+            if (currentDay.getMonth() !== month) {
+                dayElement.classList.add('other-month');
+            }
+            
+            if (this.isToday(currentDay)) {
+                dayElement.classList.add('today');
+            }
+            
+            if (this.isSelected(currentDay)) {
+                dayElement.classList.add('selected');
+            }
+            
+            if (this.hasSummary(dateString)) {
+                dayElement.classList.add('has-summary');
+            }
+            
+            // Add click event
+            dayElement.addEventListener('click', () => {
+                this.selectDate(currentDay);
+            });
+            
+            calendarGrid.appendChild(dayElement);
+        }
+    }
+    
+    selectDate(date) {
+        this.selectedDate = new Date(date);
+        const dateString = this.formatDate(date);
+        
+        // Update the existing date input
+        const dateInput = document.getElementById('summaryDate');
+        if (dateInput) {
+            dateInput.value = dateString;
+        }
+        
+        // Re-render to update selected state
+        this.render();
+        
+        // Call the existing function to load summary
+        if (window.loadSummaryForDate) {
+            window.loadSummaryForDate();
+        }
+        
+        // Call callback
+        if (this.options.onDateSelect) {
+            this.options.onDateSelect(dateString, this.hasSummary(dateString));
+        }
+    }
+    
+    isToday(date) {
+        return this.formatDate(date) === this.formatDate(this.today);
+    }
+    
+    isSelected(date) {
+        return this.selectedDate && this.formatDate(date) === this.formatDate(this.selectedDate);
+    }
+    
+    hasSummary(dateString) {
+        return this.summaryDates.has(dateString);
+    }
+    
+    formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    
+    updateSummaryDates(summaryDates) {
+        this.summaryDates = new Set(summaryDates);
+        this.render();
+    }
+    
+    setSelectedDate(dateString) {
+        this.selectedDate = dateString ? new Date(dateString + 'T00:00:00') : null;
+        this.render();
+    }
+    
+    goToDate(dateString) {
+        const targetDate = new Date(dateString + 'T00:00:00');
+        this.currentDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+        this.selectedDate = targetDate;
+        this.render();
+    }
+}
+
+let archiveCalendar = null;
 
 // Make functions globally available
 window.resetDailySummaryLimit = resetDailySummaryLimit;
