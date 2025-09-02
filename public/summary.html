@@ -6,13 +6,6 @@
     <!-- Primary Meta Tags -->
     <title>InfoDash Internet Archive: Daily News, Market, and Web Trends Archive</title>
     <meta name="title" content="InfoDash Internet Archive: Daily News, Market, and Web Trends Archive">
-    <meta name="description" content="InfoDash is your internet archive for daily news, market trends,  and trending topics. Explore, search, and access historical summaries and headlines from around the world.">
-    <meta name="robots" content="index, follow">
-    <meta property="og:title" content="InfoDash Internet Archive: Daily News, Market, and Web Trends Archive">
-    <meta property="og:description" content="Explore the InfoDash Internet Archive for daily news, market trends, and trending topics. Search and access historical summaries and headlines from around the world.">
-    <meta property="og:type" content="website">
-    <title>InfoDash Internet Archive: Daily News, Market, and Web Trends Archive</title>
-    <meta name="title" content="InfoDash Internet Archive: Daily News, Market, and Web Trends Archive">
     <meta name="description" content="InfoDash is your internet archive for daily news, market trends,  and trending topics, with a primary focus on US news. Explore, search, and access historical summaries and headlines for the US and select other regions.">
     <meta name="keywords" content="internet archive, news archive, market archive, daily summaries, historical news, trending topics, US news, InfoDash, web archive, digital archive, news history, market history, regional archive">
     <meta name="robots" content="index, follow">
@@ -207,6 +200,7 @@
                     <div class="card-content card-controls">
                         <!-- Archive Calendar Widget -->
                         <div class="archive-calendar" id="archiveCalendar">
+                            <input type="date" id="summaryDate" onchange="loadSummaryForDate()">
                             <div class="calendar-header">
                                 <button class="calendar-nav-btn" id="prevMonth">‹ Previous</button>
                                 <div class="calendar-month-year" id="monthYear"></div>
@@ -249,7 +243,7 @@
                             </h3>
                             <div class="right">
                                 <div class="section-controls">
-                                    <button id="summary-refresh-btn" class="btn-small waves-effect waves-light" onclick="refreshSummary()">🔄 Refresh</button>
+                                    <button id="summary-refresh-btn" class="btn-small waves-effect waves-light" onclick="refreshSummary()">🔄 Generate a New Summary</button>
                                 </div>
                             </div>
                             <div class="section-toggle" onclick="toggleSection('summary-content-container')" title="Show/Hide Section">
@@ -430,13 +424,10 @@
                     <span class="footer-separator">•</span>
                     <a href="privacy-policy.html" target="_blank" class="footer-link">Privacy Policy</a>
                 </div>
-                <p class="footer-disclaimer">The content provided on this website is for informational and archival purposes only and does not constitute financial, investment, legal, or other professional advice. While we strive to provide accurate and up-to-date information, we make no guarantees about the completeness, reliability, or suitability of the content for any specific purpose.</p>
+                <p class="footer-disclaimer">The information on this website is for informational purposes only and should not constitute professional or legal advice.</p>
             </div>
         </footer>
         <button id="scrollToTopBtn" class="scroll-to-top">↑</button>
-
-        <!-- Notification Bar -->
-        <div id="notification-bar"></div>
 
         <script type="module">
             import { showNotification, toggleSection, showLocationModal, closeLocationModal } from './js/uiUtils.js';
@@ -462,6 +453,7 @@
         </script>
     </main>
     </body>
+    
     <script>
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('sidebar');

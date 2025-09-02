@@ -2,10 +2,44 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width">
-        <title>InfoDash - Stocks</title>
-        <meta name="description" content="Yahoo Finance Data">
-        
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Stock Market Dashboard & Live Financial Data | InfoDash</title>
+        <meta name="title" content="Stock Market Dashboard & Live Financial Data | InfoDash">
+        <meta name="description" content="Track live stock prices, charts, and financial market data with InfoDash. Analyze stocks, manage your watchlist, and stay updated with real-time Yahoo Finance data.">
+        <meta name="keywords" content="stocks, finance, stock market, live data, charts, watchlist, Yahoo Finance, investing, trading, InfoDash">
+        <meta name="author" content="InfoDash">
+        <meta name="robots" content="index, follow">
+        <meta name="language" content="English">
+        <meta name="revisit-after" content="7 days">
+        <meta name="distribution" content="global">
+        <meta name="rating" content="general">
+        <link rel="canonical" href="https://infodash.app/finance.html">
+
+        <!-- Structured Data / JSON-LD -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Stock Market Dashboard & Live Financial Data | InfoDash",
+          "description": "Track live stock prices, charts, and financial market data with InfoDash. Analyze stocks, manage your watchlist, and stay updated with real-time Yahoo Finance data.",
+          "url": "https://infodash.app/finance.html",
+          "publisher": {
+            "@type": "Organization",
+            "name": "InfoDash"
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://infodash.app/finance.html"
+          },
+          "about": [
+            { "@type": "Thing", "name": "Stocks" },
+            { "@type": "Thing", "name": "Finance" },
+            { "@type": "Thing", "name": "Stock Market" },
+            { "@type": "Thing", "name": "Investing" }
+          ]
+        }
+        </script>
+
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
@@ -164,6 +198,16 @@
               </div>
           
               <div class="card-content">
+                <!-- Chart Container -->
+                <div class="chart-container">
+                <div class="chart-header">
+                    <span class="card-title" id="chartTitle">Stock Chart</span>
+                    <button id="chartFullscreenBtn" class="btn-small waves-effect waves-light">
+                    <i class="material-icons">fullscreen</i>
+                    </button>
+                </div>
+                <canvas id="stockChart"></canvas>
+                </div>
                 <!-- Stock Symbol Input -->
                 <div class="card">
                   <div class="card-content" id="stockControls">
@@ -187,16 +231,7 @@
                     </div>
                   </div>
                 </div>
-                <!-- Chart Container -->
-                <div class="chart-container">
-                <div class="chart-header">
-                    <span class="card-title" id="chartTitle">Stock Chart</span>
-                    <button id="chartFullscreenBtn" class="btn-small waves-effect waves-light">
-                    <i class="material-icons">fullscreen</i>
-                    </button>
-                </div>
-                <canvas id="stockChart"></canvas>
-                </div>
+                
 
                 <!-- Stock Data Parameters Section -->
                 <div class="card stock-parameters-section" id="stock-parameters-section" style="margin-top: 18px;">
@@ -276,7 +311,7 @@
             <span class="footer-separator">•</span>
             <a href="privacy-policy.html" target="_blank" class="footer-link">Privacy Policy</a>
         </div>
-        <p class="footer-disclaimer">The content provided on this website is for informational purposes only and does not constitute financial, investment, legal, or other professional advice. While we strive to provide accurate and up-to-date information, we make no guarantees about the completeness, reliability, or suitability of the content for any specific purpose.</p>
+        <p class="footer-disclaimer">The information on this website is for informational purposes only and should not constitute professional or legal advice.</p>
     </div>
 </footer>
     <button id="scrollToTopBtn" class="scroll-to-top">↑</button>

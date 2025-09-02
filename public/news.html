@@ -2,10 +2,44 @@
 <html lang="en">
     <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">   
-    <title>InfoDash - News</title>
-    <meta name="description" content="Daily news from NewsAPI">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latest News & Headlines - Real-Time Updates | InfoDash</title>
+    <meta name="title" content="Latest News & Headlines - Real-Time Updates | InfoDash">
+    <meta name="description" content="Stay updated with the latest news headlines, breaking stories, and real-time updates from trusted sources. InfoDash delivers daily news, trends, and in-depth coverage across topics.">
+    <meta name="keywords" content="news, headlines, breaking news, daily news, world news, trending, InfoDash, real-time news, top stories, news updates">
+    <meta name="author" content="InfoDash">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="6 hours">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+    <link rel="canonical" href="https://infodash.app/news.html">
+
+    <!-- Structured Data / JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Latest News & Headlines - Real-Time Updates | InfoDash",
+      "description": "Stay updated with the latest news headlines, breaking stories, and real-time updates from trusted sources. InfoDash delivers daily news, trends, and in-depth coverage across topics.",
+      "url": "https://infodash.app/news.html",
+      "publisher": {
+        "@type": "Organization",
+        "name": "InfoDash"
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://infodash.app/news.html"
+      },
+      "about": [
+        { "@type": "Thing", "name": "News" },
+        { "@type": "Thing", "name": "Headlines" },
+        { "@type": "Thing", "name": "Breaking News" },
+        { "@type": "Thing", "name": "Trending" }
+      ]
+    }
+    </script>
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
@@ -14,18 +48,18 @@
     <script src="js/themeInit.js"></script>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/news.css">
-    
+
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    
+
     <!-- Application Scripts -->
     <script type="module" src="js/userPreferences.js"></script>
     <script type="module" src="js/app.js"></script>
     <script type="module" src="js/news.js"></script>
-    <script type="module" src="js/trends.js"></script>   
+    <script type="module" src="js/trends.js"></script>
     </head>
         <body>
         <!-- Sidebar Navigation -->
@@ -395,7 +429,7 @@
                     <span class="footer-separator">•</span>
                     <a href="privacy-policy.html" target="_blank" class="footer-link">Privacy Policy</a>
                 </div>
-                <p class="footer-disclaimer">The content provided on this website is for informational purposes only and does not constitute financial, investment, legal, or other professional advice. While we strive to provide accurate and up-to-date information, we make no guarantees about the completeness, reliability, or suitability of the content for any specific purpose.</p>
+                <p class="footer-disclaimer">The information on this website is for informational purposes only and should not constitute professional or legal advice.</p>
             </div>
         </footer>
         <button id="scrollToTopBtn" class="scroll-to-top">↑</button>

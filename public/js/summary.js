@@ -690,10 +690,10 @@ async function updateSummaryDisplay(summaryText) {
     if (!summaryText || summaryText === 'Error: Unable to generate summary. Please try again later.') {
         console.log('updateSummaryDisplay: No valid summary text, showing error messages');
         // Update all summary text elements with error message
-        if (newsSummary) newsSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
-        if (trendsSummary) trendsSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
-        if (financeSummary) financeSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
-        if (overallSummary) overallSummary.innerHTML = '<p class="error-text">Unable to generate summary at this time.</p>';
+        if (newsSummary) newsSummary.innerHTML = '<p class="error-text">No summary exists for the selected date.</p>';
+        if (trendsSummary) trendsSummary.innerHTML = '<p class="error-text">No summary exists for the selected date.</p>';
+        if (financeSummary) financeSummary.innerHTML = '<p class="error-text">No summary exists for the selected date.</p>';
+        if (overallSummary) overallSummary.innerHTML = '<p class="error-text">No summary exists for the selected date.</p>';
         return;
     }
     
@@ -1343,6 +1343,13 @@ async function initializeSummarySection() {
     const dateInput = document.getElementById('summaryDate');
     if (dateInput) {
         dateInput.addEventListener('change', loadSummaryForDate);
+        // Add event listener to update calendar when date input changes
+        dateInput.addEventListener('change', function() {
+            if (archiveCalendar) {
+                archiveCalendar.setSelectedDate(this.value);
+                archiveCalendar.goToDate(this.value);
+            }
+        });
         // Initialize the date picker with today's date
         const today = getLocalDateString();
         dateInput.value = today;
@@ -1507,7 +1514,7 @@ function updateRefreshButtonStatus() {
         refreshBtn.disabled = true;
         refreshBtn.style.opacity = '0.6';
     } else {
-        refreshBtn.textContent = '🔄 Refresh';
+        refreshBtn.textContent = '🔄 Generate a New Summary';
         refreshBtn.title = 'Generate a new summary (Daily limit: 1 manual refresh per day)';
         refreshBtn.disabled = false;
         refreshBtn.style.opacity = '1';

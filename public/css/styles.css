@@ -417,9 +417,6 @@ section:hover, .section:hover, .summary-card:hover, #finance:hover, #finance .ca
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* === Utility & Misc === */
-.data-container { margin-top: 10px; }
-
 /* === Controls Header === */
 .controls-header {
   background: var(--secondary-bg);
@@ -1514,7 +1511,6 @@ body.dark-theme label {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 2px solid var(--accent-color);
 }
