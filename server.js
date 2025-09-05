@@ -367,219 +367,8 @@ async function initializeDailySummary() {
     }
 }
 
-async function cleanupSummaryData() {
-    try {
-        console.log('cleanupSummaryData: Starting cleanup of malformed summary data...');
-        
-        // Check file size first to prevent memory overload
-        const stats = await fs.stat(SUMMARY_FILE).catch(() => null);
-        if (!stats) {
-            console.log('cleanupSummaryData: No summary file found');
-            return {};
-        }
-        
-        const fileSizeKB = Math.round(stats.size / 1024);
-        console.log(`cleanupSummaryData: File size: ${fileSizeKB}KB`);
-        
-        // Skip cleanup if file is too large (>1MB could crash 512MB instance)
-        if (stats.size > 1024 * 1024) {
-            console.warn('cleanupSummaryData: File too large, skipping cleanup to prevent memory crash');
-            return null;
-        }
-        
-        const data = await fs.readFile(SUMMARY_FILE, 'utf8');
-        let summaries;
-        
-        try {
-            summaries = JSON.parse(data);
-        } catch (parseError) {
-            console.error('cleanupSummaryData: JSON parse error, creating backup and starting fresh');
-            await fs.writeFile(SUMMARY_FILE + '.backup', data);
-            return {};
-        }
-        
-        // Memory check - if we have too many keys, process in batches
-        const totalKeys = Object.keys(summaries).length;
-        console.log(`cleanupSummaryData: Processing ${totalKeys} keys`);
-        
-        if (totalKeys > 100) {
-            console.warn('cleanupSummaryData: Too many keys, will process in smaller batches');
-            return await cleanupInBatches(summaries);
-        }
-        
-        let hasChanges = false;
-        const cleanedSummaries = {};
-        let processedCount = 0;
-        
-        for (const [key, value] of Object.entries(summaries)) {
-            processedCount++;
-            
-            // Log progress for large datasets
-            if (processedCount % 20 === 0) {
-                console.log(`cleanupSummaryData: Processed ${processedCount}/${totalKeys} keys`);
-            }
-            
-            // Skip obviously invalid keys early
-            if (!key || typeof key !== 'string') {
-                console.log(`cleanupSummaryData: Skipping invalid key: ${key}`);
-                continue;
-            }
-            
-            // Skip problematic keys that could contain large arrays
-            if (key === '2025' || key.length < 8 || key.length > 20) {
-                console.log(`cleanupSummaryData: Skipping suspicious key: ${key}`);
-                continue;
-            }
-            
-            // Only process valid date format keys
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) {
-                console.log(`cleanupSummaryData: Skipping invalid date format: ${key}`);
-                continue;
-            }
-            
-            // Handle array values (limit processing to prevent memory issues)
-            if (Array.isArray(value)) {
-                // Limit array size to prevent memory overflow
-                const limitedValue = value.slice(0, 10); // Max 10 summaries per date
-                const uniqueSummaries = [];
-                const seen = new Set();
-                
-                for (const summary of limitedValue) {
-                    // Skip invalid objects
-                    if (!summary || typeof summary !== 'object') continue;
-                    
-                    // Skip objects with numeric keys (corrupted data)
-                    const hasNumericKeys = Object.keys(summary).some(k => !isNaN(k) && k !== 'timestamp');
-                    if (hasNumericKeys) continue;
-                    
-                    // Create identifier for deduplication
-                    const timestamp = summary.timestamp || new Date().toISOString();
-                    const language = summary.language || 'en';
-                    const country = summary.country || 'US';
-                    const identifier = `${timestamp}-${language}-${country}`;
-                    
-                    if (!seen.has(identifier)) {
-                        seen.add(identifier);
-                        
-                        // Create clean summary object with only needed fields
-                        const cleanSummary = {
-                            news: summary.news || '',
-                            trends: summary.trends || '',
-                            finance: summary.finance || '',
-                            overall: summary.overall || '',
-                            timestamp: timestamp,
-                            language: language,
-                            country: country,
-                            automated: summary.automated || false
-                        };
-                        
-                        uniqueSummaries.push(cleanSummary);
-                    }
-                }
-                
-                if (uniqueSummaries.length > 0) {
-                    cleanedSummaries[key] = uniqueSummaries.length === 1 ? uniqueSummaries[0] : uniqueSummaries;
-                    hasChanges = true;
-                }
-            } else if (value && typeof value === 'object') {
-                // Handle single object
-                const cleanSummary = {
-                    news: value.news || '',
-                    trends: value.trends || '',
-                    finance: value.finance || '',
-                    overall: value.overall || '',
-                    timestamp: value.timestamp || new Date().toISOString(),
-                    language: value.language || 'en',
-                    country: value.country || 'US',
-                    automated: value.automated || false
-                };
-                
-                cleanedSummaries[key] = cleanSummary;
-                hasChanges = true;
-            }
-        }
-        
-        if (hasChanges) {
-            // Create backup before saving
-            await fs.writeFile(SUMMARY_FILE + '.backup', data);
-            
-            // Save cleaned data
-            await fs.writeFile(SUMMARY_FILE, JSON.stringify(cleanedSummaries, null, 2));
-            console.log('cleanupSummaryData: Successfully cleaned up malformed summary data');
-            
-            // Log cleanup results
-            const originalSize = Object.keys(summaries).length;
-            const cleanedSize = Object.keys(cleanedSummaries).length;
-            console.log(`cleanupSummaryData: Reduced from ${originalSize} to ${cleanedSize} entries`);
-        } else {
-            console.log('cleanupSummaryData: No malformed data found');
-        }
-        
-        return cleanedSummaries;
-        
-    } catch (error) {
-        console.error('cleanupSummaryData: Error during cleanup:', error);
-        
-        // If we crash during cleanup, don't try to recover - just return null
-        if (error.message && error.message.includes('out of memory')) {
-            console.error('cleanupSummaryData: OUT OF MEMORY - Consider deleting summary file manually');
-        }
-        
-        return null;
-    }
-}
-
-// Helper function to process large datasets in batches
-async function cleanupInBatches(summaries) {
-    console.log('cleanupInBatches: Processing large dataset in batches...');
-    
-    const keys = Object.keys(summaries);
-    const batchSize = 20; // Process 20 keys at a time
-    const cleanedSummaries = {};
-    
-    for (let i = 0; i < keys.length; i += batchSize) {
-        const batch = keys.slice(i, i + batchSize);
-        console.log(`cleanupInBatches: Processing batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(keys.length/batchSize)}`);
-        
-        for (const key of batch) {
-            // Only process valid date keys
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) continue;
-            
-            const value = summaries[key];
-            if (value && typeof value === 'object' && !Array.isArray(value)) {
-                // Keep simple objects only
-                cleanedSummaries[key] = {
-                    news: value.news || '',
-                    trends: value.trends || '',
-                    finance: value.finance || '',
-                    overall: value.overall || '',
-                    timestamp: value.timestamp || new Date().toISOString(),
-                    language: value.language || 'en',
-                    country: value.country || 'US',
-                    automated: value.automated || false
-                };
-            }
-        }
-        
-        // Small delay between batches to prevent overwhelming the system
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    
-    console.log(`cleanupInBatches: Completed processing, kept ${Object.keys(cleanedSummaries).length} valid entries`);
-    
-    // Save the cleaned data
-    await fs.writeFile(SUMMARY_FILE, JSON.stringify(cleanedSummaries, null, 2));
-    return cleanedSummaries;
-}
-
-// Call initialization
-(async () => {
-    // Clean up any malformed summary data first
-    await cleanupSummaryData();
-    
-    // Then initialize daily summary
-    await initializeDailySummary();
-})();
+// Initialize daily summary on server start
+initializeDailySummary();
 
 // Automated Summary Generation System
 class AutomatedSummaryGenerator {
@@ -716,13 +505,18 @@ class AutomatedSummaryGenerator {
             // Collect section data (same as manual generation)
             const sectionData = await this.collectAutomatedSectionData(region);
 
-            if (!sectionData || (!sectionData.news && !sectionData.trends && !sectionData.finance)) {
-                console.log(`No data available for ${region.country} (${region.language}), skipping summary generation`);
+            // NEW CODE (allows partial summaries):
+            if (!sectionData) {
+                console.log(`No section data object returned for ${region.country} (${region.language}), skipping...`);
                 return;
             }
-            // second check for sectionData
-            if (!sectionData) {
-                console.log(`No section data available for ${region.country} (${region.language}), skipping...`);
+
+            // Require at least news OR finance (trends is optional)
+            // This allows summaries to be generated even if Google Trends fails
+            if ((!sectionData.news || sectionData.news.length === 0) && 
+            (!sectionData.finance || Object.keys(sectionData.finance).length === 0)) 
+            {
+                console.log(`Insufficient core data for ${region.country} (${region.language}) - need at least news OR finance data, skipping...`);
                 return;
             }
 
@@ -812,17 +606,35 @@ class AutomatedSummaryGenerator {
         }
     }
 
-    // Collect trends data for automated generation
-    async collectAutomatedTrendsData(region) {
+    // Add retry logic for the Google Trends API specifically
+    async collectAutomatedTrendsData(region, retryCount = 0) {
+        const maxRetries = 2;
+        
         try {
             const baseUrl = this.getBaseUrl();
             const response = await fetch(`${baseUrl}/api/trends2?type=daily&category=all&language=${region.language}&geo=${region.country}`);
             
-            if (!response.ok) return null;
+            if (!response.ok) {
+                if (retryCount < maxRetries) {
+                    console.log(`Trends API failed (attempt ${retryCount + 1}), retrying in 3 seconds...`);
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    return this.collectAutomatedTrendsData(region, retryCount + 1);
+                }
+                console.log(`Trends API failed after ${maxRetries + 1} attempts, proceeding without trends data`);
+                return null;
+            }
             
             const data = await response.json();
             
-            if (!data || !data.default || !data.default.trendingSearchesDays) return null;
+            if (!data || !data.default || !data.default.trendingSearchesDays) {
+                if (retryCount < maxRetries) {
+                    console.log(`Trends API returned empty data (attempt ${retryCount + 1}), retrying in 3 seconds...`);
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    return this.collectAutomatedTrendsData(region, retryCount + 1);
+                }
+                console.log(`Trends API returned empty data after ${maxRetries + 1} attempts, proceeding without trends data`);
+                return null;
+            }
 
             let allTopics = [];
             const trendingSearchesDays = data.default.trendingSearchesDays || [];
@@ -837,8 +649,17 @@ class AutomatedSummaryGenerator {
                 title: topic.title?.query || topic.title || 'Unknown',
                 traffic: topic.formattedTraffic || 'N/A'
             }));
+            
         } catch (error) {
-            console.error('Error collecting automated trends data:', error);
+            console.error(`Error collecting automated trends data (attempt ${retryCount + 1}):`, error);
+            
+            if (retryCount < maxRetries) {
+                console.log(`Retrying trends collection in 3 seconds...`);
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                return this.collectAutomatedTrendsData(region, retryCount + 1);
+            }
+            
+            console.log(`Trends collection failed after ${maxRetries + 1} attempts, proceeding without trends data`);
             return null;
         }
     }
@@ -959,7 +780,6 @@ class AutomatedSummaryGenerator {
         let prompt = 'Please analyze the following current data and provide a comprehensive summary:';
         
         const selectedDate = new Date();
-        // If not provided, fallback to current date logic
         if (isWeekend === null) {
             isWeekend = selectedDate.getDay() === 0 || selectedDate.getDay() === 6;
         }
@@ -967,6 +787,7 @@ class AutomatedSummaryGenerator {
             isMarketClosed = !isMarketOpen();
         }
 
+        // Handle news data
         if (sectionData.news && sectionData.news.length > 0) {
             prompt += ' TOP HEADLINES:';
             sectionData.news.forEach((item, index) => {
@@ -975,16 +796,22 @@ class AutomatedSummaryGenerator {
                     prompt += ` ${item.description.substring(0, 100)}...`;
                 }
             });
+        } else {
+            prompt += ' TOP HEADLINES: No current headlines available.';
         }
         
+        // Handle trends data (gracefully handle missing data)
         if (sectionData.trends && sectionData.trends.length > 0) {
             prompt += ' TRENDING TOPICS:';
             prompt += ' Group the top trending topics by category (Sports, Technology, Entertainment, Other). Under each category, list relevant topics.';
             sectionData.trends.forEach((item, index) => {
                 prompt += ` ${index + 1}. ${item.title} ${item.traffic ? `(${item.traffic})` : ''}`;
             });
+        } else {
+            prompt += ' TRENDING TOPICS: Trending topics data is currently unavailable. Please focus on news and market analysis.';
         }
         
+        // Handle finance data
         if (sectionData.finance) {
             prompt += ' MARKET DATA:';
             if (isMarketClosed) {
@@ -1006,14 +833,33 @@ class AutomatedSummaryGenerator {
                     prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
                 });
             }
+        } else {
+            prompt += ' MARKET DATA: Financial data is currently unavailable.';
         }
         
-        prompt += ' Please provide a structured summary with the following sections: NEWS HIGHLIGHTS (max 300 words), TRENDING TOPICS (max 300 words), ';
-        if (isMarketClosed || isWeekend) {
-            prompt += 'MARKET OVERVIEW focusing on crypto (max 300 words), ';
-        } else {
-            prompt += 'MARKET OVERVIEW including tech stocks and crypto (max 300 words), ';
+        // Adjust the output request based on available data
+        prompt += ' Please provide a structured summary with the following sections: ';
+        
+        if (sectionData.news && sectionData.news.length > 0) {
+            prompt += 'NEWS HIGHLIGHTS (max 300 words), ';
         }
+        
+        if (sectionData.trends && sectionData.trends.length > 0) {
+            prompt += 'TRENDING TOPICS (max 300 words), ';
+        } else {
+            prompt += 'TRENDING TOPICS (indicate data unavailable, max 100 words), ';
+        }
+        
+        if (sectionData.finance) {
+            if (isMarketClosed || isWeekend) {
+                prompt += 'MARKET OVERVIEW focusing on crypto (max 300 words), ';
+            } else {
+                prompt += 'MARKET OVERVIEW including tech stocks and crypto (max 300 words), ';
+            }
+        } else {
+            prompt += 'MARKET OVERVIEW (indicate data unavailable, max 100 words), ';
+        }
+        
         prompt += 'INFO GENIE fortune teller predictions (max 300 words).';
         
         return prompt;
