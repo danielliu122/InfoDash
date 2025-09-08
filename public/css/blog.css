@@ -5,7 +5,7 @@
     max-width: 800px;
     margin: 32px auto;
     padding: 24px 18px;
-    background: var(--background, #fff);
+    background: linear-gradient(135deg, #e3eaf6 0%, #cfe3ea 35%, #d6ede2 65%, #e6f5e9 100%);
     border-radius: 10px;
     box-shadow: 0 6px 32px rgba(0,0,0,0.10);
     transition: background 0.3s;

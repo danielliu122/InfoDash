@@ -72,6 +72,42 @@ const port = process.env.PORT || 3000;
 // Middleware to parse JSON requests
 app.use(express.json());
 
+app.use((req, res, next) => {
+    // Cache Control - Set appropriate caching for different endpoints
+    if (req.path.startsWith('/api/finance') || req.path.startsWith('/api/news')) {
+        // Short cache for dynamic financial/news data
+        res.setHeader('Cache-Control', 'public, max-age=60, must-revalidate');
+    } else if (req.path.startsWith('/api/')) {
+        // Very short cache for other API endpoints
+        res.setHeader('Cache-Control', 'public, max-age=30, must-revalidate');
+    } else {
+        // Longer cache for static assets
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
+    
+    // Security headers
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.removeHeader('X-Powered-By'); // Remove Express signature
+    res.setHeader('Server', 'InfoDash'); // Custom server name instead of Express
+    
+    // CORS headers for API endpoints
+    if (req.path.startsWith('/api/')) {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    }
+    
+    next();
+});
+
+// Handle preflight OPTIONS requests
+app.options('*', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.status(200).end();
+});
+
 // Create rate limiters
 const chatLimiter = rateLimit({
     windowMs: 24 * 60 * 60 * 1000, // 24 hours
