@@ -856,10 +856,10 @@ class AutomatedSummaryGenerator {
                 prompt += ' Stock markets are closed for the weekend. Here is the latest crypto data:';
             }
 
-            if (sectionData.finance.nasdaq && !isMarketClosed && !isWeekend) {
+            if (sectionData.finance.nasdaq) {
                 prompt += ` NASDAQ (^IXIC): $${sectionData.finance.nasdaq.price} (${sectionData.finance.nasdaq.changePercent}%)`;
             }
-            if (sectionData.finance.techStocks && !isMarketClosed && !isWeekend) {
+            if (sectionData.finance.techStocks) {
                 Object.entries(sectionData.finance.techStocks).forEach(([symbol, data]) => {
                     prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
                 });
