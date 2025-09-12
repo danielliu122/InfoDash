@@ -703,52 +703,191 @@ class AutomatedSummaryGenerator {
     // Collect finance data for automated generation
     async collectAutomatedFinanceData() {
         try {
-            // Use the bulk finance endpoint for better performance
-            const symbols = ['^IXIC', 'META', 'AAPL', 'GOOGL', 'AMZN', 'TSLA', 'BTC-USD', 'ETH-USD', 'SOL-USD', 'XRP-USD'];
-            
-            const baseUrl = this.getBaseUrl();
-            const response = await fetch(`${baseUrl}/api/finance/bulk-real-time`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ symbols })
-            });
-
-            if (!response.ok) return null;
-            
-            const data = await response.json();
+            console.log('collectAutomatedFinanceData: Starting finance data collection...');
             
             const financeData = {
                 nasdaq: null,
                 techStocks: {},
                 crypto: {}
             };
-
-            // Process the bulk response
-            for (const [symbol, stockData] of Object.entries(data)) {
-                if (stockData.error) continue;
-
-                const processedData = {
-                    price: stockData.price?.toFixed(2) || 'N/A',
-                    change: stockData.change?.toFixed(2) || 'N/A',
-                    changePercent: stockData.changePercent?.toFixed(2) || 'N/A',
-                    timeframe: 'Current'
-                };
-
-                if (symbol === '^IXIC') {
-                    financeData.nasdaq = processedData;
-                } else if (symbol.endsWith('-USD')) {
-                    financeData.crypto[symbol] = processedData;
+    
+            const baseUrl = this.getBaseUrl();
+    
+            // Fetch NASDAQ data using the same approach as frontend
+            console.log('collectAutomatedFinanceData: Fetching NASDAQ data...');
+            try {
+                const nasdaqResponse = await fetch(`${baseUrl}/api/finance/^IXIC?range=1d&interval=1m`);
+                if (nasdaqResponse.ok) {
+                    const nasdaqData = await nasdaqResponse.json();
+                    console.log('collectAutomatedFinanceData: NASDAQ response received');
+                    
+                    if (nasdaqData.chart && nasdaqData.chart.result && nasdaqData.chart.result[0]) {
+                        const result = nasdaqData.chart.result[0];
+                        const meta = result.meta;
+                        console.log('collectAutomatedFinanceData: NASDAQ meta data processed');
+                        
+                        // Calculate current day's open-to-close (or latest) change
+                        const currentPrice = meta.regularMarketPrice;
+                        const openPrice = meta.regularMarketOpen;
+                        
+                        if (openPrice && currentPrice) {
+                            const change = currentPrice - openPrice;
+                            const changePercent = (change / openPrice) * 100;
+                            
+                            financeData.nasdaq = {
+                                price: currentPrice?.toFixed(2) || 'N/A',
+                                open: openPrice?.toFixed(2) || 'N/A',
+                                change: change?.toFixed(2) || 'N/A',
+                                changePercent: changePercent?.toFixed(2) || 'N/A',
+                                timeframe: 'Today'
+                            };
+                        } else {
+                            // Fallback to previous close if open price not available
+                            const previousClose = meta.previousClose;
+                            if (previousClose && currentPrice) {
+                                const change = currentPrice - previousClose;
+                                const changePercent = (change / previousClose) * 100;
+                                
+                                financeData.nasdaq = {
+                                    price: currentPrice?.toFixed(2) || 'N/A',
+                                    open: 'N/A',
+                                    change: change?.toFixed(2) || 'N/A',
+                                    changePercent: changePercent?.toFixed(2) || 'N/A',
+                                    timeframe: 'Since Previous Close'
+                                };
+                            }
+                        }
+                        console.log('collectAutomatedFinanceData: NASDAQ data collected:', !!financeData.nasdaq);
+                    } else {
+                        console.log('collectAutomatedFinanceData: NASDAQ data structure invalid');
+                    }
                 } else {
-                    financeData.techStocks[symbol] = processedData;
+                    console.log('collectAutomatedFinanceData: NASDAQ response not ok:', nasdaqResponse.status);
+                }
+            } catch (error) {
+                console.error('collectAutomatedFinanceData: Error fetching NASDAQ:', error);
+            }
+    
+            // Fetch tech stocks data using the same approach as frontend
+            const techStocks = ['META', 'AAPL', 'GOOGL', 'AMZN', 'TSLA'];
+            console.log('collectAutomatedFinanceData: Fetching tech stocks data...');
+            
+            for (const symbol of techStocks) {
+                try {
+                    const response = await fetch(`${baseUrl}/api/finance/${symbol}?range=1d&interval=1m`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.chart && data.chart.result && data.chart.result[0]) {
+                            const result = data.chart.result[0];
+                            const meta = result.meta;
+                            
+                            const currentPrice = meta.regularMarketPrice;
+                            const openPrice = meta.regularMarketOpen;
+                            
+                            if (openPrice && currentPrice) {
+                                const change = currentPrice - openPrice;
+                                const changePercent = (change / openPrice) * 100;
+                                
+                                financeData.techStocks[symbol] = {
+                                    price: currentPrice?.toFixed(2) || 'N/A',
+                                    open: openPrice?.toFixed(2) || 'N/A',
+                                    change: change?.toFixed(2) || 'N/A',
+                                    changePercent: changePercent?.toFixed(2) || 'N/A',
+                                    timeframe: 'Today'
+                                };
+                            } else {
+                                const previousClose = meta.previousClose;
+                                if (previousClose && currentPrice) {
+                                    const change = currentPrice - previousClose;
+                                    const changePercent = (change / previousClose) * 100;
+                                    
+                                    financeData.techStocks[symbol] = {
+                                        price: currentPrice?.toFixed(2) || 'N/A',
+                                        open: 'N/A',
+                                        change: change?.toFixed(2) || 'N/A',
+                                        changePercent: changePercent?.toFixed(2) || 'N/A',
+                                        timeframe: 'Since Previous Close'
+                                    };
+                                }
+                            }
+                            console.log(`collectAutomatedFinanceData: ${symbol} data collected`);
+                        }
+                    } else {
+                        console.log(`collectAutomatedFinanceData: ${symbol} response not ok:`, response.status);
+                    }
+                } catch (error) {
+                    console.error(`collectAutomatedFinanceData: Error fetching ${symbol}:`, error);
                 }
             }
-
+    
+            // Fetch crypto data using the same approach as frontend
+            const cryptoStocks = ['BTC-USD', 'ETH-USD', 'SOL-USD', 'XRP-USD'];
+            console.log('collectAutomatedFinanceData: Fetching crypto data...');
+            
+            for (const symbol of cryptoStocks) {
+                try {
+                    const response = await fetch(`${baseUrl}/api/finance/${symbol}?range=1d&interval=1m`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.chart && data.chart.result && data.chart.result[0]) {
+                            const result = data.chart.result[0];
+                            const meta = result.meta;
+                            
+                            const currentPrice = meta.regularMarketPrice;
+                            const openPrice = meta.regularMarketOpen;
+                            
+                            if (openPrice && currentPrice) {
+                                const change = currentPrice - openPrice;
+                                const changePercent = (change / openPrice) * 100;
+                                
+                                financeData.crypto[symbol] = {
+                                    price: currentPrice?.toFixed(2) || 'N/A',
+                                    open: openPrice?.toFixed(2) || 'N/A',
+                                    change: change?.toFixed(2) || 'N/A',
+                                    changePercent: changePercent?.toFixed(2) || 'N/A',
+                                    timeframe: 'Today'
+                                };
+                            } else {
+                                const previousClose = meta.previousClose;
+                                if (previousClose && currentPrice) {
+                                    const change = currentPrice - previousClose;
+                                    const changePercent = (change / previousClose) * 100;
+                                    
+                                    financeData.crypto[symbol] = {
+                                        price: currentPrice?.toFixed(2) || 'N/A',
+                                        open: 'N/A',
+                                        change: change?.toFixed(2) || 'N/A',
+                                        changePercent: changePercent?.toFixed(2) || 'N/A',
+                                        timeframe: 'Since Previous Close'
+                                    };
+                                }
+                            }
+                            console.log(`collectAutomatedFinanceData: ${symbol} data collected`);
+                        }
+                    } else {
+                        console.log(`collectAutomatedFinanceData: ${symbol} response not ok:`, response.status);
+                    }
+                } catch (error) {
+                    console.error(`collectAutomatedFinanceData: Error fetching ${symbol}:`, error);
+                }
+            }
+    
+            console.log('collectAutomatedFinanceData: Finance data collection completed:', {
+                hasNasdaq: !!financeData.nasdaq,
+                techStocksCount: Object.keys(financeData.techStocks).length,
+                cryptoCount: Object.keys(financeData.crypto).length,
+                techStocks: Object.keys(financeData.techStocks),
+                crypto: Object.keys(financeData.crypto)
+            });
+    
             return financeData;
+            
         } catch (error) {
-            console.error('Error collecting automated finance data:', error);
+            console.error('collectAutomatedFinanceData: Error collecting finance data:', error);
             return null;
         }
     }
+    
 
     // Generate AI summary for automated generation, with retry logic
     async generateAutomatedSummary(sectionData) {
