@@ -811,7 +811,6 @@ class AutomatedSummaryGenerator {
     }
 
     // Create analysis prompt for automated generation
-    // Now accepts isWeekend and isMarketClosed as arguments
     createAutomatedAnalysisPrompt(sectionData, isWeekend = null, isMarketClosed = null) {
         let prompt = 'Please analyze the following current data and provide a comprehensive summary:';
         
@@ -822,7 +821,7 @@ class AutomatedSummaryGenerator {
         if (isMarketClosed === null && typeof isMarketOpen === 'function') {
             isMarketClosed = !isMarketOpen();
         }
-
+    
         // Handle news data
         if (sectionData.news && sectionData.news.length > 0) {
             prompt += ' TOP HEADLINES:';
@@ -847,23 +846,32 @@ class AutomatedSummaryGenerator {
             prompt += ' TRENDING TOPICS: Trending topics data is currently unavailable. Please focus on news and market analysis.';
         }
         
-        // Handle finance data
+        // Handle finance data - FIXED VERSION
         if (sectionData.finance) {
             prompt += ' MARKET DATA:';
-            if (isMarketClosed) {
-                prompt += ' Stock markets are closed for a holiday, weekend, or after-hours. Here is the latest crypto data:';
+            
+            // Always include all available market data, but provide context about market status
+            if (isMarketClosed && !isWeekend) {
+                prompt += ' Regular trading session is closed, but here is the latest market data from today\'s session and current crypto prices:';
             } else if (isWeekend) {
-                prompt += ' Stock markets are closed for the weekend. Here is the latest crypto data:';
+                prompt += ' Stock markets are closed for the weekend. Here is the latest market data from Friday\'s session and current crypto prices:';
+            } else {
+                prompt += ' Current market data:';
             }
-
+    
+            // Always include NASDAQ data if available
             if (sectionData.finance.nasdaq) {
                 prompt += ` NASDAQ (^IXIC): $${sectionData.finance.nasdaq.price} (${sectionData.finance.nasdaq.changePercent}%)`;
             }
+            
+            // Always include tech stocks if available
             if (sectionData.finance.techStocks) {
                 Object.entries(sectionData.finance.techStocks).forEach(([symbol, data]) => {
                     prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
                 });
             }
+            
+            // Always include crypto if available
             if (sectionData.finance.crypto) {
                 Object.entries(sectionData.finance.crypto).forEach(([symbol, data]) => {
                     prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
@@ -887,8 +895,11 @@ class AutomatedSummaryGenerator {
         }
         
         if (sectionData.finance) {
-            if (isMarketClosed || isWeekend) {
-                prompt += 'MARKET OVERVIEW focusing on crypto (max 300 words), ';
+            // FIXED: Always request comprehensive market overview
+            if (isMarketClosed && !isWeekend) {
+                prompt += 'MARKET OVERVIEW covering today\'s stock performance and current crypto prices (max 300 words), ';
+            } else if (isWeekend) {
+                prompt += 'MARKET OVERVIEW covering Friday\'s stock performance and current crypto prices (max 300 words), ';
             } else {
                 prompt += 'MARKET OVERVIEW including tech stocks and crypto (max 300 words), ';
             }
