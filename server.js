@@ -425,7 +425,7 @@ class AutomatedSummaryGenerator {
             timezone: 'America/New_York'
         });
 
-        // At 11:05 PM, 11:30 PM, and 11:55 PM, only generate if a summary has NOT been generated after 11:00 PM
+        // At 11:05 PM, 11:30 PM, and 11:50 PM, only generate if a summary has NOT been generated after 11:00 PM
         const tryGenerateIfNoPost11pmSummary = async (label) => {
             // Always use current date in America/New_York (EDT/EST) for summary date
             const now = new Date();
@@ -470,17 +470,17 @@ class AutomatedSummaryGenerator {
         });
 
         // 11:55 PM
-        cron.schedule('55 23 * * *', () => {
+        cron.schedule('50 23 * * *', () => {
             tryGenerateIfNoPost11pmSummary('11:50 PM check');
         }, {
             timezone: 'America/New_York'
         });
 
-        // === TESTING ONLY: Run 3 minutes after server starts ===
+        // === TESTING ONLY: Run 30 sec after server starts ===
         // setTimeout(() => {
-        //     console.log('TEST: Triggering automated summary generation 3 minute after startup');
+        //     console.log('TEST: Triggering automated summary generation 30 sec after startup');
         //     this.generateDailySummary();
-        // }, 60 * 3000);
+        // }, 60 * 500);
     }
 
     // Generate summary for en-US at 11:00PM EDT (America/New_York)
@@ -841,24 +841,62 @@ class AutomatedSummaryGenerator {
         // Handle finance data
         if (sectionData.finance) {
             prompt += ' MARKET DATA:';
-            if (isMarketClosed) {
-                prompt += ' Stock markets are closed for a holiday, weekend, or after-hours. Here is the latest crypto data:';
-            } else if (isWeekend) {
+            // Determine if it's a holiday (market closed for holiday), weekend, or just after-hours
+            // For after-hours (not weekend, not holiday), still show trading market data for the day
+            if (isMarketClosed && isWeekend) {
+                // Weekend: show only crypto
                 prompt += ' Stock markets are closed for the weekend. Here is the latest crypto data:';
-            }
-
-            if (sectionData.finance.nasdaq) {
-                prompt += ` NASDAQ (^IXIC): $${sectionData.finance.nasdaq.price} (${sectionData.finance.nasdaq.changePercent}%)`;
-            }
-            if (sectionData.finance.techStocks) {
-                Object.entries(sectionData.finance.techStocks).forEach(([symbol, data]) => {
-                    prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
-                });
-            }
-            if (sectionData.finance.crypto) {
-                Object.entries(sectionData.finance.crypto).forEach(([symbol, data]) => {
-                    prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
-                });
+                if (sectionData.finance.crypto) {
+                    Object.entries(sectionData.finance.crypto).forEach(([symbol, data]) => {
+                        prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
+                    });
+                }
+            } else if (isMarketClosed && !isWeekend) {
+                // Market closed for holiday or after-hours
+                // We'll assume isMarketClosed means either after-hours or holiday, so we need to distinguish
+                // If it's a holiday, only show crypto; if after-hours, show full market data for the day
+                // We'll try to infer holiday by absence of trading data (nasdaq/techStocks) and presence of crypto
+                // But since we don't have explicit holiday info, let's assume: if finance.nasdaq and finance.techStocks exist, it's after-hours, else it's a holiday
+                if (sectionData.finance.nasdaq || sectionData.finance.techStocks) {
+                    // After-hours: show full market data for the day, plus crypto
+                    prompt += ' Stock markets are closed for the day (after-hours). Here is the latest market data:';
+                    if (sectionData.finance.nasdaq) {
+                        prompt += ` NASDAQ (^IXIC): $${sectionData.finance.nasdaq.price} (${sectionData.finance.nasdaq.changePercent}%)`;
+                    }
+                    if (sectionData.finance.techStocks) {
+                        Object.entries(sectionData.finance.techStocks).forEach(([symbol, data]) => {
+                            prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
+                        });
+                    }
+                    if (sectionData.finance.crypto) {
+                        Object.entries(sectionData.finance.crypto).forEach(([symbol, data]) => {
+                            prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
+                        });
+                    }
+                } else {
+                    // Holiday: only show crypto
+                    prompt += ' Stock markets are closed for a holiday. Here is the latest crypto data:';
+                    if (sectionData.finance.crypto) {
+                        Object.entries(sectionData.finance.crypto).forEach(([symbol, data]) => {
+                            prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
+                        });
+                    }
+                }
+            } else {
+                // Markets are open - include all data
+                if (sectionData.finance.nasdaq) {
+                    prompt += ` NASDAQ (^IXIC): $${sectionData.finance.nasdaq.price} (${sectionData.finance.nasdaq.changePercent}%)`;
+                }
+                if (sectionData.finance.techStocks) {
+                    Object.entries(sectionData.finance.techStocks).forEach(([symbol, data]) => {
+                        prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
+                    });
+                }
+                if (sectionData.finance.crypto) {
+                    Object.entries(sectionData.finance.crypto).forEach(([symbol, data]) => {
+                        prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
+                    });
+                }
             }
         } else {
             prompt += ' MARKET DATA: Financial data is currently unavailable.';
