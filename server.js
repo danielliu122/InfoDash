@@ -120,16 +120,7 @@ const chatLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-const summaryGenerationLimiter = rateLimit({
-    windowMs: 24 * 60 * 60 * 1000, // 24 hours
-    max: 1, // limit each IP to 1 request per day
-    message: {
-        error: 'Daily summary generation limit exceeded',
-        message: 'Summary generation is limited to once per day per IP address.'
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+
 
 // Admin IP whitelist for summary generation
 const ADMIN_IPS = process.env.ADMIN_IPS ? process.env.ADMIN_IPS.split(',') : ['127.0.0.1', '::1'];
@@ -434,7 +425,7 @@ class AutomatedSummaryGenerator {
             timezone: 'America/New_York'
         });
 
-        // At 11:05 PM, 11:30 PM, and 11:59 PM, only generate if a summary has NOT been generated after 11:00 PM
+        // At 11:05 PM, 11:30 PM, and 11:55 PM, only generate if a summary has NOT been generated after 11:00 PM
         const tryGenerateIfNoPost11pmSummary = async (label) => {
             // Always use current date in America/New_York (EDT/EST) for summary date
             const now = new Date();
@@ -478,9 +469,9 @@ class AutomatedSummaryGenerator {
             timezone: 'America/New_York'
         });
 
-        // 11:59 PM
-        cron.schedule('59 23 * * *', () => {
-            tryGenerateIfNoPost11pmSummary('11:59 PM check');
+        // 11:55 PM
+        cron.schedule('55 23 * * *', () => {
+            tryGenerateIfNoPost11pmSummary('11:50 PM check');
         }, {
             timezone: 'America/New_York'
         });
@@ -942,8 +933,8 @@ const summaryGenerator = new AutomatedSummaryGenerator();
 // Initialize when server starts
 summaryGenerator.init();
 
-// Add API endpoint to manually trigger generation (for testing) - ADMIN ONLY
-app.post('/api/summary/trigger-automated', adminOnly, summaryGenerationLimiter, async (req, res) => {
+// Add API endpoint to manually trigger generation (for testing)
+app.post('/api/summary/trigger-automated', adminOnly, async (req, res) => {
     try {
         if (summaryGenerator.isGenerating) {
             return res.json({
@@ -1185,6 +1176,24 @@ app.get('/api/finance/:symbol', async (req, res) => {
         //     resultLength: response.data?.chart?.result?.length || 0,
         //     metaKeys: response.data?.chart?.result?.[0]?.meta ? Object.keys(response.data.chart.result[0].meta) : []
         // });
+        
+        // If we have chart data, also calculate the change from open
+        if (response.data?.chart?.result?.[0]?.meta) {
+            const meta = response.data.chart.result[0].meta;
+            const currentPrice = meta.regularMarketPrice;
+            const openPrice = meta.regularMarketOpen || meta.chartPreviousClose;
+            
+            // Add calculated change from open
+            if (currentPrice !== null && openPrice !== null && openPrice !== 0) {
+                const changeFromOpen = currentPrice - openPrice;
+                const changePercentFromOpen = ((currentPrice - openPrice) / openPrice) * 100;
+                
+                // Add these to the meta object
+                meta.changeFromOpen = parseFloat(changeFromOpen.toFixed(2));
+                meta.changePercentFromOpen = parseFloat(changePercentFromOpen.toFixed(2));
+            }
+        }
+        
         res.json(response.data);
     } catch (error) {
         console.error('Error fetching financial data:', error);

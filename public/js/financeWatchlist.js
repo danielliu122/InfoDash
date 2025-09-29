@@ -272,12 +272,38 @@ async function fetchRealTimeYahooFinanceData(symbol) {
             return { error: `No data available for ${symbol}` };
         }
         
-        const price = meta.regularMarketPrice;
-        const change = meta.regularMarketChange;
-        const changePercent = meta.regularMarketChangePercent;
+        const currentPrice = meta.regularMarketPrice;
+        const openPrice = meta.regularMarketOpen;
+        const previousClose = meta.regularMarketPreviousClose || meta.chartPreviousClose;
         const timestamp = new Date(meta.regularMarketTime * 1000);
+        
+        // Calculate change and change percentage from open price (intraday change)
+        let change = null;
+        let changePercent = null;
+        
+        if (currentPrice !== null && openPrice !== null && openPrice !== 0) {
+            // Use open price for intraday change calculation
+            change = currentPrice - openPrice;
+            changePercent = ((currentPrice - openPrice) / openPrice) * 100;
+        } else if (currentPrice !== null && previousClose !== null && previousClose !== 0) {
+            // Fallback to previous close if open price is not available
+            change = currentPrice - previousClose;
+            changePercent = ((currentPrice - previousClose) / previousClose) * 100;
+        } else {
+            // Use the API's values as last resort
+            change = meta.regularMarketChange || 0;
+            changePercent = meta.regularMarketChangePercent || 0;
+        }
 
-        return { symbol, price, change, changePercent, timestamp };
+        return { 
+            symbol, 
+            price: currentPrice, 
+            change: change !== null ? parseFloat(change.toFixed(2)) : 0, 
+            changePercent: changePercent !== null ? parseFloat(changePercent.toFixed(2)) : 0, 
+            timestamp,
+            openPrice: openPrice,
+            previousClose: previousClose
+        };
     } catch (error) {
         console.error(`Error fetching real-time Yahoo Finance data for ${symbol}:`, error);
         return { error: `Unable to fetch data for ${symbol}` };
