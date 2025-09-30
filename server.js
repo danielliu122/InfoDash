@@ -483,11 +483,11 @@ class AutomatedSummaryGenerator {
         // }, 60 * 500);
 
         // 10:30 AM
-        cron.schedule('30 10 * * *', () => {
-            tryGenerateIfNoPost11pmSummary('test');
-        }, {
-            timezone: 'America/New_York'
-        });
+        // cron.schedule('30 10 * * *', () => {
+        //     tryGenerateIfNoPost11pmSummary('test');
+        // }, {
+        //     timezone: 'America/New_York'
+        // });
     }
 
     // Generate summary for en-US at 11:00PM EDT (America/New_York)
