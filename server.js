@@ -476,7 +476,7 @@ class AutomatedSummaryGenerator {
             timezone: 'America/New_York'
         });
 
-        // === TESTING ONLY: Run 30 sec after server starts ===
+        //// === TESTING ONLY: Run 30 sec after server starts ===
         // setTimeout(() => {
         //     console.log('TEST: Triggering automated summary generation 30 sec after startup');
         //     this.generateDailySummary();
@@ -751,7 +751,7 @@ class AutomatedSummaryGenerator {
         // Market closed if it's a weekend or a holiday/after-hours
         const isMarketClosed = !isMarketOpenFlag;
         const analysisPrompt = this.createAutomatedAnalysisPrompt(sectionData, isWeekend, isMarketClosed);
-        const selectedModel = 'deepseek/deepseek-chat-v3-0324:free';
+        const selectedModel = 'deepseek/deepseek-chat-v3.1:free';
         const maxRetries = 3;
         let lastError = null;
 
