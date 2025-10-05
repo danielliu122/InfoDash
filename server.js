@@ -702,7 +702,50 @@ class AutomatedSummaryGenerator {
     async collectAutomatedFinanceData() {
         try {
             // Use the bulk finance endpoint for better performance
-            const symbols = ['^IXIC', 'META', 'AAPL', 'GOOGL', 'AMZN', 'TSLA', 'BTC-USD', 'ETH-USD', 'SOL-USD', 'XRP-USD'];
+            // Top 20 US stocks, 5 crypto, 4 major USD forex pairs, 5 major indices
+            const symbols = [
+                // Indices (5)
+                '^IXIC', // Nasdaq Composite
+                '^GSPC', // S&P 500
+                '^DJI',  // Dow Jones Industrial Average
+                '^N225', // Nikkei 225
+                '^HSI',  // Hang Seng Index
+
+                // Top 20 US stocks by market cap (as of 2024)
+                'AAPL',   // Apple
+                'MSFT',   // Microsoft
+                'GOOGL',  // Alphabet (Google)
+                'AMZN',   // Amazon
+                'NVDA',   // NVIDIA
+                'META',   // Meta (Facebook)
+                'TSLA',   // Tesla
+                'BRK.A',  // Berkshire Hathaway
+                'V',      // Visa
+                'UNH',    // UnitedHealth Group
+                'JPM',    // JPMorgan Chase
+                'JNJ',    // Johnson & Johnson
+                'PG',     // Procter & Gamble
+                'HD',     // Home Depot
+                'DIS',    // Walt Disney
+                'MA',     // Mastercard
+                'XOM',    // Exxon Mobil
+                'LLY',    // Eli Lilly and Company
+                'AVGO',   // Broadcom
+                'PEP',    // PepsiCo
+
+                // Crypto (5)
+                'BTC-USD', // Bitcoin
+                'ETH-USD', // Ethereum
+                'SOL-USD', // Solana
+                'XRP-USD', // XRP
+                'BNB-USD', // Binance Coin
+
+                // Major USD forex pairs (4)
+                'EURUSD=X', // Euro to US Dollar
+                'USDJPY=X', // US Dollar to Japanese Yen
+                'GBPUSD=X', // British Pound to US Dollar
+                'USDCNY=X'  // US Dollar to Chinese Yuan
+            ];
             
             const baseUrl = this.getBaseUrl();
             const response = await fetch(`${baseUrl}/api/finance/bulk-real-time`, {
