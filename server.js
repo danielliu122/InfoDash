@@ -719,17 +719,15 @@ class AutomatedSummaryGenerator {
                 'NVDA',   // NVIDIA
                 'META',   // Meta (Facebook)
                 'TSLA',   // Tesla
-                'BRK.A',  // Berkshire Hathaway
+                'BRK-B',  // Berkshire Hathaway
                 'V',      // Visa
                 'UNH',    // UnitedHealth Group
                 'JPM',    // JPMorgan Chase
                 'JNJ',    // Johnson & Johnson
                 'PG',     // Procter & Gamble
                 'HD',     // Home Depot
-                'DIS',    // Walt Disney
                 'MA',     // Mastercard
                 'XOM',    // Exxon Mobil
-                'LLY',    // Eli Lilly and Company
                 'AVGO',   // Broadcom
                 'PEP',    // PepsiCo
 
