@@ -482,8 +482,8 @@ class AutomatedSummaryGenerator {
         //     this.generateDailySummary();
         // }, 60 * 500);
 
-        // 10:30 AM
-        // cron.schedule('30 10 * * *', () => {
+        // specific time cron test
+        // cron.schedule('45 16 * * *', () => {
         //     tryGenerateIfNoPost11pmSummary('test');
         // }, {
         //     timezone: 'America/New_York'
@@ -799,7 +799,7 @@ class AutomatedSummaryGenerator {
         // Market closed if it's a weekend or a holiday/after-hours
         const isMarketClosed = !isMarketOpenFlag;
         const analysisPrompt = this.createAutomatedAnalysisPrompt(sectionData, isWeekend, isMarketClosed);
-        const selectedModel = 'deepseek/deepseek-chat-v3.1:free';
+        const selectedModel = 'z-ai/glm-4.5-air:free';
         const maxRetries = 3;
         let lastError = null;
 
@@ -850,8 +850,7 @@ class AutomatedSummaryGenerator {
     }
 
     // Create analysis prompt for automated generation
-    // Now accepts isWeekend and isMarketClosed as arguments
-    createAutomatedAnalysisPrompt(sectionData, isWeekend = null, isMarketClosed = null) {
+    createAutomatedAnalysisPrompt(sectionData, isWeekend = null, isMarketClosed = null, isMarketOpenFlag = null) {
         let prompt = 'Please analyze the following current data and provide a comprehensive summary:';
         
         const selectedDate = new Date();
@@ -860,6 +859,9 @@ class AutomatedSummaryGenerator {
         }
         if (isMarketClosed === null && typeof isMarketOpen === 'function') {
             isMarketClosed = !isMarketOpen();
+        }
+        if (isMarketOpenFlag === null && typeof isMarketOpen === 'function') {
+            isMarketOpenFlag = isMarketOpen();
         }
 
         // Handle news data
@@ -889,8 +891,11 @@ class AutomatedSummaryGenerator {
         // Handle finance data
         if (sectionData.finance) {
             prompt += ' MARKET DATA:';
-            // Determine if it's a holiday (market closed for holiday), weekend, or just after-hours
-            // For after-hours (not weekend, not holiday), still show trading market data for the day
+            
+            // Count how many stocks we have
+            const stockCount = sectionData.finance.techStocks ? Object.keys(sectionData.finance.techStocks).length : 0;
+            const cryptoCount = sectionData.finance.crypto ? Object.keys(sectionData.finance.crypto).length : 0;
+            
             if (isMarketClosed && isWeekend) {
                 // Weekend: show only crypto
                 prompt += ' Stock markets are closed for the weekend. Here is the latest crypto data:';
@@ -900,23 +905,27 @@ class AutomatedSummaryGenerator {
                     });
                 }
             } else if (isMarketClosed && !isWeekend) {
-                // Market closed for holiday or after-hours
-                // We'll assume isMarketClosed means either after-hours or holiday, so we need to distinguish
-                // If it's a holiday, only show crypto; if after-hours, show full market data for the day
-                // We'll try to infer holiday by absence of trading data (nasdaq/techStocks) and presence of crypto
-                // But since we don't have explicit holiday info, let's assume: if finance.nasdaq and finance.techStocks exist, it's after-hours, else it's a holiday
+                // After-hours or holiday
                 if (sectionData.finance.nasdaq || sectionData.finance.techStocks) {
-                    // After-hours: show full market data for the day, plus crypto
-                    prompt += ' Stock markets are closed for the day (after-hours). Here is the latest market data:';
+                    // After-hours: show full market data for the day
+                    prompt += ` Stock markets are closed for the day (after-hours). Here is today's closing market data - IMPORTANT: Include ALL ${stockCount} individual stocks in your Market Overview section, not just indices:`;
+                    
+                    // Major indices first
                     if (sectionData.finance.nasdaq) {
                         prompt += ` NASDAQ (^IXIC): $${sectionData.finance.nasdaq.price} (${sectionData.finance.nasdaq.changePercent}%)`;
                     }
+                    
+                    // All individual tech stocks - emphasize these should be included
                     if (sectionData.finance.techStocks) {
+                        prompt += ` INDIVIDUAL STOCKS (must analyze ALL ${stockCount} stocks):`;
                         Object.entries(sectionData.finance.techStocks).forEach(([symbol, data]) => {
                             prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
                         });
                     }
+                    
+                    // Crypto
                     if (sectionData.finance.crypto) {
+                        prompt += ` CRYPTO:`;
                         Object.entries(sectionData.finance.crypto).forEach(([symbol, data]) => {
                             prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
                         });
@@ -932,15 +941,21 @@ class AutomatedSummaryGenerator {
                 }
             } else {
                 // Markets are open - include all data
+                prompt += ` Markets are currently open. Here is the live market data - IMPORTANT: Include ALL ${stockCount} individual stocks in your Market Overview section:`;
+                
                 if (sectionData.finance.nasdaq) {
                     prompt += ` NASDAQ (^IXIC): $${sectionData.finance.nasdaq.price} (${sectionData.finance.nasdaq.changePercent}%)`;
                 }
+                
                 if (sectionData.finance.techStocks) {
+                    prompt += ` INDIVIDUAL STOCKS (must analyze ALL ${stockCount} stocks):`;
                     Object.entries(sectionData.finance.techStocks).forEach(([symbol, data]) => {
                         prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
                     });
                 }
+                
                 if (sectionData.finance.crypto) {
+                    prompt += ` CRYPTO:`;
                     Object.entries(sectionData.finance.crypto).forEach(([symbol, data]) => {
                         prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
                     });
@@ -964,10 +979,14 @@ class AutomatedSummaryGenerator {
         }
         
         if (sectionData.finance) {
-            if (isMarketClosed || isWeekend) {
+            const stockCount = sectionData.finance.techStocks ? Object.keys(sectionData.finance.techStocks).length : 0;
+            if (isMarketClosed && !isWeekend && (sectionData.finance.nasdaq || sectionData.finance.techStocks)) {
+                // After-hours with stock data
+                prompt += `MARKET OVERVIEW (max 400 words) - CRITICAL: You MUST include analysis of ALL ${stockCount} individual stocks provided above (AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, etc.), not just the indices. Group stocks by performance (gainers/losers) and mention notable movers. Then cover crypto markets., `;
+            } else if (isMarketClosed || isWeekend) {
                 prompt += 'MARKET OVERVIEW focusing on crypto (max 300 words), ';
             } else {
-                prompt += 'MARKET OVERVIEW including tech stocks and crypto (max 300 words), ';
+                prompt += `MARKET OVERVIEW (max 400 words) - CRITICAL: You MUST include analysis of ALL ${stockCount} individual stocks provided above, not just the indices. Group stocks by performance and mention notable movers. Then cover crypto markets., `;
             }
         } else {
             prompt += 'MARKET OVERVIEW (indicate data unavailable, max 100 words), ';
@@ -1300,17 +1319,41 @@ app.get('/api/googlemaps/script', (req, res) => {
     res.redirect(scriptUrl);
 });
 
-// Helper function for retrying OpenRouter API calls with delay
+// Helper function for retrying OpenRouter API calls with delay and model fallback
 async function callOpenRouterWithRetry(options, retries = 2) {
+    // Fallback models to try if primary model fails
+    const fallbackModels = [
+        options.model, // Try the requested model first
+        'openai/gpt-oss-20b:free',
+        'meta-llama/llama-3.3-70b-instruct:free',
+        'qwen/qwen3-235b-a22b:free'
+    ];
+    
+    // Remove duplicates in case the requested model is already in fallback list
+    const uniqueModels = [...new Set(fallbackModels)];
+    
     for (let attempt = 0; attempt <= retries; attempt++) {
+        const currentModel = uniqueModels[Math.min(attempt, uniqueModels.length - 1)];
+        
         try {
-            return await openai.chat.completions.create(options);
+            console.log(`Attempting API call with model: ${currentModel} (attempt ${attempt + 1}/${retries + 1})`);
+            
+            return await openai.chat.completions.create({
+                ...options,
+                model: currentModel
+            });
         } catch (error) {
-            if (attempt === retries) throw error;
-            // Only retry on network errors
-            if (error.code !== 'ERR_STREAM_PREMATURE_CLOSE') throw error;
+            console.error(`API call failed with model ${currentModel}:`, error.message);
+            
+            if (attempt === retries) {
+                console.error('All retry attempts exhausted');
+                throw error;
+            }
+            
             // Wait with exponential backoff
-            await new Promise(res => setTimeout(res, 1000 * (attempt + 1)));
+            const waitTime = 1000 * (attempt + 1);
+            console.log(`Waiting ${waitTime}ms before retry with next model...`);
+            await new Promise(res => setTimeout(res, waitTime));
         }
     }
 }
