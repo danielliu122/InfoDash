@@ -11,7 +11,7 @@ const newsCache = new NodeCache({ stdTTL: 43200, checkperiod: 14400 });
 const rateLimit = require('express-rate-limit');
 const geoip = require('geoip-lite');
 const OpenAI = require('openai'); // Import OpenAI directly
-// Initialize OpenAI API directly with the API key
+// Initialize Openrouter API directly with the API key
 const openai = new OpenAI({
     baseURL: 'https://openrouter.ai/api/v1',
     apiKey: process.env.DEEPSEEK_API_KEY,
@@ -111,10 +111,10 @@ app.options('*', (req, res) => {
 // Create rate limiters
 const chatLimiter = rateLimit({
     windowMs: 24 * 60 * 60 * 1000, // 24 hours
-    max: 3, // limit each IP to 3 requests per day
+    max: 5, // limit each IP to 5 requests per day
     message: {
         error: 'Daily chat limit exceeded',
-        message: 'You have reached the daily limit of 3 chat requests. Please try again tomorrow.'
+        message: 'You have reached the daily limit of 5 chat requests. Please try again tomorrow.'
     },
     standardHeaders: true,
     legacyHeaders: false,
