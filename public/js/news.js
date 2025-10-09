@@ -180,7 +180,7 @@ export function updateNews(data) {
 
     // Pagination
     let currentPage = 1;
-    const itemsPerPage = 5;
+    const itemsPerPage = 6;
     const totalPages = Math.ceil(articlesToDisplay.length / itemsPerPage);
 
     const renderPage = (page) => {
