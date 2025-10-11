@@ -969,11 +969,11 @@ class AutomatedSummaryGenerator {
         prompt += ' Please provide a structured summary with the following sections: ';
         
         if (sectionData.news && sectionData.news.length > 0) {
-            prompt += 'NEWS HIGHLIGHTS (max 300 words), ';
+            prompt += 'NEWS HIGHLIGHTS (max 500 words), ';
         }
         
         if (sectionData.trends && sectionData.trends.length > 0) {
-            prompt += 'TRENDING TOPICS (max 300 words), ';
+            prompt += 'TRENDING TOPICS (max 500 words), ';
         } else {
             prompt += 'TRENDING TOPICS (indicate data unavailable, max 100 words), ';
         }
@@ -982,11 +982,11 @@ class AutomatedSummaryGenerator {
             const stockCount = sectionData.finance.techStocks ? Object.keys(sectionData.finance.techStocks).length : 0;
             if (isMarketClosed && !isWeekend && (sectionData.finance.nasdaq || sectionData.finance.techStocks)) {
                 // After-hours with stock data
-                prompt += `MARKET OVERVIEW (max 400 words) - CRITICAL: You MUST include analysis of ALL ${stockCount} individual stocks provided above (AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, etc.), not just the indices. Group stocks by performance (gainers/losers) and mention notable movers. Then cover crypto markets., `;
+                prompt += `MARKET OVERVIEW (max 500 words) - CRITICAL: You MUST include analysis of ALL ${stockCount} individual stocks provided above (AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, etc.), not just the indices. Group stocks by performance (gainers/losers) and mention notable movers. Then cover crypto markets., `;
             } else if (isMarketClosed || isWeekend) {
-                prompt += 'MARKET OVERVIEW focusing on crypto (max 300 words), ';
+                prompt += 'MARKET OVERVIEW focusing on crypto (max 500 words), ';
             } else {
-                prompt += `MARKET OVERVIEW (max 400 words) - CRITICAL: You MUST include analysis of ALL ${stockCount} individual stocks provided above, not just the indices. Group stocks by performance and mention notable movers. Then cover crypto markets., `;
+                prompt += `MARKET OVERVIEW (max 500 words) - CRITICAL: You MUST include analysis of ALL ${stockCount} individual stocks provided above, not just the indices. Group stocks by performance and mention notable movers. Then cover crypto markets., `;
             }
         } else {
             prompt += 'MARKET OVERVIEW (indicate data unavailable, max 100 words), ';
