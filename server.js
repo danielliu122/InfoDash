@@ -896,7 +896,12 @@ class AutomatedSummaryGenerator {
             const stockCount = sectionData.finance.techStocks ? Object.keys(sectionData.finance.techStocks).length : 0;
             const cryptoCount = sectionData.finance.crypto ? Object.keys(sectionData.finance.crypto).length : 0;
             
-            if (isMarketClosed && isWeekend) {
+            // Determine if it's actually a weekend (Saturday or Sunday)
+            const etNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+            const dayOfWeek = etNow.getDay();
+            const isActualWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+            
+            if (isMarketClosed && isActualWeekend) {
                 // Weekend: show only crypto
                 prompt += ' Stock markets are closed for the weekend. Here is the latest crypto data:';
                 if (sectionData.finance.crypto) {
@@ -904,8 +909,8 @@ class AutomatedSummaryGenerator {
                         prompt += ` ${symbol}: $${data.price} (${data.changePercent}%)`;
                     });
                 }
-            } else if (isMarketClosed && !isWeekend) {
-                // After-hours or holiday
+            } else if (isMarketClosed && !isActualWeekend) {
+                // After-hours on a weekday (including Friday) or holiday
                 if (sectionData.finance.nasdaq || sectionData.finance.techStocks) {
                     // After-hours: show full market data for the day
                     prompt += ` Stock markets are closed for the day (after-hours). Here is today's closing market data - IMPORTANT: Include ALL ${stockCount} individual stocks in your Market Overview section, not just indices:`;
@@ -978,12 +983,17 @@ class AutomatedSummaryGenerator {
             prompt += 'TRENDING TOPICS (indicate data unavailable, max 100 words), ';
         }
         
+        // Determine if it's actually a weekend for the final prompt instructions
+        const etNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+        const dayOfWeek = etNow.getDay();
+        const isActualWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+        
         if (sectionData.finance) {
             const stockCount = sectionData.finance.techStocks ? Object.keys(sectionData.finance.techStocks).length : 0;
-            if (isMarketClosed && !isWeekend && (sectionData.finance.nasdaq || sectionData.finance.techStocks)) {
+            if (isMarketClosed && !isActualWeekend && (sectionData.finance.nasdaq || sectionData.finance.techStocks)) {
                 // After-hours with stock data
                 prompt += `MARKET OVERVIEW (max 500 words) - CRITICAL: You MUST include analysis of ALL ${stockCount} individual stocks provided above (AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, etc.), not just the indices. Group stocks by performance (gainers/losers) and mention notable movers. Then cover crypto markets., `;
-            } else if (isMarketClosed || isWeekend) {
+            } else if (isMarketClosed || isActualWeekend) {
                 prompt += 'MARKET OVERVIEW focusing on crypto (max 500 words), ';
             } else {
                 prompt += `MARKET OVERVIEW (max 500 words) - CRITICAL: You MUST include analysis of ALL ${stockCount} individual stocks provided above, not just the indices. Group stocks by performance and mention notable movers. Then cover crypto markets., `;
