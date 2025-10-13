@@ -357,7 +357,7 @@ section, .section, .summary-card, .trend-card, .news-item {
   padding: 20px;
 }
 
-section:hover, .section:hover, .summary-card:hover, #finance:hover, #finance .card:hover, .news-item:hover, .trend-card:hover, .chart-container:hover {
+.summary-card:hover, #finance .card:hover, .news-item:hover, .trend-card:hover {
   border: 1px solid var(--accent-color);
 }
 
@@ -594,7 +594,6 @@ section:hover, .section:hover, .summary-card:hover, #finance:hover, #finance .ca
 
 .card:hover {
   transform: translateY(-2px);
-  border: 1px solid var(--accent-color);
   box-shadow: 0 6px 24px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.12);
   transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s ease;
 }
