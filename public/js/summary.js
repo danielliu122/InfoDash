@@ -1321,7 +1321,7 @@ async function loadOrGenerateTodaySummary() {
         const financeSummary = document.querySelector('.finance-summary .summary-text');
         const overallSummary = document.querySelector('.overall-summary .summary-text');
         
-        const placeholderSummary= '<p>No summary date is currently selected. Press the refresh button to generate a summary for the current date or view the summary archive to select historical summaries.</p>';
+        const placeholderSummary= '<p>No summary date is currently selected. Click a date on the calendar widget or select a date on the summary archive to show a summary for that date. </p>';
 
         newsSummary.innerHTML = placeholderSummary;
         trendsSummary.innerHTML =  placeholderSummary;
