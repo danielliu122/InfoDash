@@ -550,38 +550,41 @@ function startAutoRefresh() {
     const isCrypto = currentSymbol.endsWith('-USD');
     const pauseButton = document.getElementById('pause-finance-button');
     if (pauseButton && pauseButton.classList.contains('paused')) {
-        return; // Do not start if pauseopend
+        return; // Do not start if paused
     }
     
-    // Determine if we should start auto-refresh
-    // userSelectedSymbol tracks whether the user has manually changed the stock symbol
-    // vs. the app automatically switching between NASDAQ (market hours) and Bitcoin (off-hours)
-    const shouldStartRefresh = isMarketOpen() || isCrypto || userSelectedSymbol;
+    // Start auto-refresh only if:
+    // 1. It's crypto (24/7 trading), OR
+    // 2. Market is currently open for regular stocks
+    // userSelectedSymbol only prevents auto-switching, not auto-refresh eligibility
+    const shouldStartRefresh = isCrypto || isMarketOpen();
     
     if (shouldStartRefresh) {
         updateInterval = setInterval(() => {
-            // Only check for market close transition if user hasn't manually selected a symbol
-            // This means the app is in "auto mode" and can switch between NASDAQ/Bitcoin based on market hours
-            if (!userSelectedSymbol) {
-                const shouldSwitchToCrypto = !isMarketOpen() && !currentSymbol.endsWith('-USD');
-                if (shouldSwitchToCrypto) {
-                    // Market just closed, switch to BTC-USD only if user hasn't selected a symbol
-                    currentSymbol = 'BTC-USD';
-                    const stockSymbolInput = document.getElementById('stockSymbolInput');
-                    if (stockSymbolInput) {
-                        stockSymbolInput.value = currentSymbol;
-                    }
-                    // Keep userSelectedSymbol as false since this is automatic switching
-                    updateFinanceData(currentSymbol, undefined, undefined, false);
-                    return;
-                }
+            // For non-crypto, stop if market closes during the session
+            if (!currentSymbol.endsWith('-USD') && !isMarketOpen()) {
+                stopAutoRefresh();
+                logger.info(`Market closed for ${currentSymbol}, stopping auto-refresh`);
+                return;
             }
             
-            // Normal refresh - Pass `true` for the `isRefresh` flag to prevent full chart recreation
+            // Only attempt auto-switching if user hasn't manually selected a symbol
+            if (!userSelectedSymbol && !isMarketOpen() && !currentSymbol.endsWith('-USD')) {
+                // Market just closed, switch to BTC-USD (auto mode only)
+                currentSymbol = 'BTC-USD';
+                const stockSymbolInput = document.getElementById('stockSymbolInput');
+                if (stockSymbolInput) {
+                    stockSymbolInput.value = currentSymbol;
+                }
+                updateFinanceData(currentSymbol, undefined, undefined, false);
+                return;
+            }
+            
+            // Normal refresh - only runs if market is open or it's crypto
             updateFinanceData(currentSymbol, undefined, undefined, true);
-        }, 5000); // Refresh every 5 seconds
+        }, 5000);
     } else {
-        logger.warn(`Market is closed for ${currentSymbol} and user hasn't selected a symbol. Auto-refresh will not start.`);
+        logger.info(`Auto-refresh not started: Market is closed for ${currentSymbol}`);
     }
 }
 
