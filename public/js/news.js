@@ -296,6 +296,14 @@ export function updateNews(data) {
                 event.preventDefault();
                 currentPage++;
                 renderPage(currentPage);
+                
+                // Check if the current page has less than 5 items and scroll to top
+                const start = (currentPage - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                const pageData = articlesToDisplay.slice(start, end);
+                if (pageData.length < 5) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
             };
             paginationControls.appendChild(nextButton);
         }

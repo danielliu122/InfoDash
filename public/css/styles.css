@@ -357,21 +357,19 @@ section, .section, .summary-card, .trend-card, .news-item {
   padding: 20px;
 }
 
-.summary-card:hover, #finance .card:hover, .news-item:hover, .trend-card:hover {
+.summary-card:hover, .news-item:hover, .trend-card:hover {
   border: 1px solid var(--accent-color);
 }
 
 /* === Summary Cards === */
 .summary-card {
   box-shadow: 0 6px 24px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.12);
-  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s ease;
   display: block !important;
   visibility: visible !important;
   border: 1px solid transparent;
 }
 
 .summary-card:hover {
-  transform: translateY(-5px);
   box-shadow: 0 12px 36px rgba(0,0,0,0.22), 0 3px 12px rgba(0,0,0,0.16);
   border: 1px solid var(--accent-color);
 }
