@@ -97,13 +97,6 @@
     .news-item {
       max-height: none !important;
     }
-    /* Fix Mobile Top Header Overwidth issue*/
-    #regionSelect{
-        max-width: 130px;
-    }
-    .page-title{
-        display:none;
-    }
 }
   
 body.dark-theme #news-controls input.select-dropdown {
@@ -247,15 +240,25 @@ width: 100%;
         gap: 16px;
         padding: 16px;
     }
-    
     .news-card {
         flex-direction: column;
         gap: 12px;
     }
-    
     .news-image {
         width: 100%;
         height: 200px;
+    }
+    /* Fix Mobile Top Header Flex Row Overwidth issue*/
+    #regionSelect{
+        max-width: 90px;
+    }
+    .page-title{
+        display: none;
+    }
+    /* Fix Mobile News Filters Flex Row  Overwidth issue*/
+    .news-filters{
+        display:block;
+        font-size: 32px;
     }
 }
 
