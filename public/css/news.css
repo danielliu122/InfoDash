@@ -97,6 +97,13 @@
     .news-item {
       max-height: none !important;
     }
+    /* Fix Mobile Top Header Overwidth issue*/
+    #regionSelect{
+        max-width: 130px;
+    }
+    .page-title{
+        display:none;
+    }
 }
   
 body.dark-theme #news-controls input.select-dropdown {
